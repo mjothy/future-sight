@@ -1,0 +1,20 @@
+{
+  "name": "future-sight",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+     "packages/*"
+  ],
+  "devDependencies": {
+    "lerna": "^4.0.0"
+  },
+  "scripts": {
+    "client": "yarn workspace @future-sight/client dev",
+    "common": "yarn workspace @future-sight/common",
+    "server": "yarn workspace @future-sight/server dev",
+    "dev": "yarn client dev & yarn server dev --verbose",
+    "start": "yarn server start"
+  }
+}
