@@ -14,7 +14,7 @@
     "client": "yarn workspace @future-sight/client dev",
     "common": "yarn workspace @future-sight/common",
     "server": "yarn workspace @future-sight/server dev",
-    "dev": "yarn client dev & yarn server dev --verbose",
+    "dev": "yarn client & yarn server --verbose",
     "start": "yarn server start"
   }
 }
