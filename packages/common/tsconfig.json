@@ -3,10 +3,11 @@
   "compilerOptions": {
     "composite": true,
     "module": "commonjs",
+    "jsx": "react-jsx",
     "rootDir": "src",
     "outDir": "build"
   },
   "include": [
-    "src"
+    "src","assets"
   ]
 }

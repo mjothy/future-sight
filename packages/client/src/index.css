@@ -1,13 +1,128 @@
+@import '~antd/dist/antd.css';
+@import '~react-grid-layout/css/styles.css';
+@import '~react-resizable/css/styles.css';
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  -moz-osx-font-smoothing: grayscale; */
+  min-height: 100vh;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+.center{
+  text-align: center;
+}
+.width-100{
+  width: 100%;
+}
+.width-90{
+  width: 90%;
+}
+.width-80{
+  width: 80%;
+}
+
+.translate-0{
+  transform: translate(0, 0) !important;
+}
+.translate-1{
+  transform: translate(1,1) !important;
+}
+
+.react-grid-layout{
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.bg-secondry{
+  background-color: #F6F8FA;
+}
+
+.bg-primary{
+  background-color: #001529;
+}
+
+.content{
+  margin: 5%;
+}
+
+/* dashboard */
+.dashboard-content{
+  margin-top: 10px;
+  padding: 10px;
+  background-color: aliceblue;
+  width: 100%;
+  height: 100%;
+}
+.sidebar-right{
+  position: absolute;
+  height: 100vh;
+  width: 250px;
+  left: 0; 
+}
+
+.adjust-margin{
+  margin-top: -10px;
+  margin-left: -10px;
+  
+}
+
+/* .z-index-1{
+  z-index:1;}
+  .z-index--1{
+    z-index:0;} */
+.fixed-sidebar{
+  height: 100%;
+  /* margin-top: -60px !important; */
+  padding-top: 60px !important;
+  padding: 30px;
+  background: #334454;
+  position: fixed;
+  max-height: 100%;
+  margin-right: 200px;
+}
+
+.sidebar-context{
+  display: flex; 
+  min-height:100vh;
+}
+.sidebar{
+  width: 50%;
+  background-color: #001529;
+  padding: 20px;
+  min-height: 100%;
+  /* position: fixed;
+  max-height: 100%;
+  margin-right: 200px;
+  top:0 !important;  
+  overflow-y: scroll; 
+  scrollbar-width: 2px;
+  scrollbar-color: black; */
+}
+/* .sidebar::-webkit-scrollbar {
+  width: 100px;
+  color: white;
+} */
+
+.content-sidebar{
+  width: 100%;
+  height: 100%;
+  margin: 10px;
+  /* margin-left: 600px; */
+}
+.hide-sidebar{
+  display: none;
+  transform: translate(10,10) !important;
+
+}
+
+.layouts-view{
+  position: fixed;
 }

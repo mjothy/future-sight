@@ -1,18 +1,17 @@
-import React , { useState } from 'react';
-import { Grid, TextField, Fab } from '@material-ui/core';
+import { useState } from "react";
+import ViewSetup from "../dashboard/form/SetupView";
+import { Dashboard } from "@future-sight/common";
 
-import { CloudDownloadRounded } from '@material-ui/icons';
+import "./App.css";
+import DashboardView from "../dashboard/DashboardView";
 
-import { App_Name } from '@future-sight/common';
-
-import './App.css';
 
 export default function App() {
   const [apiResponse, setApiResponse] = useState("");
 
   const onCallApi = async () => {
     try {
-      const response = await fetch('/api', {
+      const response = await fetch("/api", {
         method: "GET",
       });
       const text = await response.text();
@@ -23,24 +22,10 @@ export default function App() {
       throw error;
     }
   }
+
   return (
     <div className="App">
-      <Grid container spacing={6} justifyContent="center" direction="column">
-        <Grid item>
-          {`Client App Name - ${ App_Name } `}
-        </Grid>
-        <Grid item>
-          <Fab variant="extended" color="primary" onClick={onCallApi}>
-            <CloudDownloadRounded className="icon"/>
-            Call API
-          </Fab>
-        </Grid>
-        {apiResponse &&
-          <Grid item>
-            {`Server Response - ${ apiResponse } `}
-          </Grid>
-        }
-      </Grid>
+      <DashboardView />
     </div>
   );
 }
