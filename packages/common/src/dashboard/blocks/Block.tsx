@@ -5,8 +5,7 @@ import Plot from 'react-plotly.js';
 
 export default class Block extends Component<any,any> {
   render() {
-    console.log("Block props: ", this.props.item)
-    console.log("Block key: ", this.props.type)
+    console.log("Block data: ", this.props.data)
 
     return (        
       <Plot

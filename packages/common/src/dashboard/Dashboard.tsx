@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import DashboardConfigView from './DashboardConfigView';
-import SideBar from './sidebar/SideBar';
 import DashboardManager from './DashboardManager';
 import DashboardConfigControl from './DashboardConfigControl';
 import initialState from './initialState';
@@ -10,41 +9,79 @@ import {
 } from '@ant-design/icons';
 import layoutConfig from './layoutConfig';
 
-//To visualize all the dashboard (blocks layout, header navbar, and the sidebar that move)
-//make 4 choises of sidebar (up, down, left, right)
-//this is independent module so we can import it, make the architecture, and save the dashboard config on database
-
-// 2 types (published or uppublished dashboard )
-
-
-
 export default class Dashboard extends Component<any, any> {
+
+  sidebarRef;
 
   constructor(props) {
     super(props);
     this.state = {
-      collapsed: false
+      collapsed: false,
+      isResizing: false,
+      sidebarWidth: (window.innerWidth) * 0.3,
+      contentWidth: window.innerWidth - (window.innerWidth) * 0.3
+    }
+    this.sidebarRef = React.createRef();
+
+  }
+  startResizing = () => {
+    this.setState({ isResizing: true });
+  };
+  stopResizing = () => {
+    this.setState({ isResizing: false });
+  };
+
+  resize = (mouseMoveEvent) => {
+    if (this.state.isResizing) {
+      const sidebarWidth = mouseMoveEvent.clientX -
+        this.sidebarRef.current.getBoundingClientRect().left;
+      const contentWidth = window.innerWidth - sidebarWidth;
+      this.setState({
+        sidebarWidth, contentWidth
+      }, () => {
+        window.dispatchEvent(new Event('resize'));
+      })
     }
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot)
-{
-  if(prevState.collapsed !== this.state.collapsed)
-  this.render();
-}
+  componentDidMount() {
+    console.log("componentDidMount")
+    window.addEventListener("mousemove", this.resize);
+    window.addEventListener("mouseup", this.stopResizing);
+  }
+
+  componentWillUnmount(){
+   console.log("componentWillUnmount") 
+    window.removeEventListener("mousemove", this.resize);
+    window.removeEventListener("mouseup", this.stopResizing);
+  }
 
   render() {
     const setCollapsed = () => {
-      console.log("collapse")
-      this.setState({ collapsed: !this.state.collapsed })
+      const state = {
+        sidebarWidth: (window.innerWidth) * 0.3,
+        contentWidth: window.innerWidth - (window.innerWidth) * 0.3,
+        collapsed: !this.state.collapsed
+      }
+      if (state.collapsed) state.contentWidth = window.innerWidth
+      else state.contentWidth = window.innerWidth - state.sidebarWidth
+
+      this.setState(state, () => {
+        window.dispatchEvent(new Event('resize'));
+      })
     }
+
     return (
       <DashboardManager>
-        <div className='sidebar-context'>
-          <div className={!this.state.collapsed ? "sidebar" : "sidebar hide-sidebar"}>
+        <div className='dashboard'>
+
+          <div ref={this.sidebarRef} style={{ width: this.state.sidebarWidth }} className={!this.state.collapsed ? "sidebar" : "sidebar hide-sidebar"}>
             <DashboardConfigControl />
           </div>
-          <div className="content-sidebar">
+
+          <div className={!this.state.collapsed ? "sidebar-resizer" : "sidebar-resizer hide-sidebar"} onMouseDown={this.startResizing} />
+
+          <div className="dashboard-content" style={{ width: this.state.contentWidth }}>
             <div>
               {React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
                 className: 'trigger',
@@ -53,9 +90,9 @@ export default class Dashboard extends Component<any, any> {
             </div>
             <DashboardConfigView data={initialState.data} layouts={layoutConfig} />
           </div>
+
         </div>
       </DashboardManager>
-
     )
   }
 }
