@@ -2,6 +2,7 @@ import { Component } from 'react'
 import { Button, Col, Divider, Row, Select } from 'antd';
 import type { SelectProps } from 'antd';
 import AnalysisDataTable from './AnalysisDataTable';
+import DataManager from '../../../services/DataManager';
 
 // To send the data selected by user
 // INPUT: 
@@ -21,7 +22,33 @@ const handleChange = (value: string[]) => {
   console.log(`selected ${value}`);
 };
 
-export default class DataStructureForm extends Component {
+class DataStructureForm extends Component<any,any> {
+  data = {};
+
+  constructor(props){
+    super(props)
+    this.state = {
+      scenarios:{},
+      models:{},
+      options: []
+    }
+  }
+
+  componentDidMount(){
+    this.props.dataManager.fetchModels().then((data)=>{
+      const opt: SelectProps['options'] = [];
+      data.forEach(model => {
+        opt.push({
+          label: model,
+          value:model,
+        })
+      });
+      this.setState({models: data, options: opt})
+      console.log("DataStructureForm models: ", data);
+
+    });
+  }
+
 
   render() {
     return (
@@ -30,20 +57,20 @@ export default class DataStructureForm extends Component {
         <Col xs={20} sm={20} md={6} lg={7} >
           <Select
             mode="multiple"
-            style={{ width: '100%' }}
+            className="width-100"
             placeholder="Please select the model"
             onChange={handleChange}
-            options={options}
+            options={this.state.options}
           />
         </Col>
 
         <Col xs={20} sm={20} md={6} lg={7} >
           <Select
             mode="multiple"
-            style={{ width: '100%' }}
+            className='width-100'
             placeholder="Scenarios"
             onChange={handleChange}
-            options={options}
+            options={this.state.options}
           />
         </Col>
         <Divider />
@@ -62,3 +89,5 @@ export default class DataStructureForm extends Component {
 
   }
 }
+
+export default DataManager(DataStructureForm);

@@ -1,1 +1,92 @@
-[{"ID","Name"},{1,"test_model"},{21,"MEESA v1.1"},{41,"REMIND 2.1"},{42,"OSeMBE v0.1.2"},{61,"OSeMBE v1.0.0"},{81,"PROMETHEUS 1.2"},{101,"IMAGE 3.2"},{102,"WITCH 5.0"},{103,"Euro-Calliope 2.0"},{121,"TIAM-ECN 1.2"},{141,"test"},{161,"MESSAGEix-GLOBIOM_1.2"},{181,"MESSAGEix-GLOBIOM 1.2"},{201,"WITCH 5.1"},{221,"Reference"},{241,"PRIMES-TREMOVE 2021"}]
+[
+    {
+        "id": 121,
+        "name": "TIAM-ECN 1.2",
+        "scenarios": [
+            {
+                "id": 1,
+                "name": "DIAG_Nzero"
+            }
+        ],
+        "variables": [
+            {
+                "id": 11,
+                "Name": "Capacity|Electricity",
+                "unitId": 11,
+                "unit": "GW"
+            },
+            {
+                "id": 174,
+                "Name": "Capacity|Electricity|Biomass|w/ CCS",
+                "unitId": 11,
+                "unit": "GW"
+            },
+            {
+                "id": 761,
+                "Name": "Capacity|Electricity|Coal|w/o CCS",
+                "unitId": 174,
+                "unit": "GW"
+            },
+            {
+                "id": 267,
+                "Name": "Capacity|Electricity|Biomass|w/o CCS",
+                "unitId": 11,
+                "unit": "GW"
+            },
+            {
+                "id": 269,
+                "Name": "Capacity|Electricity|Coal|w/ CCS",
+                "unitId": 174,
+                "unit": "GW"
+            }
+        ]
+    },
+    {
+        "id": 61,
+        "name": "OSeMBE v1.0.0",
+        "scenarios": [
+            {
+                "id": 41,
+                "name": "DIAG-Base"
+            },
+            {
+                "id": 122,
+                "name": "DIAG-C0to80-gr5"
+            },
+            {
+                "id": 12,
+                "name": "DIAG-C80-gr5"
+            },
+            {
+                "id": 33,
+                "name": "DIAG-C400-lin"
+            }
+        ],
+        "variables": [
+            {
+                "id": 11,
+                "Name": "Capacity|Electricity",
+                "unitId": 11,
+                "unit": "GW"
+            },
+            {
+                "id": 174,
+                "Name": "Capacity|Electricity|Coal",
+                "unitId": 11,
+                "unit": "GW"
+            },
+            {
+                "id": 267,
+                "Name": "Capacity|Electricity|Biomass|w/o CCS",
+                "unitId": 11,
+                "unit": "GW"
+            },
+            {
+                "id": 269,
+                "Name": "Capacity|Electricity|Coal|w/ CCS",
+                "unitId": 174,
+                "unit": "GW"
+            }
+        ]
+    }
+]

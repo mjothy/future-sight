@@ -23,6 +23,8 @@ export default class Dashboard extends Component<any, any> {
     }
     this.sidebarRef = React.createRef();
 
+    console.log("Dashboard: ", this.props);
+
   }
   startResizing = () => {
     this.setState({ isResizing: true });

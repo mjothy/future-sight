@@ -24,13 +24,13 @@ export default class SideBar extends Component<any, any> {
         <div>
           <Row justify="start">
             <Col span={4}>
-              <Button type="primary" onClick={() => null} style={{ marginBottom: 16 }} className="bg-primary">
+              <Button type="primary" onClick={() => null} className="bg-primary">
                 <LeftCircleFilled />
               </Button>
             </Col>
             <Col span={4}>
 
-              <Button type="primary" onClick={() => null} style={{ marginBottom: 16 }} className="bg-primary">
+              <Button type="primary" onClick={() => null} className="bg-primary">
                 <RightCircleFilled />
               </Button>
             </Col>

@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import UserDataForm from './UserDataForm';
 import DataStructureForm from './DataStructureForm';
-import { Button, Divider, Row, Typography } from 'antd';
+import { Button, Col, Divider, Row, Typography } from 'antd';
 import AnalysisDataTable from './AnalysisDataTable';
 //To save the metadata of the dashboard
 // INPUT: User data (title, author, tags), models and scenarios
@@ -32,7 +32,6 @@ export default class ViewSetup extends Component<any,any> {
           <DataStructureForm />
          
           <Divider />
-
           <Row justify='end'>
             <Button type='primary' onClick={this.handleSubmit}>
               Submit</Button>

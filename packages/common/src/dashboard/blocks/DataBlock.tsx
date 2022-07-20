@@ -18,22 +18,22 @@ export default class DataBlock extends Component {
   render() {
     console.log("this.context: ", this.context);
     return (
-      <div style={{width:'100%'}}>
+      <div className='width-100'>
         <Divider />
           <Select
             mode="multiple"
-            style={{ width: '100%' }}
+            className='width-100'
             placeholder="Please select the model"
           />
 
           <Divider />
           <Select
             mode="multiple"
-            style={{ width: '100%' }}
+            className='width-100'
             placeholder="Scenarios"
           />
           <Divider />
-          <Button type='primary' style={{ width: '100%' }}
+          <Button type='primary' className='width-100'
  onClick={this.addDataBlock}>Add data block</Button>
       </div>
     )

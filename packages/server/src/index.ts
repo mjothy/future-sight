@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { join } from 'path';
-import scenarios from './data/scenarios.json';
+import testData from './data/test-data.json';
 
 const clientPath = '../../client/build';
 const app = express();
@@ -15,7 +15,28 @@ app.get('/api', (req, res) => {
     res.send(`Hello , From server`);
 });
 
-app.get('/api/scenarios', (req, res) => {
+app.get('/api/data', (req, res) => {
+    res.send(testData);
+});
+
+app.get('/api/models', (req, res) => {
+
+    const models = new Array<string>();
+
+    testData.forEach(data => {
+        if (models.indexOf(data['Model']) < 0)
+            models.push(data['Model']);
+    });
+    res.send(models);
+});
+
+app.get(`/api/scenarios`, (req, res) => {
+    const scenarios = new Array<string>();
+    console.log("params: ",req.query);
+    testData.forEach(data => {
+        if (scenarios.indexOf(data['Scenario']) < 0 && data['Model']===req.query.model)
+            scenarios.push(data['Scenario']);
+    });
     res.send(scenarios);
 });
 
@@ -26,5 +47,5 @@ app.get('*', (req: any, res: any) => {
 
 // start the Express server
 app.listen(port, () => {
-    console.log(`app started at http://localhost:${port}` );
+    console.log(`app started at http://localhost:${port}`);
 });

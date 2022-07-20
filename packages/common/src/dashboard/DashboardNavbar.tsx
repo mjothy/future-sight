@@ -34,9 +34,9 @@ export default class DashboardNavbar extends Component<any,any> {
     return <Menu
             theme="dark"
             mode="horizontal"
-            style={{ padding: '0 50px', justifyContent: 'flex-end' }}
+            className='menu-navbar'
             >
-              <Item style={{ float: 'right' }}>
+              <Item>
                 <Dropdown overlay={this.menu()}>
                   <Button>
                     <Space>

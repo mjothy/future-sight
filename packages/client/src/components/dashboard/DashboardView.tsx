@@ -9,8 +9,8 @@ import ViewSetup from './form/SetupView';
  */
 // If submited: the blocks page
 // if not: ViewSetup
-export default class DashboardView extends React.Component<any, any> {
-
+class DashboardView extends React.Component<any, any> {
+  data = {};
   constructor(props) {
     super(props);
     this.state = {
@@ -24,7 +24,6 @@ export default class DashboardView extends React.Component<any, any> {
   }
 
   handleSubmit = () => {
-    console.log("enter here !");
     this.setState({ isSubmited: true }, () => true);
     return true;
   }
@@ -38,18 +37,22 @@ export default class DashboardView extends React.Component<any, any> {
   }
 
   dashboardManager = () => {
-    // props: scenarios, models, userData ...
+    // props: scenarios, models, userData ... (gettong selected data from ViewSetup)
     return <Dashboard />
   }
   render() {
     return (
 
-      <>
-        <DashboardNavbar submited={this.state.isSubmited} />
+      <div className='height-100'>
+        <div className='height-10'>
+                  <DashboardNavbar submited={this.state.isSubmited} />
+        </div>
         {
           this.state.isSubmited ? this.dashboardManager() : this.dashboardAddForm()
         }
-      </>
+      </div>
     )
   }
 }
+
+export default DashboardView
