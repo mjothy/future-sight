@@ -5,7 +5,7 @@ import AnalysisDataTable from './AnalysisDataTable';
 import DataManager from '../../../services/DataManager';
 
 // To send the data selected by user
-// INPUT: 
+// INPUT:
 // Output: models and scenarios
 
 const options: SelectProps['options'] = [];
@@ -45,10 +45,8 @@ class DataStructureForm extends Component<any,any> {
       });
       this.setState({models: data, options: opt})
       console.log("DataStructureForm models: ", data);
-
     });
   }
-
 
   render() {
     return (
@@ -63,7 +61,6 @@ class DataStructureForm extends Component<any,any> {
             options={this.state.options}
           />
         </Col>
-
         <Col xs={20} sm={20} md={6} lg={7} >
           <Select
             mode="multiple"
@@ -73,14 +70,11 @@ class DataStructureForm extends Component<any,any> {
             options={this.state.options}
           />
         </Col>
-        <Divider />
-
+        <Col>
+          <Button type='primary'>Add as analysis data </Button>
+        </Col>
       </Row>
-      <Row justify='center'>
-        <Button type='primary'>Add as analysis data </Button>
-      </Row>
-      <Divider />
-
+      <Divider/>
       <Row justify='center'>
         <AnalysisDataTable />
       </Row>

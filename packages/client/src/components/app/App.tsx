@@ -1,9 +1,8 @@
 import { useState } from "react";
-import ViewSetup from "../dashboard/form/SetupView";
-import { Dashboard } from "@future-sight/common";
 
 import "./App.css";
 import DashboardView from "../dashboard/DashboardView";
+import Navbar from "./Navbar";
 
 
 export default function App() {
@@ -25,6 +24,7 @@ export default function App() {
 
   return (
     <div className="App">
+      <Navbar/>
       <DashboardView />
     </div>
   );
