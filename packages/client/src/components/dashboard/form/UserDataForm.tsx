@@ -24,6 +24,7 @@ export default class UserDataForm extends Component {
                 </Col>
 
                 <Col xs={20} sm={20} md={6} lg={7} >
+                    {/* Search for antd design tag */}
                     <Input
                         prefix={<TagOutlined className="site-form-item-icon" />}
                         placeholder="Tag1; Tag2; "

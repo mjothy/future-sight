@@ -1,0 +1,156 @@
+[
+    {
+        "Model": "TIAM-ECN 1.2",
+        "Scenario": "DIAG_Nzero",
+        "region": "Europe (excl. Turkey)",
+        "Variable": "Capacity|Electricity|Coal|w/o CCS",
+        "Unit": "GW",
+        "data": [
+            {
+                "year": 2005,
+                "value": 0
+            },
+            {
+                "year": 2010,
+                "value": 0
+            },
+            {
+                "year": 2015,
+                "value": 0.0025
+            },
+            {
+                "year": 2016,
+                "val": 12.3333
+            }
+        ]
+    },
+    {
+        "Model": "OSeMBE v1.0.0",
+        "Scenario": "DIAG-Base",
+        "Region": "Europe (excl. Turkey)",
+        "Variable": "Capacity|Electricity|Coal|w/o CCS",
+        "Unit": "GW",
+        "data": [
+            {
+                "year": 2005,
+                "value": 0
+            },
+            {
+                "year": 2010,
+                "value": 0
+            },
+            {
+                "year": 2015,
+                "value": 44.13521909999999
+            },
+            {
+                "year": 2016,
+                "value": 45.36999999626556
+            }
+        ]
+    },
+    {
+        "Model": "OSeMBE v1.0.0",
+        "Scenario": "DIAG-Base",
+        "Region": "EU27 & UK",
+        "Variable": "Capacity|Electricity|Coal",
+        "Unit": "GW",
+        "data": [
+            {
+                "year": 2005,
+                "value": 0
+            },
+            {
+                "year": 2010,
+                "value": 0
+            },
+            {
+                "year": 2015,
+                "value": 91.411138
+            },
+            {
+                "year": 2016,
+                "value": 91.411138
+            }
+        ]
+    },
+    {
+        "Model": "OSeMBE v1.0.0",
+        "Scenario": "DIAG-Base",
+        "Region": "EU27 & EFTA",
+        "Variable": "Capacity|Electricity|Coal",
+        "Unit": "GW",
+        "data": [
+            {
+                "year": 2005,
+                "value": 0
+            },
+            {
+                "year": 2010,
+                "value": 19
+            },
+            {
+                "year": 2015,
+                "value": 100.411138
+            },
+            {
+                "year": 2016,
+                "value": 91.411138
+            }
+        ]
+    },
+    {
+        "Model": "OSeMBE v1.0.0",
+        "Scenario": "DIAG-C0to80-gr5",
+        "region": "R5ASIA",
+        "unit": "million t DM/yr",
+        "variable": "Agricultural Demand|Energy",
+        "data": [
+            {
+                "year": 2018,
+                "value": 47.5957047887967
+            },
+            {
+                "year": 2019,
+                "value": 48.8328071850622
+            },
+            {
+                "year": 2020,
+                "value": 50.29604187808015
+            },
+            {
+                "year": 2021,
+                "value": 51.76594187808014
+            },
+            {
+                "year": 2022,
+                "value": 53.15811687808014
+            }
+        ]
+    },
+    {
+        "Model": "OSeMBE v1.0.0",
+        "Scenario": "DIAG-C400-lin",
+        "region": "R5ASIA",
+        "unit": "million t DM/yr",
+        "variable": "Agricultural Demand|Energy|Crops",
+        "data": [
+            {
+                "year": 2005,
+                "value": 0
+            },
+            {
+                "year": 2010,
+                "value": 0
+            },
+            {
+                "year": 2015,
+                "value": 44.13521909999999
+            },
+            {
+                "year": 2016,
+                "value": 45.36999999626556
+            }
+        ]
+    }
+]

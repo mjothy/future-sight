@@ -1,0 +1,138 @@
+[
+    {
+        "Model": "TIAM-ECN 1.2",
+        "Scenario": "DIAG_Nzero",
+        "variables": [
+            {
+                "id": 11,
+                "Name": "Capacity|Electricity",
+                "unit": "GW"
+            },
+            {
+                "id": 174,
+                "Name": "Capacity|Electricity|Biomass|w/ CCS",
+                "unit": "GW"
+            },
+            {
+                "id": 761,
+                "Name": "Capacity|Electricity|Coal|w/o CCS",
+                "unit": "GW"
+            },
+            {
+                "id": 267,
+                "Name": "Capacity|Electricity|Biomass|w/o CCS",
+                "unit": "GW"
+            },
+            {
+                "id": 269,
+                "Name": "Capacity|Electricity|Coal|w/ CCS",
+                "unitId": 174,
+                "unit": "GW"
+            }
+        ]
+    },
+    {
+        "Model": "OSeMBE v1.0.0",
+        "Scenario": "DIAG-Base",
+        "variables": [
+            {
+                "id": 11,
+                "Name": "Capacity|Electricity",
+                "unit": "GW"
+            },
+            {
+                "id": 174,
+                "Name": "Capacity|Electricity|Coal",
+                "unit": "GW"
+            },
+            {
+                "id": 267,
+                "Name": "Capacity|Electricity|Biomass|w/o CCS",
+                "unit": "GW"
+            },
+            {
+                "id": 269,
+                "Name": "Capacity|Electricity|Coal|w/ CCS",
+                "unit": "GW"
+            }
+        ]
+    },
+    {
+        "Model": "OSeMBE v1.0.0",
+        "Scenario": "DIAG-C0to80-gr5",
+        "variables": [
+            {
+                "id": 11,
+                "Name": "Capacity|Electricity",
+                "unit": "GW"
+            },
+            {
+                "id": 174,
+                "Name": "Capacity|Electricity|Coal",
+                "unit": "GW"
+            },
+            {
+                "id": 267,
+                "Name": "Capacity|Electricity|Biomass|w/o CCS",
+                "unit": "GW"
+            },
+            {
+                "id": 269,
+                "Name": "Capacity|Electricity|Coal|w/ CCS",
+                "unit": "GW"
+            }
+        ]
+    },
+    {
+        "Model": "OSeMBE v1.0.0",
+        "Scenario": "DIAG-C80-gr5",
+        "variables": [
+            {
+                "id": 11,
+                "Name": "Capacity|Electricity",
+                "unit": "GW"
+            },
+            {
+                "id": 174,
+                "Name": "Capacity|Electricity|Coal",
+                "unit": "GW"
+            },
+            {
+                "id": 267,
+                "Name": "Capacity|Electricity|Biomass|w/o CCS",
+                "unit": "GW"
+            },
+            {
+                "id": 269,
+                "Name": "Capacity|Electricity|Coal|w/ CCS",
+                "unit": "GW"
+            }
+        ]
+    },
+    {
+        "Model": "OSeMBE v1.0.0",
+        "Scenario": "DIAG-C400-lin",
+        "variables": [
+            {
+                "id": 11,
+                "Name": "Capacity|Electricity",
+                "unit": "GW"
+            },
+            {
+                "id": 174,
+                "Name": "Capacity|Electricity|Coal",
+                "unit": "GW"
+            },
+            {
+                "id": 267,
+                "Name": "Capacity|Electricity|Biomass|w/o CCS",
+                "unit": "GW"
+            },
+            {
+                "id": 269,
+                "Name": "Capacity|Electricity|Coal|w/ CCS",
+                "unit": "GW"
+            }
+        ]
+    }
+]

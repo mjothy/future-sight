@@ -1,7 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import { join } from 'path';
-import testData from './data/test-data.json';
+// Static database for testing
+import models from './data/models.json';
+import variables from './data/variables.json';
+import regions from './data/regions.json';
+import data from './data/data.json';
 
 const clientPath = '../../client/build';
 const app = express();
@@ -16,28 +20,38 @@ app.get('/api', (req, res) => {
 });
 
 app.get('/api/data', (req, res) => {
-    res.send(testData);
+    res.send(data);
 });
 
 app.get('/api/models', (req, res) => {
-
-    const models = new Array<string>();
-
-    testData.forEach(data => {
-        if (models.indexOf(data['Model']) < 0)
-            models.push(data['Model']);
-    });
     res.send(models);
 });
 
-app.get(`/api/scenarios`, (req, res) => {
-    const scenarios = new Array<string>();
-    console.log("params: ",req.query);
-    testData.forEach(data => {
-        if (scenarios.indexOf(data['Scenario']) < 0 && data['Model']===req.query.model)
-            scenarios.push(data['Scenario']);
+app.get(`/api/variables`, (req, res) => {
+    const model = req.query.model;
+    const scenario = req.query.scenario;
+
+    variables.forEach(element => {
+        if (element.Model === model && element.Scenario === scenario)
+            res.send(element.variables);
     });
-    res.send(scenarios);
+
+    res.status(404).send("No data found");
+});
+
+app.get(`/api/regions`, (req, res) => {
+    const model = req.query.model;
+    const scenario = req.query.scenario;
+    const variable = req.query.variable;
+
+
+    regions.forEach(element => {
+        if (element.Model === model && element.Scenario === scenario &&
+            element.Variable === variable)
+            res.send(element.regions);
+    });
+
+    res.status(404).send("No data found");
 });
 
 // Serve the HTML page

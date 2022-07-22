@@ -59,6 +59,8 @@
     "Unit": "GW"
   },
   {
+    "Model": "OSeMBE v1.0.0",
+    "Scenario": "DIAG-Base",
     "2005": 0,
     "2010": 0,
     "2015": "",

@@ -1,84 +1,117 @@
 import { Component } from 'react'
 import { Button, Col, Divider, Row, Select } from 'antd';
-import type { SelectProps } from 'antd';
 import AnalysisDataTable from './AnalysisDataTable';
 import DataManager from '../../../services/DataManager';
 
-// To send the data selected by user
-// INPUT:
-// Output: models and scenarios
 
-const options: SelectProps['options'] = [];
-for (let i = 0; i < 100000; i++) {
-  const value = `${i.toString(36)}${i}`;
-  options.push({
-    label: value,
-    value,
-    disabled: i === 10,
-  });
-}
-
-const handleChange = (value: string[]) => {
-  console.log(`selected ${value}`);
-};
-
-class DataStructureForm extends Component<any,any> {
+class DataStructureForm extends Component<any, any> {
   data = {};
 
-  constructor(props){
+  constructor(props) {
     super(props)
+    this.modelSelectionChange = this.modelSelectionChange.bind(this);
+    this.scenariosSelectionChange = this.scenariosSelectionChange.bind(this);
     this.state = {
-      scenarios:{},
-      models:{},
-      options: []
+      scenarios: [],
+      models: [],
+
+      /**
+      * The data selected in dropdownn list
+      */
+      selectedModel: {},
+      selectedScenarios: [],
+
+      /**
+      * The data showed in table
+      */
+      modelsInTable: [],
+      scenariosInTable: []
     }
   }
 
-  componentDidMount(){
-    this.props.dataManager.fetchModels().then((data)=>{
-      const opt: SelectProps['options'] = [];
-      data.forEach(model => {
-        opt.push({
-          label: model,
-          value:model,
-        })
-      });
-      this.setState({models: data, options: opt})
-      console.log("DataStructureForm models: ", data);
+  componentDidMount() {
+    this.props.dataManager.fetchModels().then((data) => {
+      this.setState({ models: data })
     });
+  }
+
+  /**
+   * Trigged when the list of selection models changed
+   * to update the list of scenarios
+   */
+  modelSelectionChange(modelSelected: string) {
+    const selectedModel = this.state.models.filter(model => model.name === modelSelected)[0];
+    // Change scenarios on dropdown list
+    let scenarios: any[] = [];
+    scenarios = [...scenarios, ...selectedModel.scenarios]
+    this.setState({ scenarios, selectedModel: selectedModel});
+  }
+
+  scenariosSelectionChange(scenarioSelectes: string[]){
+    const selectedScenarios = this.state.selectedModel.scenarios.filter(scenario => scenarioSelectes.indexOf(scenario.name) >=0).map(scenario => scenario)
+    console.log("scenarios: ", selectedScenarios)
+    this.setState({selectedScenarios})
+
+  }
+
+  /**
+   * To show the selected data in table
+   */
+  addDataToTable = () => {
+
+    const model = this.state.selectedModel;
+    model.scenarios = this.state.selectedScenarios
+    const state = {
+      modelsInTable: [model, ...this.state.modelsInTable],
+      scenariosInTable: [...this.state.scenarios, ...this.state.scenariosInTable]
+    }
+
+    console.log("state: ",state)
+    this.setState(state)
   }
 
   render() {
     return (
-    <div>
-      <Row justify="space-evenly">
-        <Col xs={20} sm={20} md={6} lg={7} >
-          <Select
-            mode="multiple"
-            className="width-100"
-            placeholder="Please select the model"
-            onChange={handleChange}
-            options={this.state.options}
-          />
-        </Col>
-        <Col xs={20} sm={20} md={6} lg={7} >
-          <Select
-            mode="multiple"
-            className='width-100'
-            placeholder="Scenarios"
-            onChange={handleChange}
-            options={this.state.options}
-          />
-        </Col>
-        <Col>
-          <Button type='primary'>Add as analysis data </Button>
-        </Col>
-      </Row>
-      <Divider/>
-      <Row justify='center'>
-        <AnalysisDataTable />
-      </Row>
-    </div>
+      <div>
+        <Row justify="space-evenly">
+          <Col xs={20} sm={20} md={6} lg={7} >
+            <Select
+              className="width-100"
+              placeholder="Please select the model"
+              onChange={this.modelSelectionChange}
+              options={this.state.models}
+              fieldNames={{
+                value: "name",
+                label: "name",
+              }}
+            />
+          </Col>
+
+          <Col xs={20} sm={20} md={6} lg={7} >
+            <Select
+              mode="multiple"
+              className='width-100'
+              placeholder="Scenarios"
+              onChange={this.scenariosSelectionChange}
+              options={this.state.scenarios}
+              fieldNames={{
+                value: "name",
+                label: "name",
+              }}
+            />
+          </Col>
+          <Divider />
+
+        </Row>
+        <Row justify='center'>
+          <Button type='primary' onClick={this.addDataToTable}>Add as analysis data </Button>
+        </Row>
+        <Divider />
+
+        <Row justify='center'>
+          <AnalysisDataTable models={this.state.modelsInTable} scenarios={this.state.scenariosInTable} />
+        </Row>
+      </div>
     )
 
   }

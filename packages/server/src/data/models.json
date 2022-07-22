@@ -7,38 +7,6 @@
                 "id": 1,
                 "name": "DIAG_Nzero"
             }
-        ],
-        "variables": [
-            {
-                "id": 11,
-                "Name": "Capacity|Electricity",
-                "unitId": 11,
-                "unit": "GW"
-            },
-            {
-                "id": 174,
-                "Name": "Capacity|Electricity|Biomass|w/ CCS",
-                "unitId": 11,
-                "unit": "GW"
-            },
-            {
-                "id": 761,
-                "Name": "Capacity|Electricity|Coal|w/o CCS",
-                "unitId": 174,
-                "unit": "GW"
-            },
-            {
-                "id": 267,
-                "Name": "Capacity|Electricity|Biomass|w/o CCS",
-                "unitId": 11,
-                "unit": "GW"
-            },
-            {
-                "id": 269,
-                "Name": "Capacity|Electricity|Coal|w/ CCS",
-                "unitId": 174,
-                "unit": "GW"
-            }
         ]
     },
     {
@@ -60,32 +28,6 @@
             {
                 "id": 33,
                 "name": "DIAG-C400-lin"
-            }
-        ],
-        "variables": [
-            {
-                "id": 11,
-                "Name": "Capacity|Electricity",
-                "unitId": 11,
-                "unit": "GW"
-            },
-            {
-                "id": 174,
-                "Name": "Capacity|Electricity|Coal",
-                "unitId": 11,
-                "unit": "GW"
-            },
-            {
-                "id": 267,
-                "Name": "Capacity|Electricity|Biomass|w/o CCS",
-                "unitId": 11,
-                "unit": "GW"
-            },
-            {
-                "id": 269,
-                "Name": "Capacity|Electricity|Coal|w/ CCS",
-                "unitId": 174,
-                "unit": "GW"
             }
         ]
     }

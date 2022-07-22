@@ -1,34 +1,71 @@
 [
     {
-        "id": 1,
-        "name": "World"
+        "Model": "TIAM-ECN 1.2",
+        "Scenario": "DIAG_Nzero",
+        "Variable": "Capacity|Electricity|Coal|w/o CCS",
+        "regions": [
+            {
+                "id": 11,
+                "name": "Europe (excl. Turkey)"
+            }
+        ]
     },
     {
-        "id": 2,
-        "name": "EU27"
+        "Model": "OSeMBE v1.0.0",
+        "Scenario": "DIAG-Base",
+        "Variable": "Capacity|Electricity|Coal",
+        "regions": [
+            {
+                "id": 14,
+                "name": "EU27 & EFTA"
+            },
+            {
+                "id": 3,
+                "name": "EU27 & UK"
+            }
+        ]
     },
     {
-        "id": 3,
-        "name": "EU27 & UK"
+        "Model": "OSeMBE v1.0.0",
+        "Scenario": "DIAG-Base",
+        "Variable": "Capacity|Electricity|Coal|w/o CCS",
+        "regions": [
+            {
+                "id": 14,
+                "name": "Europe (excl. Turkey)"
+            }
+        ]
     },
     {
-        "id": 4,
-        "name": "EU27 & EFTA"
+        "Model": "OSeMBE v1.0.0",
+        "Scenario": "DIAG-C0to80-gr5",
+        "variable": "Agricultural Demand|Energy",
+        "regions": [
+            {
+                "id": 10,
+                "name": "R5ASIA"
+            }
+        ]
     },
     {
-        "id": 5,
-        "name": "OSeMBE v1.0|AUT"
+        "Model": "OSeMBE v1.0.0",
+        "Scenario": "DIAG-C80-gr5",
+        "regions": [
+            {
+                "id": 10,
+                "name": "R5ASIA"
+            }
+        ]
     },
     {
-        "id": 6,
-        "name": "OSeMBE v1.0|BEL"
-    },
-    {
-        "id": 7,
-        "name": "Baltics"
-    },
-    {
-        "id": 8,
-        "name": "Scandinavia"
+        "Model": "OSeMBE v1.0.0",
+        "Scenario": "DIAG-C400-lin",
+        "variable": "Agricultural Demand|Energy|Crops",
+        "regions": [
+            {
+                "id": 10,
+                "name": "R5ASIA"
+            }
+        ]
     }
 ]

@@ -3,39 +3,68 @@ import React from 'react'
 // Make the datamanager(endpoints) accessible using to other component using HOC
 
 export default function DataManager(Component) {
-  return class extends React.Component<any,any> {
-    
-    constructor(props){
+  return class extends React.Component<any, any> {
+
+    constructor(props) {
       super(props);
       this.state = {
-          data: {}
+        data: {}
       }
     }
-    fetchData = () =>  {
-      return fetch('http://localhost:8080/api/data')
-      .then((response)=>response.json())
-      .then((data) => {
-        return data;
+    fetchData = (data) => {
+      
+      return fetch('http://localhost:8080/api/data',{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: data,
+
       })
-      .catch(err => err);
+        .then((response) => response.json())
+        .then((data) => {
+          return data;
+        })
+        .catch(err => err);
     }
 
-    fetchScenarios = (model) =>  {
-      return fetch(`http://localhost:8080/api/scenarios?model=${model}`)
-      .then((response)=>response.json())
-      .then((data) => {
-        return data;
-      })
-      .catch(err => err);
-    }
-
-    fetchModels = () =>  {
+    fetchModels = () => {
       return fetch('http://localhost:8080/api/models')
-      .then((response)=>response.json())
-      .then((data) => {
-        return data;
+        .then((response) => response.json())
+        .then((data) => {
+          return data;
+        })
+        .catch(err => err);
+    }
+
+    fetchVariables = (data) => {
+      return fetch('http://localhost:8080/api/data',{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: data,
       })
-      .catch(err => err);
+        .then((response) => response.json())
+        .then((data) => {
+          return data;
+        })
+        .catch(err => err);
+    }
+
+    fetchRegions = (data) => {
+      return fetch('http://localhost:8080/api/regions',{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: data,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          return data;
+        })
+        .catch(err => err);
     }
 
     render() {
