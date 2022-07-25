@@ -1,11 +1,11 @@
-import { Component } from 'react'
+import React, { Component } from 'react'
 import { Button, Col, Divider, Row, Select } from 'antd';
 import AnalysisDataTable from './AnalysisDataTable';
 import DataManager from '../../../services/DataManager';
 
-
 class DataStructureForm extends Component<any, any> {
   data = {};
+  scenarioSelectRef = React.createRef();
 
   constructor(props) {
     super(props)
@@ -51,7 +51,6 @@ class DataStructureForm extends Component<any, any> {
     const selectedScenarios = this.state.selectedModel.scenarios.filter(scenario => scenarioSelectes.indexOf(scenario.name) >=0).map(scenario => scenario)
     console.log("scenarios: ", selectedScenarios)
     this.setState({selectedScenarios})
-
   }
 
   /**
@@ -66,9 +65,22 @@ class DataStructureForm extends Component<any, any> {
       scenariosInTable: [...this.state.scenarios, ...this.state.scenariosInTable]
     }
 
-    console.log("state: ",state)
-    this.setState(state)
+    this.setState(state, () => {
+      this.resetForm();
+    })
   }
+  
+  /**
+   * Reset the drop down lists
+   */
+  resetForm = () => {
+    this.setState({
+      selectedScenarios: [],
+      selectedModel: {},
+    })
+
+  }
+
 
   render() {
     return (
@@ -78,6 +90,7 @@ class DataStructureForm extends Component<any, any> {
             <Select
               className="width-100"
               placeholder="Please select the model"
+              value={this.state.selectedModel.name}
               onChange={this.modelSelectionChange}
               options={this.state.models}
               fieldNames={{
@@ -92,6 +105,7 @@ class DataStructureForm extends Component<any, any> {
               mode="multiple"
               className='width-100'
               placeholder="Scenarios"
+              value={this.state.selectedScenarios.map(e => e.name)}
               onChange={this.scenariosSelectionChange}
               options={this.state.scenarios}
               fieldNames={{
