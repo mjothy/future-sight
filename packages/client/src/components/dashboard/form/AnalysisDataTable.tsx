@@ -8,7 +8,7 @@ import { Component } from 'react'
 export default class AnalysisDataTable extends Component<any, any> {
   columns;
 
-  constructor(props){
+  constructor(props) {
     super(props)
     console.log("props table: ", props);
 
@@ -19,7 +19,33 @@ export default class AnalysisDataTable extends Component<any, any> {
     /**
      * return the table columns
      */
-   this.columns = [{
+    this.columns = this.setColumns();
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (this.props.models !== prevProps.models) {
+      this.setState({ models: this.props.models })
+      this.columns = this.setColumns();
+
+
+    }
+  }
+
+  /**
+   * return the table datasource
+   * @returns {*}
+   */
+  data = () => {
+    if (this.props.models.length >= 0) {
+      return this.state.models
+    } else return []
+  }
+
+  /**
+   * Set table columns
+   */
+  setColumns = () => {
+    const columns = [{
       title: 'Model',
       dataIndex: 'name',
       key: 'name',
@@ -28,38 +54,18 @@ export default class AnalysisDataTable extends Component<any, any> {
       title: 'Scenario',
       dataIndex: 'scenarios',
       key: 'name',
-      render: (scenarios) => scenarios.map(scenario => <p>{scenario.name}</p> )
+      render: (scenarios) => scenarios.map(scenario => <p>{scenario.name}</p>)
 
     }
-  ]
+    ]
+
+    return columns;
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot)
-{
-  if(this.props !== prevProps){
-    this.setState({models: this.props.models})
-  }
-}
-
-  /**
-   * return the table datasource
-   * @returns {*}
-   */
-  data = () =>{
-    console.log("outside here: ", this.props.models);
-
-    if(this.props.models.length >= 0){
-      console.log("enter here: ", this.props.models);
-      return this.state.models
-    }else return []
-  }
-
- 
 
   render() {
-    console.log("models: ",this.props.models)
     return (
-    <Table className='width-60' dataSource={this.data()} columns={this.columns} />
+      <Table className='width-60' dataSource={this.data()} columns={this.columns} />
     )
   }
 }

@@ -41,35 +41,63 @@ class DataStructureForm extends Component<any, any> {
    */
   modelSelectionChange(modelSelected: string) {
     const selectedModel = this.state.models.filter(model => model.name === modelSelected)[0];
+    console.log("selected model: ", selectedModel);
     // Change scenarios on dropdown list
     let scenarios: any[] = [];
-    scenarios = [...scenarios, ...selectedModel.scenarios]
-    this.setState({ scenarios, selectedModel: selectedModel});
+    scenarios = [...selectedModel.scenarios]
+    this.setState({ scenarios, selectedModel: selectedModel });
   }
 
-  scenariosSelectionChange(scenarioSelectes: string[]){
-    const selectedScenarios = this.state.selectedModel.scenarios.filter(scenario => scenarioSelectes.indexOf(scenario.name) >=0).map(scenario => scenario)
+  scenariosSelectionChange(scenarioSelectes: string[]) {
+    const selectedScenarios = this.state.selectedModel.scenarios.filter(scenario => scenarioSelectes.indexOf(scenario.name) >= 0).map(scenario => scenario)
     console.log("scenarios: ", selectedScenarios)
-    this.setState({selectedScenarios})
+    this.setState({ selectedScenarios })
   }
 
   /**
    * To show the selected data in table
    */
   addDataToTable = () => {
+    if (this.state.selectedModel.id != null) {
 
-    const model = this.state.selectedModel;
-    model.scenarios = this.state.selectedScenarios
-    const state = {
-      modelsInTable: [model, ...this.state.modelsInTable],
-      scenariosInTable: [...this.state.scenarios, ...this.state.scenariosInTable]
+      const modelExist = this.isModelExist();
+      console.log("modelExist: ", modelExist);
+      let state = {};
+      if (modelExist.length > 0) {
+        const models = this.state.modelsInTable
+        models.map(model => {
+          if (model.name === this.state.selectedModel.name) {
+            model.scenarios = this.state.selectedScenarios
+          }
+        })
+        console.log("this.state.modelsInTable: ", this.state.modelsInTable);
+        state = {
+          modelsInTable: [...this.state.modelsInTable],
+        }
+      } else {
+        const model = { ...this.state.selectedModel };
+        console.log("this.state.selectedModel: ", this.state.selectedModel);
+        model.scenarios = this.state.selectedScenarios
+        state = {
+          modelsInTable: [model, ...this.state.modelsInTable],
+        }
+      }
+
+      this.setState(state, () => {
+        console.log("this.state.modelsInTable after: ", this.state.modelsInTable);
+        this.resetForm();
+      })
     }
-
-    this.setState(state, () => {
-      this.resetForm();
-    })
   }
-  
+
+  /**
+   * Check if the selected model is already existing in table
+   * @returns {boolean}
+   */
+  isModelExist = () => {
+    return this.state.modelsInTable.filter(model => model.name === this.state.selectedModel.name);
+  }
+
   /**
    * Reset the drop down lists
    */
@@ -77,6 +105,7 @@ class DataStructureForm extends Component<any, any> {
     this.setState({
       selectedScenarios: [],
       selectedModel: {},
+      scenarios: []
     })
 
   }
@@ -123,7 +152,7 @@ class DataStructureForm extends Component<any, any> {
         <Divider />
 
         <Row justify='center'>
-          <AnalysisDataTable models={this.state.modelsInTable} scenarios={this.state.scenariosInTable} />
+          <AnalysisDataTable models={this.state.modelsInTable} />
         </Row>
       </div>
     )
