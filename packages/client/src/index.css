@@ -22,6 +22,7 @@ body {
 .width-80 {
   width: 80%;
 }
+
 .width-60 {
   width: 60%;
 }
@@ -87,9 +88,28 @@ body {
 }
 
 /* Table */
-.ant-table-thead > tr > th,
-.ant-table-tbody > tr > td,
-.ant-table tfoot > tr > th,
-.ant-table tfoot > tr > td {
+.ant-table-thead>tr>th,
+.ant-table-tbody>tr>td,
+.ant-table tfoot>tr>th,
+.ant-table tfoot>tr>td {
   padding: 6px;
+}
+
+/* Tag input */
+.tag-input-content {
+  padding: 4px 11px;
+  font-size: 14px;
+  line-height: 1.5715;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+  transition: all 0.3s;
+  display: inline-flex;
+  height: auto;
+  width: 100%;
+}
+
+.tag-input {
+  width: 30% !important;
 }
