@@ -31,8 +31,7 @@ export default class ActionsSidebar extends Component<any,any> {
     return (
         <div>
           {
-            // eslint-disable-next-line react/jsx-key
-            actions.map((action)=> <AddButton label={action.label} type={action.type}
+            actions.map((action)=> <AddButton key={action.type} label={action.label} type={action.type}
             addBlock = {() => this.addBlock(action.type)} />)
           }
         </div>

@@ -1,44 +1,56 @@
 import { Dashboard } from '@future-sight/common'
 import React from 'react'
-import ViewSetup from './form/SetupView';
+import SetupView from './form/SetupView';
+
 /**
- * This is parent of:
- * -- ViewSetup (in client)
- * -- Dashboard (in common)
- *
+ * For adding or update a dashboard.
+ * It manage set up view and ashboard view for adding/updating a dashboard
  */
-// If submited: the blocks page
-// if not: ViewSetup
 class DashboardView extends React.Component<any, any> {
   data = {};
   constructor(props) {
     super(props);
     this.state = {
       isSubmited: false,
-      author: "",
-      title: "",
-      tags: [],
+      userData: {
+        title: '',
+        author: '',
+        tags: []
+      },
       models: [],
       scenarios: []
     }
   }
 
-  handleSubmit = () => {
-    this.setState({ isSubmited: true }, () => true);
-    return true;
+  /**
+   * Decide on wich view the user working, SetUpView (To add the metadata of the current dashboard)
+   * OR Dashbard to add and edit the dashboard blocks
+   * @param data  True if the user sumbit the metaData, OR False to back for updating the metaData
+   */
+  handleSubmit = (data: boolean) => {
+    this.setState({ isSubmited: data });
   }
 
-  submitEvent = (value) => {
-    this.setState({ isSubmited: value });
+  /**
+   * Geting and update the value the user data
+   * @param data contains the information of the dashboard {title, author and tags}
+   */
+  handleUserData = (data) => {
+    const userData = { ...this.state.userData }
+    switch (data.name) {
+      case 'title': userData.title = data.value; break;
+      case 'author': userData.author = data.value; break;
+      case 'tags': userData.tags = data.value; break;
+    }
+    this.setState({ userData: { ...userData } });
   }
 
   dashboardAddForm = () => {
-    return <ViewSetup submitEvent={this.handleSubmit} />
+    return <SetupView userData={this.state.userData} submitEvent={this.handleSubmit} updateUserData={this.handleUserData} />
   }
 
   dashboardManager = () => {
-    // props: scenarios, models, userData ... (gettong selected data from ViewSetup)
-    return <Dashboard />
+    return <Dashboard userData={this.state.userData} models={this.state.models} scenarios={this.state.scenarios} submitEvent={this.handleSubmit} />
   }
   render() {
     return (

@@ -1,5 +1,4 @@
 import {
-  RightCircleFilled,
   LeftCircleFilled
 } from '@ant-design/icons';
 import { Button, Row, Col } from 'antd';
@@ -24,14 +23,8 @@ export default class SideBar extends Component<any, any> {
         <div>
           <Row justify="start">
             <Col span={4}>
-              <Button type="primary" onClick={() => null} className="bg-primary">
+              <Button type="primary" onClick={() => this.props.handleSubmit(false)} className="bg-primary">
                 <LeftCircleFilled />
-              </Button>
-            </Col>
-            <Col span={4}>
-
-              <Button type="primary" onClick={() => null} className="bg-primary">
-                <RightCircleFilled />
               </Button>
             </Col>
           </Row>

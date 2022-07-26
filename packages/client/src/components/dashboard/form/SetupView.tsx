@@ -1,30 +1,35 @@
 import { Component } from 'react'
 import UserDataForm from './UserDataForm';
 import DataStructureForm from './DataStructureForm';
-import { Button, Col, Divider, Row, Typography } from 'antd';
-import AnalysisDataTable from './AnalysisDataTable';
-//To save the metadata of the dashboard
-// INPUT: User data (title, author, tags), models and scenarios
-// Output:
+import { Button, Divider, Row, Typography } from 'antd';
+
 const { Title } = Typography;
 
-export default class ViewSetup extends Component<any,any> {
+export default class SetupView extends Component<any, any> {
 
   constructor(props) {
     super(props);
-    this.state = { isSubmited: false };
   }
 
+  /**
+   * Submit the meta data to send it to dashboard
+   */
   handleSubmit = () => {
-    this.setState({isSubmited: ! this.state.isSubmited}, () => {
-    this.props.submitEvent(this.state.isSubmited);
-    });
+    this.props.submitEvent(true);
+  }
+
+  /**
+   * Receive the user data from UserDataForm and send it to DashboardView to update the parent state 
+   * @param data contains the information of the dashboard {title, author and tags}
+   */
+  handleUserData = (data) => {
+    this.props.updateUserData(data);
   }
 
   render() {
     return (
       <div className='content'>
-        <UserDataForm />
+        <UserDataForm handleUserData={this.handleUserData} userData={this.props.userData} />
         <Divider />
 
         <Title level={4} className="center"> Data Structure</Title>

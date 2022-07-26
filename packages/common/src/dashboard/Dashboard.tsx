@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import DashboardConfigView from './DashboardConfigView';
-import DashboardManager from './DashboardManager';
 import DashboardConfigControl from './DashboardConfigControl';
 import initialState from './initialState';
 import {
@@ -47,13 +46,11 @@ export default class Dashboard extends Component<any, any> {
   }
 
   componentDidMount() {
-    console.log("componentDidMount")
     window.addEventListener("mousemove", this.resize);
     window.addEventListener("mouseup", this.stopResizing);
   }
 
-  componentWillUnmount(){
-   console.log("componentWillUnmount") 
+  componentWillUnmount() {
     window.removeEventListener("mousemove", this.resize);
     window.removeEventListener("mouseup", this.stopResizing);
   }
@@ -74,27 +71,23 @@ export default class Dashboard extends Component<any, any> {
     }
 
     return (
-      <DashboardManager>
-        <div className='dashboard'>
-
-          <div ref={this.sidebarRef} style={{ width: this.state.sidebarWidth }} className={!this.state.collapsed ? "sidebar" : "sidebar hide-sidebar"}>
-            <DashboardConfigControl />
-          </div>
-
-          <div className={!this.state.collapsed ? "sidebar-resizer" : "sidebar-resizer hide-sidebar"} onMouseDown={this.startResizing} />
-
-          <div className="dashboard-content" style={{ width: this.state.contentWidth }}>
-            <div>
-              {React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
-                className: 'trigger',
-                onClick: () => setCollapsed(),
-              })}
-            </div>
-            <DashboardConfigView data={initialState.data} layouts={layoutConfig} />
-          </div>
-
+      <div className='dashboard'>
+        <div ref={this.sidebarRef} style={{ width: this.state.sidebarWidth }} className={!this.state.collapsed ? "sidebar" : "sidebar hide-sidebar"}>
+          <DashboardConfigControl data={this.props} />
         </div>
-      </DashboardManager>
+
+        <div className={!this.state.collapsed ? "sidebar-resizer" : "sidebar-resizer hide-sidebar"} onMouseDown={this.startResizing} />
+
+        <div className="dashboard-content" style={{ width: this.state.contentWidth }}>
+          <div>
+            {React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
+              className: 'trigger',
+              onClick: () => setCollapsed(),
+            })}
+          </div>
+          <DashboardConfigView data={initialState.data} layouts={layoutConfig} />
+        </div>
+      </div>
     )
   }
 }

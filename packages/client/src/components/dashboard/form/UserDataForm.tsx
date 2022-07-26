@@ -9,12 +9,19 @@ export default class UserDataForm extends Component<any, any> {
         super(props)
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleInputConfirm = this.handleInputConfirm.bind(this);
+        this.handleUserData = this.handleUserData.bind(this);
         this.saveInputRef = React.createRef();
         this.state = {
-            tags: ['Tag 1', 'Tag 2'],
+            tags: this.props.userData.tags,
             inputVisible: false,
             inputValue: '',
         };
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevState.tags !== this.state.tags) {
+            this.handleTags()
+        }
     }
 
     showInput = () => {
@@ -41,8 +48,30 @@ export default class UserDataForm extends Component<any, any> {
 
     handleClose = (removedTag) => {
         const tags = this.state.tags.filter(tag => tag !== removedTag);
-        console.log(tags);
         this.setState({ tags });
+    }
+
+    /**
+     * Update user data 
+     * @param e HTML input element
+     */
+    handleUserData = (e) => {
+        const data = {
+            name: e.currentTarget.name,
+            value: e.currentTarget.value
+        }
+        this.props.handleUserData(data)
+    }
+
+    /**
+     * Update tags
+     */
+    handleTags = () => {
+        const data = {
+            name: 'tags',
+            value: this.state.tags
+        }
+        this.props.handleUserData(data)
     }
 
     render() {
@@ -52,14 +81,19 @@ export default class UserDataForm extends Component<any, any> {
             <Row justify="space-evenly">
                 <Col xs={20} sm={20} md={6} lg={7} >
                     <Input
-                        prefix={<EditFilled className="site-form-item-icon" />} placeholder="Title"
+                        defaultValue={this.props.userData.title}
+                        name='title'
+                        prefix={<EditFilled className="site-form-item-icon" />} placeholder="Title" onChange={this.handleUserData}
                     />
                 </Col>
 
                 <Col xs={20} sm={20} md={6} lg={7} >
                     <Input
+                        value={this.props.userData.author}
+                        name='author'
                         prefix={<UserOutlined className="site-form-item-icon" />}
                         placeholder="Author"
+                        onChange={this.handleUserData}
                     />
                 </Col>
 

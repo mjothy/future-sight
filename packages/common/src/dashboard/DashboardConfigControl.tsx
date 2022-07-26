@@ -12,9 +12,10 @@ export default class DashboardConfigControl extends Component<any,any> {
       blockSelected: false
     }
   }
+
   render() {
     return (
-      <SideBar>
+      <SideBar handleSubmit = {this.props.data.submitEvent}>
         {/* selected in props */}
         {this.state.blockSelected} ? <BlockEditor />: <DashboardControl />
       </SideBar>
