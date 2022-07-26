@@ -24,7 +24,6 @@ class DataStructureForm extends Component<any, any> {
       /**
       * The data showed in table
       */
-      modelsInTable: [],
       scenariosInTable: []
     }
   }
@@ -60,33 +59,24 @@ class DataStructureForm extends Component<any, any> {
   addDataToTable = () => {
     if (this.state.selectedModel.id != null) {
 
+      // Check if the model selected already in table, if TRUE
+      // update the existing data
       const modelExist = this.isModelExist();
-      console.log("modelExist: ", modelExist);
-      let state = {};
+      let models = [...this.props.models];
       if (modelExist.length > 0) {
-        const models = this.state.modelsInTable
         models.map(model => {
           if (model.name === this.state.selectedModel.name) {
             model.scenarios = this.state.selectedScenarios
           }
         })
-        console.log("this.state.modelsInTable: ", this.state.modelsInTable);
-        state = {
-          modelsInTable: [...this.state.modelsInTable],
-        }
       } else {
         const model = { ...this.state.selectedModel };
-        console.log("this.state.selectedModel: ", this.state.selectedModel);
-        model.scenarios = this.state.selectedScenarios
-        state = {
-          modelsInTable: [model, ...this.state.modelsInTable],
-        }
+        model.scenarios = this.state.selectedScenarios;
+        models = [model, ...models];
       }
 
-      this.setState(state, () => {
-        console.log("this.state.modelsInTable after: ", this.state.modelsInTable);
-        this.resetForm();
-      })
+      this.props.handleModels(models);
+      this.resetForm();
     }
   }
 
@@ -95,7 +85,7 @@ class DataStructureForm extends Component<any, any> {
    * @returns {boolean}
    */
   isModelExist = () => {
-    return this.state.modelsInTable.filter(model => model.name === this.state.selectedModel.name);
+    return this.props.models.filter(model => model.name === this.state.selectedModel.name);
   }
 
   /**
@@ -109,7 +99,6 @@ class DataStructureForm extends Component<any, any> {
     })
 
   }
-
 
   render() {
     return (
@@ -152,7 +141,7 @@ class DataStructureForm extends Component<any, any> {
         <Divider />
 
         <Row justify='center'>
-          <AnalysisDataTable models={this.state.modelsInTable} />
+          <AnalysisDataTable models={this.props.models} />
         </Row>
       </div>
     )

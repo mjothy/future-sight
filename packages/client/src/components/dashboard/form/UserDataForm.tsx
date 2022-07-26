@@ -89,7 +89,7 @@ export default class UserDataForm extends Component<any, any> {
 
                 <Col xs={20} sm={20} md={6} lg={7} >
                     <Input
-                        value={this.props.userData.author}
+                        defaultValue={this.props.userData.author}
                         name='author'
                         prefix={<UserOutlined className="site-form-item-icon" />}
                         placeholder="Author"

@@ -33,7 +33,7 @@ export default class SetupView extends Component<any, any> {
         <Divider />
 
         <Title level={4} className="center"> Data Structure</Title>
-        <DataStructureForm />
+        <DataStructureForm handleModels = {this.props.handleModels} models = {this.props.models} />
 
         <Divider />
         <Row justify='end'>
