@@ -1,40 +1,67 @@
 import { Component } from 'react'
-import { Button, Col, Divider, Row, Select } from 'antd';
+import { Button, Divider, Select } from 'antd';
 
-// Content of dataBlock
-export default class DataBlock extends Component {
+export default class DataBlock extends Component<any, any> {
 
   constructor(props) {
     super(props);
- }
+    this.modelSelectionChange = this.modelSelectionChange.bind(this);
+    this.scenariosSelectionChange = this.scenariosSelectionChange.bind(this);
+    this.state = {
+      scenarios: [],
+      selectedModel: {},
+      selectedScenario: {},
+    }
+  }
+
+  /**
+   * Trigged when the list of selection models changed
+   * to update the list of scenarios
+   */
+  modelSelectionChange(modelSelected: string) {
+    const selectedModel = this.props.data.models.filter(model => model.name === modelSelected)[0];
+    this.setState({ selectedModel, scenarios: selectedModel.scenarios, selectedScenario: {} });
+  }
+
+  scenariosSelectionChange(selectedScenario: string) {
+    const scenario = this.state.selectedModel.scenarios.filter(scenario => scenario.name === selectedScenario)[0];
+    this.setState({ selectedScenario: scenario });
+  }
 
   addDataBlock = () => {
-    // add data block
-    console.log("DataBlock: ", this.context);
-    const {addBlock} = this.context;
-    addBlock();
-
+    // Add datablock
   }
+
   render() {
-    console.log("this.context: ", this.context);
     return (
       <div className='width-100'>
         <Divider />
-          <Select
-            mode="multiple"
-            className='width-100'
-            placeholder="Please select the model"
-          />
+        <Select
+          className="width-100"
+          placeholder="Please select the model"
+          options={this.props.data.models}
+          onChange={this.modelSelectionChange}
+          fieldNames={{
+            value: "name",
+            label: "name",
+          }}
+        />
 
-          <Divider />
-          <Select
-            mode="multiple"
-            className='width-100'
-            placeholder="Scenarios"
-          />
-          <Divider />
-          <Button type='primary' className='width-100'
- onClick={this.addDataBlock}>Add data block</Button>
+        <Divider />
+        <Select
+          className="width-100"
+          placeholder="Scenario"
+          value={this.state.selectedScenario.name}
+          options={this.state.scenarios}
+          onChange={this.scenariosSelectionChange}
+          fieldNames={{
+            value: "name",
+            label: "name",
+          }}
+        />
+        <Divider />
+        <Button type='primary' className='width-100'
+          onClick={this.addDataBlock}>Add data block</Button>
       </div>
     )
   }

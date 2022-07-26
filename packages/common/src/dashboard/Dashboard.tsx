@@ -7,6 +7,7 @@ import {
   MenuUnfoldOutlined
 } from '@ant-design/icons';
 import layoutConfig from './layoutConfig';
+import { Button, Drawer, Space } from 'antd';
 
 export default class Dashboard extends Component<any, any> {
 
@@ -16,6 +17,7 @@ export default class Dashboard extends Component<any, any> {
     super(props);
     this.state = {
       collapsed: false,
+      placement:'right',
       isResizing: false,
       sidebarWidth: (window.innerWidth) * 0.3,
       contentWidth: window.innerWidth - (window.innerWidth) * 0.3
@@ -23,7 +25,6 @@ export default class Dashboard extends Component<any, any> {
     this.sidebarRef = React.createRef();
 
     console.log("Dashboard: ", this.props);
-
   }
   startResizing = () => {
     this.setState({ isResizing: true });
@@ -48,6 +49,8 @@ export default class Dashboard extends Component<any, any> {
   componentDidMount() {
     window.addEventListener("mousemove", this.resize);
     window.addEventListener("mouseup", this.stopResizing);
+    window.scrollTo(0, 0)
+
   }
 
   componentWillUnmount() {
@@ -70,19 +73,42 @@ export default class Dashboard extends Component<any, any> {
       })
     }
 
+    const setVisibility = () => {
+      this.setState({        collapsed: !this.state.collapsed
+      })
+    }
+
+    const setPlacement = (e) =>{
+      console.log("target: ",e.target)
+      this.setState({placement: e.target.value})
+    }
     return (
       <div className='dashboard'>
-        <div ref={this.sidebarRef} style={{ width: this.state.sidebarWidth }} className={!this.state.collapsed ? "sidebar" : "sidebar hide-sidebar"}>
-          <DashboardConfigControl data={this.props} />
+        <div>
+          <Drawer
+            placement={this.state.placement}
+            width={500}
+            visible={this.state.collapsed}
+            onClose={setVisibility}
+            maskClosable={false}
+            mask={false}
+            extra={
+              <Space>
+                <Button onClick={setPlacement} value="left">left</Button>
+                <Button type="primary" onClick={setPlacement} value="right">
+                  right
+                </Button>
+              </Space>
+            }
+          >
+            <DashboardConfigControl data={this.props} />
+          </Drawer>
         </div>
-
-        <div className={!this.state.collapsed ? "sidebar-resizer" : "sidebar-resizer hide-sidebar"} onMouseDown={this.startResizing} />
-
-        <div className="dashboard-content" style={{ width: this.state.contentWidth }}>
+        <div className="dashboard-content" style={{width: "100%"}}>
           <div>
             {React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
               className: 'trigger',
-              onClick: () => setCollapsed(),
+              onClick: () => setVisibility(),
             })}
           </div>
           <DashboardConfigView data={initialState.data} layouts={layoutConfig} />

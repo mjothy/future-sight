@@ -40,16 +40,14 @@ class DataStructureForm extends Component<any, any> {
    */
   modelSelectionChange(modelSelected: string) {
     const selectedModel = this.state.models.filter(model => model.name === modelSelected)[0];
-    console.log("selected model: ", selectedModel);
     // Change scenarios on dropdown list
     let scenarios: any[] = [];
     scenarios = [...selectedModel.scenarios]
-    this.setState({ scenarios, selectedModel: selectedModel });
+    this.setState({ scenarios, selectedModel: selectedModel, selectedScenarios: [] });
   }
 
   scenariosSelectionChange(scenarioSelectes: string[]) {
     const selectedScenarios = this.state.selectedModel.scenarios.filter(scenario => scenarioSelectes.indexOf(scenario.name) >= 0).map(scenario => scenario)
-    console.log("scenarios: ", selectedScenarios)
     this.setState({ selectedScenarios })
   }
 

@@ -6,11 +6,11 @@ import ControlBlock from '../blocks/ControlBlock';
 
 // Deside which form (Block Type) will send to UI
 // Input: 
-export default class SidebarManager extends Component<any,any> {
-    
+export default class SidebarManager extends Component<any, any> {
+
   static propTypes = {
-      label: PropTypes.string,
-      type: PropTypes.string // formulaire or action buttons
+    label: PropTypes.string,
+    type: PropTypes.string // formulaire or action buttons
   };
 
   constructor(props) {
@@ -18,11 +18,11 @@ export default class SidebarManager extends Component<any,any> {
   }
 
   // block type handler
-  renderAddBlockView(){
-    switch(this.props.type){
-      case "text": return <TextBlock />
-      case "data": return <DataBlock />
-      case "control": return <ControlBlock />
+  renderAddBlockView() {
+    switch (this.props.type) {
+      case "text": return <TextBlock data={this.props.data} />
+      case "data": return <DataBlock data={this.props.data} />
+      case "control": return <ControlBlock data={this.props.data} />
       default: return <p>Error ! </p>
     }
   }
