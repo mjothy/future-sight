@@ -12,7 +12,7 @@
   },
   "scripts": {
     "client": "yarn workspace @future-sight/client dev",
-    "common": "yarn workspace @future-sight/common",
+    "common": "yarn workspace @future-sight/common watch",
     "server": "yarn workspace @future-sight/server dev",
     "dev": "yarn client & yarn server --verbose",
     "start": "yarn server start"

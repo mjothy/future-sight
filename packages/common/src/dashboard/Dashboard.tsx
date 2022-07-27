@@ -42,8 +42,8 @@ export default class Dashboard extends Component<any, any> {
           width={500}
           visible={this.state.collapsed}
           onClose={setVisibility}
-          maskClosable={false}
-          mask={false}
+          maskClosable={true}
+          mask={true}
           className={"drawer"}
           style={!this.state.collapsed ? { zIndex: '-1' } : { zIndex: '999' }}
           extra={

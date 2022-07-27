@@ -1,7 +1,6 @@
 /* eslint-disable react/jsx-no-undef */
 import { Component } from 'react'
 import { Button, Divider, Select } from 'antd';
-import { Option } from 'antd/lib/mentions';
 
 export default class DataBlock extends Component<any, any> {
 

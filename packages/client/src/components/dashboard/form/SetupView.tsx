@@ -29,11 +29,11 @@ export default class SetupView extends Component<any, any> {
   render() {
     return (
       <div className='content'>
-        <UserDataForm handleUserData={this.handleUserData} userData={this.props.userData} />
+        <UserDataForm {...this.props} handleUserData={this.handleUserData} userData={this.props.userData} />
         <Divider />
 
         <Title level={4} className="center"> Data Structure</Title>
-        <DataStructureForm handleStructureData = {this.props.handleStructureData} models = {this.props.models} />
+        <DataStructureForm {...this.props} handleStructureData = {this.props.handleStructureData} structureData = {this.props.structureData} />
 
         <Divider />
         <Row justify='end'>

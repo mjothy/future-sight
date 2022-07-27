@@ -1,5 +1,6 @@
 import { Dashboard } from '@future-sight/common'
 import React from 'react'
+import DataManager from '../../services/DataManager';
 import SetupView from './form/SetupView';
 
 /**
@@ -10,6 +11,7 @@ class DashboardView extends React.Component<any, any> {
   data = {};
   constructor(props) {
     super(props);
+    console.log("props dashboardview: ", props);
     this.state = {
       isSubmited: false,
       userData: {
@@ -22,7 +24,8 @@ class DashboardView extends React.Component<any, any> {
        */
       models: [],
       scenarios: [],
-      variables: []
+      variables: [],
+      regions: []
     }
   }
 
@@ -55,13 +58,13 @@ class DashboardView extends React.Component<any, any> {
   }
 
   dashboardAddForm = () => {
-    return <SetupView userData={this.state.userData} submitEvent={this.handleSubmit} updateUserData={this.handleUserData}
+    return <SetupView {...this.props} userData={this.state.userData} structureData = {{models: this.state.models, variables: this.state.variables}} submitEvent={this.handleSubmit} updateUserData={this.handleUserData}
     handleStructureData = {this.handleStructureData} models = {this.state.models} />
   }
 
   dashboardManager = () => {
     // props: scenarios, models, userData ... (gettong selected data from SetupView)
-    return <Dashboard userData={this.state.userData} structureData = {{models: this.state.models, variables: this.state.variables}} submitEvent={this.handleSubmit} />
+    return <Dashboard {...this.props} userData={this.state.userData} structureData = {{models: this.state.models, variables: this.state.variables}} submitEvent={this.handleSubmit} />
   }
   render() {
     return (
@@ -75,4 +78,4 @@ class DashboardView extends React.Component<any, any> {
   }
 }
 
-export default DashboardView
+export default DataManager(DashboardView);

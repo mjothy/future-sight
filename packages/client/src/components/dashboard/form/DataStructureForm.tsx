@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Button, Col, Divider, Row, Select } from 'antd';
 import AnalysisDataTable from './AnalysisDataTable';
-import DataManager from '../../../services/DataManager';
 
 class DataStructureForm extends Component<any, any> {
   data = {};
@@ -60,7 +59,7 @@ class DataStructureForm extends Component<any, any> {
       // Check if the model selected already in table, if TRUE
       // update the existing data
       const modelExist = this.isModelExist();
-      let models = [...this.props.models];
+      let models = [...this.props.structureData.models];
       if (modelExist.length > 0) {
         models.map(model => {
           if (model.name === this.state.selectedModel.name) {
@@ -89,7 +88,7 @@ class DataStructureForm extends Component<any, any> {
    * @returns {boolean}
    */
   isModelExist = () => {
-    return this.props.models.filter(model => model.name === this.state.selectedModel.name);
+    return this.props.structureData.models.filter(model => model.name === this.state.selectedModel.name);
   }
 
   getVariables = (models) => {
@@ -166,7 +165,7 @@ class DataStructureForm extends Component<any, any> {
         <Divider />
 
         <Row justify='center'>
-          <AnalysisDataTable models={this.props.models} />
+          <AnalysisDataTable models={this.props.structureData.models} />
         </Row>
       </div>
     )
@@ -174,4 +173,4 @@ class DataStructureForm extends Component<any, any> {
   }
 }
 
-export default DataManager(DataStructureForm);
+export default DataStructureForm;
