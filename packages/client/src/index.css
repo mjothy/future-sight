@@ -40,6 +40,14 @@ body {
 }
 
 /* navbar */
+.ant-menu.ant-menu-dark {
+  position: fixed;
+  z-index: 1;
+  width: 100%;
+  height: 60px;
+  padding: 5px;
+}
+
 .menu-navbar {
   padding: 0 20px;
   justify-content: flex-end;
@@ -68,6 +76,7 @@ body {
   margin: 10px;
   padding: 10px;
   background-color: azure;
+  width: 100%;
 }
 
 .dashboard .sidebar-resizer {
@@ -112,4 +121,12 @@ body {
 
 .tag-input {
   width: 30% !important;
+}
+
+/* Drawer */
+.drawer {
+  margin-top: 60px;
+  width: 30% !important;
+  /* z-index: -1; */
+  /* overflow: "auto" */
 }
