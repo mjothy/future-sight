@@ -4,7 +4,11 @@
 
 body {
   margin: 0;
-  min-height: 100vh;
+  max-height: 100vh;
+}
+
+.App{
+  max-height: 100vh;
 }
 
 .center {
@@ -127,6 +131,8 @@ body {
 .drawer {
   margin-top: 60px;
   width: 30% !important;
-  /* z-index: -1; */
-  /* overflow: "auto" */
+}
+
+.space-div{
+  min-height: 60px;
 }

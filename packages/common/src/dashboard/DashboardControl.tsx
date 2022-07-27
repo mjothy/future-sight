@@ -29,7 +29,7 @@ export default class DashboardControl extends Component<any, any> {
             ?
             <>
               <Button type='default' onClick={this.showActions}>X</Button>
-              <SidebarManager type={this.state.type} data={this.props.data} />
+              <SidebarManager type={this.state.type} {...this.props} />
             </>
             :
             <ActionsSidebar formAddBlock={(type) => this.formAddBlock(type)} />

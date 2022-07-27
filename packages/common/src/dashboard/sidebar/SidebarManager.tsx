@@ -20,9 +20,9 @@ export default class SidebarManager extends Component<any, any> {
   // block type handler
   renderAddBlockView() {
     switch (this.props.type) {
-      case "text": return <TextBlock data={this.props.data} />
-      case "data": return <DataBlock data={this.props.data} />
-      case "control": return <ControlBlock data={this.props.data} />
+      case "text": return <TextBlock {...this.props}/>
+      case "data": return <DataBlock {...this.props}/>
+      case "control": return <ControlBlock {...this.props}/>
       default: return <p>Error ! </p>
     }
   }

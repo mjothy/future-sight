@@ -38,13 +38,7 @@ export default function DataManager(Component) {
     }
 
     fetchVariables = (data) => {
-      return fetch('http://localhost:8080/api/data',{
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: data,
-      })
+      return fetch(`http://localhost:8080/api/variables?model=${data.model}&scenario=${data.scenario}`)
         .then((response) => response.json())
         .then((data) => {
           return data;
@@ -53,13 +47,7 @@ export default function DataManager(Component) {
     }
 
     fetchRegions = (data) => {
-      return fetch('http://localhost:8080/api/regions',{
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: data,
-      })
+      return fetch(`http://localhost:8080/api/regions?model=${data.model}&scenario=${data.scenario}&variable=${data.variable}`)
         .then((response) => response.json())
         .then((data) => {
           return data;

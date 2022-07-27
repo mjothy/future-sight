@@ -6,9 +6,12 @@ import models from './data/models.json';
 import variables from './data/variables.json';
 import regions from './data/regions.json';
 import data from './data/data.json';
+import bodyParser from 'body-parser';
 
 const clientPath = '../../client/build';
 const app = express();
+app.use(bodyParser.json())
+
 app.use(cors());
 const port = 8080; // default port to listen
 
@@ -31,9 +34,9 @@ app.get(`/api/variables`, (req, res) => {
     const model = req.query.model;
     const scenario = req.query.scenario;
 
-    variables.forEach(element => {
-        if (element.Model === model && element.Scenario === scenario)
-            res.send(element.variables);
+    variables.forEach(variable => {
+        if (variable.model === model && variable.scenario === scenario)
+            res.send({...variable});
     });
 
     res.status(404).send("No data found");
@@ -45,10 +48,10 @@ app.get(`/api/regions`, (req, res) => {
     const variable = req.query.variable;
 
 
-    regions.forEach(element => {
-        if (element.Model === model && element.Scenario === scenario &&
-            element.Variable === variable)
-            res.send(element.regions);
+    regions.forEach(region => {
+        if (region.model === model && region.scenario === scenario &&
+            region.variable === variable)
+            res.send(region.regions);
     });
 
     res.status(404).send("No data found");

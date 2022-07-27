@@ -1,5 +1,7 @@
+/* eslint-disable react/jsx-no-undef */
 import { Component } from 'react'
 import { Button, Divider, Select } from 'antd';
+import { Option } from 'antd/lib/mentions';
 
 export default class DataBlock extends Component<any, any> {
 
@@ -7,10 +9,14 @@ export default class DataBlock extends Component<any, any> {
     super(props);
     this.modelSelectionChange = this.modelSelectionChange.bind(this);
     this.scenariosSelectionChange = this.scenariosSelectionChange.bind(this);
+    this.variablesSelectionChange = this.variablesSelectionChange.bind(this);
+
     this.state = {
       scenarios: [],
       selectedModel: {},
       selectedScenario: {},
+      selectedVariable: {},
+
     }
   }
 
@@ -19,13 +25,22 @@ export default class DataBlock extends Component<any, any> {
    * to update the list of scenarios
    */
   modelSelectionChange(modelSelected: string) {
-    const selectedModel = this.props.data.models.filter(model => model.name === modelSelected)[0];
+    const selectedModel = this.props.structureData.models.filter(model => model.name === modelSelected)[0];
     this.setState({ selectedModel, scenarios: selectedModel.scenarios, selectedScenario: {} });
   }
 
   scenariosSelectionChange(selectedScenario: string) {
     const scenario = this.state.selectedModel.scenarios.filter(scenario => scenario.name === selectedScenario)[0];
-    this.setState({ selectedScenario: scenario });
+    const variables = (this.props.structureData.variables.filter(variable => variable.model === this.state.selectedModel.name && variable.scenario === selectedScenario)[0]).variables;
+
+
+    console.log("variables DataBlock: ", variables);
+
+    this.setState({ selectedScenario: scenario, variables });
+  }
+
+  variablesSelectionChange() {
+    // 
   }
 
   addDataBlock = () => {
@@ -39,7 +54,7 @@ export default class DataBlock extends Component<any, any> {
         <Select
           className="width-100"
           placeholder="Please select the model"
-          options={this.props.data.models}
+          options={this.props.structureData.models}
           onChange={this.modelSelectionChange}
           fieldNames={{
             value: "name",
@@ -60,8 +75,22 @@ export default class DataBlock extends Component<any, any> {
           }}
         />
         <Divider />
+        <Select
+          className="width-100"
+          placeholder="Variable"
+          options={this.state.variables}
+          onChange={this.variablesSelectionChange}
+          fieldNames={{
+            value: "name",
+            label: "name",
+          }}
+        />
+
+        <Divider />
         <Button type='primary' className='width-100'
           onClick={this.addDataBlock}>Add data block</Button>
+
+        <div className='space-div'></div>
       </div>
     )
   }

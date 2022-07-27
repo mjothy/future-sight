@@ -21,7 +21,8 @@ class DashboardView extends React.Component<any, any> {
        * Selected models to work with in dashboard
        */
       models: [],
-      scenarios: []
+      scenarios: [],
+      variables: []
     }
   }
 
@@ -49,18 +50,18 @@ class DashboardView extends React.Component<any, any> {
     this.setState({ userData: { ...userData } });
   }
 
-  handleModels = (data) => {
-    this.setState({models: data});
+  handleStructureData = (models, variables) => {
+    this.setState({models, variables});
   }
 
   dashboardAddForm = () => {
     return <SetupView userData={this.state.userData} submitEvent={this.handleSubmit} updateUserData={this.handleUserData}
-                      handleModels = {this.handleModels} models = {this.state.models} />
+    handleStructureData = {this.handleStructureData} models = {this.state.models} />
   }
 
   dashboardManager = () => {
     // props: scenarios, models, userData ... (gettong selected data from SetupView)
-    return <Dashboard userData={this.state.userData} models = {this.state.models}submitEvent={this.handleSubmit} />
+    return <Dashboard userData={this.state.userData} structureData = {{models: this.state.models, variables: this.state.variables}} submitEvent={this.handleSubmit} />
   }
   render() {
     return (

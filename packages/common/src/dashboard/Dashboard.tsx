@@ -4,7 +4,8 @@ import DashboardConfigControl from './DashboardConfigControl';
 import initialState from './initialState';
 import {
   MenuFoldOutlined,
-  MenuUnfoldOutlined
+  MenuUnfoldOutlined,
+  LeftCircleFilled
 } from '@ant-design/icons';
 import layoutConfig from './layoutConfig';
 import { Button, Drawer, Space } from 'antd';
@@ -36,26 +37,27 @@ export default class Dashboard extends Component<any, any> {
 
     return (
       <div className='dashboard'>
-        <div>
-          <Drawer
-            placement={this.state.placement}
-            width={500}
-            visible={this.state.collapsed}
-            onClose={setVisibility}
-            maskClosable={false}
-            mask={false}
-            className={"drawer"}
-            style={!this.state.collapsed ? {zIndex:'-1'}: {zIndex:'0'}}
-            extra={
-              <Space>
-                <Button onClick={setPlacement} value="left">left</Button>
-                <Button onClick={setPlacement} value="right">right</Button>
-              </Space>
-            }
-          >
-            <DashboardConfigControl data={this.props} />
-          </Drawer>
-        </div>
+        <Drawer
+          placement={this.state.placement}
+          width={500}
+          visible={this.state.collapsed}
+          onClose={setVisibility}
+          maskClosable={false}
+          mask={false}
+          className={"drawer"}
+          style={!this.state.collapsed ? { zIndex: '-1' } : { zIndex: '999' }}
+          extra={
+            <Space>
+              <Button onClick={() => this.props.submitEvent(false)}>
+                <LeftCircleFilled />
+              </Button>                
+              <Button onClick={setPlacement} value="left">left</Button>
+              <Button onClick={setPlacement} value="right">right</Button>
+            </Space>
+          }
+        >
+          <DashboardConfigControl {...this.props} />
+        </Drawer>
         <div className="dashboard-content">
           <div>
             {React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
