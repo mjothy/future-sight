@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-undef */
 import { Component } from 'react'
 import { Button, Divider, Select } from 'antd';
 
@@ -31,15 +30,20 @@ export default class DataBlock extends Component<any, any> {
   scenariosSelectionChange(selectedScenario: string) {
     const scenario = this.state.selectedModel.scenarios.filter(scenario => scenario.name === selectedScenario)[0];
     const variables = (this.props.structureData.variables.filter(variable => variable.model === this.state.selectedModel.name && variable.scenario === selectedScenario)[0]).variables;
-
-
-    console.log("variables DataBlock: ", variables);
-
     this.setState({ selectedScenario: scenario, variables });
   }
 
-  variablesSelectionChange() {
-    // 
+  variablesSelectionChange(variable: string) {
+
+    const data = {
+      model: this.state.selectedModel.name,
+      scenario: this.state.selectedScenario.name,
+      variable: variable
+    }
+
+    this.props.dataManager.fetchRegions(data).then(regions =>
+      this.setState({ regions })
+    )
   }
 
   addDataBlock = () => {
@@ -84,7 +88,16 @@ export default class DataBlock extends Component<any, any> {
             label: "name",
           }}
         />
-
+        <Divider />
+        <Select
+          className="width-100"
+          placeholder="Regions"
+          options={this.state.regions}
+          fieldNames={{
+            value: "name",
+            label: "name",
+          }}
+        />
         <Divider />
         <Button type='primary' className='width-100'
           onClick={this.addDataBlock}>Add data block</Button>
