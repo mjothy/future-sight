@@ -1,9 +1,8 @@
 import { useState } from "react";
+import DataManagerContextProvider from "../../services/DataManagerContextProvider";
 
 import "./App.css";
-import DashboardView from "../dashboard/DashboardView";
-import Navbar from "./Navbar";
-
+import AppComponent from "./AppComponent";
 
 export default function App() {
   const [apiResponse, setApiResponse] = useState("");
@@ -24,8 +23,10 @@ export default function App() {
 
   return (
     <div className="App">
-      <Navbar/>
-      <DashboardView />
+      {/* All components inside DataManagerContextProvider, can access to DataManagerContext */}
+      <DataManagerContextProvider>
+        <AppComponent />
+      </DataManagerContextProvider>
     </div>
   );
 }

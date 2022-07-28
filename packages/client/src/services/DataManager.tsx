@@ -1,19 +1,20 @@
-import React from 'react'
 
-// Make the datamanager(endpoints) accessible using to other component using HOC
+export default class DataManager {
+    url: string;
+    port: number;
 
-export default function DataManager(Component) {
-  return class extends React.Component<any, any> {
-
-    constructor(props) {
-      super(props);
-      this.state = {
-        data: {}
-      }
+    constructor() {
+      this.url = 'http://localhost'
+      this.port = 8080;
     }
+
+    getBaseUrl(){
+      return this.url + ':'+this.port + '/api'
+    }
+
     fetchData = (data) => {
       
-      return fetch('http://localhost:8080/api/data',{
+      return fetch(`${this.getBaseUrl()}/data`,{
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -29,7 +30,7 @@ export default function DataManager(Component) {
     }
 
     fetchModels = () => {
-      return fetch('http://localhost:8080/api/models')
+      return fetch(`${this.getBaseUrl()}/models`)
         .then((response) => response.json())
         .then((data) => {
           return data;
@@ -38,7 +39,7 @@ export default function DataManager(Component) {
     }
 
     fetchVariables = (data) => {
-      return fetch(`http://localhost:8080/api/variables?model=${data.model}&scenario=${data.scenario}`)
+      return fetch(`${this.getBaseUrl()}/variables?model=${data.model}&scenario=${data.scenario}`)
         .then((response) => response.json())
         .then((data) => {
           return data;
@@ -47,7 +48,7 @@ export default function DataManager(Component) {
     }
 
     fetchRegions = (data) => {
-      return fetch(`http://localhost:8080/api/regions?model=${data.model}&scenario=${data.scenario}&variable=${data.variable}`)
+      return fetch(`${this.getBaseUrl()}/regions?model=${data.model}&scenario=${data.scenario}&variable=${data.variable}`)
         .then((response) => response.json())
         .then((data) => {
           return data;
@@ -55,10 +56,4 @@ export default function DataManager(Component) {
         .catch(err => err);
     }
 
-    render() {
-      return (
-        <Component dataManager={this} {...this.props} />
-      )
-    }
-  }
 }

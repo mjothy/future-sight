@@ -54,7 +54,7 @@ app.get(`/api/regions`, (req, res) => {
             res.send(region.regions);
     });
 
-    res.status(404).send("No data found");
+    res.status(404).send([]);
 });
 
 // Serve the HTML page
