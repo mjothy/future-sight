@@ -72,13 +72,7 @@ class DataStructureForm extends Component<any, any> {
         models = [model, ...models];
       }
 
-      // Find variables and regions
-
-      const variables = this.getVariables(models);
-      console.log("variables: ", variables);
-
-      this.props.handleStructureData(models, variables);
-      // this.props.handleVariables(variables);
+      this.props.handleStructureData(models);
       this.resetForm();
     }
   }
@@ -89,27 +83,6 @@ class DataStructureForm extends Component<any, any> {
    */
   isModelExist = () => {
     return this.props.structureData.models.filter(model => model.name === this.state.selectedModel.name);
-  }
-
-  getVariables = (models) => {
-
-    const variables:any[] = [];
-    models.map(model => {
-      model.scenarios.map(scenario => {
-        const data = {
-          model: model.name,
-          scenario: scenario.name
-        }
-        console.log("data: ", data);
-        this.props.dataManager.fetchVariables(data).then(res => {
-          console.log("res: ", res);
-          // variables = [...variables , res]
-          variables.push({...res})
-        }
-          );
-      });
-    });
-    return variables;
   }
 
   /**

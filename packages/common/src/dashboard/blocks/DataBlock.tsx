@@ -1,5 +1,6 @@
 import { Component } from 'react'
 import { Button, Divider, Select } from 'antd';
+import { Option } from 'antd/lib/mentions';
 
 export default class DataBlock extends Component<any, any> {
 
@@ -11,9 +12,13 @@ export default class DataBlock extends Component<any, any> {
 
     this.state = {
       scenarios: [],
-      selectedModel: {},
-      selectedScenario: {},
-      selectedVariable: {},
+      selectedModels: [],
+      selectedScenarios: [],
+      selectedVariable: [],
+      selectedRegions: [],
+
+      variables: [],
+      regions: []
 
     }
   }
@@ -21,29 +26,81 @@ export default class DataBlock extends Component<any, any> {
   /**
    * Trigged when the list of selection models changed
    * to update the list of scenarios
+   * @param selectedModelsString Array of names of all selected models
    */
-  modelSelectionChange(modelSelected: string) {
-    const selectedModel = this.props.structureData.models.filter(model => model.name === modelSelected)[0];
-    this.setState({ selectedModel, scenarios: selectedModel.scenarios, selectedScenario: {} });
+  modelSelectionChange(selectedModelsString: string[]) {
+    // map into the string array, find the model, fetch scenario and add it to 
+    const selectedModels: any[] = [];
+    const scenarios: any = [];
+
+    selectedModelsString.map(model => {
+      const modelExist = this.getModel(model);
+      if (modelExist) selectedModels.push(modelExist);
+    })
+
+    selectedModels.map(e => scenarios.push(...e.scenarios))
+    this.setState({ selectedModels, scenarios });
   }
 
-  scenariosSelectionChange(selectedScenario: string) {
-    const scenario = this.state.selectedModel.scenarios.filter(scenario => scenario.name === selectedScenario)[0];
-    const variables = (this.props.structureData.variables.filter(variable => variable.model === this.state.selectedModel.name && variable.scenario === selectedScenario)[0]).variables;
-    this.setState({ selectedScenario: scenario, variables });
+  getModel(model: string) {
+    const selectedModel = this.props.structureData.models.filter(modelElement => modelElement.name === model)[0];
+    return selectedModel;
   }
 
-  variablesSelectionChange(variable: string) {
+  /**
+   * 
+   * @param selectedScenariosString 
+   */
+  scenariosSelectionChange(selectedScenariosString: string[]) {
+    // get variables of the selected scenarios
+    // change it after to filter by {model, scenario}
+    const selectedScenarios: any[] = [];
+    this.state.selectedModels.map(model => {
 
-    const data = {
-      model: this.state.selectedModel.name,
-      scenario: this.state.selectedScenario.name,
-      variable: variable
-    }
+      model.scenarios.map(scenario => {
+        if (selectedScenariosString.includes(scenario.name)) {
+          selectedScenarios.push(scenario);
+          this.setVariables(model, scenario);
+        }
+        this.setState({ selectedScenarios });
+      });
+    });
 
-    this.props.dataManager.fetchRegions(data).then(regions =>
-      this.setState({ regions })
-    )
+  }
+
+  setVariables = (model, scenario) => {
+    this.props.dataManager.fetchVariables({
+      model: model.name,
+      scenario: scenario.name
+    }).then(data => {
+      const vars = data.variables.filter(e => {
+        if (!this.state.variables.includes(e.name)) return e;
+      }).map(e => e.name);
+      this.setState({ variables: [...this.state.variables, ...vars] })
+    });
+  }
+
+  variablesSelectionChange(variables: string[]) {
+    // get Region by {model, scenario, variable}
+    this.state.selectedModels.map(model => {
+      this.state.selectedScenarios.map(scenario => {
+        variables.map(variable => {
+          this.props.dataManager.fetchRegions({
+            model: model.name,
+            scenario: scenario.name,
+            variable: variable
+          }).then(fetchRegions => {
+            fetchRegions.map(r => {
+              if (!this.state.regions.includes(r.name))
+                this.state.regions.push(r.name);
+            })
+            this.setState({ regions: this.state.regions })
+          });
+
+
+        })
+      })
+    })
   }
 
   addDataBlock = () => {
@@ -55,6 +112,7 @@ export default class DataBlock extends Component<any, any> {
       <div className='width-100'>
         <Divider />
         <Select
+          mode="multiple"
           className="width-100"
           placeholder="Please select the model"
           options={this.props.structureData.models}
@@ -67,9 +125,9 @@ export default class DataBlock extends Component<any, any> {
 
         <Divider />
         <Select
+          mode="multiple"
           className="width-100"
           placeholder="Scenario"
-          value={this.state.selectedScenario.name}
           options={this.state.scenarios}
           onChange={this.scenariosSelectionChange}
           fieldNames={{
@@ -79,25 +137,25 @@ export default class DataBlock extends Component<any, any> {
         />
         <Divider />
         <Select
+          mode="multiple"
           className="width-100"
           placeholder="Variable"
-          options={this.state.variables}
           onChange={this.variablesSelectionChange}
-          fieldNames={{
-            value: "name",
-            label: "name",
-          }}
-        />
+        >
+          {this.state.variables.map(variable =>
+            <Option key={variable} value={variable}>{variable}</Option>
+          )}
+        </Select>
         <Divider />
         <Select
+          mode="multiple"
           className="width-100"
           placeholder="Regions"
-          options={this.state.regions}
-          fieldNames={{
-            value: "name",
-            label: "name",
-          }}
-        />
+        >
+          {this.state.regions.map(region =>
+            <Option key={region} value={region}>{region}</Option>
+          )}
+        </Select>
         <Divider />
         <Button type='primary' className='width-100'
           onClick={this.addDataBlock}>Add data block</Button>
