@@ -18,7 +18,11 @@ export default class DataBlock extends Component<any, any> {
       selectedRegions: [],
 
       variables: [],
-      regions: []
+      regions: [],
+
+      data: [],
+
+      click: 0
 
     }
   }
@@ -96,8 +100,6 @@ export default class DataBlock extends Component<any, any> {
             })
             this.setState({ regions: this.state.regions })
           });
-
-
         })
       })
     })
@@ -105,6 +107,25 @@ export default class DataBlock extends Component<any, any> {
 
   addDataBlock = () => {
     // Add datablock
+    // fetch data by model, scenario, variables and regions selected
+    this.props.dataManager.fetchData().then(data => this.setState({ data }, () => {
+      // Add changes directly to Database (json file)
+      const layout = {
+        w: 4,
+        h: 2,
+        x: this.state.click,
+        y: 0,
+        i: "graph" + this.state.click
+      };
+      // Change on database
+      const key = "graph" + this.state.click;
+      const data1 = {}
+      data1[key] = data[0]
+      // Send the props to Dashboard.tsx (Thant inject the data and layout to DashboardConfigView)
+      this.props.buildLayouts(layout, data1);
+      this.setState({ click: this.state.click + 1 });
+
+    }))
   }
 
   render() {

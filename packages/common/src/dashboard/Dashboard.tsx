@@ -1,13 +1,11 @@
 import React, { Component } from 'react'
 import DashboardConfigView from './DashboardConfigView';
 import DashboardConfigControl from './DashboardConfigControl';
-import initialState from './initialState';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   LeftCircleFilled
 } from '@ant-design/icons';
-import layoutConfig from './layoutConfig';
 import { Button, Drawer, Space } from 'antd';
 
 export default class Dashboard extends Component<any, any> {
@@ -16,12 +14,35 @@ export default class Dashboard extends Component<any, any> {
     super(props);
     this.state = {
       collapsed: false,
-      placement: 'left',
+      placement: 'right',
+      // layouts: {
+      //   lg: [],
+      //   md: [],
+      //   sm: [],
+      //   xs: [],
+      //   xxs: [],
+      // },
+      layouts: [],
+      data: {}
     }
   }
 
   componentDidMount() {
     window.scrollTo(0, 0)
+  }
+
+  buildLayouts = (layout, data) => {
+    // Object.keys(this.state.layouts).map(key => {
+    //   this.state.layouts[key].push(layout);
+    // });
+
+    this.state.layouts.push(layout);
+    const newData = this.state.data;
+    Object.keys(data).map(key => {
+      newData[key] = data[key];
+    })
+
+    this.setState({ layouts: this.state.layouts, data: newData });
   }
 
   render() {
@@ -50,13 +71,13 @@ export default class Dashboard extends Component<any, any> {
             <Space>
               <Button onClick={() => this.props.submitEvent(false)}>
                 <LeftCircleFilled />
-              </Button>                
+              </Button>
               <Button onClick={setPlacement} value="left">left</Button>
               <Button onClick={setPlacement} value="right">right</Button>
             </Space>
           }
         >
-          <DashboardConfigControl {...this.props} />
+          <DashboardConfigControl {...this.props} buildLayouts={this.buildLayouts} />
         </Drawer>
         <div className="dashboard-content">
           <div>
@@ -65,7 +86,7 @@ export default class Dashboard extends Component<any, any> {
               onClick: () => setVisibility(),
             })}
           </div>
-          <DashboardConfigView data={initialState.data} layouts={layoutConfig} />
+          <DashboardConfigView data={this.state.data} layouts={this.state.layouts} />
         </div>
       </div>
     )

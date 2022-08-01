@@ -1,10 +1,10 @@
 [
     {
-        "Model": "TIAM-ECN 1.2",
-        "Scenario": "DIAG_Nzero",
+        "model": "TIAM-ECN 1.2",
+        "scenario": "DIAG_Nzero",
         "region": "Europe (excl. Turkey)",
-        "Variable": "Capacity|Electricity|Coal|w/o CCS",
-        "Unit": "GW",
+        "variable": "Capacity|Electricity|Coal|w/o CCS",
+        "unit": "GW",
         "data": [
             {
                 "year": 2005,
@@ -20,16 +20,16 @@
             },
             {
                 "year": 2016,
-                "val": 12.3333
+                "value": 12.3333
             }
         ]
     },
     {
-        "Model": "OSeMBE v1.0.0",
-        "Scenario": "DIAG-Base",
+        "model": "OSeMBE v1.0.0",
+        "scenario": "DIAG-Base",
         "Region": "Europe (excl. Turkey)",
-        "Variable": "Capacity|Electricity|Coal|w/o CCS",
-        "Unit": "GW",
+        "variable": "Capacity|Electricity|Coal|w/o CCS",
+        "unit": "GW",
         "data": [
             {
                 "year": 2005,
@@ -50,11 +50,11 @@
         ]
     },
     {
-        "Model": "OSeMBE v1.0.0",
-        "Scenario": "DIAG-Base",
+        "model": "OSeMBE v1.0.0",
+        "scenario": "DIAG-Base",
         "Region": "EU27 & UK",
-        "Variable": "Capacity|Electricity|Coal",
-        "Unit": "GW",
+        "variable": "Capacity|Electricity|Coal",
+        "unit": "GW",
         "data": [
             {
                 "year": 2005,
@@ -75,11 +75,11 @@
         ]
     },
     {
-        "Model": "OSeMBE v1.0.0",
-        "Scenario": "DIAG-Base",
+        "model": "OSeMBE v1.0.0",
+        "scenario": "DIAG-Base",
         "Region": "EU27 & EFTA",
-        "Variable": "Capacity|Electricity|Coal",
-        "Unit": "GW",
+        "variable": "Capacity|Electricity|Coal",
+        "unit": "GW",
         "data": [
             {
                 "year": 2005,
@@ -100,8 +100,8 @@
         ]
     },
     {
-        "Model": "OSeMBE v1.0.0",
-        "Scenario": "DIAG-C0to80-gr5",
+        "model": "OSeMBE v1.0.0",
+        "scenario": "DIAG-C0to80-gr5",
         "region": "R5ASIA",
         "unit": "million t DM/yr",
         "variable": "Agricultural Demand|Energy",
@@ -129,8 +129,8 @@
         ]
     },
     {
-        "Model": "OSeMBE v1.0.0",
-        "Scenario": "DIAG-C400-lin",
+        "model": "OSeMBE v1.0.0",
+        "scenario": "DIAG-C400-lin",
         "region": "R5ASIA",
         "unit": "million t DM/yr",
         "variable": "Agricultural Demand|Energy|Crops",

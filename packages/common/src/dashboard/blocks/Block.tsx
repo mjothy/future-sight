@@ -4,23 +4,41 @@ import Plot from 'react-plotly.js';
 // Responsability choise the block
 
 export default class Block extends Component<any,any> {
-  render() {
-    console.log("Block data: ", this.props.data)
 
-    return (        
+  constructor(props){
+    super(props);
+  }
+  render() {
+    const data = this.props.data;  
+    
+    const getX = () => {
+      const x :string[]= []; 
+      data.data.map(d => x.push(d.year))
+      return x;
+    }
+
+    const getY = () => {
+      const y :string[]= []; 
+      data.data.map(d => y.push(d.value))
+      return y;
+    }
+
+    return (  
+      <div>
       <Plot
         data={[
           {
-            x: [1, 2, 3],
-            y: [2, 6, 3],
+            x: getX(),
+            y: getY(),
             type: 'scatter',
             mode: 'lines+markers',
             marker: {color: 'red'},
           },
-          {type: 'bar', x: [1, 2, 3], y: [2, 5, 3]},
+          {type: 'bar', x: getX(), y: getY()},
         ]}
-        layout={ {width: 320, height: 240, title: 'A Fancy Plot'} }
+        layout={ {width: 300, height: 250, title: data.model + '/'+data.scenario} }
       />
+      </div>
         )
   }
 }
