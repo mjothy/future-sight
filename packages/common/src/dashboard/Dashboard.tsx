@@ -15,14 +15,13 @@ export default class Dashboard extends Component<any, any> {
     this.state = {
       collapsed: false,
       placement: 'right',
-      // layouts: {
-      //   lg: [],
-      //   md: [],
-      //   sm: [],
-      //   xs: [],
-      //   xxs: [],
-      // },
-      layouts: [],
+      layouts: {
+        lg: [],
+        md: [],
+        sm: [],
+        xs: [],
+        xxs: [],
+      },
       data: {}
     }
   }
@@ -31,18 +30,20 @@ export default class Dashboard extends Component<any, any> {
     window.scrollTo(0, 0)
   }
 
-  buildLayouts = (layout, data) => {
-    // Object.keys(this.state.layouts).map(key => {
-    //   this.state.layouts[key].push(layout);
-    // });
+  buildLayouts = (layouts, data) => {
 
-    this.state.layouts.push(layout);
+    const newLayouts = {...this.state.layouts};
+    Object.keys(this.state.layouts).map(key => {
+      newLayouts[key] = [...newLayouts[key], ...layouts[key]];
+    });
+
     const newData = this.state.data;
     Object.keys(data).map(key => {
       newData[key] = data[key];
     })
 
-    this.setState({ layouts: this.state.layouts, data: newData });
+
+    this.setState({ layouts: newLayouts, data: newData });
   }
 
   render() {

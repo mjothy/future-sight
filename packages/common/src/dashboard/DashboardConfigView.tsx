@@ -32,7 +32,7 @@ class DashboardConfigView extends Component<any, any> {
     return (
       <ResponsiveGridLayout
         className="layout"
-        layouts={{lg: layouts}}
+        layouts={layouts}
         autoSize={true}
         isDraggable={true}
         isResizable={true}
