@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import withDataManager from './withDataManager';
 
-export const DataManagerContext = React.createContext({});
+export const DataManagerContext = React.createContext({dataManager:{}});
 
 /**
  * Provide the dataManager class to all children components using react context
@@ -17,4 +17,4 @@ class DataManagerContextProvider extends Component<any, any> {
     }
 }
 
-export default withDataManager(DataManagerContextProvider);
+export default DataManagerContextProvider;

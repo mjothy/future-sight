@@ -1,6 +1,7 @@
 import { Component } from 'react'
 import { Button, Divider, Select } from 'antd';
 import { Option } from 'antd/lib/mentions';
+import PlotTypes from '../graphs/PlotTypes';
 
 export default class DataBlock extends Component<any, any> {
 
@@ -9,6 +10,7 @@ export default class DataBlock extends Component<any, any> {
     this.modelSelectionChange = this.modelSelectionChange.bind(this);
     this.scenariosSelectionChange = this.scenariosSelectionChange.bind(this);
     this.variablesSelectionChange = this.variablesSelectionChange.bind(this);
+    this.plotTypeOnChange = this.plotTypeOnChange.bind(this);
 
     this.state = {
       scenarios: [],
@@ -22,7 +24,9 @@ export default class DataBlock extends Component<any, any> {
 
       data: [],
 
-      click: 0
+      click: 0,
+
+      plotType: "line"
 
     }
   }
@@ -105,24 +109,37 @@ export default class DataBlock extends Component<any, any> {
     })
   }
 
+  plotTypeOnChange(plotType: string){
+    console.log("plotType selected: ", plotType);
+    this.setState({plotType})
+  }
+
   addDataBlock = () => {
     // Add datablock
     // fetch data by model, scenario, variables and regions selected
     this.props.dataManager.fetchData().then(data => this.setState({ data }, () => {
       // Add changes directly to Database (json file)
-      const layout = {
+      const layout = [{
         w: 4,
         h: 2,
-        x: this.state.click,
+        x: 0,
         y: 0,
         i: "graph" + this.state.click
-      };
+      }];
+      const layouts = {
+          lg: layout,
+          md: layout,
+          sm: layout,
+          xs: layout,
+          xxs: layout,
+        };
       // Change on database
       const key = "graph" + this.state.click;
       const data1 = {}
+      data[0].type = this.state.plotType;
       data1[key] = data[0]
       // Send the props to Dashboard.tsx (Thant inject the data and layout to DashboardConfigView)
-      this.props.buildLayouts(layout, data1);
+      this.props.buildLayouts(layouts, data1);
       this.setState({ click: this.state.click + 1 });
 
     }))
@@ -177,6 +194,18 @@ export default class DataBlock extends Component<any, any> {
             <Option key={region} value={region}>{region}</Option>
           )}
         </Select>
+        <Divider />
+        <Select
+          className="width-100"
+          placeholder="Graph type"
+          defaultValue={this.state.plotType}
+          options={PlotTypes}
+          onChange={this.plotTypeOnChange}
+          fieldNames={{
+            value: "type",
+            label: "type",
+          }}
+        />
         <Divider />
         <Button type='primary' className='width-100'
           onClick={this.addDataBlock}>Add data block</Button>

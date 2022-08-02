@@ -34,16 +34,16 @@ export default class Dashboard extends Component<any, any> {
 
     const newLayouts = {...this.state.layouts};
     Object.keys(this.state.layouts).map(key => {
-      newLayouts[key] = [...newLayouts[key], ...layouts[key]];
+      newLayouts[key] = [ ...layouts[key], ...newLayouts[key]];
     });
 
-    const newData = this.state.data;
+    const newData = [];
     Object.keys(data).map(key => {
       newData[key] = data[key];
     })
 
 
-    this.setState({ layouts: newLayouts, data: newData });
+    this.setState({ layouts: newLayouts, data: {...newData, ...this.state.data}});
   }
 
   render() {

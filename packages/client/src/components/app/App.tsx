@@ -1,8 +1,11 @@
 import { useState } from "react";
+import DataManager from "../../services/DataManager";
 import DataManagerContextProvider from "../../services/DataManagerContextProvider";
 
 import "./App.css";
 import AppComponent from "./AppComponent";
+
+const dataManager = new DataManager();
 
 export default function App() {
   const [apiResponse, setApiResponse] = useState("");
@@ -24,7 +27,7 @@ export default function App() {
   return (
     <div className="App">
       {/* All components inside DataManagerContextProvider, can access to DataManagerContext */}
-      <DataManagerContextProvider>
+      <DataManagerContextProvider dataManager={dataManager}>
         <AppComponent />
       </DataManagerContextProvider>
     </div>

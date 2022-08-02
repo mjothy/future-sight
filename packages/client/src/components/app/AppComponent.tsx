@@ -1,16 +1,18 @@
 import React, { Component } from 'react'
 import { DataManagerContext } from '../../services/DataManagerContextProvider';
+import withDataManager from '../../services/withDataManager';
 import DashboardView from "../dashboard/DashboardView";
 import Navbar from "./Navbar";
 
-export default class AppComponent extends Component {
-    static contextType = DataManagerContext;
+class AppComponent extends Component {
+
     render() {
-        const dataManager = this.context
         return (
             <>
-                <Navbar {...dataManager} />
-                <DashboardView {...dataManager} />
+                <Navbar  />
+                <DashboardView />
             </>)
     }
 }
+
+export default AppComponent;

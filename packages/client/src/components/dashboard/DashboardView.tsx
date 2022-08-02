@@ -1,5 +1,6 @@
 import { Dashboard } from '@future-sight/common'
 import React from 'react'
+import withDataManager from '../../services/withDataManager';
 import SetupView from './form/SetupView';
 
 /**
@@ -72,4 +73,4 @@ class DashboardView extends React.Component<any, any> {
   }
 }
 
-export default DashboardView;
+export default withDataManager(DashboardView);

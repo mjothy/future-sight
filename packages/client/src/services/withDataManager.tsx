@@ -1,13 +1,19 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
 import DataManager from './DataManager';
-const dataManager = new DataManager();
+import { DataManagerContext } from './DataManagerContextProvider';
 
 export default function withDataManager(Component) {
-    class withDataManager extends React.Component {
+    class withDataManager extends React.Component<any,any> {
+
         static displayName: string;
-        render(){
-            return <Component {...this.props} dataManager = {dataManager} />
+        render() {
+            return <DataManagerContext.Consumer>
+                {
+                context => {
+                    return <Component {...this.props} dataManager={context.dataManager} />
+                }}
+            </DataManagerContext.Consumer>
         }
     }
 
