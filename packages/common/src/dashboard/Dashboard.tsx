@@ -32,9 +32,9 @@ export default class Dashboard extends Component<any, any> {
 
   buildLayouts = (layouts, data) => {
 
-    const newLayouts = {...this.state.layouts};
+    const newLayouts = { ...this.state.layouts };
     Object.keys(this.state.layouts).map(key => {
-      newLayouts[key] = [ ...layouts[key], ...newLayouts[key]];
+      newLayouts[key] = [...layouts[key], ...newLayouts[key]];
     });
 
     const newData = [];
@@ -43,7 +43,7 @@ export default class Dashboard extends Component<any, any> {
     })
 
 
-    this.setState({ layouts: newLayouts, data: {...newData, ...this.state.data}});
+    this.setState({ layouts: newLayouts, data: { ...newData, ...this.state.data } });
   }
 
   render() {

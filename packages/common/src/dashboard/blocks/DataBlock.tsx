@@ -7,16 +7,12 @@ export default class DataBlock extends Component<any, any> {
 
   constructor(props) {
     super(props);
-    this.modelSelectionChange = this.modelSelectionChange.bind(this);
-    this.scenariosSelectionChange = this.scenariosSelectionChange.bind(this);
-    this.variablesSelectionChange = this.variablesSelectionChange.bind(this);
-    this.plotTypeOnChange = this.plotTypeOnChange.bind(this);
-
+    this.binding();
     this.state = {
       scenarios: [],
       selectedModels: [],
       selectedScenarios: [],
-      selectedVariable: [],
+      selectedVariables: [],
       selectedRegions: [],
 
       variables: [],
@@ -26,92 +22,66 @@ export default class DataBlock extends Component<any, any> {
 
       click: 0,
 
-      plotType: "line"
+      plotType: "line",
 
+      visualizationData: []
     }
+  }
+
+  binding() {
+    this.modelSelectionChange = this.modelSelectionChange.bind(this);
+    this.scenariosSelectionChange = this.scenariosSelectionChange.bind(this);
+    this.variablesSelectionChange = this.variablesSelectionChange.bind(this);
+    this.plotTypeOnChange = this.plotTypeOnChange.bind(this);
   }
 
   /**
    * Trigged when the list of selection models changed
    * to update the list of scenarios
-   * @param selectedModelsString Array of names of all selected models
+   * @param selectedModels Array of names of all selected models
    */
-  modelSelectionChange(selectedModelsString: string[]) {
-    // map into the string array, find the model, fetch scenario and add it to 
-    const selectedModels: any[] = [];
-    const scenarios: any = [];
+  modelSelectionChange(selectedModels: string[]) {
+    this.setState({ selectedModels }, () => {
+      this.setVariablesRegions();
+    });
 
-    selectedModelsString.map(model => {
-      const modelExist = this.getModel(model);
-      if (modelExist) selectedModels.push(modelExist);
-    })
-
-    selectedModels.map(e => scenarios.push(...e.scenarios))
-    this.setState({ selectedModels, scenarios });
-  }
-
-  getModel(model: string) {
-    const selectedModel = this.props.structureData.models.filter(modelElement => modelElement.name === model)[0];
-    return selectedModel;
   }
 
   /**
    * 
-   * @param selectedScenariosString 
+   * @param selectedScenarios 
    */
-  scenariosSelectionChange(selectedScenariosString: string[]) {
-    // get variables of the selected scenarios
-    // change it after to filter by {model, scenario}
-    const selectedScenarios: any[] = [];
-    this.state.selectedModels.map(model => {
+  scenariosSelectionChange(selectedScenarios: string[]) {
+    this.setState({ selectedScenarios }, () => {
+      this.setVariablesRegions();
+    })
 
-      model.scenarios.map(scenario => {
-        if (selectedScenariosString.includes(scenario.name)) {
-          selectedScenarios.push(scenario);
-          this.setVariables(model, scenario);
+  }
+
+  setVariablesRegions = () => {
+
+    const data = this.props.structureData;
+    const models = this.state.selectedModels;
+    const scenarios = this.state.selectedScenarios;
+    const variables: any[] = [];
+    const regions: any[] = [];
+    models.map(model => {
+      scenarios.map(scenario => {
+        if (data[model][scenario] != null) {
+          variables.push(...data[model][scenario].variables)
+          regions.push(...data[model][scenario].regions)
         }
-        this.setState({ selectedScenarios });
-      });
-    });
-
-  }
-
-  setVariables = (model, scenario) => {
-    this.props.dataManager.fetchVariables({
-      model: model.name,
-      scenario: scenario.name
-    }).then(data => {
-      const vars = data.variables.filter(e => {
-        if (!this.state.variables.includes(e.name)) return e;
-      }).map(e => e.name);
-      this.setState({ variables: [...this.state.variables, ...vars] })
-    });
-  }
-
-  variablesSelectionChange(variables: string[]) {
-    // get Region by {model, scenario, variable}
-    this.state.selectedModels.map(model => {
-      this.state.selectedScenarios.map(scenario => {
-        variables.map(variable => {
-          this.props.dataManager.fetchRegions({
-            model: model.name,
-            scenario: scenario.name,
-            variable: variable
-          }).then(fetchRegions => {
-            fetchRegions.map(r => {
-              if (!this.state.regions.includes(r.name))
-                this.state.regions.push(r.name);
-            })
-            this.setState({ regions: this.state.regions })
-          });
-        })
       })
     })
+    this.setState({ variables: [... new Set(variables)], regions: [... new Set(regions)] });
   }
 
-  plotTypeOnChange(plotType: string){
-    console.log("plotType selected: ", plotType);
-    this.setState({plotType})
+  variablesSelectionChange(selectedVariables: string[]) {
+    this.setState({ selectedVariables })
+  }
+
+  plotTypeOnChange(plotType: string) {
+    this.setState({ plotType })
   }
 
   addDataBlock = () => {
@@ -127,12 +97,12 @@ export default class DataBlock extends Component<any, any> {
         i: "graph" + this.state.click
       }];
       const layouts = {
-          lg: layout,
-          md: layout,
-          sm: layout,
-          xs: layout,
-          xxs: layout,
-        };
+        lg: layout,
+        md: layout,
+        sm: layout,
+        xs: layout,
+        xxs: layout,
+      };
       // Change on database
       const key = "graph" + this.state.click;
       const data1 = {}
@@ -146,6 +116,7 @@ export default class DataBlock extends Component<any, any> {
   }
 
   render() {
+    const structureData = this.props.structureData;
     return (
       <div className='width-100'>
         <Divider />
@@ -153,31 +124,35 @@ export default class DataBlock extends Component<any, any> {
           mode="multiple"
           className="width-100"
           placeholder="Please select the model"
-          options={this.props.structureData.models}
           onChange={this.modelSelectionChange}
-          fieldNames={{
-            value: "name",
-            label: "name",
-          }}
-        />
+        >
+          {
+            Object.keys(structureData).map(modelKey =>
+              <Option key={modelKey} value={modelKey}>{modelKey}</Option>
+            )}
+        </Select>
 
         <Divider />
         <Select
           mode="multiple"
           className="width-100"
           placeholder="Scenario"
-          options={this.state.scenarios}
           onChange={this.scenariosSelectionChange}
-          fieldNames={{
-            value: "name",
-            label: "name",
-          }}
-        />
+        >
+          {
+            this.state.selectedModels.map((model) => {
+              return Object.keys(structureData[model]).map(scenarioKey =>
+                <Select.Option key={scenarioKey} value={scenarioKey}>{scenarioKey}</Select.Option>
+              )
+            }
+            )
+          }
+        </Select>
         <Divider />
         <Select
           mode="multiple"
           className="width-100"
-          placeholder="Variable"
+          placeholder="Variables"
           onChange={this.variablesSelectionChange}
         >
           {this.state.variables.map(variable =>

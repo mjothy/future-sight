@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Button, Col, Divider, Row, Select } from 'antd';
 import AnalysisDataTable from './AnalysisDataTable';
+import { Option } from 'antd/lib/mentions';
 
 class DataStructureForm extends Component<any, any> {
   data = {};
@@ -17,13 +18,8 @@ class DataStructureForm extends Component<any, any> {
       /**
       * The data selected in dropdownn list
       */
-      selectedModel: {},
+      selectedModel: null,
       selectedScenarios: [],
-
-      /**
-      * The data showed in table
-      */
-      scenariosInTable: []
     }
   }
 
@@ -39,14 +35,15 @@ class DataStructureForm extends Component<any, any> {
    */
   modelSelectionChange(modelSelected: string) {
     const selectedModel = this.state.models.filter(model => model.name === modelSelected)[0];
+    const data = {}
+    data[modelSelected] = {}
     // Change scenarios on dropdown list
     let scenarios: any[] = [];
     scenarios = [...selectedModel.scenarios]
-    this.setState({ scenarios, selectedModel: selectedModel, selectedScenarios: [] });
+    this.setState({ scenarios, selectedModel: selectedModel.name, selectedScenarios: [], data: { ...this.state.data, ...data } });
   }
 
-  scenariosSelectionChange(scenarioSelectes: string[]) {
-    const selectedScenarios = this.state.selectedModel.scenarios.filter(scenario => scenarioSelectes.indexOf(scenario.name) >= 0).map(scenario => scenario)
+  scenariosSelectionChange(selectedScenarios: string[]) {
     this.setState({ selectedScenarios })
   }
 
@@ -54,35 +51,49 @@ class DataStructureForm extends Component<any, any> {
    * To show the selected data in table
    */
   addDataToTable = () => {
-    if (this.state.selectedModel.id != null) {
-
-      // Check if the model selected already in table, if TRUE
-      // update the existing data
-      const modelExist = this.isModelExist();
-      let models = [...this.props.structureData.models];
-      if (modelExist.length > 0) {
-        models.map(model => {
-          if (model.name === this.state.selectedModel.name) {
-            model.scenarios = this.state.selectedScenarios
-          }
-        })
-      } else {
-        const model = { ...this.state.selectedModel };
-        model.scenarios = this.state.selectedScenarios;
-        models = [model, ...models];
-      }
-
-      this.props.handleStructureData(models);
+    if (this.state.selectedModel != "" && this.state.selectedScenarios.length > 0) {
+      const data = this.state.data;
+      const model = this.state.selectedModel;
+      this.state.selectedScenarios.map(scenario => {
+        data[model][scenario] = {
+          regions: [],
+          variables: []
+        }
+        // get variables, and regions
+        this.getVariables(model, scenario).then(res => data[model][scenario].variables = res);
+        this.getRegions(model, scenario).then(res => data[model][scenario].regions = res);
+      })
+      this.props.handleStructureData(data);
       this.resetForm();
     }
   }
 
   /**
-   * Check if the selected model is already existing in table
-   * @returns {boolean}
+   * To fetch the variables of {model, scenario}
+   * @param model model name
+   * @param scenario scenario name
+   * @returns array of strings of variables name
    */
-  isModelExist = () => {
-    return this.props.structureData.models.filter(model => model.name === this.state.selectedModel.name);
+  async getVariables(model, scenario) {
+    const dataManager = this.props.dataManager;
+    const data = {
+      model, scenario
+    }
+    return await dataManager.fetchVariables(data).then(variablesData => variablesData.variables.map(v => v.name));
+  }
+
+  /**
+   * To fetch the regions of {model, scenario}
+   * @param model model name
+   * @param scenario scenario name
+   * @returns array of strings of regions name
+   */
+  async getRegions(model, scenario) {
+    const dataManager = this.props.dataManager;
+    const data = {
+      model, scenario
+    }
+    return await dataManager.fetchRegions(data).then(regionsData => regionsData.map(r => r.name));
   }
 
   /**
@@ -91,10 +102,9 @@ class DataStructureForm extends Component<any, any> {
   resetForm = () => {
     this.setState({
       selectedScenarios: [],
-      selectedModel: {},
-      scenarios: []
+      selectedModel: null,
+      scenarios: [],
     })
-
   }
 
   render() {
@@ -105,7 +115,7 @@ class DataStructureForm extends Component<any, any> {
             <Select
               className="width-100"
               placeholder="Please select the model"
-              value={this.state.selectedModel.name}
+              value={this.state.selectedModel}
               onChange={this.modelSelectionChange}
               options={this.state.models}
               fieldNames={{
@@ -120,14 +130,13 @@ class DataStructureForm extends Component<any, any> {
               mode="multiple"
               className='width-100'
               placeholder="Scenarios"
-              value={this.state.selectedScenarios.map(e => e.name)}
               onChange={this.scenariosSelectionChange}
-              options={this.state.scenarios}
-              fieldNames={{
-                value: "name",
-                label: "name",
-              }}
-            />
+              value={this.state.selectedScenarios}
+            >
+              {this.state.scenarios.map(scenario =>
+                <Option key={scenario.name} value={scenario.name}>{scenario.name}</Option>
+              )}
+            </Select>
           </Col>
           <Divider />
 
@@ -138,11 +147,10 @@ class DataStructureForm extends Component<any, any> {
         <Divider />
 
         <Row justify='center'>
-          <AnalysisDataTable models={this.props.structureData.models} />
+          <AnalysisDataTable structureData={this.props.structureData} />
         </Row>
       </div>
     )
-
   }
 }
 

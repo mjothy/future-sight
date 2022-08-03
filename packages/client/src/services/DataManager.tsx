@@ -48,7 +48,7 @@ export default class DataManager {
     }
 
     fetchRegions = (data) => {
-      return fetch(`${this.getBaseUrl()}/regions?model=${data.model}&scenario=${data.scenario}&variable=${data.variable}`)
+      return fetch(`${this.getBaseUrl()}/regions?model=${data.model}&scenario=${data.scenario}`)
         .then((response) => response.json())
         .then((data) => {
           return data;

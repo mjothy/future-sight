@@ -45,16 +45,13 @@ app.get(`/api/variables`, (req, res) => {
 app.get(`/api/regions`, (req, res) => {
     const model = req.query.model;
     const scenario = req.query.scenario;
-    const variable = req.query.variable;
 
-
+    let allRegions :any[]= [];
     regions.forEach(region => {
-        if (region.model === model && region.scenario === scenario &&
-            region.variable === variable)
-            res.send(region.regions);
+        if (region.model === model && region.scenario === scenario)
+            allRegions = [...allRegions, ...region.regions];
     });
-
-    res.status(404).send([]);
+    res.send(allRegions);
 });
 
 // Serve the HTML page
