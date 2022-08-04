@@ -16,9 +16,21 @@ export default class AnalysisDataTable extends Component<any, any> {
     this.columns = this.setColumns();
   }
 
+  componentDidMount() {
+    this.prepareDataSource();
+  }
+
   componentDidUpdate(prevProps, prevState, snapshot) {
-    const data = this.props.structureData;
     if (this.props.structureData !== prevProps.structureData) {
+      this.prepareDataSource();
+    }
+  }
+
+  prepareDataSource() {
+    const data = this.props.structureData;
+
+    if (data != null) {
+
       const dataSource: any[] = [];
 
       Object.keys(data).map(key => {

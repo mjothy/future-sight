@@ -42,8 +42,11 @@ export default class Dashboard extends Component<any, any> {
       newData[key] = data[key];
     })
 
-
     this.setState({ layouts: newLayouts, data: { ...newData, ...this.state.data } });
+  }
+
+  updateLayouts = (layouts) => {
+    this.setState({ layouts });
   }
 
   render() {
@@ -87,7 +90,7 @@ export default class Dashboard extends Component<any, any> {
               onClick: () => setVisibility(),
             })}
           </div>
-          <DashboardConfigView data={this.state.data} layouts={this.state.layouts} />
+          <DashboardConfigView data={this.state.data} layouts={this.state.layouts} updateLayouts={this.updateLayouts} />
         </div>
       </div>
     )

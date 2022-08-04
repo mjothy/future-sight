@@ -1,55 +1,100 @@
-/* eslint-disable react/prop-types */
 import React, { Component } from "react";
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import Block from "./blocks/Block";
-
-// Responsibility: return all the blocks added by user
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 class DashboardConfigView extends Component<any, any> {
 
-  constructor(props){
+  ref;
+  constructor(props) {
     super(props);
-    this.handleBreakPointChange = this.handleBreakPointChange.bind(this);
-    this.layoutChanged = this.layoutChanged.bind(self);
+    this.ref = [];
+
+    this.state = {
+      width: 200,
+      height: 200,
+      graphsSize: [],
+      currentLayouts: this.props.layouts["lg"]
+    }
   }
 
-  handleBreakPointChange = (breakpoint, cols) => {
-    console.log("here!", breakpoint);
-    console.log("here! cols", cols);
+  /**
+   * Calls back with breakpoint and new cols
+   * @param newBreakPoint 
+   * @param newCols 
+   */
+  onBreakpointChange(newBreakPoint, newCols) {
+    this.updateAllLayoutsView();
+  }
 
-  };
+  /**
+   * Callback with new layouts
+   * @param layouts the update layouts
+   */
+  onLayoutChange = (layouts) => {
+    this.setState({ currentLayouts: layouts }, () => this.updateAllLayoutsView())
+  }
 
+  /**
+   * Calls when resize is complete
+   * @param e The update layouts (returns an array of all layouts in the GridLayoutView)
+   * @param layout current updated layout
+   */
+  resizeStop = (e, layout) => {
+    this.updateLayoutView(layout);
+  }
 
-  layoutChanged = (layouts) => {
-    console.log("enter here layoutsChanged");
-    console.log("Layouts: ", layouts);
+  /**
+   * Update {width,height} of layout item content
+   * @param layout 
+   */
+  updateLayoutView = (layout) => {
+    const key = layout.i;
+    const graphsSize = this.state.graphsSize;
+    const obj = {
+      width: this.ref[key].clientWidth,
+      height: this.ref[key].clientHeight
     }
+    graphsSize[layout.i] = obj;
+    this.setState({ graphsSize });
+  }
+
+  /**
+   * Update {width,height} of all layout items content
+   */
+  updateAllLayoutsView = () => {
+    this.state.currentLayouts.map(layout => {
+      this.updateLayoutView(layout);
+    });
+  }
 
   render() {
     const { data, layouts } = this.props;
+    console.log("layouts['lg']: ", layouts["lg"])
     return (
       <ResponsiveGridLayout
         className="layout"
-        layouts={layouts}
+        layouts={{ lg: layouts["lg"] }}
         autoSize={true}
         isDraggable={true}
         isResizable={true}
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-        cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-        rowHeight = {50}
-        onBreakpointChange = {this.handleBreakPointChange}
-        onLayoutChange={this.layoutChanged}
-        >
+        cols={{ lg: 12, md: 12, sm: 12, xs: 12, xxs: 12 }}
+        rowHeight={100}
+        onLayoutChange={this.onLayoutChange.bind(this)}
+        onBreakpointChange={this.onBreakpointChange.bind(this)}
+        onResizeStop={this.resizeStop.bind(this)}
+      >
         {Object.keys(data).map(item => <div key={item}>
-          <Block data={data[item]} />
+          <div ref={ref => this.ref[item] = ref} id={item} className={"width-100 height-100"}>
+            <Block {...this.props} data={data[item]} width={this.state.graphsSize[item] ? this.state.graphsSize[item].width : 300} height={this.state.graphsSize[item] ? this.state.graphsSize[item].height : 300} />
+          </div>
         </div>)}
 
       </ResponsiveGridLayout>
     )
   }
 }
-
 
 export default DashboardConfigView;

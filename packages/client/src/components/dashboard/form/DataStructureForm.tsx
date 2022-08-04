@@ -20,6 +20,11 @@ class DataStructureForm extends Component<any, any> {
       */
       selectedModel: null,
       selectedScenarios: [],
+
+      /**
+       * The data to send to dashboard
+       */
+      data: []
     }
   }
 
@@ -79,7 +84,7 @@ class DataStructureForm extends Component<any, any> {
     const data = {
       model, scenario
     }
-    return await dataManager.fetchVariables(data).then(variablesData => variablesData.variables.map(v => v.name));
+    return await dataManager.fetchVariables(data).then(variablesData => { if (variablesData != null) return variablesData.variables.map(v => v.name) });
   }
 
   /**

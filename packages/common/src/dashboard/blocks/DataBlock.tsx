@@ -22,7 +22,7 @@ export default class DataBlock extends Component<any, any> {
 
       click: 0,
 
-      plotType: "line",
+      plotType: "bar",
 
       visualizationData: []
     }
@@ -33,6 +33,7 @@ export default class DataBlock extends Component<any, any> {
     this.scenariosSelectionChange = this.scenariosSelectionChange.bind(this);
     this.variablesSelectionChange = this.variablesSelectionChange.bind(this);
     this.plotTypeOnChange = this.plotTypeOnChange.bind(this);
+    this.regionsSelectionChange = this.regionsSelectionChange.bind(this);
   }
 
   /**
@@ -42,9 +43,15 @@ export default class DataBlock extends Component<any, any> {
    */
   modelSelectionChange(selectedModels: string[]) {
     this.setState({ selectedModels }, () => {
+      // setting scenarios after selecting models
+      let scenarios: any[] = [];
+      this.state.selectedModels.map((model) => {
+        scenarios = [...scenarios, ...Object.keys(this.props.structureData[model])];
+      });
+      this.setState({ scenarios: [...new Set(scenarios)] });
+      // Update variables and regions list
       this.setVariablesRegions();
     });
-
   }
 
   /**
@@ -52,9 +59,10 @@ export default class DataBlock extends Component<any, any> {
    * @param selectedScenarios 
    */
   scenariosSelectionChange(selectedScenarios: string[]) {
-    this.setState({ selectedScenarios }, () => {
+    this.setState({ selectedScenarios: [...new Set(selectedScenarios)] }, () => {
+      // Update variables and regions list
       this.setVariablesRegions();
-    })
+    });
 
   }
 
@@ -80,13 +88,16 @@ export default class DataBlock extends Component<any, any> {
     this.setState({ selectedVariables })
   }
 
+  regionsSelectionChange(selectedRegions: string[]) {
+    this.setState({ selectedRegions })
+  }
+
   plotTypeOnChange(plotType: string) {
     this.setState({ plotType })
   }
 
   addDataBlock = () => {
-    // Add datablock
-    // fetch data by model, scenario, variables and regions selected
+    // ["model1", ...], ["scenario1", ...], ["variable1", ...], ["region1", ...]
     this.props.dataManager.fetchData().then(data => this.setState({ data }, () => {
       // Add changes directly to Database (json file)
       const layout = [{
@@ -139,14 +150,9 @@ export default class DataBlock extends Component<any, any> {
           placeholder="Scenario"
           onChange={this.scenariosSelectionChange}
         >
-          {
-            this.state.selectedModels.map((model) => {
-              return Object.keys(structureData[model]).map(scenarioKey =>
-                <Select.Option key={scenarioKey} value={scenarioKey}>{scenarioKey}</Select.Option>
-              )
-            }
-            )
-          }
+          {this.state.scenarios.map(scenario =>
+            <Option key={scenario} value={scenario}>{scenario}</Option>
+          )}
         </Select>
         <Divider />
         <Select
@@ -164,6 +170,7 @@ export default class DataBlock extends Component<any, any> {
           mode="multiple"
           className="width-100"
           placeholder="Regions"
+          onChange={this.regionsSelectionChange}
         >
           {this.state.regions.map(region =>
             <Option key={region} value={region}>{region}</Option>

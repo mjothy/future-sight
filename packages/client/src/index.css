@@ -31,6 +31,10 @@ body {
   width: 60%;
 }
 
+.height-100{
+  height: 100%;
+}
+
 .bg-secondry {
   background-color: #F6F8FA;
 }

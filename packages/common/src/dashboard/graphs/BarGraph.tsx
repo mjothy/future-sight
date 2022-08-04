@@ -21,11 +21,11 @@ export default class BarGraph extends Component<any, any> {
             return y;
         }
         return (
-            <Plot
+            <Plot  
                 data={[
                     { type: 'bar', x: getX(), y: getY() },
                 ]}
-                layout={{ width: 300, height: 250, title: data.model + '/' + data.scenario }}
+                layout={{ width: this.props.width, height: this.props.height, title: data.model + '/' + data.scenario }}
             />
         )
     }
