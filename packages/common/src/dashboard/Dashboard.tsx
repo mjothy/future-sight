@@ -15,13 +15,7 @@ export default class Dashboard extends Component<any, any> {
     this.state = {
       collapsed: false,
       placement: 'right',
-      layouts: {
-        lg: [],
-        md: [],
-        sm: [],
-        xs: [],
-        xxs: [],
-      },
+      layouts:[],
       data: {}
     }
   }
@@ -32,17 +26,12 @@ export default class Dashboard extends Component<any, any> {
 
   buildLayouts = (layouts, data) => {
 
-    const newLayouts = { ...this.state.layouts };
-    Object.keys(this.state.layouts).map(key => {
-      newLayouts[key] = [...layouts[key], ...newLayouts[key]];
-    });
-
     const newData = [];
     Object.keys(data).map(key => {
       newData[key] = data[key];
     })
 
-    this.setState({ layouts: newLayouts, data: { ...newData, ...this.state.data } });
+    this.setState({ layouts: [layouts, ...this.state.layouts], data: { ...newData, ...this.state.data } });
   }
 
   updateLayouts = (layouts) => {

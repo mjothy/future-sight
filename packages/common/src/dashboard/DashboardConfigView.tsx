@@ -6,7 +6,11 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 
 class DashboardConfigView extends Component<any, any> {
 
-  ref;
+  /**
+   * Array of references of all blocks on LayoutGrid
+   */
+  private ref:any[];
+
   constructor(props) {
     super(props);
     this.ref = [];
@@ -15,8 +19,16 @@ class DashboardConfigView extends Component<any, any> {
       width: 200,
       height: 200,
       graphsSize: [],
-      currentLayouts: this.props.layouts["lg"]
+      currentLayouts: this.props.layouts
     }
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.updateAllLayoutsView);
+  }
+  
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateAllLayoutsView);
   }
 
   /**
@@ -33,6 +45,7 @@ class DashboardConfigView extends Component<any, any> {
    * @param layouts the update layouts
    */
   onLayoutChange = (layouts) => {
+    this.props.updateLayouts(layouts);
     this.setState({ currentLayouts: layouts }, () => this.updateAllLayoutsView())
   }
 
@@ -71,11 +84,10 @@ class DashboardConfigView extends Component<any, any> {
 
   render() {
     const { data, layouts } = this.props;
-    console.log("layouts['lg']: ", layouts["lg"])
     return (
       <ResponsiveGridLayout
         className="layout"
-        layouts={{ lg: layouts["lg"] }}
+        layouts={{ lg: layouts }}
         autoSize={true}
         isDraggable={true}
         isResizable={true}
