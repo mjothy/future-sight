@@ -21,13 +21,13 @@ export default class AddButton extends Component<any,any> {
     }
 
 
-    addBlock = () => {
-      this.props.addBlock()
+    clicked = () => {
+      this.props.clicked()
     }  
 
   render() {
     return (
-      <Button type='default' onClick={this.addBlock}>{this.props.label}</Button>
+      <Button type='default' onClick={this.clicked.bind(this)}>{this.props.label}</Button>
     )
   }
 }

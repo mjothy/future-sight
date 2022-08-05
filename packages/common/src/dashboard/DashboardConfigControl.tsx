@@ -1,22 +1,30 @@
-import React, { Component } from 'react'
-import BlockEditor from './BlockEditor'
-import DashboardControl from './DashboardControl'
+import { Component } from 'react'
+import DashboardControl from './sidebar/DashboardControl';
+import BlockEditor from './sidebar/BlockEditor';
+
 
 // Show {Edit selected block} OR {Add new block}
 export default class DashboardConfigControl extends Component<any, any> {
 
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
-      blockSelected: false
+      collapsed: false,
+      click: 0,
     }
   }
 
   render() {
     return (
-      <div>
-        {this.state.blockSelected ? <BlockEditor />: <DashboardControl {...this.props} />}
-      </div>
+      <>
+        {
+          this.props.blockSelectedId
+            ?
+            <BlockEditor type={this.state.type} {...this.props} />
+            :
+            <DashboardControl  {...this.props}/>
+        }
+      </>
     )
   }
 }

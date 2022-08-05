@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import Block from "./blocks/Block";
+import BlockViewManager from "./blocks/views/BlockViewManager";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -9,7 +9,7 @@ class DashboardConfigView extends Component<any, any> {
   /**
    * Array of references of all blocks on LayoutGrid
    */
-  private ref:any[];
+  private ref: any[];
 
   constructor(props) {
     super(props);
@@ -26,7 +26,7 @@ class DashboardConfigView extends Component<any, any> {
   componentDidMount() {
     window.addEventListener('resize', this.updateAllLayoutsView);
   }
-  
+
   componentWillUnmount() {
     window.removeEventListener('resize', this.updateAllLayoutsView);
   }
@@ -98,9 +98,9 @@ class DashboardConfigView extends Component<any, any> {
         onBreakpointChange={this.onBreakpointChange.bind(this)}
         onResizeStop={this.resizeStop.bind(this)}
       >
-        {Object.keys(data).map(item => <div key={item}>
-          <div ref={ref => this.ref[item] = ref} id={item} className={"width-100 height-100"}>
-            <Block {...this.props} data={data[item]} width={this.state.graphsSize[item] ? this.state.graphsSize[item].width : 300} height={this.state.graphsSize[item] ? this.state.graphsSize[item].height : 300} />
+        {layouts.map(layout => <div key={layout.i}>
+          <div ref={ref => this.ref[layout.i] = ref} id={layout.i} className={"width-100 height-100"}>
+            <BlockViewManager {...this.props} data={data[layout.i]} width={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].width : 300} height={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].height : 300} />
           </div>
         </div>)}
 

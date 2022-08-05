@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import { Button, Divider, Select } from 'antd';
 import { Option } from 'antd/lib/mentions';
-import PlotTypes from '../graphs/PlotTypes';
+import PlotTypes from '../../graphs/PlotTypes';
 
 export default class DataBlock extends Component<any, any> {
 
@@ -19,8 +19,6 @@ export default class DataBlock extends Component<any, any> {
       regions: [],
 
       data: [],
-
-      click: 0,
 
       plotType: "bar",
 
@@ -97,29 +95,6 @@ export default class DataBlock extends Component<any, any> {
     this.setState({ plotType })
   }
 
-  addDataBlock = () => {
-    // ["model1", ...], ["scenario1", ...], ["variable1", ...], ["region1", ...]
-    this.props.dataManager.fetchData().then(data => this.setState({ data }, () => {
-      // Add changes directly to Database (json file)
-      const layout = {
-        w: 4,
-        h: 2,
-        x: 0,
-        y: 0,
-        i: "graph" + this.state.click
-      };
-      // Change on database
-      const key = "graph" + this.state.click;
-      const data1 = {}
-      data[0].type = this.state.plotType;
-      data1[key] = data[0]
-      // Send the props to Dashboard.tsx (Thant inject the data and layout to DashboardConfigView)
-      this.props.buildLayouts(layout, data1);
-      this.setState({ click: this.state.click + 1 });
-
-    }))
-  }
-
   render() {
     const structureData = this.props.structureData;
     return (
@@ -182,10 +157,6 @@ export default class DataBlock extends Component<any, any> {
             label: "type",
           }}
         />
-        <Divider />
-        <Button type='primary' className='width-100'
-          onClick={this.addDataBlock}>Add data block</Button>
-
         <div className='space-div'></div>
       </div>
     )

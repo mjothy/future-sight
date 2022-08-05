@@ -7,7 +7,11 @@ export default class BarGraph extends Component<any, any> {
         super(props);
     }
     render() {
-        const data = this.props.data;
+        let data = this.props.data;
+        if (data == null) {
+            data = {}
+            data.data = []
+        }
 
         const getX = () => {
             const x: string[] = [];
@@ -21,7 +25,7 @@ export default class BarGraph extends Component<any, any> {
             return y;
         }
         return (
-            <Plot  
+            <Plot
                 data={[
                     { type: 'bar', x: getX(), y: getY() },
                 ]}

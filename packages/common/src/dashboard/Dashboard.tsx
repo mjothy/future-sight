@@ -3,20 +3,21 @@ import DashboardConfigView from './DashboardConfigView';
 import DashboardConfigControl from './DashboardConfigControl';
 import {
   MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  LeftCircleFilled
+  MenuUnfoldOutlined
 } from '@ant-design/icons';
-import { Button, Drawer, Space } from 'antd';
+import Sidebar from './sidebar/Sidebar';
 
 export default class Dashboard extends Component<any, any> {
 
   constructor(props) {
     super(props);
     this.state = {
-      collapsed: false,
-      placement: 'right',
-      layouts:[],
-      data: {}
+      sidebarVisible: false,
+      layouts: [],
+      data: {},
+      blockSelectedId: "",
+      click: 0,
+      type: ""
     }
   }
 
@@ -24,62 +25,59 @@ export default class Dashboard extends Component<any, any> {
     window.scrollTo(0, 0)
   }
 
-  buildLayouts = (layouts, data) => {
+  buildLayouts = (layout, data) => {
+    this.setState({ layouts: [layout, ...this.state.layouts], data: { ...data }, blockSelectedId: layout.i });
+  }
 
-    const newData = [];
-    Object.keys(data).map(key => {
-      newData[key] = data[key];
-    })
-
-    this.setState({ layouts: [layouts, ...this.state.layouts], data: { ...newData, ...this.state.data } });
+  unselectBlock() {
+    console.log("call unselected");
+    this.setState({ blockSelectedId: "" });
   }
 
   updateLayouts = (layouts) => {
     this.setState({ layouts });
   }
 
+  addBlock = (type) => {
+    console.log("add block, ", type)
+    this.props.dataManager.fetchData().then(data => this.setState({ data }, () => {
+      const layout = {
+        w: 4,
+        h: 2,
+        x: 0,
+        y: 0,
+        i: "graph" + this.state.click
+      };
+      const key = "graph" + this.state.click;
+      const data1 = {}
+      data[0].type = type;
+      this.buildLayouts(layout, data1);
+      this.setState({ click: this.state.click + 1, type });
+    }))
+  }
+
   render() {
     const setVisibility = () => {
       this.setState({
-        collapsed: !this.state.collapsed
+        sidebarVisible: !this.state.sidebarVisible
       })
     }
 
-    const setPlacement = (e) => {
-      this.setState({ placement: e.currentTarget.value })
-    }
-
     return (
+
       <div className='dashboard'>
-        <Drawer
-          placement={this.state.placement}
-          width={500}
-          visible={this.state.collapsed}
-          onClose={setVisibility}
-          maskClosable={true}
-          mask={true}
-          className={"drawer"}
-          style={!this.state.collapsed ? { zIndex: '-1' } : { zIndex: '999' }}
-          extra={
-            <Space>
-              <Button onClick={() => this.props.submitEvent(false)}>
-                <LeftCircleFilled />
-              </Button>
-              <Button onClick={setPlacement} value="left">left</Button>
-              <Button onClick={setPlacement} value="right">right</Button>
-            </Space>
-          }
-        >
-          <DashboardConfigControl {...this.props} buildLayouts={this.buildLayouts} />
-        </Drawer>
+        <Sidebar visible={this.state.sidebarVisible} {...this.props} >
+          <DashboardConfigControl {...this.props} buildLayouts={this.buildLayouts} blockSelectedId={this.state.blockSelectedId} unselectBlock={this.unselectBlock.bind(this)}
+            addBlock={this.addBlock} type={this.state.type} />
+        </Sidebar>
         <div className="dashboard-content">
           <div>
-            {React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
+            {React.createElement(this.state.sidebarVisible ? MenuUnfoldOutlined : MenuFoldOutlined, {
               className: 'trigger',
               onClick: () => setVisibility(),
             })}
           </div>
-          <DashboardConfigView data={this.state.data} layouts={this.state.layouts} updateLayouts={this.updateLayouts} />
+          <DashboardConfigView data={this.state.data} layouts={this.state.layouts} updateLayouts={this.updateLayouts} type={this.state.type} />
         </div>
       </div>
     )
