@@ -1,4 +1,4 @@
-import { Dashboard } from '@future-sight/common'
+import { DashboardSelectionControl } from '@future-sight/common'
 import React from 'react'
 import withDataManager from '../../services/withDataManager';
 import SetupView from './form/SetupView';
@@ -60,7 +60,7 @@ class DashboardView extends React.Component<any, any> {
   }
 
   dashboardManager = () => {
-    return <Dashboard {...this.props} userData={this.state.userData} structureData={this.state.data} submitEvent={this.handleSubmit} />
+    return <DashboardSelectionControl {...this.props} userData={this.state.userData} structureData={this.state.data} submitSetupView={this.handleSubmit} />
   }
   render() {
     return (

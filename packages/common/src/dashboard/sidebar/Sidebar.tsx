@@ -1,18 +1,21 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types';
 import {
     LeftCircleFilled
 } from '@ant-design/icons';
 import { Button, Drawer, Space } from 'antd';
 export default class Sidebar extends Component<any, any> {
 
+    static propTypes = {
+        visible: PropTypes.bool,
+        submitSetupView: PropTypes.func
+    }
+
     constructor(props) {
         super(props);
         this.state = {
             collapsed: false,
             placement: 'right',
-            layouts: [],
-            data: {},
-            blockSelectedId: ""
         }
     }
 
@@ -44,7 +47,7 @@ export default class Sidebar extends Component<any, any> {
                 style={!this.state.collapsed ? { zIndex: '-1' } : { zIndex: '999' }}
                 extra={
                     <Space>
-                        <Button onClick={() => this.props.submitEvent(false)}>
+                        <Button onClick={() => this.props.submitSetupView(false)}>
                             <LeftCircleFilled />
                         </Button>
                         <Button onClick={setPlacement} value="left">left</Button>

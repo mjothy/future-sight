@@ -1,30 +1,21 @@
 import { Component } from 'react'
 import DashboardControl from './sidebar/DashboardControl';
 import BlockEditor from './sidebar/BlockEditor';
+import PropTypes from 'prop-types';
 
-
-// Show {Edit selected block} OR {Add new block}
+/**
+ * Show {Edit selected block} OR {Add new block}
+ */
 export default class DashboardConfigControl extends Component<any, any> {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      collapsed: false,
-      click: 0,
-    }
+  static propTypes = {
+    blockSelectedId: PropTypes.string
   }
 
   render() {
     return (
-      <>
-        {
-          this.props.blockSelectedId
-            ?
-            <BlockEditor type={this.state.type} {...this.props} />
-            :
-            <DashboardControl  {...this.props}/>
-        }
-      </>
+      this.props.blockSelectedId ? <BlockEditor {...this.props} /> : <DashboardControl  {...this.props} />
     )
   }
+
 }

@@ -1,10 +1,19 @@
 import React, { Component } from "react";
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import BlockViewManager from "./blocks/views/BlockViewManager";
+import PropTypes from 'prop-types';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
+/**
+ * Manage react grid layout
+ */
 class DashboardConfigView extends Component<any, any> {
+
+  static propTypes = {
+    layouts: PropTypes.arrayOf(PropTypes.object),
+    updateLayouts: PropTypes.func
+  }
 
   /**
    * Array of references of all blocks on LayoutGrid
@@ -100,7 +109,7 @@ class DashboardConfigView extends Component<any, any> {
       >
         {layouts.map(layout => <div key={layout.i}>
           <div ref={ref => this.ref[layout.i] = ref} id={layout.i} className={"width-100 height-100"}>
-            <BlockViewManager {...this.props} data={data[layout.i]} width={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].width : 300} height={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].height : 300} />
+            <BlockViewManager {...this.props} data={...data[layout.i]} width={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].width : 300} height={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].height : 300} />
           </div>
         </div>)}
 

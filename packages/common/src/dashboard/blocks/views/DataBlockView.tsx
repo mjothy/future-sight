@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import BarGraph from '../../graphs/BarGraph'
+import PlotlyGraph from '../../graphs/PlotlyGraph'
 
 export default class DataBlockView extends Component {
   render() {
-    return <BarGraph {...this.props} />
+    return <PlotlyGraph {...this.props} />
   }
 }

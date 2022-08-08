@@ -3,8 +3,9 @@ import ControlBlockView from './ControlBlockView';
 import DataBlockView from './DataBlockView';
 import TextBlockView from './TextBlockView';
 
-// Responsability choise the block
-
+/**
+ * Render the view of block in Grid Layout
+ */
 export default class BlockViewManager extends Component<any, any> {
 
     constructor(props) {
@@ -12,14 +13,17 @@ export default class BlockViewManager extends Component<any, any> {
     }
 
     blockByType = () => {
-        const type = this.props.type;
-        switch (type) {
+        const blockType = this.props.data ? this.props.data.blockType : "data";
+
+        switch (blockType) {
             case "data":
                 return <DataBlockView {...this.props} />
             case "text":
                 return <TextBlockView {...this.props} />
             case "control":
                 return <ControlBlockView {...this.props} />
+            default:
+                return <p>Error !</p>
         }
     }
     render() {

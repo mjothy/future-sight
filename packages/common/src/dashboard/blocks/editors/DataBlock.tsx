@@ -1,13 +1,17 @@
 import { Component } from 'react'
-import { Button, Divider, Select } from 'antd';
+import { Divider, Select } from 'antd';
 import { Option } from 'antd/lib/mentions';
 import PlotTypes from '../../graphs/PlotTypes';
+import PropTypes from 'prop-types';
 
 export default class DataBlock extends Component<any, any> {
 
+  static propTypes = {
+    structureData: PropTypes.objectOf(PropTypes.objectOf(PropTypes.objectOf(PropTypes.array)))
+  }
+
   constructor(props) {
     super(props);
-    this.binding();
     this.state = {
       scenarios: [],
       selectedModels: [],
@@ -24,14 +28,6 @@ export default class DataBlock extends Component<any, any> {
 
       visualizationData: []
     }
-  }
-
-  binding() {
-    this.modelSelectionChange = this.modelSelectionChange.bind(this);
-    this.scenariosSelectionChange = this.scenariosSelectionChange.bind(this);
-    this.variablesSelectionChange = this.variablesSelectionChange.bind(this);
-    this.plotTypeOnChange = this.plotTypeOnChange.bind(this);
-    this.regionsSelectionChange = this.regionsSelectionChange.bind(this);
   }
 
   /**
@@ -51,7 +47,6 @@ export default class DataBlock extends Component<any, any> {
       this.setVariablesRegions();
     });
   }
-  
 
   /**
    * 
@@ -104,7 +99,7 @@ export default class DataBlock extends Component<any, any> {
           mode="multiple"
           className="width-100"
           placeholder="Please select the model"
-          onChange={this.modelSelectionChange}
+          onChange={this.modelSelectionChange.bind(this)}
         >
           {
             Object.keys(structureData).map(modelKey =>
@@ -117,7 +112,7 @@ export default class DataBlock extends Component<any, any> {
           mode="multiple"
           className="width-100"
           placeholder="Scenario"
-          onChange={this.scenariosSelectionChange}
+          onChange={this.scenariosSelectionChange.bind(this)}
         >
           {this.state.scenarios.map(scenario =>
             <Option key={scenario} value={scenario}>{scenario}</Option>
@@ -128,7 +123,7 @@ export default class DataBlock extends Component<any, any> {
           mode="multiple"
           className="width-100"
           placeholder="Variables"
-          onChange={this.variablesSelectionChange}
+          onChange={this.variablesSelectionChange.bind(this)}
         >
           {this.state.variables.map(variable =>
             <Option key={variable} value={variable}>{variable}</Option>
@@ -139,7 +134,7 @@ export default class DataBlock extends Component<any, any> {
           mode="multiple"
           className="width-100"
           placeholder="Regions"
-          onChange={this.regionsSelectionChange}
+          onChange={this.regionsSelectionChange.bind(this)}
         >
           {this.state.regions.map(region =>
             <Option key={region} value={region}>{region}</Option>
@@ -151,7 +146,7 @@ export default class DataBlock extends Component<any, any> {
           placeholder="Graph type"
           defaultValue={this.state.plotType}
           options={PlotTypes}
-          onChange={this.plotTypeOnChange}
+          onChange={this.plotTypeOnChange.bind(this)}
           fieldNames={{
             value: "type",
             label: "type",

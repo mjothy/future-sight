@@ -1,5 +1,6 @@
 import { Component } from 'react'
 import AddButton from './actions/AddButton'
+import PropTypes from 'prop-types';
 
 const actions = [{
   label: "Add data block", type: "data"
@@ -17,12 +18,16 @@ const actions = [{
  */
 export default class DashboardControl extends Component<any, any> {
 
+  static propTypes = {
+    addBlock: PropTypes.func
+  }
+
   constructor(props) {
     super(props);
   }
 
-  clicked = (type) => {
-    this.props.addBlock(type);
+  clicked = (blockType) => {
+    this.props.addBlock(blockType);
   }
 
   render() {
@@ -30,7 +35,7 @@ export default class DashboardControl extends Component<any, any> {
       <div>
         {
           actions.map((action) => <AddButton key={action.type} label={action.label} type={action.type}
-          clicked={() => this.clicked(action.type)} />)
+            clicked={() => this.clicked(action.type)} />)
         }
       </div>
     )
