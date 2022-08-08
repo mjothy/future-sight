@@ -12,7 +12,7 @@ export default class BlockEditorManager extends Component<any, any> {
   static propTypes = {
     blockType: PropTypes.string
   }
-  
+
   constructor(props) {
     super(props);
   }
@@ -26,7 +26,7 @@ export default class BlockEditorManager extends Component<any, any> {
         return <TextBlock {...this.props} />
       case "control":
         return <ControlBlock {...this.props} />
-      default: 
+      default:
         return <p>Error !</p>
     }
   }

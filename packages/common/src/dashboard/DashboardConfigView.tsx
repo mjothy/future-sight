@@ -12,7 +12,8 @@ class DashboardConfigView extends Component<any, any> {
 
   static propTypes = {
     layouts: PropTypes.arrayOf(PropTypes.object),
-    updateLayouts: PropTypes.func
+    updateLayouts: PropTypes.func,
+    updateSelectedBlock: PropTypes.func
   }
 
   /**
@@ -91,6 +92,13 @@ class DashboardConfigView extends Component<any, any> {
     });
   }
 
+  onBlockClick = e => {
+    console.log("Block: ", e.currentTarget.id);
+    if (e.currentTarget.id)
+      this.props.updateSelectedBlock(e.currentTarget.id);
+    else alert("No block selected !");
+  };
+
   render() {
     const { data, layouts } = this.props;
     return (
@@ -106,10 +114,11 @@ class DashboardConfigView extends Component<any, any> {
         onLayoutChange={this.onLayoutChange.bind(this)}
         onBreakpointChange={this.onBreakpointChange.bind(this)}
         onResizeStop={this.resizeStop.bind(this)}
+        onCli
       >
-        {layouts.map(layout => <div key={layout.i}>
-          <div ref={ref => this.ref[layout.i] = ref} id={layout.i} className={"width-100 height-100"}>
-            <BlockViewManager {...this.props} data={...data[layout.i]} width={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].width : 300} height={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].height : 300} />
+        {layouts.map(layout => <div key={layout.i} className={this.props.blockSelectedId === layout.i ? "selected-layout" : ""} >
+          <div ref={ref => this.ref[layout.i] = ref} id={layout.i} className={"width-100 height-100"} onClick={this.onBlockClick.bind(this)}>
+            <BlockViewManager  {...this.props} data={...data[layout.i]} width={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].width : 300} height={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].height : 300} />
           </div>
         </div>)}
 

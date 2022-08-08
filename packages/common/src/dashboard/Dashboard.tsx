@@ -20,6 +20,14 @@ export default class Dashboard extends Component<any, any> {
     window.scrollTo(0, 0)
   }
 
+  componentDidUpdate(prevProps, prevState, snaphshot) {
+    if (this.props.blockSelectedId != prevProps.blockSelectedId) {
+      this.setState({
+        sidebarVisible: true
+      })
+    }
+  }
+
   render() {
     const setVisibility = () => {
       this.setState({
@@ -30,7 +38,7 @@ export default class Dashboard extends Component<any, any> {
     return (
 
       <div className='dashboard'>
-        <Sidebar visible={this.state.sidebarVisible} {...this.props} >
+        <Sidebar sidebarVisible={this.state.sidebarVisible} setVisibility={setVisibility} {...this.props} >
           <DashboardConfigControl {...this.props} />
         </Sidebar>
         <div className="dashboard-content">

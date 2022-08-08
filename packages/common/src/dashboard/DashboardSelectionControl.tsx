@@ -28,6 +28,10 @@ export default class DashboardSelectionControl extends Component<any, any> {
     this.setState({ layouts });
   }
 
+  updateSelectedBlock = (blockSelectedId) => {
+    this.setState({ blockSelectedId });
+  }
+
   addBlock = (blockType) => {
     this.props.dataManager.fetchData().then(data => {
       const layout = {
@@ -40,14 +44,14 @@ export default class DashboardSelectionControl extends Component<any, any> {
       this.buildLayouts(layout);
       const dataPlot = this.state.data;
       // add after plotType
-      dataPlot[layout.i] = {blockType: blockType, visualizeData: data }
-      this.setState({ click: this.state.click + 1, blockType,data: dataPlot});
+      dataPlot[layout.i] = { blockType: blockType, visualizeData: data }
+      this.setState({ click: this.state.click + 1, blockType, data: dataPlot });
     })
   }
 
   render() {
     return (
-      <Dashboard 
+      <Dashboard
         addBlock={this.addBlock}
         buildLayouts={this.buildLayouts}
         blockSelectedId={this.state.blockSelectedId}
@@ -56,6 +60,7 @@ export default class DashboardSelectionControl extends Component<any, any> {
         layouts={this.state.layouts}
         updateLayouts={this.updateLayouts}
         data={this.state.data}
+        updateSelectedBlock={this.updateSelectedBlock}
         {...this.props} />
     )
   }

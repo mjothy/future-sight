@@ -8,28 +8,18 @@ export default class Sidebar extends Component<any, any> {
 
     static propTypes = {
         visible: PropTypes.bool,
-        submitSetupView: PropTypes.func
+        submitSetupView: PropTypes.func,
+        setVisibility: PropTypes.func
     }
 
     constructor(props) {
         super(props);
         this.state = {
-            collapsed: false,
             placement: 'right',
         }
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.props.visible !== prevProps.visible) {
-            this.setState({ collapsed: this.props.visible })
-        }
-    }
     render() {
-        const setVisibility = () => {
-            this.setState({
-                collapsed: !this.state.collapsed
-            })
-        }
 
         const setPlacement = (e) => {
             this.setState({ placement: e.currentTarget.value })
@@ -39,12 +29,12 @@ export default class Sidebar extends Component<any, any> {
             <Drawer
                 placement={this.state.placement}
                 width={500}
-                visible={this.state.collapsed}
-                onClose={setVisibility}
+                visible={this.props.sidebarVisible}
+                onClose={this.props.setVisibility}
                 maskClosable={true}
                 mask={true}
                 className={"drawer"}
-                style={!this.state.collapsed ? { zIndex: '-1' } : { zIndex: '999' }}
+                style={!this.props.sidebarVisible ? { zIndex: '-1' } : { zIndex: '999' }}
                 extra={
                     <Space>
                         <Button onClick={() => this.props.submitSetupView(false)}>
