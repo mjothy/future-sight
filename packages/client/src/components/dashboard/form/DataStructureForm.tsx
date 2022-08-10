@@ -9,8 +9,6 @@ class DataStructureForm extends Component<any, any> {
 
   constructor(props) {
     super(props)
-    this.modelSelectionChange = this.modelSelectionChange.bind(this);
-    this.scenariosSelectionChange = this.scenariosSelectionChange.bind(this);
     this.state = {
       scenarios: [],
       models: [],
@@ -38,7 +36,7 @@ class DataStructureForm extends Component<any, any> {
    * Trigged when the list of selection models changed
    * to update the list of scenarios
    */
-  modelSelectionChange(modelSelected: string) {
+  modelSelectionChange = (modelSelected: string) => {
     const selectedModel = this.state.models.filter(model => model.name === modelSelected)[0];
     const data = {}
     data[modelSelected] = {}
@@ -48,7 +46,7 @@ class DataStructureForm extends Component<any, any> {
     this.setState({ scenarios, selectedModel: selectedModel.name, selectedScenarios: [], data: { ...this.state.data, ...data } });
   }
 
-  scenariosSelectionChange(selectedScenarios: string[]) {
+  scenariosSelectionChange = (selectedScenarios: string[]) => {
     this.setState({ selectedScenarios })
   }
 

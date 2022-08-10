@@ -7,9 +7,6 @@ export default class UserDataForm extends Component<any, any> {
     saveInputRef;
     constructor(props) {
         super(props)
-        this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleInputConfirm = this.handleInputConfirm.bind(this);
-        this.handleUserData = this.handleUserData.bind(this);
         this.saveInputRef = React.createRef();
         this.state = {
             tags: this.props.userData.tags,
