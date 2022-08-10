@@ -19,7 +19,7 @@ export default class AddButton extends Component<any, any> {
 
   render() {
     return (
-      <Button type='default' onClick={this.clicked.bind(this)}>{this.props.label}</Button>
+      <Button type='default' onClick={this.clicked}>{this.props.label}</Button>
     )
   }
 }

@@ -4,6 +4,7 @@ import { Option } from 'antd/lib/mentions';
 import PlotTypes from '../../graphs/PlotTypes';
 import PropTypes from 'prop-types';
 
+// 2Types: controlled / not controlled
 export default class DataBlock extends Component<any, any> {
 
   static propTypes = {
@@ -30,6 +31,14 @@ export default class DataBlock extends Component<any, any> {
     }
   }
 
+  componantDidUpdate(prevProps, prevState, snapshot){
+    if(prevState != this.state){
+        // filter and update the block data
+        console.log("block data update");
+
+      }
+  }
+
   /**
    * Trigged when the list of selection models changed
    * to update the list of scenarios
@@ -45,6 +54,7 @@ export default class DataBlock extends Component<any, any> {
       this.setState({ scenarios: [...new Set(scenarios)] });
       // Update variables and regions list
       this.setVariablesRegions();
+      this.parentNotifyUpdateData();
     });
   }
 
@@ -56,6 +66,7 @@ export default class DataBlock extends Component<any, any> {
     this.setState({ selectedScenarios: [...new Set(selectedScenarios)] }, () => {
       // Update variables and regions list
       this.setVariablesRegions();
+      this.parentNotifyUpdateData();
     });
 
   }
@@ -79,15 +90,41 @@ export default class DataBlock extends Component<any, any> {
   }
 
   variablesSelectionChange(selectedVariables: string[]) {
-    this.setState({ selectedVariables })
+    this.setState({ selectedVariables }, ()=>       this.parentNotifyUpdateData()    )
   }
 
   regionsSelectionChange(selectedRegions: string[]) {
-    this.setState({ selectedRegions })
+    this.setState({ selectedRegions }, ()=>       this.parentNotifyUpdateData()    )
   }
 
   plotTypeOnChange(plotType: string) {
     this.setState({ plotType })
+  }
+
+  parentNotifyUpdateData = () => {
+    if(this.state.selectedModels.length > 0 &&
+      this.state.selectedScenarios.length > 0 &&
+      this.state.selectedVariables.length > 0 &&
+      this.state.selectedRegions.length > 0 ) {
+        let sendData:any[] = [];
+        this.props.dataManager.fetchAllData().then(data => {
+          sendData = [];
+          data.map(e => {
+            if(this.state.selectedModels.includes(e.model) &&
+            this.state.selectedScenarios.includes(e.scenario) &&
+            this.state.selectedVariables.includes(e.variable) &&
+            this.state.selectedRegions.includes(e.region)){
+                sendData.push(e);
+            }
+          });
+          this.props.updateBlockData(sendData);
+        });
+
+      }else {
+        console.log("here ! ");
+        this.props.updateBlockData([]);
+
+      }
   }
 
   render() {

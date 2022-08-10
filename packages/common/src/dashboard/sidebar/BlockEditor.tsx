@@ -9,13 +9,13 @@ import PropTypes from 'prop-types';
 export default class BlockEditor extends Component<any, any> {
 
   static propTypes = {
-    unselectBlock: PropTypes.func
+    updateSelectedBlock: PropTypes.func
   }
 
   render() {
     return (
       <>
-        <Button type='default' onClick={this.props.unselectBlock}>X</Button>
+        <Button type='default' onClick={() => this.props.updateSelectedBlock("")}>X</Button>
         <BlockEditorManager {...this.props} />
       </>
     )

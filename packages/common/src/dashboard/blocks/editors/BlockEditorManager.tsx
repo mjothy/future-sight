@@ -18,7 +18,8 @@ export default class BlockEditorManager extends Component<any, any> {
   }
 
   blockByType = () => {
-    const blockType = this.props.blockType;
+    const blockSelectedId = this.props.blockSelectedId;
+    const blockType = this.props.data[blockSelectedId] ? this.props.data[blockSelectedId].blockType : "data";
     switch (blockType) {
       case "data":
         return <DataBlock {...this.props} />

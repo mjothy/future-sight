@@ -29,6 +29,22 @@ export default class DataManager {
         .catch(err => err);
     }
 
+    fetchAllData = () => {
+      
+      return fetch(`${this.getBaseUrl()}/data`,{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          return data;
+        })
+        .catch(err => err);
+    }
+    
+
     fetchModels = () => {
       return fetch(`${this.getBaseUrl()}/models`)
         .then((response) => response.json())

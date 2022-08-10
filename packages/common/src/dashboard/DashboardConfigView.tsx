@@ -12,7 +12,7 @@ class DashboardConfigView extends Component<any, any> {
 
   static propTypes = {
     layouts: PropTypes.arrayOf(PropTypes.object),
-    updateLayouts: PropTypes.func,
+    updateLayout: PropTypes.func,
     updateSelectedBlock: PropTypes.func
   }
 
@@ -21,15 +21,15 @@ class DashboardConfigView extends Component<any, any> {
    */
   private ref: any[];
 
+  private width = 300;
+  private height = 200;
+
   constructor(props) {
     super(props);
     this.ref = [];
 
     this.state = {
-      width: 200,
-      height: 200,
       graphsSize: [],
-      currentLayouts: this.props.layouts
     }
   }
 
@@ -55,8 +55,8 @@ class DashboardConfigView extends Component<any, any> {
    * @param layouts the update layouts
    */
   onLayoutChange = (layouts) => {
-    this.props.updateLayouts(layouts);
-    this.setState({ currentLayouts: layouts }, () => this.updateAllLayoutsView())
+    this.props.updateLayout(layouts);
+    this.updateAllLayoutsView();
   }
 
   /**
@@ -78,33 +78,33 @@ class DashboardConfigView extends Component<any, any> {
     const obj = {
       width: this.ref[key].clientWidth,
       height: this.ref[key].clientHeight
-    }
+    };
     graphsSize[layout.i] = obj;
     this.setState({ graphsSize });
   }
 
   /**
-   * Update {width,height} of all layout items content
+   * Update {width,height} of all blocks content on every block dimentions change
    */
   updateAllLayoutsView = () => {
-    this.state.currentLayouts.map(layout => {
+    const layout = this.props.layout;
+    layout.map(layout => {
       this.updateLayoutView(layout);
     });
   }
 
   onBlockClick = e => {
-    console.log("Block: ", e.currentTarget.id);
     if (e.currentTarget.id)
       this.props.updateSelectedBlock(e.currentTarget.id);
     else alert("No block selected !");
   };
 
   render() {
-    const { data, layouts } = this.props;
+    const { data, layout } = this.props;
     return (
       <ResponsiveGridLayout
         className="layout"
-        layouts={{ lg: layouts }}
+        layouts={{ lg: layout }}
         autoSize={true}
         isDraggable={true}
         isResizable={true}
@@ -114,11 +114,10 @@ class DashboardConfigView extends Component<any, any> {
         onLayoutChange={this.onLayoutChange.bind(this)}
         onBreakpointChange={this.onBreakpointChange.bind(this)}
         onResizeStop={this.resizeStop.bind(this)}
-        onCli
       >
-        {layouts.map(layout => <div key={layout.i} className={this.props.blockSelectedId === layout.i ? "selected-layout" : ""} >
+        {layout.map(layout => <div key={layout.i} className={this.props.blockSelectedId === layout.i ? "selected-layout" : ""} >
           <div ref={ref => this.ref[layout.i] = ref} id={layout.i} className={"width-100 height-100"} onClick={this.onBlockClick.bind(this)}>
-            <BlockViewManager  {...this.props} data={...data[layout.i]} width={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].width : 300} height={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].height : 300} />
+            <BlockViewManager  {...this.props} data={...data[layout.i]} width={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].width : this.width} height={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].height : this.height} />
           </div>
         </div>)}
 
