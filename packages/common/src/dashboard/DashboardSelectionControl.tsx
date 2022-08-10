@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import DashboardModel from '../models/DashboardModel';
 import Dashboard from './Dashboard'
 
 export default class DashboardSelectionControl extends Component<any, any> {
@@ -15,9 +16,9 @@ export default class DashboardSelectionControl extends Component<any, any> {
       layout: [],
 
       /**
-       * The config data of the new added bock
+       * Blocks
       */
-      data: {
+      blocks: {
       },
       /**
        * The selected block id
@@ -37,9 +38,9 @@ export default class DashboardSelectionControl extends Component<any, any> {
   }
 
   updateBlockData = (data) => {
-    const dashboardData = this.state.data;
+    const dashboardData = this.state.blocks;
     dashboardData[this.state.blockSelectedId].visualizeData = data;
-    this.setState({ data: dashboardData });
+    this.setState({ blocks: dashboardData });
   }
 
   addBlock = (blockType: string, masterBlockId?: string) => {
@@ -51,17 +52,23 @@ export default class DashboardSelectionControl extends Component<any, any> {
       y: 0,
       i: "graph" + this.state.click
     };
-    const data = this.state.data;
-    data[block.i] = { blockType, visualizeData: [] }
+    let dash = new DashboardModel();
+    dash = this.state.blocks;
+    console.log("dash: ", dash);
+    console.log("dash id: ", dash.id);
+
+    const blocks = this.state.blocks;
+
+    blocks[block.i] = { blockType, visualizeData: [] }
     const state = {
-      data,
+      blocks,
       layout: [block, ...this.state.layout],
       blockSelectedId: block.i,
       click: this.state.click + 1,
     };
 
     if (masterBlockId)
-      data[block.i].masterBlocks = masterBlockId;
+    blocks[block.i].masterBlocks = masterBlockId;
 
     this.setState(state);
   }
@@ -73,7 +80,7 @@ export default class DashboardSelectionControl extends Component<any, any> {
         blockSelectedId={this.state.blockSelectedId}
         layout={this.state.layout}
         updateLayout={this.updateLayout}
-        data={this.state.data}
+        blocks={this.state.blocks}
         updateSelectedBlock={this.updateSelectedBlock}
         updateBlockData={this.updateBlockData}
         {...this.props} />

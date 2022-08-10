@@ -100,7 +100,7 @@ class DashboardConfigView extends Component<any, any> {
   };
 
   render() {
-    const { data, layout } = this.props;
+    const { blocks, layout } = this.props;
     return (
       <ResponsiveGridLayout
         className="layout"
@@ -117,7 +117,7 @@ class DashboardConfigView extends Component<any, any> {
       >
         {layout.map(layout => <div key={layout.i} className={this.props.blockSelectedId === layout.i ? "selected-layout" : ""} >
           <div ref={ref => this.ref[layout.i] = ref} id={layout.i} className={"width-100 height-100"} onClick={this.onBlockClick}>
-            <BlockViewManager  {...this.props} data={...data[layout.i]} width={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].width : this.width} height={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].height : this.height} />
+            <BlockViewManager  {...this.props} data={...blocks[layout.i]} width={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].width : this.width} height={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].height : this.height} />
           </div>
         </div>)}
 
