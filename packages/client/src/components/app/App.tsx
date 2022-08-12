@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {BrowserRouter} from "react-router-dom";
 import DataManager from "../../services/DataManager";
 import DataManagerContextProvider from "../../services/DataManagerContextProvider";
 
@@ -26,10 +27,11 @@ export default function App() {
 
   return (
     <div className="App">
-      {/* All components inside DataManagerContextProvider, can access to DataManagerContext */}
-      <DataManagerContextProvider dataManager={dataManager}>
-        <AppComponent />
-      </DataManagerContextProvider>
+      <BrowserRouter>
+        <DataManagerContextProvider dataManager={dataManager}>
+          <AppComponent />
+        </DataManagerContextProvider>
+      </BrowserRouter>
     </div>
   );
 }

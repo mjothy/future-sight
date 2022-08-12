@@ -1,6 +1,7 @@
 import {Component} from 'react'
 import {Menu} from 'antd';
-import {HomeOutlined} from '@ant-design/icons';
+import {HomeOutlined, LoginOutlined} from '@ant-design/icons';
+import {Link} from 'react-router-dom'
 
 import './Navbar.css'
 import Logo from '../../assets/images/ECEMF_logo.png'
@@ -15,9 +16,19 @@ export default class Navbar extends Component<any, any> {
         return (
             <div className={"navbar"}>
                 <Menu theme="dark" mode="horizontal">
-                    <img src={Logo} alt="Logo"/>
+                    <Menu.Item key="logo">
+                        <img src={Logo} alt="Logo"/>
+                    </Menu.Item>
                     <Menu.Item key="home" icon={<HomeOutlined/>}>
-                        Home
+                        <Link to={'/'}>
+                            Home
+                        </Link>
+                    </Menu.Item>
+
+                    <Menu.Item key="login" icon={<LoginOutlined />}>
+                        <Link to={'/login'}>
+                            Login
+                        </Link>
                     </Menu.Item>
                 </Menu>
             </div>

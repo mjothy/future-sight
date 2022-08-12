@@ -18,9 +18,7 @@
     "react-plotly.js": "^2.5.1"
   },
   "scripts": {
-    "tsc": "tsc --build",
     "watch": "tsc -w",
-    "clean": "rimraf build tsconfig.tsbuildinfo",
-    "build": "yarn clean && yarn tsc"
+    "build": "tsc"
   }
 }

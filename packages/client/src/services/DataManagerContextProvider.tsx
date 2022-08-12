@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import withDataManager from './withDataManager';
 
 export const DataManagerContext = React.createContext({dataManager:{}});
 

@@ -1,10 +1,10 @@
 import { createClient } from 'redis';
 
-const DEV_URL = 'redis://localhost:6379'
+
 
 export default class RedisClient {
     private client: any;
-    constructor(url= DEV_URL) {
+    constructor(url) {
         this.client = createClient({
             url: url
         });

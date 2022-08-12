@@ -2,22 +2,29 @@ import express from "express";
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import {join} from "path";
+import cookieParser from 'cookie-parser'
 
 import data from "../data/data.json";
 import models from "../data/models.json";
 import variables from "../data/variables.json";
 import regions from "../data/regions.json";
 
-const clientPath = '../../client/build';
-
 export default class ExpressServer {
     private app: any;
     private readonly port: number;
+    private readonly auth: any;
+    private readonly clientPath: any;
 
-    constructor(port = 8080) {
+    constructor(port, cookieKey, auth, clientPath) {
         this.app = express();
         this.port = port;
-        this.app.use(bodyParser.json())
+        this.auth = auth;
+        this.clientPath = clientPath
+        this.app.use(bodyParser.json());
+        if (auth) {
+            this.app.use(this.auth);
+        }
+        this.app.use(cookieParser(cookieKey));
         this.app.use(cors());
         // Serve static resources from the "public" folder (ex: when there are images to display)
         this.app.use(express.static(join(__dirname, clientPath)));
@@ -25,6 +32,19 @@ export default class ExpressServer {
     }
 
     private endpoints = () => {
+        this.app.get('/api/users/auth', (req, res) => {
+            const options = {
+                httpOnly: true,
+                signed: true,
+            };
+
+            if (req.auth.user === 'admin') {
+                res.cookie('name', 'admin', options).send({ screen: 'admin' });
+            } else if (req.auth.user === 'user') {
+                res.cookie('name', 'user', options).send({ screen: 'user' });
+            }
+            res.send({auth: 'ok'});
+        });
 
         this.app.get('/api', (req, res) => {
             res.send(`Hello , From server`);
@@ -64,7 +84,7 @@ export default class ExpressServer {
 
         // Serve the HTML page
         this.app.get('*', (req: any, res: any) => {
-            res.sendFile(join(__dirname, clientPath, 'index.html'));
+            res.sendFile(join(__dirname, this.clientPath, 'index.html'));
         });
     }
 
