@@ -145,3 +145,14 @@ body {
   border: 1px solid #8d70ff;
   box-shadow: inset 0 0 0.5em #2a8bff, 0 0 1em #2a8bff;
 }
+
+
+.sidebar-left{
+  display: flex;
+  justify-content: start;
+}
+
+.sidebar-right{
+  display: flex;
+  justify-content: end;
+}

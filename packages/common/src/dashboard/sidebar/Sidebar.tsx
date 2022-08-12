@@ -1,7 +1,10 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 import {
-    LeftCircleFilled
+    LeftCircleFilled,
+    MenuUnfoldOutlined,
+    PicLeftOutlined,
+    PicRightOutlined
 } from '@ant-design/icons';
 import { Button, Drawer, Space } from 'antd';
 export default class Sidebar extends Component<any, any> {
@@ -14,34 +17,30 @@ export default class Sidebar extends Component<any, any> {
 
     constructor(props) {
         super(props);
-        this.state = {
-            placement: 'right',
-        }
     }
 
     render() {
 
-        const setPlacement = (e) => {
-            this.setState({ placement: e.currentTarget.value })
-        }
-
         return (
             <Drawer
-                placement={this.state.placement}
+                placement={this.props.placement}
                 width={500}
                 visible={this.props.sidebarVisible}
                 onClose={this.props.setVisibility}
+                closeIcon={<MenuUnfoldOutlined />}
                 maskClosable={true}
                 mask={true}
                 className={"drawer"}
                 style={!this.props.sidebarVisible ? { zIndex: '-1' } : { zIndex: '999' }}
                 extra={
                     <Space>
-                        <Button onClick={() => this.props.submitSetupView(false)}>
-                            <LeftCircleFilled />
+                            <LeftCircleFilled onClick={() => this.props.submitSetupView(false)} />
+                        <Button onClick={this.props.setPlacement} value="left">
+                        <PicLeftOutlined />
                         </Button>
-                        <Button onClick={setPlacement} value="left">left</Button>
-                        <Button onClick={setPlacement} value="right">right</Button>
+                        <Button onClick={this.props.setPlacement} value="right">
+                        <PicRightOutlined />
+                        </Button>
                     </Space>
                 }
             >
