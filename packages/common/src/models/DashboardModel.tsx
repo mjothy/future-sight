@@ -1,12 +1,20 @@
 
 import BlockModel from './BlockModel';
 import LayoutModel from './LayoutModel';
+import UserDataModel from './UserDataModel';
 
 export default class DashboardModel{
+    constructor(id?:string){
+        this.id = id;
+    }
 
-    id:string | undefined ;
+    id?:string;
+    userData?: UserDataModel;
+    // Dict of data: keys are models
+    dataStructure?: object;
     layout: LayoutModel[] = [];
-    blocks: BlockModel[] = [];
+    blocks: {[id:string]: BlockModel} = {};
     isPublished = false;
+
   
 }

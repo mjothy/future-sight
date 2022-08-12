@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import BlockViewManager from "./blocks/views/BlockViewManager";
 import PropTypes from 'prop-types';
+import LayoutModel from "../models/LayoutModel";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -54,8 +55,8 @@ class DashboardConfigView extends Component<any, any> {
    * Callback with new layouts
    * @param layouts the update layouts
    */
-  onLayoutChange = (layouts) => {
-    this.props.updateLayout(layouts);
+  onLayoutChange = (layout) => {
+    this.props.updateLayout(layout);
     this.updateAllLayoutsView();
   }
 
@@ -101,6 +102,7 @@ class DashboardConfigView extends Component<any, any> {
 
   render() {
     const { blocks, layout } = this.props;
+    console.log("blocks view: ", blocks);
     return (
       <ResponsiveGridLayout
         className="layout"

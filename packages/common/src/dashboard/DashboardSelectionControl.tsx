@@ -1,5 +1,9 @@
 import React, { Component } from 'react'
+import { v1 as uuidv1 } from 'uuid';
+import BlockModel from '../models/BlockModel';
+
 import DashboardModel from '../models/DashboardModel';
+import LayoutModel from '../models/LayoutModel';
 import Dashboard from './Dashboard'
 
 export default class DashboardSelectionControl extends Component<any, any> {
@@ -7,19 +11,9 @@ export default class DashboardSelectionControl extends Component<any, any> {
   constructor(props) {
     super(props);
     this.state = {
+      dashboard: new DashboardModel(uuidv1()),
       sidebarVisible: false,
-      dashboardId: "",
 
-      /**
-       * layout (lg) on the dashboard view
-       */
-      layout: [],
-
-      /**
-       * Blocks
-      */
-      blocks: {
-      },
       /**
        * The selected block id
        */
@@ -29,60 +23,76 @@ export default class DashboardSelectionControl extends Component<any, any> {
     }
   }
 
+  componentDidMount() {
+    const dashboard = this.state.dashboard;
+    dashboard.userData = this.props.userData;
+    dashboard.dataStructure = this.props.structureData;
+    this.setState({ dashboard });
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    // console.log("dashboard Updated !!! ");
+    if (prevState.dashboard !== this.state.dashboard) {
+      console.log("dashboard Updated !!! ");
+      const str = JSON.stringify(this.state.dashboard);
+      // this.props.dataManager.addDashboard(str);
+    }
+  }
+
   updateLayout = (layout) => {
-    this.setState({ layout });
+    this.setState({
+      dashboard: {
+        ...this.state.dashboard,
+        layout: layout
+      }
+    });
   }
 
   updateSelectedBlock = (blockSelectedId) => {
     this.setState({ blockSelectedId });
   }
 
-  updateBlockData = (data) => {
-    const dashboardData = this.state.blocks;
-    dashboardData[this.state.blockSelectedId].visualizeData = data;
-    this.setState({ blocks: dashboardData });
+  updateBlockMetaData = (data) => {
+    const dashboard = this.state.dashboard;
+    // store the selected data 
+    let metaData = dashboard.blocks[this.state.blockSelectedId].config.metaData;
+    metaData = { ...metaData, ...data };
+    dashboard.blocks[this.state.blockSelectedId].config.metaData = metaData;
+    console.log("dashboard: ", dashboard);
+    this.setState({ dashboard: { ...this.state.dashboard, blocks: dashboard.blocks } });
   }
 
   addBlock = (blockType: string, masterBlockId?: string) => {
-    console.log("block type: ", blockType);
-    const block = {
-      w: 4,
-      h: 2,
-      x: 0,
-      y: 0,
-      i: "graph" + this.state.click
-    };
-    let dash = new DashboardModel();
-    dash = this.state.blocks;
-    console.log("dash: ", dash);
-    console.log("dash id: ", dash.id);
+    const layoutItem = new LayoutModel("block" + this.state.click);
+    const dashboard = this.state.dashboard;
 
-    const blocks = this.state.blocks;
+    dashboard.blocks[layoutItem.i] = new BlockModel(layoutItem.i, blockType);
+    dashboard.layout = [layoutItem, ...dashboard.layout]
+    console.log("dashboard.blocks: ", dashboard);
 
-    blocks[block.i] = { blockType, visualizeData: [] }
-    const state = {
-      blocks,
-      layout: [block, ...this.state.layout],
-      blockSelectedId: block.i,
-      click: this.state.click + 1,
-    };
 
     if (masterBlockId)
-    blocks[block.i].masterBlocks = masterBlockId;
+      dashboard.blocks[layoutItem.i].masterBlocks = masterBlockId;
 
+    const state = {
+      dashboard: { ...this.state.dashboard, blocks: dashboard.blocks, layout: dashboard.layout },
+      blockSelectedId: layoutItem.i,
+      click: this.state.click + 1,
+    };
     this.setState(state);
   }
 
   render() {
     return (
       <Dashboard
+        dashboard={this.state.dashboard}
         addBlock={this.addBlock}
         blockSelectedId={this.state.blockSelectedId}
-        layout={this.state.layout}
+        layout={this.state.dashboard.layout}
         updateLayout={this.updateLayout}
-        blocks={this.state.blocks}
+        blocks={this.state.dashboard.blocks}
         updateSelectedBlock={this.updateSelectedBlock}
-        updateBlockData={this.updateBlockData}
+        updateBlockMetaData={this.updateBlockMetaData}
         {...this.props} />
     )
   }

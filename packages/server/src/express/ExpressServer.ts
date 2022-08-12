@@ -2,12 +2,12 @@ import express from "express";
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import {join} from "path";
-import cookieParser from 'cookie-parser'
 
 import data from "../data/data.json";
 import models from "../data/models.json";
 import variables from "../data/variables.json";
 import regions from "../data/regions.json";
+import * as fs from "fs";
 
 export default class ExpressServer {
     private app: any;
@@ -24,7 +24,6 @@ export default class ExpressServer {
         if (auth) {
             this.app.use(this.auth);
         }
-        this.app.use(cookieParser(cookieKey));
         this.app.use(cors());
         // Serve static resources from the "public" folder (ex: when there are images to display)
         this.app.use(express.static(join(__dirname, clientPath)));
@@ -50,8 +49,16 @@ export default class ExpressServer {
             res.send(`Hello , From server`);
         });
 
-        this.app.get('/api/data', (req, res) => {
-            res.send(data);
+        this.app.post('/api/data', (req, res) => {
+            const body = req.body;
+            console.log("body: ", req.body)
+            data.map(e => {
+                if (e.model === body.model && e.scenario === body.scenario
+                    && e.region === body.region && e.variable === body.variable) {
+                    res.send(e);
+                }
+            })
+            res.send([]);
         });
 
         this.app.get('/api/models', (req, res) => {
@@ -64,7 +71,7 @@ export default class ExpressServer {
 
             variables.forEach(variable => {
                 if (variable.model === model && variable.scenario === scenario)
-                    res.send({...variable});
+                    res.send({ ...variable });
             });
 
             res.status(404).send("No data found");
@@ -74,12 +81,22 @@ export default class ExpressServer {
             const model = req.query.model;
             const scenario = req.query.scenario;
 
-            let allRegions :any[]= [];
+            let allRegions: any[] = [];
             regions.forEach(region => {
                 if (region.model === model && region.scenario === scenario)
                     allRegions = [...allRegions, ...region.regions];
             });
             res.send(allRegions);
+        });
+
+        // Posts methods
+        this.app.post(`/api/dashboard`, (req, res) => {
+            console.log(req.body)
+            // console.log(req.method)
+            fs.writeFile('./dashboards.json', JSON.stringify(req.body), (err) => {
+                if (err) console.log('Error writing file:', err);
+            })
+            // console.log(redisClient.getClient())
         });
 
         // Serve the HTML page

@@ -19,4 +19,7 @@ export default class RedisClient {
     onError = (err) => {
         console.log('Redis Client Error', err)
     }
+    getClient = () => {
+        return this.client;
+    }
 }
