@@ -1,144 +1,107 @@
 import { Component } from 'react'
 import { Divider, Select } from 'antd';
 import { Option } from 'antd/lib/mentions';
-import PlotTypes from '../../graphs/PlotTypes';
 import PropTypes from 'prop-types';
+import DataBlockTableSelection from './DataBlockTableSelection';
 
-// 2Types: controlled / not controlled
 export default class DataBlock extends Component<any, any> {
 
   static propTypes = {
     structureData: PropTypes.objectOf(PropTypes.objectOf(PropTypes.objectOf(PropTypes.array)))
   }
 
-  models: string[] = [];
-  scenarios: string[] = [];
   variables: string[] = [];
   regions: string[] = [];
+  defaultVariables: string[] = [];
+  defaultRegions: string[] = [];
 
   constructor(props) {
     super(props);
+    this.updateDropdownData();
+  }
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.blockSelectedId !== this.props.blockSelectedId) {
+      this.updateDropdownData();
+    }
   }
 
-  componentDidMount() {
+  /**
+   * Update the options of dropdown lists of variables and regions
+   * SHOW only the options when we can find data to visualize
+   */
+  updateDropdownData = () => {
+    const selectedData = this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
+    const models = selectedData.models;
     const structureData = this.props.structureData;
-    // models
-    Object.keys(structureData).map(modelKey => {
-      this.models = [...this.models, modelKey];
-      // scenarios
-      Object.keys(structureData[modelKey]).map(scenarioKey => {
-        this.scenarios = [...this.scenarios, scenarioKey];
-        // regions and variables
+    this.variables = [];
+    this.regions = [];
+    Object.keys(models).map((modelKey) => {
+      models[modelKey].map(scenarioKey => {
         this.variables = [...this.variables, ...structureData[modelKey][scenarioKey].variables];
         this.regions = [...this.regions, ...structureData[modelKey][scenarioKey].regions];
       })
     });
 
     // Show unique values
-    this.models = [...new Set(this.models)];
-    this.scenarios = [...new Set(this.scenarios)];
     this.variables = [...new Set(this.variables)];
     this.regions = [...new Set(this.regions)];
-  }
 
-  /**
-   * Trigged when the list of selection models changed
-   * to update the list of scenarios
-   * @param selectedModels Array of names of all selected models
-   */
-  modelSelectionChange = (selectedModels: string[]) => {
-    this.props.updateBlockMetaData({models: selectedModels});
-  }
+    // Show selected/default values (check if the selected values in the dropdown list options)
+    this.defaultVariables = selectedData.variables.filter((variable: string) => this.variables.indexOf(variable) >= 0).map(variable => variable);
+    this.defaultRegions = selectedData.regions.filter((region: string) => this.regions.indexOf(region) >= 0).map(region => region);
 
-  /**
-   * 
-   * @param selectedScenarios 
-   */
-  scenariosSelectionChange = (selectedScenarios: string[]) => {
-    this.props.updateBlockMetaData({scenarios: selectedScenarios});
+    this.props.updateBlockMetaData({ variables: this.defaultVariables, regions: this.defaultRegions });
   }
 
   variablesSelectionChange = (selectedVariables: string[]) => {
-    this.props.updateBlockMetaData({variables: selectedVariables});
+    this.props.updateBlockMetaData({ variables: selectedVariables });
   }
 
   regionsSelectionChange = (selectedRegions: string[]) => {
-    this.props.updateBlockMetaData({regions: selectedRegions});
-  }
-
-  plotTypeOnChange = (plotType: string) => {
-    this.setState({ plotType })
+    this.props.updateBlockMetaData({ regions: selectedRegions });
   }
 
   render() {
-    const {blocks, blockSelectedId} = this.props;
-    const metaData = blocks[blockSelectedId].config.metaData;
+
+    const defaultRegions: string[] = this.regions.filter((region: string) => { if (this.regions.indexOf(region) >= 0) return region }).map(region => region);
+    console.log("defaultRegions: ", defaultRegions);
+
     return (
       <div className='width-100'>
         <Divider />
-        <Select
-          mode="multiple"
-          className="width-100"
-          placeholder="Please select the model"
-          defaultValue={metaData.models}
-          onChange={this.modelSelectionChange}
-        >
-          {
-            this.models.map(model =>
-              <Option key={model} value={model}>{model}</Option>
-            )}
-        </Select>
-
+        <DataBlockTableSelection  {...this.props} updateDropdownData={this.updateDropdownData} />
         <Divider />
-        <Select
-          mode="multiple"
-          className="width-100"
-          placeholder="Scenario"
-          defaultValue={metaData.scenarios}
-          onChange={this.scenariosSelectionChange}
-        >
-          {
-            this.scenarios.map(scenario =>
-              <Option key={scenario} value={scenario}>{scenario}</Option>
-            )}
-        </Select>
+        {/* adding key, because react not updating the default value on state change */}
+        <div>
+          <Select key={this.defaultVariables.toString()}
+            mode="multiple"
+            className="width-100"
+            placeholder="Variables"
+            defaultValue={this.defaultVariables}
+            onChange={this.variablesSelectionChange}
+          >
+            {this.defaultVariables}
+            {
+              this.variables.map(variable =>
+                <Option key={variable} value={variable}>{variable}</Option>
+              )}
+          </Select>
+        </div>
         <Divider />
-        <Select
-          mode="multiple"
-          className="width-100"
-          placeholder="Variables"
-          defaultValue={metaData.variables}
-          onChange={this.variablesSelectionChange}
-        >
-          {
-            this.variables.map(variable =>
-              <Option key={variable} value={variable}>{variable}</Option>
-            )}
-        </Select>
-        <Divider />
-        <Select
-          mode="multiple"
-          className="width-100"
-          placeholder="Regions"
-          defaultValue={metaData.regions}
-          onChange={this.regionsSelectionChange}
-        >
-          {
-            this.regions.map(region =>
-              <Option key={region} value={region}>{region}</Option>
-            )}
-        </Select>
-        <Divider />
-        <Select
-          className="width-100"
-          placeholder="Graph type"
-          options={PlotTypes}
-          onChange={this.plotTypeOnChange}
-          fieldNames={{
-            value: "type",
-            label: "type",
-          }}
-        />
+        <div>
+          <Select key={this.defaultRegions.toString()}
+            mode="multiple"
+            className="width-100"
+            placeholder="Regions"
+            defaultValue={this.defaultRegions}
+            onChange={this.regionsSelectionChange}
+          >
+            {
+              this.regions.map(region =>
+                <Option key={region} value={region}>{region}</Option>
+              )}
+          </Select>
+        </div>
         <div className='space-div'></div>
       </div>
     )

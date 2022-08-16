@@ -31,7 +31,6 @@ export default class DashboardSelectionControl extends Component<any, any> {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    // console.log("dashboard Updated !!! ");
     if (prevState.dashboard !== this.state.dashboard) {
       console.log("dashboard Updated !!! ");
       const str = JSON.stringify(this.state.dashboard);
@@ -58,7 +57,6 @@ export default class DashboardSelectionControl extends Component<any, any> {
     let metaData = dashboard.blocks[this.state.blockSelectedId].config.metaData;
     metaData = { ...metaData, ...data };
     dashboard.blocks[this.state.blockSelectedId].config.metaData = metaData;
-    console.log("dashboard: ", dashboard);
     this.setState({ dashboard: { ...this.state.dashboard, blocks: dashboard.blocks } });
   }
 
@@ -68,8 +66,6 @@ export default class DashboardSelectionControl extends Component<any, any> {
 
     dashboard.blocks[layoutItem.i] = new BlockModel(layoutItem.i, blockType);
     dashboard.layout = [layoutItem, ...dashboard.layout]
-    console.log("dashboard.blocks: ", dashboard);
-
 
     if (masterBlockId)
       dashboard.blocks[layoutItem.i].masterBlocks = masterBlockId;
