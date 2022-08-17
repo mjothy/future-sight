@@ -63,16 +63,18 @@ export default class DataBlockTableSelection extends Component<any, any> {
      *The key table is: model/scenario
      */
     prepareDataTable() {
-        const { structureData } = this.props;
-        Object.keys(structureData).map(modelKey => {
-            Object.keys(structureData[modelKey]).map(scenarioKey => {
-                this.data.push({
-                    key: modelKey + '/' + scenarioKey,
-                    model: modelKey,
-                    scenario: scenarioKey
+        const { dataStructure } = this.props.dashboard;
+        if (dataStructure != null) {
+            Object.keys(dataStructure).map(modelKey => {
+                Object.keys(dataStructure[modelKey]).map(scenarioKey => {
+                    this.data.push({
+                        key: modelKey + '/' + scenarioKey,
+                        model: modelKey,
+                        scenario: scenarioKey
+                    });
                 });
             });
-        });
+        }
     }
 
     onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -88,6 +90,7 @@ export default class DataBlockTableSelection extends Component<any, any> {
         // Update the selected data variable
         this.selectedData = this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData.models;
         this.props.updateDropdownData();
+        this.props.dashboardDataUpdate();
     };
 
 

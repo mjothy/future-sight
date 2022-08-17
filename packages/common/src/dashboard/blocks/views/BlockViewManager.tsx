@@ -13,7 +13,7 @@ export default class BlockViewManager extends Component<any, any> {
     }
 
     blockByType = () => {
-        const blockType = this.props.data ? this.props.data.blockType : "data";
+        const blockType = this.props.currentBlock ? this.props.currentBlock.blockType : "data";
 
         switch (blockType) {
             case "data":

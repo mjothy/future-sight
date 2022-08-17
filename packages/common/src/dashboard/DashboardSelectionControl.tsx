@@ -4,7 +4,7 @@ import BlockModel from '../models/BlockModel';
 
 import DashboardModel from '../models/DashboardModel';
 import LayoutModel from '../models/LayoutModel';
-import Dashboard from './Dashboard'
+import DashboardDataConfiguration from './DashboardDataConfiguration';
 
 export default class DashboardSelectionControl extends Component<any, any> {
 
@@ -21,21 +21,25 @@ export default class DashboardSelectionControl extends Component<any, any> {
       click: 0,
       blockType: ""
     }
+
   }
 
-  componentDidMount() {
+ componentDidMount() {
     const dashboard = this.state.dashboard;
-    dashboard.userData = this.props.userData;
     dashboard.dataStructure = this.props.structureData;
-    this.setState({ dashboard });
+    dashboard.userData = this.props.userData;
+    this.setState({dashboard});
+    // this.props.dataManager.getDashboard().then(data=>{
+    //   const dashboard = data;
+    //   this.setState({ dashboard });
+    // })
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevState.dashboard !== this.state.dashboard) {
-      console.log("dashboard Updated !!! ");
-      const str = JSON.stringify(this.state.dashboard);
+    // if (prevState.dashboard !== this.state.dashboard) {
+      // const str = JSON.stringify(this.state.dashboard);
       // this.props.dataManager.addDashboard(str);
-    }
+    // }
   }
 
   updateLayout = (layout) => {
@@ -77,10 +81,10 @@ export default class DashboardSelectionControl extends Component<any, any> {
     };
     this.setState(state);
   }
-
+  
   render() {
     return (
-      <Dashboard
+      <DashboardDataConfiguration
         dashboard={this.state.dashboard}
         addBlock={this.addBlock}
         blockSelectedId={this.state.blockSelectedId}

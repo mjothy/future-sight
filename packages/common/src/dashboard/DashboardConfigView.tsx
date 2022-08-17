@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import BlockViewManager from "./blocks/views/BlockViewManager";
 import PropTypes from 'prop-types';
-import LayoutModel from "../models/LayoutModel";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -102,7 +101,6 @@ class DashboardConfigView extends Component<any, any> {
 
   render() {
     const { blocks, layout } = this.props;
-    console.log("blocks view: ", blocks);
     return (
       <ResponsiveGridLayout
         className="layout"
@@ -112,14 +110,14 @@ class DashboardConfigView extends Component<any, any> {
         isResizable={true}
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
         cols={{ lg: 12, md: 12, sm: 12, xs: 12, xxs: 12 }}
-        rowHeight={100}
+        rowHeight={150}
         onLayoutChange={this.onLayoutChange}
         onBreakpointChange={this.onBreakpointChange}
         onResizeStop={this.resizeStop}
       >
         {layout.map(layout => <div key={layout.i} className={this.props.blockSelectedId === layout.i ? "selected-layout" : ""} >
           <div ref={ref => this.ref[layout.i] = ref} id={layout.i} className={"width-100 height-100"} onClick={this.onBlockClick}>
-            <BlockViewManager  {...this.props} data={...blocks[layout.i]} width={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].width : this.width} height={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].height : this.height} />
+            <BlockViewManager  {...this.props} currentBlock={...blocks[layout.i]} width={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].width : this.width} height={this.state.graphsSize[layout.i] ? this.state.graphsSize[layout.i].height : this.height} />
           </div>
         </div>)}
 

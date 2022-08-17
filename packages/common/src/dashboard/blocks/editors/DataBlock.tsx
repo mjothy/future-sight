@@ -1,14 +1,9 @@
 import { Component } from 'react'
 import { Divider, Select } from 'antd';
 import { Option } from 'antd/lib/mentions';
-import PropTypes from 'prop-types';
 import DataBlockTableSelection from './DataBlockTableSelection';
 
 export default class DataBlock extends Component<any, any> {
-
-  static propTypes = {
-    structureData: PropTypes.objectOf(PropTypes.objectOf(PropTypes.objectOf(PropTypes.array)))
-  }
 
   variables: string[] = [];
   regions: string[] = [];
@@ -32,13 +27,13 @@ export default class DataBlock extends Component<any, any> {
   updateDropdownData = () => {
     const selectedData = this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
     const models = selectedData.models;
-    const structureData = this.props.structureData;
+    const dataStructure = this.props.dashboard.dataStructure;
     this.variables = [];
     this.regions = [];
     Object.keys(models).map((modelKey) => {
       models[modelKey].map(scenarioKey => {
-        this.variables = [...this.variables, ...structureData[modelKey][scenarioKey].variables];
-        this.regions = [...this.regions, ...structureData[modelKey][scenarioKey].regions];
+        this.variables = [...this.variables, ...dataStructure[modelKey][scenarioKey].variables];
+        this.regions = [...this.regions, ...dataStructure[modelKey][scenarioKey].regions];
       })
     });
 
@@ -55,16 +50,16 @@ export default class DataBlock extends Component<any, any> {
 
   variablesSelectionChange = (selectedVariables: string[]) => {
     this.props.updateBlockMetaData({ variables: selectedVariables });
+    this.props.dashboardDataUpdate();
+
   }
 
   regionsSelectionChange = (selectedRegions: string[]) => {
     this.props.updateBlockMetaData({ regions: selectedRegions });
+    this.props.dashboardDataUpdate();
   }
 
   render() {
-
-    const defaultRegions: string[] = this.regions.filter((region: string) => { if (this.regions.indexOf(region) >= 0) return region }).map(region => region);
-    console.log("defaultRegions: ", defaultRegions);
 
     return (
       <div className='width-100'>

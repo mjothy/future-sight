@@ -7,6 +7,8 @@ import data from "../data/data.json";
 import models from "../data/models.json";
 import variables from "../data/variables.json";
 import regions from "../data/regions.json";
+import dashboard from "../data/dashboards.json";
+
 import * as fs from "fs";
 
 export default class ExpressServer {
@@ -51,7 +53,7 @@ export default class ExpressServer {
 
         this.app.post('/api/data', (req, res) => {
             const body = req.body;
-            console.log("body: ", req.body)
+            console.log("body: ", JSON.stringify(req.body));
             data.map(e => {
                 if (e.model === body.model && e.scenario === body.scenario
                     && e.region === body.region && e.variable === body.variable) {
@@ -91,12 +93,12 @@ export default class ExpressServer {
 
         // Posts methods
         this.app.post(`/api/dashboard`, (req, res) => {
-            console.log(req.body)
-            // console.log(req.method)
             fs.writeFile('./dashboards.json', JSON.stringify(req.body), (err) => {
                 if (err) console.log('Error writing file:', err);
             })
-            // console.log(redisClient.getClient())
+        });
+        this.app.get(`/api/dashboard`, (req, res) => {
+           res.send(dashboard);
         });
 
         // Serve the HTML page

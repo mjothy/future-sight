@@ -15,7 +15,6 @@ export default class DataManager {
 
   fetchData = (data) => {
 
-    console.log("data: ",data);
     return fetch(`${this.getBaseUrl()}/data`, {
       method: 'POST',
       headers: {
@@ -81,6 +80,16 @@ export default class DataManager {
       },
       body: data
     })
+      .then((response) => response.json())
+      .then((data) => {
+        return data;
+      })
+      .catch(err => err);
+  }
+
+
+  getDashboard = () => {
+    return fetch(`${this.getBaseUrl()}/dashboard`)
       .then((response) => response.json())
       .then((data) => {
         return data;
