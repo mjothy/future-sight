@@ -1,19 +1,12 @@
 
 export default class DataManager {
-    url: string;
-    port: number;
-
-    constructor() {
-      this.url = 'http://localhost'
-      this.port = 8080;
-    }
 
     getBaseUrl(){
-      return this.url + ':'+this.port + '/api'
+      return '/api'
     }
 
     fetchData = (data) => {
-      
+
       return fetch(`${this.getBaseUrl()}/data`,{
         method: 'GET',
         headers: {
@@ -30,7 +23,7 @@ export default class DataManager {
     }
 
     fetchAllData = () => {
-      
+
       return fetch(`${this.getBaseUrl()}/data`,{
         method: 'GET',
         headers: {
@@ -43,7 +36,7 @@ export default class DataManager {
         })
         .catch(err => err);
     }
-    
+
 
     fetchModels = () => {
       return fetch(`${this.getBaseUrl()}/models`)
