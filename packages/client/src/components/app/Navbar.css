@@ -3,10 +3,7 @@
 }
 
 .navbar .logo-wrapper {
-  display: flex;
-  align-items: center;
-  background: #001529;
-  padding: 0 15px;
+  pointer-events: none;
 }
 
 .navbar img {
