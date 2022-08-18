@@ -1,8 +1,7 @@
-import React, { Component } from 'react'
-import PlotlyGraph from '../../graphs/PlotlyGraph'
+import React, { Component } from 'react';
+import PlotlyGraph from '../../graphs/PlotlyGraph';
 
 export default class DataBlockView extends Component<any, any> {
-
   /**
    * Getting the data to visualize on the graph
    * @returns Data with timeseries
@@ -11,10 +10,10 @@ export default class DataBlockView extends Component<any, any> {
     const data: any[] = [];
     const metaData = this.props.currentBlock.config.metaData;
     if (metaData.models && metaData.variables && metaData.regions) {
-      Object.keys(metaData.models).map(model => {
-        metaData.models[model].map(scenario => {
-          metaData.variables.map(variable => {
-            metaData.regions.map(region => {
+      Object.keys(metaData.models).map((model) => {
+        metaData.models[model].map((scenario) => {
+          metaData.variables.map((variable) => {
+            metaData.regions.map((region) => {
               data.push({ model, scenario, variable, region });
             });
           });
@@ -23,28 +22,27 @@ export default class DataBlockView extends Component<any, any> {
       const returnData = this.props.getData(data);
       return returnData;
     }
-  }
+  };
 
   /**
    * Preparing the fetched data to adapt plotly data
-   * @returns 
+   * @returns
    */
   settingPlotData() {
     const data: any[] = this.getPlotData();
-    data.map(dataElement => {
+    data.map((dataElement) => {
       const obj = {
-        type: "line",
+        type: 'line',
         x: this.getX(dataElement),
         y: this.getY(dataElement),
         name: dataElement.model + '/' + dataElement.scenario,
-        showlegend: true
+        showlegend: true,
       };
       data.push(obj);
     });
 
     return data;
   }
-
 
   /**
    * Extract the x axis from data
@@ -53,9 +51,9 @@ export default class DataBlockView extends Component<any, any> {
    */
   getX = (data) => {
     const x: string[] = [];
-    data.data.map(d => x.push(d.year))
+    data.data.map((d) => x.push(d.year));
     return x;
-  }
+  };
 
   /**
    * Extract the y axis from data
@@ -64,11 +62,11 @@ export default class DataBlockView extends Component<any, any> {
    */
   getY = (data) => {
     const y: string[] = [];
-    data.data.map(d => y.push(d.value))
+    data.data.map((d) => y.push(d.value));
     return y;
-  }
+  };
 
   render() {
-    return <PlotlyGraph {...this.props} data={this.settingPlotData()} />
+    return <PlotlyGraph {...this.props} data={this.settingPlotData()} />;
   }
 }

@@ -1,3 +1,3 @@
-export const App_Name = "My Cool Webapp";
+export const App_Name = 'My Cool Webapp';
 // export { default as DashboardSelectionControl} from "./dashboard/DashboardSelectionControl";
-export { default as DashboardDataConfiguration} from "./dashboard/DashboardDataConfiguration";
+export { default as DashboardDataConfiguration } from './dashboard/DashboardDataConfiguration';

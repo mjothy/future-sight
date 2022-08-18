@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import ControlBlock from './ControlBlock';
 import DataBlock from './DataBlock';
 import TextBlock from './TextBlock';
@@ -8,10 +8,9 @@ import PropTypes from 'prop-types';
  * Render the view edit block according the the selected type
  */
 export default class BlockEditorManager extends Component<any, any> {
-
   static propTypes = {
-    blockType: PropTypes.string
-  }
+    blockType: PropTypes.string,
+  };
 
   constructor(props) {
     super(props);
@@ -19,19 +18,21 @@ export default class BlockEditorManager extends Component<any, any> {
 
   blockByType = () => {
     const blockSelectedId = this.props.blockSelectedId;
-    const blockType = this.props.blocks[blockSelectedId] ? this.props.blocks[blockSelectedId].blockType : "data";
+    const blockType = this.props.blocks[blockSelectedId]
+      ? this.props.blocks[blockSelectedId].blockType
+      : 'data';
     switch (blockType) {
-      case "data":
-        return <DataBlock {...this.props} />
-      case "text":
-        return <TextBlock {...this.props} />
-      case "control":
-        return <ControlBlock {...this.props} />
+      case 'data':
+        return <DataBlock {...this.props} />;
+      case 'text':
+        return <TextBlock {...this.props} />;
+      case 'control':
+        return <ControlBlock {...this.props} />;
       default:
-        return <p>Error !</p>
+        return <p>Error !</p>;
     }
-  }
+  };
   render() {
-    return this.blockByType()
+    return this.blockByType();
   }
 }

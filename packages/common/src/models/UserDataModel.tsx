@@ -1,8 +1,5 @@
-
 export default class UserDataModel {
-
-    title?:string;
-    author?:string;
-    tags?:string[];
-
+  title?: string;
+  author?: string;
+  tags?: string[];
 }

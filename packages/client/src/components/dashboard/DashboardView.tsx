@@ -1,5 +1,5 @@
 import { DashboardDataConfiguration } from '@future-sight/common';
-import React from 'react'
+import React from 'react';
 import withDataManager from '../../services/withDataManager';
 import SetupView from './form/SetupView';
 
@@ -16,14 +16,14 @@ class DashboardView extends React.Component<any, any> {
       userData: {
         title: '',
         author: '',
-        tags: []
+        tags: [],
       },
       /**
        * Selected data to work with in dashboard {model: {scenario: { variables: [], regions: []}}}
        */
       data: [],
-      scenarios: []
-    }
+      scenarios: [],
+    };
   }
 
   /**
@@ -33,43 +33,64 @@ class DashboardView extends React.Component<any, any> {
    */
   handleSubmit = (data: boolean) => {
     this.setState({ isSubmited: data });
-  }
+  };
 
   /**
    * Geting and update the value the user data
    * @param data contains the information of the dashboard {title, author and tags}
    */
   handleUserData = (data) => {
-    const userData = { ...this.state.userData }
+    const userData = { ...this.state.userData };
 
     switch (data.name) {
-      case 'title': userData.title = data.value; break;
-      case 'author': userData.author = data.value; break;
-      case 'tags': userData.tags = data.value; break;
+      case 'title':
+        userData.title = data.value;
+        break;
+      case 'author':
+        userData.author = data.value;
+        break;
+      case 'tags':
+        userData.tags = data.value;
+        break;
     }
     this.setState({ userData: { ...userData } });
-  }
+  };
 
   handleStructureData = (data) => {
     this.setState({ data });
-  }
+  };
 
   dashboardAddForm = () => {
-    return <SetupView {...this.props} userData={this.state.userData} structureData={this.state.data} submitEvent={this.handleSubmit} updateUserData={this.handleUserData}
-      handleStructureData={this.handleStructureData} />
-  }
+    return (
+      <SetupView
+        {...this.props}
+        userData={this.state.userData}
+        structureData={this.state.data}
+        submitEvent={this.handleSubmit}
+        updateUserData={this.handleUserData}
+        handleStructureData={this.handleStructureData}
+      />
+    );
+  };
 
   dashboardManager = () => {
-    return <DashboardDataConfiguration {...this.props} userData={this.state.userData} structureData={this.state.data} submitSetupView={this.handleSubmit} />
-  }
+    return (
+      <DashboardDataConfiguration
+        {...this.props}
+        userData={this.state.userData}
+        structureData={this.state.data}
+        submitSetupView={this.handleSubmit}
+      />
+    );
+  };
   render() {
     return (
-      <div className='height-100'>
-        {
-          this.state.isSubmited ? this.dashboardManager() : this.dashboardAddForm()
-        }
+      <div className="height-100">
+        {this.state.isSubmited
+          ? this.dashboardManager()
+          : this.dashboardAddForm()}
       </div>
-    )
+    );
   }
 }
 

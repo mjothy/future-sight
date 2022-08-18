@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import { Button, Col, Divider, Row, Select } from 'antd';
 import AnalysisDataTable from './AnalysisDataTable';
 import { Option } from 'antd/lib/mentions';
@@ -8,27 +8,27 @@ class DataStructureForm extends Component<any, any> {
   scenarioSelectRef = React.createRef();
 
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       scenarios: [],
       models: [],
 
       /**
-      * The data selected in dropdownn list
-      */
+       * The data selected in dropdownn list
+       */
       selectedModel: null,
       selectedScenarios: [],
 
       /**
        * The data to send to dashboard
        */
-      data: []
-    }
+      data: [],
+    };
   }
 
   componentDidMount() {
     this.props.dataManager.fetchModels().then((data) => {
-      this.setState({ models: data })
+      this.setState({ models: data });
     });
   }
 
@@ -37,39 +37,53 @@ class DataStructureForm extends Component<any, any> {
    * to update the list of scenarios
    */
   modelSelectionChange = (modelSelected: string) => {
-    const selectedModel = this.state.models.filter(model => model.name === modelSelected)[0];
-    const data = {}
-    data[modelSelected] = {}
+    const selectedModel = this.state.models.filter(
+      (model) => model.name === modelSelected
+    )[0];
+    const data = {};
+    data[modelSelected] = {};
     // Change scenarios on dropdown list
     let scenarios: any[] = [];
-    scenarios = [...selectedModel.scenarios]
-    this.setState({ scenarios, selectedModel: selectedModel.name, selectedScenarios: [], data: { ...this.state.data, ...data } });
-  }
+    scenarios = [...selectedModel.scenarios];
+    this.setState({
+      scenarios,
+      selectedModel: selectedModel.name,
+      selectedScenarios: [],
+      data: { ...this.state.data, ...data },
+    });
+  };
 
   scenariosSelectionChange = (selectedScenarios: string[]) => {
-    this.setState({ selectedScenarios })
-  }
+    this.setState({ selectedScenarios });
+  };
 
   /**
    * To show the selected data in table
    */
   addDataToTable = () => {
-    if (this.state.selectedModel != "" && this.state.selectedScenarios.length > 0) {
+    if (
+      this.state.selectedModel != '' &&
+      this.state.selectedScenarios.length > 0
+    ) {
       const data = this.state.data;
       const model = this.state.selectedModel;
-      this.state.selectedScenarios.map(scenario => {
+      this.state.selectedScenarios.map((scenario) => {
         data[model][scenario] = {
           regions: [],
-          variables: []
-        }
+          variables: [],
+        };
         // get variables, and regions
-        this.getVariables(model, scenario).then(res => data[model][scenario].variables = res);
-        this.getRegions(model, scenario).then(res => data[model][scenario].regions = res);
-      })
+        this.getVariables(model, scenario).then(
+          (res) => (data[model][scenario].variables = res)
+        );
+        this.getRegions(model, scenario).then(
+          (res) => (data[model][scenario].regions = res)
+        );
+      });
       this.props.handleStructureData(data);
       this.resetForm();
     }
-  }
+  };
 
   /**
    * To fetch the variables of {model, scenario}
@@ -80,9 +94,13 @@ class DataStructureForm extends Component<any, any> {
   async getVariables(model, scenario) {
     const dataManager = this.props.dataManager;
     const data = {
-      model, scenario
-    }
-    return await dataManager.fetchVariables(data).then(variablesData => { if (variablesData != null) return variablesData.variables.map(v => v.name) });
+      model,
+      scenario,
+    };
+    return await dataManager.fetchVariables(data).then((variablesData) => {
+      if (variablesData != null)
+        return variablesData.variables.map((v) => v.name);
+    });
   }
 
   /**
@@ -94,9 +112,12 @@ class DataStructureForm extends Component<any, any> {
   async getRegions(model, scenario) {
     const dataManager = this.props.dataManager;
     const data = {
-      model, scenario
-    }
-    return await dataManager.fetchRegions(data).then(regionsData => regionsData.map(r => r.name));
+      model,
+      scenario,
+    };
+    return await dataManager
+      .fetchRegions(data)
+      .then((regionsData) => regionsData.map((r) => r.name));
   }
 
   /**
@@ -107,14 +128,14 @@ class DataStructureForm extends Component<any, any> {
       selectedScenarios: [],
       selectedModel: null,
       scenarios: [],
-    })
-  }
+    });
+  };
 
   render() {
     return (
       <div>
         <Row justify="space-evenly">
-          <Col xs={20} sm={20} md={6} lg={7} >
+          <Col xs={20} sm={20} md={6} lg={7}>
             <Select
               className="width-100"
               placeholder="Please select the model"
@@ -122,38 +143,41 @@ class DataStructureForm extends Component<any, any> {
               onChange={this.modelSelectionChange}
               options={this.state.models}
               fieldNames={{
-                value: "name",
-                label: "name",
+                value: 'name',
+                label: 'name',
               }}
             />
           </Col>
 
-          <Col xs={20} sm={20} md={6} lg={7} >
+          <Col xs={20} sm={20} md={6} lg={7}>
             <Select
               mode="multiple"
-              className='width-100'
+              className="width-100"
               placeholder="Scenarios"
               onChange={this.scenariosSelectionChange}
               value={this.state.selectedScenarios}
             >
-              {this.state.scenarios.map(scenario =>
-                <Option key={scenario.name} value={scenario.name}>{scenario.name}</Option>
-              )}
+              {this.state.scenarios.map((scenario) => (
+                <Option key={scenario.name} value={scenario.name}>
+                  {scenario.name}
+                </Option>
+              ))}
             </Select>
           </Col>
           <Divider />
-
         </Row>
-        <Row justify='center'>
-          <Button type='primary' onClick={this.addDataToTable}>Add as analysis data </Button>
+        <Row justify="center">
+          <Button type="primary" onClick={this.addDataToTable}>
+            Add as analysis data{' '}
+          </Button>
         </Row>
         <Divider />
 
-        <Row justify='center'>
+        <Row justify="center">
           <AnalysisDataTable structureData={this.props.structureData} />
         </Row>
       </div>
-    )
+    );
   }
 }
 

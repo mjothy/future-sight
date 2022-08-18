@@ -5,12 +5,8 @@
     "rootDir": "src",
     "outDir": "build",
     "isolatedModules": false,
-    "jsx": "react-jsx",
+    "jsx": "react-jsx"
   },
-  "references": [
-    { "path": "../common" }
-  ],
-  "include": [
-    "src"
-  ]
+  "references": [{ "path": "../common" }],
+  "include": ["src"]
 }

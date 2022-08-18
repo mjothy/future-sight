@@ -1,4 +1,4 @@
-import { Component } from 'react'
+import { Component } from 'react';
 import { Button } from 'antd';
 import BlockEditorManager from '../blocks/editors/BlockEditorManager';
 import PropTypes from 'prop-types';
@@ -7,18 +7,21 @@ import PropTypes from 'prop-types';
  * The block editor form, call BlockEditorManager to render the editor form view correspond to the control selected type
  */
 export default class BlockEditor extends Component<any, any> {
-
   static propTypes = {
-    updateSelectedBlock: PropTypes.func
-  }
+    updateSelectedBlock: PropTypes.func,
+  };
 
   render() {
     return (
       <>
-        <Button type='default' onClick={() => this.props.updateSelectedBlock("")}>X</Button>
+        <Button
+          type="default"
+          onClick={() => this.props.updateSelectedBlock('')}
+        >
+          X
+        </Button>
         <BlockEditorManager {...this.props} />
       </>
-    )
+    );
   }
-
 }

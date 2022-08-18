@@ -5,10 +5,6 @@
     "jsx": "react-jsx",
     "noEmit": true
   },
-  "references": [
-    { "path": "../common" }
-  ],
-  "include": [
-    "src"
-, "../common/src/dashboard/Block.tsx"  ]
+  "references": [{ "path": "../common" }],
+  "include": ["src", "../common/src/dashboard/Block.tsx"]
 }

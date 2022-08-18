@@ -1,4 +1,3 @@
-
 export default class BlockStyleModel {
-    graphType:string | undefined;
+  graphType: string | undefined;
 }

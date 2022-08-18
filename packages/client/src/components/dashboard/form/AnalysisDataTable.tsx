@@ -1,14 +1,14 @@
-import { Table } from 'antd'
-import { Component } from 'react'
+import { Table } from 'antd';
+import { Component } from 'react';
 
 export default class AnalysisDataTable extends Component<any, any> {
   columns;
 
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
-      dataSource: []
-    }
+      dataSource: [],
+    };
 
     /**
      * return the table columns
@@ -30,21 +30,20 @@ export default class AnalysisDataTable extends Component<any, any> {
     const data = this.props.structureData;
 
     if (data != null) {
-
       const dataSource: any[] = [];
 
-      Object.keys(data).map(key => {
+      Object.keys(data).map((key) => {
         const dataObject = {
-          model: "",
-          scenarios: new Array<string>()
-        }
+          model: '',
+          scenarios: new Array<string>(),
+        };
         dataObject.model = key;
         const scenarios: string[] = Object.keys(data[key]);
         dataObject.scenarios.push(...scenarios);
 
         dataSource.push(dataObject);
-      })
-      this.setState({ dataSource })
+      });
+      this.setState({ dataSource });
       this.columns = this.setColumns();
     }
   }
@@ -54,32 +53,37 @@ export default class AnalysisDataTable extends Component<any, any> {
    * @returns {*}
    */
   dataSource = () => {
-    return this.state.dataSource
-  }
+    return this.state.dataSource;
+  };
 
   /**
    * Set table columns
    */
   setColumns = () => {
-    const columns = [{
-      title: 'Model',
-      dataIndex: 'model',
-      key: 'model',
-    },
-    {
-      title: 'Scenario',
-      dataIndex: 'scenarios',
-      key: 'scenarios',
-      render: (scenarios) => scenarios.map(scenario => <p key={scenario}>{scenario}</p>)
-
-    }
-    ]
+    const columns = [
+      {
+        title: 'Model',
+        dataIndex: 'model',
+        key: 'model',
+      },
+      {
+        title: 'Scenario',
+        dataIndex: 'scenarios',
+        key: 'scenarios',
+        render: (scenarios) =>
+          scenarios.map((scenario) => <p key={scenario}>{scenario}</p>),
+      },
+    ];
     return columns;
-  }
+  };
 
   render() {
     return (
-      <Table className='width-60' dataSource={this.dataSource()} columns={this.columns} />
-    )
+      <Table
+        className="width-60"
+        dataSource={this.dataSource()}
+        columns={this.columns}
+      />
+    );
   }
 }

@@ -1,9 +1,7 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 
 export default class TextBlockView extends Component {
   render() {
-    return (
-      <div>TextBlockView</div>
-    )
+    return <div>TextBlockView</div>;
   }
 }

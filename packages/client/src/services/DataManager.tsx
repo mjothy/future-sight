@@ -1,37 +1,32 @@
-
 export default class DataManager {
-
   url: string;
   port: number;
 
   constructor() {
-    this.url = 'http://localhost'
+    this.url = 'http://localhost';
     this.port = 8080;
   }
 
   getBaseUrl() {
-    return this.url + ':' + this.port + '/api'
+    return this.url + ':' + this.port + '/api';
   }
 
   fetchData = (data) => {
-
     return fetch(`${this.getBaseUrl()}/data`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data)
-
+      body: JSON.stringify(data),
     })
       .then((response) => response.json())
       .then((data) => {
         return data;
       })
-      .catch(err => err);
-  }
+      .catch((err) => err);
+  };
 
   fetchAllData = () => {
-
     return fetch(`${this.getBaseUrl()}/data`, {
       method: 'GET',
       headers: {
@@ -42,8 +37,8 @@ export default class DataManager {
       .then((data) => {
         return data;
       })
-      .catch(err => err);
-  }
+      .catch((err) => err);
+  };
 
   fetchModels = () => {
     return fetch(`${this.getBaseUrl()}/models`)
@@ -51,42 +46,49 @@ export default class DataManager {
       .then((data) => {
         return data;
       })
-      .catch(err => err);
-  }
+      .catch((err) => err);
+  };
 
   fetchVariables = (data) => {
-    return fetch(`${this.getBaseUrl()}/variables?model=${data.model}&scenario=${data.scenario}`)
+    return fetch(
+      `${this.getBaseUrl()}/variables?model=${data.model}&scenario=${
+        data.scenario
+      }`
+    )
       .then((response) => response.json())
       .then((data) => {
         return data;
       })
-      .catch(err => err);
-  }
+      .catch((err) => err);
+  };
 
   fetchRegions = (data) => {
-    return fetch(`${this.getBaseUrl()}/regions?model=${data.model}&scenario=${data.scenario}`)
+    return fetch(
+      `${this.getBaseUrl()}/regions?model=${data.model}&scenario=${
+        data.scenario
+      }`
+    )
       .then((response) => response.json())
       .then((data) => {
         return data;
       })
-      .catch(err => err);
-  }
+      .catch((err) => err);
+  };
 
   addDashboard = (data) => {
     return fetch(`${this.getBaseUrl()}/dashboard`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: data
+      body: data,
     })
       .then((response) => response.json())
       .then((data) => {
         return data;
       })
-      .catch(err => err);
-  }
-
+      .catch((err) => err);
+  };
 
   getDashboard = () => {
     return fetch(`${this.getBaseUrl()}/dashboard`)
@@ -94,7 +96,6 @@ export default class DataManager {
       .then((data) => {
         return data;
       })
-      .catch(err => err);
-  }
-
+      .catch((err) => err);
+  };
 }

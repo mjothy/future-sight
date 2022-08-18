@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import { v1 as uuidv1 } from 'uuid';
 import BlockModel from '../models/BlockModel';
 
@@ -7,7 +7,6 @@ import LayoutModel from '../models/LayoutModel';
 import Dashboard from './Dashboard';
 
 export default class DashboardSelectionControl extends Component<any, any> {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -17,24 +16,23 @@ export default class DashboardSelectionControl extends Component<any, any> {
       /**
        * The selected block id
        */
-      blockSelectedId: "",
+      blockSelectedId: '',
       click: 0,
-      blockType: ""
-    }
-
+      blockType: '',
+    };
   }
 
- componentDidMount() {
+  componentDidMount() {
     const dashboard = this.state.dashboard;
     dashboard.dataStructure = this.props.structureData;
     dashboard.userData = this.props.userData;
-    this.setState({dashboard});
+    this.setState({ dashboard });
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     // if (prevState.dashboard !== this.state.dashboard) {
-      // const str = JSON.stringify(this.state.dashboard);
-      // this.props.dataManager.addDashboard(str);
+    // const str = JSON.stringify(this.state.dashboard);
+    // this.props.dataManager.addDashboard(str);
     // }
   }
 
@@ -42,42 +40,48 @@ export default class DashboardSelectionControl extends Component<any, any> {
     this.setState({
       dashboard: {
         ...this.state.dashboard,
-        layout: layout
-      }
+        layout: layout,
+      },
     });
-  }
+  };
 
   updateSelectedBlock = (blockSelectedId) => {
     this.setState({ blockSelectedId });
-  }
+  };
 
   updateBlockMetaData = (data) => {
     const dashboard = this.state.dashboard;
-    // store the selected data 
+    // store the selected data
     let metaData = dashboard.blocks[this.state.blockSelectedId].config.metaData;
     metaData = { ...metaData, ...data };
     dashboard.blocks[this.state.blockSelectedId].config.metaData = metaData;
-    this.setState({ dashboard: { ...this.state.dashboard, blocks: dashboard.blocks } });
-  }
+    this.setState({
+      dashboard: { ...this.state.dashboard, blocks: dashboard.blocks },
+    });
+  };
 
   addBlock = (blockType: string, masterBlockId?: string) => {
-    const layoutItem = new LayoutModel("block" + this.state.click);
+    const layoutItem = new LayoutModel('block' + this.state.click);
     const dashboard = this.state.dashboard;
 
     dashboard.blocks[layoutItem.i] = new BlockModel(layoutItem.i, blockType);
-    dashboard.layout = [layoutItem, ...dashboard.layout]
+    dashboard.layout = [layoutItem, ...dashboard.layout];
 
     if (masterBlockId)
       dashboard.blocks[layoutItem.i].masterBlocks = masterBlockId;
 
     const state = {
-      dashboard: { ...this.state.dashboard, blocks: dashboard.blocks, layout: dashboard.layout },
+      dashboard: {
+        ...this.state.dashboard,
+        blocks: dashboard.blocks,
+        layout: dashboard.layout,
+      },
       blockSelectedId: layoutItem.i,
       click: this.state.click + 1,
     };
     this.setState(state);
-  }
-  
+  };
+
   render() {
     return (
       <Dashboard
@@ -89,7 +93,8 @@ export default class DashboardSelectionControl extends Component<any, any> {
         blocks={this.state.dashboard.blocks}
         updateSelectedBlock={this.updateSelectedBlock}
         updateBlockMetaData={this.updateBlockMetaData}
-        {...this.props} />
-    )
+        {...this.props}
+      />
+    );
   }
 }
