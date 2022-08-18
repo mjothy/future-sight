@@ -4,7 +4,7 @@ import BlockModel from '../models/BlockModel';
 
 import DashboardModel from '../models/DashboardModel';
 import LayoutModel from '../models/LayoutModel';
-import DashboardDataConfiguration from './DashboardDataConfiguration';
+import Dashboard from './Dashboard';
 
 export default class DashboardSelectionControl extends Component<any, any> {
 
@@ -29,10 +29,6 @@ export default class DashboardSelectionControl extends Component<any, any> {
     dashboard.dataStructure = this.props.structureData;
     dashboard.userData = this.props.userData;
     this.setState({dashboard});
-    // this.props.dataManager.getDashboard().then(data=>{
-    //   const dashboard = data;
-    //   this.setState({ dashboard });
-    // })
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -84,7 +80,7 @@ export default class DashboardSelectionControl extends Component<any, any> {
   
   render() {
     return (
-      <DashboardDataConfiguration
+      <Dashboard
         dashboard={this.state.dashboard}
         addBlock={this.addBlock}
         blockSelectedId={this.state.blockSelectedId}

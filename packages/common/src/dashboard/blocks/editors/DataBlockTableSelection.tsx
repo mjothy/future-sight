@@ -90,7 +90,6 @@ export default class DataBlockTableSelection extends Component<any, any> {
         // Update the selected data variable
         this.selectedData = this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData.models;
         this.props.updateDropdownData();
-        this.props.dashboardDataUpdate();
     };
 
 

@@ -57,10 +57,10 @@ export default class ExpressServer {
             data.map(e => {
                 if (e.model === body.model && e.scenario === body.scenario
                     && e.region === body.region && e.variable === body.variable) {
-                    res.send(e);
+                    res.status(200).send(e);
                 }
             })
-            res.send([]);
+            res.status(404).send([]);
         });
 
         this.app.get('/api/models', (req, res) => {
@@ -98,7 +98,7 @@ export default class ExpressServer {
             })
         });
         this.app.get(`/api/dashboard`, (req, res) => {
-           res.send(dashboard);
+            res.send(dashboard);
         });
 
         // Serve the HTML page

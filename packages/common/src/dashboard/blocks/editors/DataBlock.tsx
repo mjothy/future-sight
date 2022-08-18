@@ -50,13 +50,11 @@ export default class DataBlock extends Component<any, any> {
 
   variablesSelectionChange = (selectedVariables: string[]) => {
     this.props.updateBlockMetaData({ variables: selectedVariables });
-    this.props.dashboardDataUpdate();
 
   }
 
   regionsSelectionChange = (selectedRegions: string[]) => {
     this.props.updateBlockMetaData({ regions: selectedRegions });
-    this.props.dashboardDataUpdate();
   }
 
   render() {
@@ -97,7 +95,7 @@ export default class DataBlock extends Component<any, any> {
               )}
           </Select>
         </div>
-        <div className='space-div'></div>
+          <div className='space-div'></div>
       </div>
     )
   }

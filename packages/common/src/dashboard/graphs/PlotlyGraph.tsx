@@ -12,7 +12,6 @@ const config = {
 export default class PlotlyGraph extends Component<any, any> {
 
     render() {
-        console.log("this.props.data: ", this.props.data);
         return (
             <Plot
                 key={this.props.currentBlock.id}
