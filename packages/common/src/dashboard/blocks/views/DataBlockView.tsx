@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import BlockDataModel from '../../../models/BlockDataModel';
+import BlockStyleModel from '../../../models/BlockStyleModel';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
 
 export default class DataBlockView extends Component<any, any> {
@@ -7,8 +9,8 @@ export default class DataBlockView extends Component<any, any> {
    * @returns Data with timeseries
    */
   getPlotData = () => {
+    const metaData: BlockDataModel = this.props.currentBlock.config.metaData;
     const data: any[] = [];
-    const metaData = this.props.currentBlock.config.metaData;
     if (metaData.models && metaData.variables && metaData.regions) {
       Object.keys(metaData.models).map((model) => {
         metaData.models[model].map((scenario) => {
@@ -30,18 +32,40 @@ export default class DataBlockView extends Component<any, any> {
    */
   settingPlotData() {
     const data: any[] = this.getPlotData();
+    const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
+
     data.map((dataElement) => {
-      const obj = {
-        type: 'line',
-        x: this.getX(dataElement),
-        y: this.getY(dataElement),
-        name: dataElement.model + '/' + dataElement.scenario,
-        showlegend: true,
-      };
-      data.push(obj);
+      data.push(this.preparePlotData(dataElement, configStyle));
     });
 
     return data;
+  }
+
+  preparePlotData(dataElement, configStyle) {
+    let obj = {};
+    switch (configStyle.graphType) {
+      case "area":
+        obj = {
+          type: "scatter",
+          fill: 'tozeroy',
+          x: this.getX(dataElement),
+          y: this.getY(dataElement),
+          mode: 'none',
+          name: dataElement.model + '/' + dataElement.scenario,
+          showlegend: configStyle.showLegend,
+        };
+        break;
+      default:
+        obj = {
+          type: configStyle.graphType,
+          x: this.getX(dataElement),
+          y: this.getY(dataElement),
+          name: dataElement.model + '/' + dataElement.scenario,
+          showlegend: configStyle.showLegend,
+        };
+    }
+
+    return obj
   }
 
   /**

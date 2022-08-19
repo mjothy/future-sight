@@ -155,3 +155,18 @@ body {
   display: flex;
   justify-content: end;
 }
+
+.mb-10{
+  margin-bottom: 10px;
+}
+
+.checkbox-col{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkbox-col-label{
+  display: flex;
+  align-items: center;
+}

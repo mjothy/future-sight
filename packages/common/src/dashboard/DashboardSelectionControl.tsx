@@ -60,6 +60,14 @@ export default class DashboardSelectionControl extends Component<any, any> {
     });
   };
 
+  updateBlockStyleConfig = (data) => {
+    const dashboard = this.state.dashboard;
+    dashboard.blocks[this.state.blockSelectedId].config.configStyle = data;
+    this.setState({
+      dashboard
+    });
+  }
+
   addBlock = (blockType: string, masterBlockId?: string) => {
     const layoutItem = new LayoutModel('block' + this.state.click);
     const dashboard = this.state.dashboard;
@@ -93,6 +101,7 @@ export default class DashboardSelectionControl extends Component<any, any> {
         blocks={this.state.dashboard.blocks}
         updateSelectedBlock={this.updateSelectedBlock}
         updateBlockMetaData={this.updateBlockMetaData}
+        updateBlockStyleConfig={this.updateBlockStyleConfig}
         {...this.props}
       />
     );

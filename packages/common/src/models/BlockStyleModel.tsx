@@ -1,3 +1,8 @@
 export default class BlockStyleModel {
-  graphType: string | undefined;
+  graphType = "line";
+  showLegend = false;
+  title = {
+    value: "Title",
+    isVisible: true
+  }
 }
