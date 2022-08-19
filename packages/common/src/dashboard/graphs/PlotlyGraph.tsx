@@ -4,25 +4,34 @@ import Plot from 'react-plotly.js';
 // get masters of the block and render only the filter informations
 
 const config = {
-  displayModeBar: false, // this is the line that hides the bar.
-  editable: false,
-  showlegend: true,
+
+    displayModeBar: false, // this is the line that hides the bar.
+    editable: false,
+    showlegend: true,
+    margin: 0
 };
 
 export default class PlotlyGraph extends Component<any, any> {
-  render() {
-    return (
-      <Plot
-        key={this.props.currentBlock.id}
-        data={this.props.data}
-        layout={{
-          width: this.props.width,
-          height: this.props.height,
-          title: 'title',
-          legend: { orientation: 'h' },
-        }}
-        config={config}
-      />
-    );
-  }
+
+    render() {
+        return (
+            <Plot
+                key={this.props.currentBlock.id}
+                data={this.props.data}
+                layout={{
+                    width: this.props.width, height: this.props.height, title: 'title', legend: { "orientation": "h" },
+                    autosize: false,
+                    margin: {
+                        l: 40,
+                        r: 40,
+                        b: 40,
+                        t: 60,
+                        // pad: 4
+                    },
+
+                }}
+                config={config}
+            />
+        )
+    }
 }

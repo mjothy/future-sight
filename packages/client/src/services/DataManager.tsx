@@ -1,14 +1,7 @@
 export default class DataManager {
-  url: string;
-  port: number;
 
-  constructor() {
-    this.url = 'http://localhost';
-    this.port = 8080;
-  }
-
-  getBaseUrl() {
-    return this.url + ':' + this.port + '/api';
+  getBaseUrl(){
+    return '/api'
   }
 
   fetchData = (data) => {

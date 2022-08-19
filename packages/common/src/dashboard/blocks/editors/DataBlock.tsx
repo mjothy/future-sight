@@ -71,12 +71,9 @@ export default class DataBlock extends Component<any, any> {
 
   render() {
     return (
-      <div className="width-100">
-        <Divider />
-        <DataBlockTableSelection
-          {...this.props}
-          updateDropdownData={this.updateDropdownData}
-        />
+
+      <div>
+        <DataBlockTableSelection  {...this.props} updateDropdownData={this.updateDropdownData} />
         <Divider />
         {/* adding key, because react not updating the default value on state change */}
         <div>
@@ -113,7 +110,6 @@ export default class DataBlock extends Component<any, any> {
             ))}
           </Select>
         </div>
-        <div className="space-div"></div>
       </div>
     );
   }

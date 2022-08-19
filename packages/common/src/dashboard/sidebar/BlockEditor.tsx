@@ -1,5 +1,4 @@
-import { Component } from 'react';
-import { Button } from 'antd';
+import { Component } from 'react'
 import BlockEditorManager from '../blocks/editors/BlockEditorManager';
 import PropTypes from 'prop-types';
 
@@ -11,16 +10,22 @@ export default class BlockEditor extends Component<any, any> {
     updateSelectedBlock: PropTypes.func,
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      tab: "data"
+    }
+  }
+
+
+  tabsToggle = (tabType) => {
+    console.log("tabType: ", tabType);
+    this.setState({ tab: tabType });
+  }
   render() {
     return (
       <>
-        <Button
-          type="default"
-          onClick={() => this.props.updateSelectedBlock('')}
-        >
-          X
-        </Button>
-        <BlockEditorManager {...this.props} />
+        <BlockEditorManager {...this.props} tabsToggle={this.tabsToggle} dataBlockTab={this.state.tab} />
       </>
     );
   }
