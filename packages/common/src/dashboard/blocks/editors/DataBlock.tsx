@@ -85,7 +85,6 @@ export default class DataBlock extends Component<any, any> {
             defaultValue={this.defaultVariables}
             onChange={this.variablesSelectionChange}
           >
-            {this.defaultVariables}
             {this.variables.map((variable) => (
               <Option key={variable} value={variable}>
                 {variable}
