@@ -1,3 +1,4 @@
+import { ColumnsType } from 'antd/lib/table';
 import React, { Component } from 'react';
 import BlockDataModel from '../../../models/BlockDataModel';
 import BlockStyleModel from '../../../models/BlockStyleModel';
@@ -32,13 +33,41 @@ export default class DataBlockView extends Component<any, any> {
    */
   settingPlotData() {
     const data: any[] = this.getPlotData();
+    const showData: any[] = [];
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
-    data.map((dataElement) => {
-      data.push(this.preparePlotData(dataElement, configStyle));
-    });
+    if (configStyle.graphType === "table") {
+      return this.prepareTableData(data);
+    } else {
+      data.map((dataElement) => {
+        showData.push(this.preparePlotData(dataElement, configStyle));
+      });
 
-    return data;
+      return showData;
+    }
+  }
+
+  prepareTableData(data) {
+    const columns: ColumnsType<any> = [{ title: "model", dataIndex: "model" }, { title: "scenario", dataIndex: "scenario" }, { title: "variable", dataIndex: "variable" }, { title: "region", dataIndex: "region" }];
+    for (let year = 2005; year <= 2100; year = year + 5) {
+      columns.push({
+        title: year,
+        dataIndex: year
+      })
+    }
+    const values: any[] = [];
+    data.map(dataElement => {
+      const obj = {}
+      dataElement.data.map(e => {
+        obj[e.year] = e.value;
+      })
+      values.push({
+        model: dataElement.model, scenario: dataElement.scenario, variable: dataElement.variable,
+        region: dataElement.region, ...obj
+      });
+    })
+
+    return { columns, values };
   }
 
   preparePlotData(dataElement, configStyle) {
@@ -65,7 +94,7 @@ export default class DataBlockView extends Component<any, any> {
         };
     }
 
-    return obj
+    return obj;
   }
 
   /**

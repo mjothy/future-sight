@@ -109,6 +109,7 @@ class DashboardConfigView extends Component<any, any> {
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
         cols={{ lg: 12, md: 12, sm: 12, xs: 12, xxs: 12 }}
         rowHeight={150}
+        maxRows = {12}
         onLayoutChange={this.onLayoutChange}
         onBreakpointChange={this.onBreakpointChange}
         onResizeStop={this.resizeStop}
@@ -123,7 +124,7 @@ class DashboardConfigView extends Component<any, any> {
             <div
               ref={(ref) => (this.ref[layout.i] = ref)}
               id={layout.i}
-              className={'width-100 height-100'}
+              className={'width-100 height-100 bg-white'}
               onClick={this.onBlockClick}
             >
               <BlockViewManager

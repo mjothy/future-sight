@@ -170,3 +170,7 @@ body {
   display: flex;
   align-items: center;
 }
+
+.bg-white{
+  background-color: white;
+}

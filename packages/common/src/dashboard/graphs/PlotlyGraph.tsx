@@ -1,3 +1,4 @@
+import { Table } from 'antd';
 import React, { Component } from 'react';
 import Plot from 'react-plotly.js';
 
@@ -31,12 +32,27 @@ export default class PlotlyGraph extends Component<any, any> {
         }
 
         return (
-            <Plot
-                key={this.props.currentBlock.id}
-                data={this.props.data}
-                layout={layout}
-                config={config}
-            />
+
+            currentBlock.config.configStyle.graphType === "table" ?
+                <Table
+                    style={{ minHeight: "100%" }}
+                    columns={this.props.data.columns}
+                    dataSource={this.props.data.values}
+                    pagination={false}
+                    scroll={{ x: 3000, y: this.props.height - 40 }}
+                    bordered
+                />
+                :
+                <Plot
+                    key={this.props.currentBlock.id}
+                    data={this.props.data}
+                    layout={layout}
+                    config={config}
+                />
+
+
+
+
         )
     }
 }
