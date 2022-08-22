@@ -2,7 +2,6 @@ import { Table } from 'antd';
 import React, { Component } from 'react';
 import Plot from 'react-plotly.js';
 
-// get masters of the block and render only the filter informations
 export default class PlotlyGraph extends Component<any, any> {
 
     render() {
@@ -35,6 +34,7 @@ export default class PlotlyGraph extends Component<any, any> {
 
             currentBlock.config.configStyle.graphType === "table" ?
                 <Table
+                    // Make the height 100% of the div (not working)
                     style={{ minHeight: "100%" }}
                     columns={this.props.data.columns}
                     dataSource={this.props.data.values}
@@ -49,10 +49,6 @@ export default class PlotlyGraph extends Component<any, any> {
                     layout={layout}
                     config={config}
                 />
-
-
-
-
         )
     }
 }

@@ -18,7 +18,7 @@ export default class Dashboard extends Component<any, any> {
   }
 
   componentDidUpdate(prevProps, prevState, snaphshot) {
-    if (this.props.blockSelectedId != prevProps.blockSelectedId) {
+    if (this.props.blockSelectedId != prevProps.blockSelectedId && this.props.blockSelectedId !== "") {
       this.setState({
         sidebarVisible: true,
       });
@@ -29,7 +29,11 @@ export default class Dashboard extends Component<any, any> {
     const setVisibility = () => {
       this.setState({
         sidebarVisible: !this.state.sidebarVisible,
-      });
+      }, () => { 
+        if(this.state.sidebarVisible === false)
+          this.props.updateSelectedBlock("")
+
+       });
     };
 
     const setPlacement = (e) => {

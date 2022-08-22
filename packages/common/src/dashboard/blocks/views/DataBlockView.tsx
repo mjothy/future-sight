@@ -28,7 +28,7 @@ export default class DataBlockView extends Component<any, any> {
   };
 
   /**
-   * Preparing the fetched data to adapt plotly data
+   * Preparing the fetched data to adapt plotly data OR antd table 
    * @returns
    */
   settingPlotData() {
@@ -42,7 +42,6 @@ export default class DataBlockView extends Component<any, any> {
       data.map((dataElement) => {
         showData.push(this.preparePlotData(dataElement, configStyle));
       });
-
       return showData;
     }
   }

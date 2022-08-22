@@ -125,7 +125,7 @@ class DashboardConfigView extends Component<any, any> {
               ref={(ref) => (this.ref[layout.i] = ref)}
               id={layout.i}
               className={'width-100 height-100 bg-white'}
-              onClick={this.onBlockClick}
+              onDoubleClick={this.onBlockClick}
             >
               <BlockViewManager
                 {...this.props}
