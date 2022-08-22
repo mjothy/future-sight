@@ -9,11 +9,6 @@ services:
     volumes:
       - ./redis.conf:/usr/local/etc/redis/redis.conf
       - redis_data:/data
-  redis_insight:
-    image: redislabs/redisinsight:1.12.1
-    restart: always
-    ports:
-      - "8001:8001"
 volumes:
   redis_data:
     driver: local
