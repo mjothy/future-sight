@@ -1,4 +1,7 @@
-import { DashboardDataConfiguration } from '@future-sight/common';
+import {
+  DashboardDataConfiguration,
+  ComponentPropsWithDataManager,
+} from '@future-sight/common';
 import React from 'react';
 import withDataManager from '../../services/withDataManager';
 import SetupView from './form/SetupView';
@@ -7,8 +10,11 @@ import SetupView from './form/SetupView';
  * For adding or update a dashboard.
  * It manage set up view and ashboard view for adding/updating a dashboard
  */
-class DashboardView extends React.Component<any, any> {
-  data = {};
+class DashboardView extends React.Component<
+  ComponentPropsWithDataManager,
+  any
+> {
+  data = {}; // TODO: remove ?
   constructor(props) {
     super(props);
     this.state = {

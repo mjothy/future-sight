@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import AddButton from './actions/AddButton';
-import PropTypes from 'prop-types';
+import { DashboardProps } from '../Dashboard';
 
 const actions = [
   {
@@ -20,16 +20,12 @@ const actions = [
 /**
  * Dashboard control: to set the block type and send a notification to parent (Dashboard) to add/edit block
  */
-export default class DashboardControl extends Component<any, any> {
-  static propTypes = {
-    addBlock: PropTypes.func,
-  };
-
+export default class DashboardControl extends Component<DashboardProps, any> {
   constructor(props) {
     super(props);
   }
 
-  clicked = (blockType) => {
+  clicked = (blockType: string) => {
     this.props.addBlock(blockType);
   };
 
