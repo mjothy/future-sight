@@ -1,13 +1,19 @@
-version: '3.8'
+version: "3.8"
 services:
   redis:
-    image: redis:7.0.4-alpine
+    image: redislabs/rejson:2.2.0
     restart: always
     ports:
-      - '6379:6379'
-    command: redis-server --requirepass adminpass
+      - "6379:6379"
+    command: redis-server /usr/local/etc/redis/redis.conf
     volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
       - redis_data:/data
+  redis_insight:
+    image: redislabs/redisinsight:1.12.1
+    restart: always
+    ports:
+      - "8001:8001"
 volumes:
   redis_data:
     driver: local
