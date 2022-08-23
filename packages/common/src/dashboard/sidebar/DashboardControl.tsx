@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import AddButton from './actions/AddButton';
 import { DashboardProps } from '../Dashboard';
+import { Button } from 'antd';
 
 const actions = [
   {
@@ -40,6 +41,9 @@ export default class DashboardControl extends Component<DashboardProps, any> {
             clicked={() => this.clicked(action.type)}
           />
         ))}
+        <Button type="primary" onClick={this.props.saveDashboard}>
+          Publish
+        </Button>
       </div>
     );
   }

@@ -26,7 +26,7 @@ if (username && password) {
     challenge: true,
   });
 }
-const app = new ExpressServer(port, cookieKey, auth, clientPath);
+const app = new ExpressServer(port, cookieKey, auth, clientPath, redisClient);
 
 // Startup
 redisClient.startup().then((r) => {

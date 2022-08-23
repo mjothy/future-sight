@@ -10,18 +10,21 @@ import regions from '../data/regions.json';
 import dashboard from '../data/dashboards.json';
 
 import * as fs from 'fs';
+import RedisClient from '../redis/RedisClient';
 
 export default class ExpressServer {
   private app: any;
   private readonly port: number;
   private readonly auth: any;
   private readonly clientPath: any;
+  private readonly dbClient: RedisClient;
 
-  constructor(port, cookieKey, auth, clientPath) {
+  constructor(port, cookieKey, auth, clientPath, dbClient) {
     this.app = express();
     this.port = port;
     this.auth = auth;
     this.clientPath = clientPath;
+    this.dbClient = dbClient;
     this.app.use(bodyParser.json());
     if (auth) {
       this.app.use(this.auth);
@@ -96,11 +99,20 @@ export default class ExpressServer {
     });
 
     // Posts methods
+    this.app.post(`/api/dashboard/save`, async (req, res) => {
+      const data = JSON.parse(req.body);
+      const id = await this.dbClient.getClient().incr('dashboards:id');
+      // TODO: change id in data ?
+      // await this.dbClient.getClient().json.arrAppend('dashboards', '.', data);
+      res.send(id);
+    });
+
     this.app.post(`/api/dashboard`, (req, res) => {
       fs.writeFile('./dashboards.json', JSON.stringify(req.body), (err) => {
         if (err) console.log('Error writing file:', err);
       });
     });
+
     this.app.get(`/api/dashboard`, (req, res) => {
       res.send(dashboard);
     });

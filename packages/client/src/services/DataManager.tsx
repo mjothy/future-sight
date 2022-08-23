@@ -96,4 +96,18 @@ export default class DataManager implements IDataManager {
       })
       .catch((err) => err);
   };
+
+  saveDashboard = async (data) => {
+    try {
+      return await fetch(`${this.getBaseUrl()}/dashboard/save`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: data,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
 }

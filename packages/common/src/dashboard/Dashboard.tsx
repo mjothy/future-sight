@@ -19,6 +19,7 @@ export interface DashboardProps extends ComponentPropsWithDataManager {
   updateSelectedBlock: (blockSelectedId: string) => void;
   updateBlockMetaData: (data: any) => void;
   updateBlockStyleConfig: (data: any) => void;
+  saveDashboard: () => void;
 }
 
 export default class Dashboard extends Component<DashboardProps, any> {
@@ -35,7 +36,10 @@ export default class Dashboard extends Component<DashboardProps, any> {
   }
 
   componentDidUpdate(prevProps, prevState, snaphshot) {
-    if (this.props.blockSelectedId != prevProps.blockSelectedId && this.props.blockSelectedId !== "") {
+    if (
+      this.props.blockSelectedId != prevProps.blockSelectedId &&
+      this.props.blockSelectedId !== ''
+    ) {
       this.setState({
         sidebarVisible: true,
       });
@@ -44,13 +48,15 @@ export default class Dashboard extends Component<DashboardProps, any> {
 
   render() {
     const setVisibility = () => {
-      this.setState({
-        sidebarVisible: !this.state.sidebarVisible,
-      }, () => { 
-        if(this.state.sidebarVisible === false)
-          this.props.updateSelectedBlock("")
-
-       });
+      this.setState(
+        {
+          sidebarVisible: !this.state.sidebarVisible,
+        },
+        () => {
+          if (this.state.sidebarVisible === false)
+            this.props.updateSelectedBlock('');
+        }
+      );
     };
 
     const setPlacement = (e) => {
