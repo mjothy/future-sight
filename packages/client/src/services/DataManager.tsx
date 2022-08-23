@@ -1,10 +1,15 @@
-export default class DataManager {
+import {
+  IDataManager,
+  ModelScenarioData,
+  DataModel,
+} from '@future-sight/common';
 
-  getBaseUrl(){
-    return '/api'
+export default class DataManager implements IDataManager {
+  getBaseUrl() {
+    return '/api';
   }
 
-  fetchData = (data) => {
+  fetchData = (data: DataModel) => {
     return fetch(`${this.getBaseUrl()}/data`, {
       method: 'POST',
       headers: {
@@ -42,7 +47,7 @@ export default class DataManager {
       .catch((err) => err);
   };
 
-  fetchVariables = (data) => {
+  fetchVariables = (data: ModelScenarioData) => {
     return fetch(
       `${this.getBaseUrl()}/variables?model=${data.model}&scenario=${
         data.scenario
@@ -55,7 +60,7 @@ export default class DataManager {
       .catch((err) => err);
   };
 
-  fetchRegions = (data) => {
+  fetchRegions = (data: ModelScenarioData) => {
     return fetch(
       `${this.getBaseUrl()}/regions?model=${data.model}&scenario=${
         data.scenario
@@ -74,7 +79,7 @@ export default class DataManager {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: data,
+      body: JSON.stringify(data),
     })
       .then((response) => response.json())
       .then((data) => {

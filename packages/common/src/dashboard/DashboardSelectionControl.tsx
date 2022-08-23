@@ -3,10 +3,20 @@ import { v1 as uuidv1 } from 'uuid';
 import BlockModel from '../models/BlockModel';
 
 import DashboardModel from '../models/DashboardModel';
+import DataModel from '../models/DataModel';
 import LayoutModel from '../models/LayoutModel';
 import Dashboard from './Dashboard';
+import { DashboardDataConfigurationProps } from './DashboardDataConfiguration';
 
-export default class DashboardSelectionControl extends Component<any, any> {
+export interface DashboardSelectionControlProps
+  extends DashboardDataConfigurationProps {
+  getData: (data: DataModel[]) => any[];
+}
+
+export default class DashboardSelectionControl extends Component<
+  DashboardSelectionControlProps,
+  any
+> {
   constructor(props) {
     super(props);
     this.state = {
@@ -36,7 +46,7 @@ export default class DashboardSelectionControl extends Component<any, any> {
     // }
   }
 
-  updateLayout = (layout) => {
+  updateLayout = (layout: LayoutModel[]) => {
     this.setState({
       dashboard: {
         ...this.state.dashboard,
@@ -45,7 +55,7 @@ export default class DashboardSelectionControl extends Component<any, any> {
     });
   };
 
-  updateSelectedBlock = (blockSelectedId) => {
+  updateSelectedBlock = (blockSelectedId: string) => {
     this.setState({ blockSelectedId });
   };
 

@@ -3,8 +3,25 @@ import DashboardConfigView from './DashboardConfigView';
 import DashboardConfigControl from './DashboardConfigControl';
 import { MenuFoldOutlined } from '@ant-design/icons';
 import Sidebar from './sidebar/Sidebar';
+import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
 
-export default class Dashboard extends Component<any, any> {
+import DashboardModel from '../models/DashboardModel';
+import LayoutModel from '../models/LayoutModel';
+import BlockModel from '../models/BlockModel';
+
+export interface DashboardProps extends ComponentPropsWithDataManager {
+  dashboard: DashboardModel;
+  addBlock: (blockType: string, masterBlockId?: string) => void;
+  blockSelectedId: string;
+  layout: LayoutModel[];
+  updateLayout: (layout: LayoutModel[]) => void;
+  blocks: { [id: string]: BlockModel };
+  updateSelectedBlock: (blockSelectedId: string) => void;
+  updateBlockMetaData: (data: any) => void;
+  updateBlockStyleConfig: (data: any) => void;
+}
+
+export default class Dashboard extends Component<DashboardProps, any> {
   constructor(props) {
     super(props);
     this.state = {
