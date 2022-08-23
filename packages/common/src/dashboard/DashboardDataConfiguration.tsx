@@ -45,6 +45,14 @@ export default class DashboardDataConfiguration extends Component<
     return this.settingPlotData(data);
   };
 
+  saveData = async () => {
+    const data = localStorage.getItem('data');
+    if (data) {
+      const res = await this.props.dataManager.saveDashboard(data);
+      console.log(res);
+    }
+  };
+
   settingPlotData(data: any[] = []) {
     const plotData: any[] = [];
     data.map((dataElement) => {
@@ -72,6 +80,12 @@ export default class DashboardDataConfiguration extends Component<
   };
 
   render() {
-    return <DashboardSelectionControl getData={this.getData} {...this.props} />;
+    return (
+      <DashboardSelectionControl
+        getData={this.getData}
+        saveData={this.saveData}
+        {...this.props}
+      />
+    );
   }
 }

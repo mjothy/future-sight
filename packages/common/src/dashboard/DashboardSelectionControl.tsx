@@ -11,6 +11,7 @@ import { DashboardDataConfigurationProps } from './DashboardDataConfiguration';
 export interface DashboardSelectionControlProps
   extends DashboardDataConfigurationProps {
   getData: (data: DataModel[]) => any[];
+  saveData: () => void;
 }
 
 export default class DashboardSelectionControl extends Component<
@@ -112,6 +113,7 @@ export default class DashboardSelectionControl extends Component<
         updateSelectedBlock={this.updateSelectedBlock}
         updateBlockMetaData={this.updateBlockMetaData}
         updateBlockStyleConfig={this.updateBlockStyleConfig}
+        saveDashboard={this.props.saveData}
         {...this.props}
       />
     );
