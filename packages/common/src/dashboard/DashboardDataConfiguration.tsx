@@ -3,7 +3,10 @@ import DashboardSelectionControl from './DashboardSelectionControl';
 import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
 import DataModel from '../models/DataModel';
 
-export interface DashboardDataConfigurationProps extends ComponentPropsWithDataManager{
+/**
+ * To fetch data and pass it to all blocks
+ */
+export interface DashboardDataConfigurationProps extends ComponentPropsWithDataManager {
   userData: object;
   structureData: object;
   submitSetupView: (data: boolean) => void;
@@ -35,7 +38,7 @@ export default class DashboardDataConfiguration extends Component<
     data.map((dataElement) => {
       if (this.isDataExist(dataElement) === null) {
         this.props.dataManager.fetchData(dataElement).then((resData) => {
-          // Check here if data exist or not*
+          // Check here if data exist or not (requested data)
           if (resData.length !== 0)
             this.setState({ data: [...this.state.data, resData] });
         });
@@ -63,6 +66,12 @@ export default class DashboardDataConfiguration extends Component<
     return plotData;
   }
 
+  /**
+   * To limit requests to IASA API, we verify if we have already fetched the element
+   * Check if this.data contains that element (already fetched by other block)
+   * @param reqData 
+   * @returns Data element if it's exist (null if not) 
+   */
   isDataExist = (reqData: DataModel) => {
     const data = this.state.data;
     let isExist = null;

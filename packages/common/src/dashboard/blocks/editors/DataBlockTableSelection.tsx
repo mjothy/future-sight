@@ -99,7 +99,12 @@ export default class DataBlockTableSelection extends Component<any, any> {
       this.props.dashboard.blocks[
         this.props.blockSelectedId
       ].config.metaData.models;
-    this.props.updateDropdownData();
+
+    console.log("controlBlock: ", this.props.dashboard.blocks[this.props.blockSelectedId].controlBlock === "");
+    console.log("controlBlock: ", this.props.dashboard.blocks[this.props.blockSelectedId].controlBlock == "");
+
+    if (this.props.dashboard.blocks[this.props.blockSelectedId].blockType === "data")
+      this.props.updateDropdownData();
   };
 
   render() {

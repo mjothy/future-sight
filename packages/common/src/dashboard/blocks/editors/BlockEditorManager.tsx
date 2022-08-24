@@ -10,15 +10,25 @@ import DataBlockVisualization from './DataBlockVisualization';
  * Render the view edit block according the the selected type
  */
 export default class BlockEditorManager extends Component<any, any> {
+  
   static propTypes = {
     blockType: PropTypes.string,
   };
 
-  blockSelectedId = this.props.blockSelectedId;
-  blockType = this.props.blocks[this.blockSelectedId] ? this.props.blocks[this.blockSelectedId].blockType : "data";
-
+  blockSelectedId;
+  blockType;
   constructor(props) {
     super(props);
+    this.initialize();
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    this.initialize();
+  }
+
+  initialize = () => {
+    this.blockSelectedId = this.props.blockSelectedId;
+    this.blockType = this.props.blocks[this.blockSelectedId] ? this.props.blocks[this.blockSelectedId].blockType : "data";
   }
 
   blockByType = () => {

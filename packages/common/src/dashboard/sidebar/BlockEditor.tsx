@@ -20,7 +20,6 @@ export default class BlockEditor extends Component<DashboardProps, any> {
 
 
   tabsToggle = (tabType) => {
-    console.log("tabType: ", tabType);
     this.setState({ tab: tabType });
   }
   render() {

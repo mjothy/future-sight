@@ -5,4 +5,14 @@ export default class BlockDataModel {
   models: { [id: string]: string[] } = {};
   regions: string[] = [];
   variables: string[] = [];
+
+  /**
+   * If type of block is control
+   */
+  master: { [id: string]: boolean } = {
+    "models": false,
+    "regions": false,
+    "variables": false
+  }
+
 }

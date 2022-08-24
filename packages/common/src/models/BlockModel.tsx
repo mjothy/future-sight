@@ -8,5 +8,5 @@ export default class BlockModel {
   id: string | undefined;
   blockType: string | undefined;
   config: ConfigurationModel = new ConfigurationModel();
-  controlBlock: string | undefined;
+  controlBlock = "";
 }

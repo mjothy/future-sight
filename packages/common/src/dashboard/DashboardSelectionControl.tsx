@@ -40,13 +40,6 @@ export default class DashboardSelectionControl extends Component<
     this.setState({ dashboard });
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    // if (prevState.dashboard !== this.state.dashboard) {
-    // const str = JSON.stringify(this.state.dashboard);
-    // this.props.dataManager.addDashboard(str);
-    // }
-  }
-
   updateLayout = (layout: LayoutModel[]) => {
     this.setState({
       dashboard: {
@@ -87,7 +80,7 @@ export default class DashboardSelectionControl extends Component<
     dashboard.layout = [layoutItem, ...dashboard.layout];
 
     if (masterBlockId)
-      dashboard.blocks[layoutItem.i].masterBlocks = masterBlockId;
+      dashboard.blocks[layoutItem.i].controlBlock = masterBlockId;
 
     const state = {
       dashboard: {

@@ -70,6 +70,7 @@ export default class DataBlockView extends Component<any, any> {
   }
 
   preparePlotData(dataElement, configStyle) {
+    console.log("dataElement: ", dataElement);
     let obj = {};
     switch (configStyle.graphType) {
       case "area":
