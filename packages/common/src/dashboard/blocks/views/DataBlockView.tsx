@@ -10,7 +10,18 @@ export default class DataBlockView extends Component<any, any> {
    * @returns Data with timeseries
    */
   getPlotData = () => {
-    const metaData: BlockDataModel = this.props.currentBlock.config.metaData;
+    // 2 options: if the block controlled or not
+    const { currentBlock } = this.props;
+    const metaData: BlockDataModel = currentBlock.config.metaData;
+    if (currentBlock.controlBlock !== "") {
+      const controlBlock = this.props.blocks[currentBlock.controlBlock].config.metaData;
+      if (controlBlock.master["models"])
+        metaData.models = controlBlock.models;
+      if (controlBlock.master["variables"])
+        metaData.variables = controlBlock.variables;
+      if (controlBlock.master["regions"])
+        metaData.regions = controlBlock.regions;
+    }
     const data: any[] = [];
     if (metaData.models && metaData.variables && metaData.regions) {
       Object.keys(metaData.models).map((model) => {
