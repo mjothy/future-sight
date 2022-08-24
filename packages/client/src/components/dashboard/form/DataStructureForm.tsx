@@ -37,17 +37,14 @@ class DataStructureForm extends Component<any, any> {
    * to update the list of scenarios
    */
   modelSelectionChange = (modelSelected: string) => {
-    const selectedModel = this.state.models.filter(
-      (model) => model.name === modelSelected
-    )[0];
     const data = {};
     data[modelSelected] = {};
     // Change scenarios on dropdown list
     let scenarios: any[] = [];
-    scenarios = [...selectedModel.scenarios];
+    scenarios = Object.keys(this.state.models[modelSelected]);
     this.setState({
       scenarios,
-      selectedModel: selectedModel.name,
+      selectedModel: modelSelected,
       selectedScenarios: [],
       data: { ...this.state.data, ...data },
     });
@@ -68,57 +65,13 @@ class DataStructureForm extends Component<any, any> {
       const data = this.state.data;
       const model = this.state.selectedModel;
       this.state.selectedScenarios.map((scenario) => {
-        data[model][scenario] = {
-          regions: [],
-          variables: [],
-        };
-        // get variables, and regions
-        this.getVariables(model, scenario).then(
-          (res) => (data[model][scenario].variables = res)
-        );
-        this.getRegions(model, scenario).then(
-          (res) => (data[model][scenario].regions = res)
-        );
+        // to set variables and regions
+        data[model][scenario] = this.state.models[model][scenario]
       });
       this.props.handleStructureData(data);
       this.resetForm();
     }
   };
-
-  /**
-   * To fetch the variables of {model, scenario}
-   * @param model model name
-   * @param scenario scenario name
-   * @returns array of strings of variables name
-   */
-  async getVariables(model, scenario) {
-    const dataManager = this.props.dataManager;
-    const data = {
-      model,
-      scenario,
-    };
-    return await dataManager.fetchVariables(data).then((variablesData) => {
-      if (variablesData != null)
-        return variablesData.variables.map((v) => v.name);
-    });
-  }
-
-  /**
-   * To fetch the regions of {model, scenario}
-   * @param model model name
-   * @param scenario scenario name
-   * @returns array of strings of regions name
-   */
-  async getRegions(model, scenario) {
-    const dataManager = this.props.dataManager;
-    const data = {
-      model,
-      scenario,
-    };
-    return await dataManager
-      .fetchRegions(data)
-      .then((regionsData) => regionsData.map((r) => r.name));
-  }
 
   /**
    * Reset the drop down lists
@@ -141,12 +94,13 @@ class DataStructureForm extends Component<any, any> {
               placeholder="Please select the model"
               value={this.state.selectedModel}
               onChange={this.modelSelectionChange}
-              options={this.state.models}
-              fieldNames={{
-                value: 'name',
-                label: 'name',
-              }}
-            />
+            >
+              {
+                Object.keys(this.state.models).map(model =>
+                  <Option key={model} value={model}>
+                    {model}
+                  </Option>)}
+            </Select>
           </Col>
 
           <Col xs={20} sm={20} md={6} lg={7}>
@@ -158,8 +112,8 @@ class DataStructureForm extends Component<any, any> {
               value={this.state.selectedScenarios}
             >
               {this.state.scenarios.map((scenario) => (
-                <Option key={scenario.name} value={scenario.name}>
-                  {scenario.name}
+                <Option key={scenario} value={scenario}>
+                  {scenario}
                 </Option>
               ))}
             </Select>

@@ -28,7 +28,6 @@ class DashboardView extends React.Component<
        * Selected data to work with in dashboard {model: {scenario: { variables: [], regions: []}}}
        */
       data: [],
-      scenarios: [],
     };
   }
 
