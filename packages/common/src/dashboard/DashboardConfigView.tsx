@@ -109,7 +109,7 @@ class DashboardConfigView extends Component<any, any> {
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
         cols={{ lg: 12, md: 12, sm: 12, xs: 12, xxs: 12 }}
         rowHeight={150}
-        maxRows = {12}
+        maxRows={12}
         onLayoutChange={this.onLayoutChange}
         onBreakpointChange={this.onBreakpointChange}
         onResizeStop={this.resizeStop}
@@ -119,6 +119,7 @@ class DashboardConfigView extends Component<any, any> {
             key={layout.i}
             className={
               this.props.blockSelectedId === layout.i ? 'selected-layout' : ''
+              // this.props.blockSelectedId === layout.i ? 'selected-layout' : ( blocks[layout.i ].controlBlock === this.props.blockSelectedId ? 'selected-layout-master' : '')
             }
           >
             <div

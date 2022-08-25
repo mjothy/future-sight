@@ -53,12 +53,19 @@ export default class DashboardSelectionControl extends Component<
     this.setState({ blockSelectedId });
   };
 
-  updateBlockMetaData = (data) => {
+  updateBlockMetaData = (data, idBlock = "") => {
     const dashboard = this.state.dashboard;
     // store the selected data
-    let metaData = dashboard.blocks[this.state.blockSelectedId].config.metaData;
+    let blockSelectedId = "";
+    if(this.state.blockSelectedId === ""){
+      blockSelectedId = idBlock;
+    } else{
+      blockSelectedId = this.state.blockSelectedId;
+
+    }
+    let metaData = dashboard.blocks[blockSelectedId].config.metaData;
     metaData = { ...metaData, ...data };
-    dashboard.blocks[this.state.blockSelectedId].config.metaData = metaData;
+    dashboard.blocks[blockSelectedId].config.metaData = metaData;
     this.setState({
       dashboard: { ...this.state.dashboard, blocks: dashboard.blocks },
     });

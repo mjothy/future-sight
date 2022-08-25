@@ -20,12 +20,16 @@ export default class DataBlock extends Component<any, any> {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     const blockSelectedId = this.props.blockSelectedId;
-    if (prevProps.blockSelectedId !== blockSelectedId) {
+    // the second condition to not update the dropdown list of ControlData
+    if (prevProps.blockSelectedId !== blockSelectedId && this.props.blocks[blockSelectedId].blockType === "data") {
       this.updateDropdownData();
       this.checkIfBlockControlled();
     }
   }
 
+  /**
+   * To disable inputes that are controlled by ControlBlock
+   */
   checkIfBlockControlled = () => {
     const blockSelectedId = this.props.blockSelectedId;
     const controlBlockId = this.props.blocks[blockSelectedId].controlBlock;
@@ -43,7 +47,6 @@ export default class DataBlock extends Component<any, any> {
    * SHOW only the options when we can find data to visualize
    */
   updateDropdownData = () => {
-    console.log("call update")
     const selectedData =
       this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
     const models = selectedData.models;
@@ -102,7 +105,7 @@ export default class DataBlock extends Component<any, any> {
 
       <div>
         {
-          (this.isBlockControlled && this.controlBlock.config.metaData.master.models) ?
+          (this.isBlockControlled && this.controlBlock.config.metaData.master["models"].isMaster) ?
             <p>That block is controled by Model/scenario</p>
             :
             <DataBlockTableSelection  {...this.props} updateDropdownData={this.updateDropdownData} />
@@ -117,7 +120,7 @@ export default class DataBlock extends Component<any, any> {
             placeholder="Variables"
             defaultValue={currentBlock.variables}
             onChange={this.variablesSelectionChange}
-            disabled={this.isBlockControlled && this.controlBlock.config.metaData.master.variables}
+            disabled={this.isBlockControlled && this.controlBlock.config.metaData.master["variables"].isMaster}
           >
             {this.variables.map((variable) => (
               <Option key={variable} value={variable}>
@@ -135,7 +138,7 @@ export default class DataBlock extends Component<any, any> {
             placeholder="Regions"
             defaultValue={currentBlock.regions}
             onChange={this.regionsSelectionChange}
-            disabled={this.isBlockControlled && this.controlBlock.config.metaData.master.regions}
+            disabled={this.isBlockControlled && this.controlBlock.config.metaData.master["regions"].isMaster}
           >
             {this.regions.map((region) => (
               <Option key={region} value={region}>

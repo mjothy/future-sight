@@ -32,28 +32,13 @@ export default class DataBlockTableSelection extends Component<any, any> {
     this.prepareDataTable();
   }
 
-  componentDidMount() {
-    this.initialState();
-  }
-
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps.blockSelectedId !== this.props.blockSelectedId) {
+    if (prevProps.blockSelectedId !== this.props.blockSelectedId && this.props.blockSelectedId != "") {
       this.selectedData =
         this.props.dashboard.blocks[
           this.props.blockSelectedId
         ].config.metaData.models;
-      this.initialState();
     }
-  }
-
-  /**
-   * Initiale selected data, if block already exist
-   */
-  initialState() {
-    const selectedRowKeys: React.Key[] = this.extractSelectedRowKeys(
-      this.selectedData
-    );
-    this.setState({ selectedRowKeys });
   }
 
   extractSelectedRowKeys(data) {
@@ -99,9 +84,6 @@ export default class DataBlockTableSelection extends Component<any, any> {
       this.props.dashboard.blocks[
         this.props.blockSelectedId
       ].config.metaData.models;
-
-    console.log("controlBlock: ", this.props.dashboard.blocks[this.props.blockSelectedId].controlBlock === "");
-    console.log("controlBlock: ", this.props.dashboard.blocks[this.props.blockSelectedId].controlBlock == "");
 
     if (this.props.dashboard.blocks[this.props.blockSelectedId].blockType === "data")
       this.props.updateDropdownData();

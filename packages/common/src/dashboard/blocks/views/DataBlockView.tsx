@@ -6,7 +6,7 @@ import PlotlyGraph from '../../graphs/PlotlyGraph';
 
 export default class DataBlockView extends Component<any, any> {
   /**
-   * Getting the data to visualize on the graph
+   * Getting the data to visualize on the graphf
    * @returns Data with timeseries
    */
   getPlotData = () => {
@@ -15,15 +15,17 @@ export default class DataBlockView extends Component<any, any> {
     const metaData: BlockDataModel = currentBlock.config.metaData;
     if (currentBlock.controlBlock !== "") {
       const controlBlock = this.props.blocks[currentBlock.controlBlock].config.metaData;
-      if (controlBlock.master["models"])
-        metaData.models = controlBlock.models;
-      if (controlBlock.master["variables"])
-        metaData.variables = controlBlock.variables;
-      if (controlBlock.master["regions"])
-        metaData.regions = controlBlock.regions;
+      if (controlBlock.master["models"].isMaster)
+        metaData.models = controlBlock.master["models"].values;
+      console.log("metaData.models1: ", metaData.models);
+      if (controlBlock.master["variables"].isMaster)
+        metaData.variables = controlBlock.master["variables"].values;
+      if (controlBlock.master["regions"].isMaster)
+        metaData.regions = controlBlock.master["regions"].values;
     }
     const data: any[] = [];
     if (metaData.models && metaData.variables && metaData.regions) {
+      console.log("metaData.models2: ", metaData.models);
       Object.keys(metaData.models).map((model) => {
         metaData.models[model].map((scenario) => {
           metaData.variables.map((variable) => {
@@ -33,7 +35,11 @@ export default class DataBlockView extends Component<any, any> {
           });
         });
       });
+
+      console.log("data befpre returnData", data);
       const returnData = this.props.getData(data);
+      console.log("returnData", returnData);
+
       return returnData;
     }
   };

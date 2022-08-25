@@ -22,6 +22,9 @@ export default class BlockEditorManager extends Component<any, any> {
     this.initialize();
   }
 
+  componentDidMount(){
+    this.initialize();
+  }
   componentDidUpdate(prevProps, prevState, snapshot) {
     this.initialize();
   }
