@@ -5,15 +5,19 @@ import {
 import React from 'react';
 import withDataManager from '../../services/withDataManager';
 import SetupView from './form/SetupView';
+import { RoutingProps } from '../app/Routing';
+
+interface DashboardViewProps
+  extends ComponentPropsWithDataManager,
+    RoutingProps {
+  readonly?: boolean;
+}
 
 /**
  * For adding or update a dashboard.
  * It manage set up view and ashboard view for adding/updating a dashboard
  */
-class DashboardView extends React.Component<
-  ComponentPropsWithDataManager,
-  any
-> {
+class DashboardView extends React.Component<DashboardViewProps, any> {
   data = {}; // TODO: remove ?
   constructor(props) {
     super(props);
@@ -30,6 +34,18 @@ class DashboardView extends React.Component<
       data: [],
     };
   }
+
+  componentDidMount = () => {
+    if (this.props.readonly) {
+      this.props.setEnableSwitchEmbeddedMode(true);
+    }
+  };
+
+  componentWillUnmount = () => {
+    if (this.props.readonly) {
+      this.props.setEnableSwitchEmbeddedMode(false);
+    }
+  };
 
   /**
    * Decide on wich view the user working, SetUpView (To add the metadata of the current dashboard)
