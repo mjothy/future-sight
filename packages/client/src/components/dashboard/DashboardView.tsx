@@ -1,6 +1,6 @@
 import {
-  DashboardDataConfiguration,
   ComponentPropsWithDataManager,
+  Dashboard,
 } from '@future-sight/common';
 import React from 'react';
 import withDataManager from '../../services/withDataManager';
@@ -9,7 +9,7 @@ import { RoutingProps } from '../app/Routing';
 
 interface DashboardViewProps
   extends ComponentPropsWithDataManager,
-    RoutingProps {
+  RoutingProps {
   readonly?: boolean;
 }
 
@@ -17,17 +17,13 @@ interface DashboardViewProps
  * For adding or update a dashboard.
  * It manage set up view and ashboard view for adding/updating a dashboard
  */
-class DashboardView extends React.Component<DashboardViewProps, any> {
+// class DashboardView extends React.Component<DashboardViewProps, any> {
+class DashboardView extends React.Component<any, any> {
   data = {}; // TODO: remove ?
   constructor(props) {
     super(props);
     this.state = {
       isSubmited: false,
-      userData: {
-        title: '',
-        author: '',
-        tags: [],
-      },
       /**
        * Selected data to work with in dashboard {model: {scenario: { variables: [], regions: []}}}
        */
@@ -39,6 +35,10 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
     if (this.props.readonly) {
       this.props.setEnableSwitchEmbeddedMode(true);
     }
+
+    // Check if the dashboard exist or it's new
+    // Get from dataStorage
+
   };
 
   componentWillUnmount = () => {
@@ -61,7 +61,7 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
    * @param data contains the information of the dashboard {title, author and tags}
    */
   handleUserData = (data) => {
-    const userData = { ...this.state.userData };
+    const userData = this.props.dashboard.userData;
 
     switch (data.name) {
       case 'title':
@@ -74,19 +74,20 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
         userData.tags = data.value;
         break;
     }
-    this.setState({ userData: { ...userData } });
+    this.props.updateDashboardMetadata({ userData });
   };
 
   handleStructureData = (data) => {
-    this.setState({ data });
+    // this.setState({ data });
+    this.props.updateDashboardMetadata({ dataStructure: data });
   };
 
   dashboardAddForm = () => {
     return (
       <SetupView
         {...this.props}
-        userData={this.state.userData}
-        structureData={this.state.data}
+        userData={this.props.dashboard.userData}
+        structureData={this.props.dashboard.dataStructure}
         submitEvent={this.handleSubmit}
         updateUserData={this.handleUserData}
         handleStructureData={this.handleStructureData}
@@ -96,7 +97,7 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
 
   dashboardManager = () => {
     return (
-      <DashboardDataConfiguration
+      <Dashboard
         {...this.props}
         userData={this.state.userData}
         structureData={this.state.data}

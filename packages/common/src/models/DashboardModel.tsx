@@ -9,9 +9,9 @@ export default class DashboardModel {
     }
 
     id?: string;
-    userData?: UserDataModel;
+    userData: UserDataModel = new UserDataModel();
     // Dict of data: keys are models
-    dataStructure?: object;
+    dataStructure: object= {};
     layout: LayoutModel[] = [];
     blocks: { [id: string]: BlockModel } = {};
 

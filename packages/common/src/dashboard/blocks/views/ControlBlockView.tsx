@@ -36,7 +36,7 @@ export default class ControlBlockView extends Component<any, any> {
               mode="multiple"
               className="width-100"
               placeholder="Variables"
-              defaultValue={metaData.master["regions"].values}
+              defaultValue={metaData.master["variables"].values}
               onChange={variablesSelectionChange}
             >
               {metaData.variables.map((variable) => (

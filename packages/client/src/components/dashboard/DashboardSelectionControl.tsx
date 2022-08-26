@@ -1,12 +1,9 @@
+import { BlockModel, DashboardModel, DataModel, LayoutModel } from '@future-sight/common';
 import React, { Component } from 'react';
 import { v1 as uuidv1 } from 'uuid';
-import BlockModel from '../models/BlockModel';
 
-import DashboardModel from '../models/DashboardModel';
-import DataModel from '../models/DataModel';
-import LayoutModel from '../models/LayoutModel';
-import Dashboard from './Dashboard';
 import { DashboardDataConfigurationProps } from './DashboardDataConfiguration';
+import DashboardView from './DashboardView';
 
 export interface DashboardSelectionControlProps
   extends DashboardDataConfigurationProps {
@@ -15,7 +12,7 @@ export interface DashboardSelectionControlProps
 }
 
 export default class DashboardSelectionControl extends Component<
-  DashboardSelectionControlProps,
+  any,
   any
 > {
   constructor(props) {
@@ -34,10 +31,7 @@ export default class DashboardSelectionControl extends Component<
   }
 
   componentDidMount() {
-    const dashboard = this.state.dashboard;
-    dashboard.dataStructure = this.props.structureData;
-    dashboard.userData = this.props.userData;
-    this.setState({ dashboard });
+    // check if dashboard is draft (exist in localStorage)
   }
 
   updateLayout = (layout: LayoutModel[]) => {
@@ -53,13 +47,17 @@ export default class DashboardSelectionControl extends Component<
     this.setState({ blockSelectedId });
   };
 
+  updateDashboardMetadata = (data) => {
+    this.setState({ dashboard: { ...this.state.dashboard, ...data } });
+  }
+
   updateBlockMetaData = (data, idBlock = "") => {
     const dashboard = this.state.dashboard;
     // store the selected data
     let blockSelectedId = "";
-    if(this.state.blockSelectedId === ""){
+    if (this.state.blockSelectedId === "") {
       blockSelectedId = idBlock;
-    } else{
+    } else {
       blockSelectedId = this.state.blockSelectedId;
 
     }
@@ -103,7 +101,7 @@ export default class DashboardSelectionControl extends Component<
 
   render() {
     return (
-      <Dashboard
+      <DashboardView
         dashboard={this.state.dashboard}
         addBlock={this.addBlock}
         blockSelectedId={this.state.blockSelectedId}
@@ -114,6 +112,7 @@ export default class DashboardSelectionControl extends Component<
         updateBlockMetaData={this.updateBlockMetaData}
         updateBlockStyleConfig={this.updateBlockStyleConfig}
         saveDashboard={this.props.saveData}
+        updateDashboardMetadata={this.updateDashboardMetadata}
         {...this.props}
       />
     );

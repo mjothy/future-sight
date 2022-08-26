@@ -21,7 +21,9 @@ const actions = [
 /**
  * Dashboard control: to set the block type and send a notification to parent (Dashboard) to add/edit block
  */
-export default class DashboardControl extends Component<DashboardProps, any> {
+// export default class DashboardControl extends Component<DashboardProps, any> {
+  export default class DashboardControl extends Component<any, any> {
+
   constructor(props) {
     super(props);
   }

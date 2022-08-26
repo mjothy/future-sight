@@ -36,10 +36,7 @@ export default class DataBlockView extends Component<any, any> {
         });
       });
 
-      console.log("data befpre returnData", data);
       const returnData = this.props.getData(data);
-      console.log("returnData", returnData);
-
       return returnData;
     }
   };

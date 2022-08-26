@@ -22,7 +22,9 @@ export interface DashboardProps extends ComponentPropsWithDataManager {
   saveDashboard: () => void;
 }
 
-export default class Dashboard extends Component<DashboardProps, any> {
+// export default class Dashboard extends Component<DashboardProps, any> {
+  export default class Dashboard extends Component<any, any> {
+
   constructor(props) {
     super(props);
     this.state = {

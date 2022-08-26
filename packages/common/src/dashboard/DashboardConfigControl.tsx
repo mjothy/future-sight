@@ -7,8 +7,12 @@ import BlockEditorManager from './blocks/editors/BlockEditorManager';
 /**
  * Show {Edit selected block} OR {Add new block}
  */
-export default class DashboardConfigControl extends Component<
-  DashboardProps,
+// export default class DashboardConfigControl extends Component<
+//   DashboardProps,
+//   any
+// > {
+  export default class DashboardConfigControl extends Component<
+  any,
   any
 > {
   static propTypes = {

@@ -1,7 +1,7 @@
+import { ComponentPropsWithDataManager, DataModel } from '@future-sight/common';
 import React, { Component } from 'react';
+import withDataManager from '../../services/withDataManager';
 import DashboardSelectionControl from './DashboardSelectionControl';
-import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
-import DataModel from '../models/DataModel';
 
 /**
  * To fetch data and pass it to all blocks
@@ -9,14 +9,15 @@ import DataModel from '../models/DataModel';
 export interface DashboardDataConfigurationProps extends ComponentPropsWithDataManager {
   userData: object;
   structureData: object;
+  // dashboard: object
   submitSetupView: (data: boolean) => void;
 }
 
 /**
  * To dispatch the data to all blocks of dashboard
  */
-export default class DashboardDataConfiguration extends Component<
-  DashboardDataConfigurationProps,
+class DashboardDataConfiguration extends Component<
+  any,
   any
 > {
   constructor(props) {
@@ -98,3 +99,5 @@ export default class DashboardDataConfiguration extends Component<
     );
   }
 }
+
+export default withDataManager(DashboardDataConfiguration);

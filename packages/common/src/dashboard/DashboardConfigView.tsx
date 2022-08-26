@@ -30,9 +30,14 @@ class DashboardConfigView extends Component<any, any> {
     this.state = {
       graphsSize: [],
     };
+
   }
 
   componentDidMount() {
+    // Adjust the width and height of the graph in case the blocks already exist
+    this.updateAllLayoutsView();
+
+    // Update graph dim after every resize
     window.addEventListener('resize', this.updateAllLayoutsView);
   }
 
