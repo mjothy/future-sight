@@ -1,51 +1,35 @@
 import React, { Component } from 'react';
-import ControlBlock from './ControlBlock';
-import DataBlock from './DataBlock';
-import TextBlock from './TextBlock';
-import PropTypes from 'prop-types';
 import { Button, Col, Divider, Row } from 'antd';
-import DataBlockVisualization from './DataBlockVisualization';
+import DataBlockEditor from './DataBlockEditor';
+import TextBlockEditor from './TextBlockEditor';
+import ControlBlockEditor from './ControlBlockEditor';
+import DataBlockVisualizationEditor from './DataBlockVisualizationEditor';
 
 /**
  * Render the view edit block according the the selected type
  */
 export default class BlockEditorManager extends Component<any, any> {
-  
-  static propTypes = {
-    blockType: PropTypes.string,
-  };
 
-  blockSelectedId;
   blockType;
   constructor(props) {
     super(props);
-    this.initialize();
-  }
-
-  componentDidMount(){
-    this.initialize();
-  }
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    this.initialize();
-  }
-
-  initialize = () => {
-    this.blockSelectedId = this.props.blockSelectedId;
-    this.blockType = this.props.blocks[this.blockSelectedId] ? this.props.blocks[this.blockSelectedId].blockType : "data";
+    this.state = {
+      tab: "data"
+    }
   }
 
   blockByType = () => {
-
-    switch (this.blockType) {
+    const currentBlock = this.props.blocks[this.props.blockSelectedId];
+    switch (currentBlock.blockType) {
       case "data":
-        if (this.props.dataBlockTab === "data")
-          return <DataBlock {...this.props} />
+        if (this.state.tab === "data")
+          return <DataBlockEditor {...this.props} currentBlock={currentBlock} />
         else
-          return <DataBlockVisualization {...this.props} />
+          return <DataBlockVisualizationEditor {...this.props} currentBlock={currentBlock} />
       case "text":
-        return <TextBlock {...this.props} />
+        return <TextBlockEditor {...this.props} currentBlock={currentBlock} />
       case "control":
-        return <ControlBlock {...this.props} />
+        return <ControlBlockEditor {...this.props} currentBlock={currentBlock} />
       default:
         return <p>Error !</p>;
     }
@@ -53,14 +37,14 @@ export default class BlockEditorManager extends Component<any, any> {
   render() {
 
     const tabsToggle = (tabType) => {
-      this.props.tabsToggle(tabType);
+      this.setState({ tab: tabType });
     }
 
     return (
 
       <>
-        <Row justify={this.blockType === "data" ? 'space-between' : 'end'}>
-          {this.blockType === "data" && <Col span={20}>
+        <Row justify={this.props.blocks[this.props.blockSelectedId].blockType === "data" ? 'space-between' : 'end'}>
+          {this.props.blocks[this.props.blockSelectedId].blockType === "data" && <Col span={20}>
             <Row justify='start'>
               <Col span={10}>
                 <Button type='default' onClick={() => tabsToggle("data")}>Data configuration</Button>

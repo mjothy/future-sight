@@ -18,6 +18,10 @@ const columns: ColumnsType<DataType> = [
         dataIndex: 'scenario',
     },
 ];
+
+/**
+ * This component is called by the view (ControlBlockView) 
+ */
 export default class ControlBlockTableSelection extends Component<any, any> {
     data: DataType[] = [];
     selectedData: { [id: string]: string[] } = {};
@@ -84,7 +88,6 @@ export default class ControlBlockTableSelection extends Component<any, any> {
           });
           const metaData = this.props.currentBlock.config.metaData;
           metaData.master['models'].values = models;
-          console.log("metaData.master['models']: ", metaData.master['models']);
           this.props.updateBlockMetaData({ master: metaData.master }, this.props.currentBlock.id);
           // Update the selected data variable
           this.selectedData = this.props.currentBlock.config.metaData.master['models'].values;

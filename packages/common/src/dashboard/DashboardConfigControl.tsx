@@ -1,8 +1,8 @@
 import { Component } from 'react';
 import DashboardControl from './sidebar/DashboardControl';
-import BlockEditor from './sidebar/BlockEditor';
 import PropTypes from 'prop-types';
 import { DashboardProps } from './Dashboard';
+import BlockEditorManager from './blocks/editors/BlockEditorManager';
 
 /**
  * Show {Edit selected block} OR {Add new block}
@@ -17,7 +17,7 @@ export default class DashboardConfigControl extends Component<
 
   render() {
     return this.props.blockSelectedId ? (
-      <BlockEditor {...this.props} />
+      <BlockEditorManager {...this.props} />
     ) : (
       <DashboardControl {...this.props} />
     );

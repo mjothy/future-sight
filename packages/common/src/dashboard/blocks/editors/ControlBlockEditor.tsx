@@ -5,7 +5,7 @@ import { Option } from 'antd/lib/mentions';
 import { Component } from 'react'
 import DataBlockTableSelection from './DataBlockTableSelection';
 
-export default class ControlBlock extends Component<any, any> {
+export default class ControlBlockEditor extends Component<any, any> {
 
   variables: string[] = [];
   regions: string[] = [];
@@ -41,7 +41,7 @@ export default class ControlBlock extends Component<any, any> {
 
   render() {
 
-    const currentBlock = this.props.blocks[this.props.blockSelectedId].config.metaData;
+    const metaData = this.props.currentBlock.config.metaData;
 
     const onAddControlledBlock = () => {
       this.props.addBlock('data', this.props.blockSelectedId);
@@ -49,18 +49,18 @@ export default class ControlBlock extends Component<any, any> {
 
     const onShowTable = (e) => {
       this.setState({ showTable: e.target.checked });
-      currentBlock.master["models"].isMaster = e.target.checked;
-      this.props.updateBlockMetaData({ master: currentBlock.master });
+      metaData.master["models"].isMaster = e.target.checked;
+      this.props.updateBlockMetaData({ master: metaData.master });
     }
 
     const onVariablesChange = (e) => {
-      currentBlock.master["variables"].isMaster = e.target.checked;
-      this.props.updateBlockMetaData({ master: currentBlock.master });
+      metaData.master["variables"].isMaster = e.target.checked;
+      this.props.updateBlockMetaData({ master: metaData.master });
     }
 
     const onRegionsChange = (e) => {
-      currentBlock.master["regions"].isMaster = e.target.checked;
-      this.props.updateBlockMetaData({ master: currentBlock.master });
+      metaData.master["regions"].isMaster = e.target.checked;
+      this.props.updateBlockMetaData({ master: metaData.master });
     }
 
     const variablesSelectionChange = (selectedVariables: string[]) => {
@@ -75,14 +75,14 @@ export default class ControlBlock extends Component<any, any> {
       <><div>
         <Row className='mb-10'>
           <Col span={2} className={'checkbox-col'}>
-            <Checkbox onChange={onShowTable} checked={this.props.blocks[this.props.blockSelectedId].config.metaData.master["models"].isMaster} />
+            <Checkbox onChange={onShowTable} checked={metaData.master["models"].isMaster} />
           </Col>
           <Col span={16}>
             Control by Model/Scenario
           </Col>
         </Row>
         {
-          this.props.blocks[this.props.blockSelectedId].config.metaData.master["models"].isMaster && <Row className='mb-10'>
+          metaData.master["models"].isMaster && <Row className='mb-10'>
             <Col span={24}>
               <DataBlockTableSelection  {...this.props} />
             </Col>
@@ -91,15 +91,15 @@ export default class ControlBlock extends Component<any, any> {
 
         <Row className='mb-10'>
           <Col span={2} className={'checkbox-col'}>
-            <Checkbox onChange={onVariablesChange} checked={this.props.blocks[this.props.blockSelectedId].config.metaData.master["variables"].isMaster} />
+            <Checkbox onChange={onVariablesChange} checked={metaData.master["variables"].isMaster} />
           </Col>
           <Col span={16}>
             <Select
-              key={this.props.blocks[this.props.blockSelectedId].config.metaData.variables.toString()}
+              key={metaData.variables.toString()}
               mode="multiple"
               className="width-100"
               placeholder="Variables"
-              value={this.props.blocks[this.props.blockSelectedId].config.metaData.variables}
+              value={metaData.variables}
               onChange={variablesSelectionChange}
             >
               {this.variables.map((variable) => (
@@ -112,15 +112,15 @@ export default class ControlBlock extends Component<any, any> {
         </Row>
         <Row className='mb-10'>
           <Col span={2} className={'checkbox-col'}>
-            <Checkbox onChange={onRegionsChange} checked={this.props.blocks[this.props.blockSelectedId].config.metaData.master["regions"].isMaster} />
+            <Checkbox onChange={onRegionsChange} checked={metaData.master["regions"].isMaster} />
           </Col>
           <Col span={16} className={'checkbox-col-label'}>
             <Select
-              key={this.props.blocks[this.props.blockSelectedId].config.metaData.regions.toString()}
+              key={metaData.regions.toString()}
               mode="multiple"
               className="width-100"
               placeholder="Regions"
-              value={this.props.blocks[this.props.blockSelectedId].config.metaData.regions}
+              value={metaData.regions}
               onChange={regionsSelectionChange}
             >
               {this.regions.map((region) => (

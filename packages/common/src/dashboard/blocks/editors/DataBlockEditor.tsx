@@ -4,7 +4,7 @@ import { Option } from 'antd/lib/mentions';
 import DataBlockTableSelection from './DataBlockTableSelection';
 import BlockModel from '../../../models/BlockModel';
 
-export default class DataBlock extends Component<any, any> {
+export default class DataBlockEditor extends Component<any, any> {
   variables: string[] = [];
   regions: string[] = [];
   defaultVariables: string[] = [];
@@ -19,9 +19,8 @@ export default class DataBlock extends Component<any, any> {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    const blockSelectedId = this.props.blockSelectedId;
     // the second condition to not update the dropdown list of ControlData
-    if (prevProps.blockSelectedId !== blockSelectedId && this.props.blocks[blockSelectedId].blockType === "data") {
+    if (prevProps.blockSelectedId !== this.props.blockSelectedId && this.props.currentBlock.blockType === "data") {
       this.updateDropdownData();
       this.checkIfBlockControlled();
     }
@@ -31,8 +30,7 @@ export default class DataBlock extends Component<any, any> {
    * To disable inputes that are controlled by ControlBlock
    */
   checkIfBlockControlled = () => {
-    const blockSelectedId = this.props.blockSelectedId;
-    const controlBlockId = this.props.blocks[blockSelectedId].controlBlock;
+    const controlBlockId = this.props.currentBlock.controlBlock;
     if (controlBlockId !== "") {
       this.isBlockControlled = true;
       this.controlBlock = this.props.blocks[controlBlockId];
@@ -47,16 +45,14 @@ export default class DataBlock extends Component<any, any> {
    * SHOW only the options when we can find data to visualize
    */
   updateDropdownData = () => {
-    const selectedData =
-      this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
-    const models = selectedData.models;
+    const metaData = this.props.currentBlock.config.metaData;
     // All data received from SetUp view
     const dataStructure = this.props.dashboard.dataStructure;
     this.variables = [];
     this.regions = [];
     // To show only variables and regions of selected data
-    Object.keys(models).map((modelKey) => {
-      models[modelKey].map((scenarioKey) => {
+    Object.keys(metaData.models).map((modelKey) => {
+      metaData.models[modelKey].map((scenarioKey) => {
         this.variables = [
           ...this.variables,
           ...dataStructure[modelKey][scenarioKey].variables,
@@ -73,10 +69,10 @@ export default class DataBlock extends Component<any, any> {
     this.regions = [...new Set(this.regions)];
 
     // Show selected/default values (check if the selected values exist in the dropdown list options)
-    this.defaultVariables = selectedData.variables
+    this.defaultVariables = metaData.variables
       .filter((variable: string) => this.variables.indexOf(variable) >= 0)
       .map((variable) => variable);
-    this.defaultRegions = selectedData.regions
+    this.defaultRegions = metaData.regions
       .filter((region: string) => this.regions.indexOf(region) >= 0)
       .map((region) => region);
 
@@ -99,7 +95,7 @@ export default class DataBlock extends Component<any, any> {
 
   render() {
 
-    const currentBlock = this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
+    const metaData = this.props.currentBlock.config.metaData;
 
     return (
 
@@ -118,7 +114,7 @@ export default class DataBlock extends Component<any, any> {
             mode="multiple"
             className="width-100"
             placeholder="Variables"
-            defaultValue={currentBlock.variables}
+            defaultValue={metaData.variables}
             onChange={this.variablesSelectionChange}
             disabled={this.isBlockControlled && this.controlBlock.config.metaData.master["variables"].isMaster}
           >
@@ -136,7 +132,7 @@ export default class DataBlock extends Component<any, any> {
             mode="multiple"
             className="width-100"
             placeholder="Regions"
-            defaultValue={currentBlock.regions}
+            defaultValue={metaData.regions}
             onChange={this.regionsSelectionChange}
             disabled={this.isBlockControlled && this.controlBlock.config.metaData.master["regions"].isMaster}
           >

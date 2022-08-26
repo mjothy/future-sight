@@ -6,18 +6,13 @@ import BlockStyleModel from '../../../models/BlockStyleModel';
 
 const plotTypes = ['line', 'bar', 'area', 'table'];
 
-export default class DataBlockVisualization extends Component<any, any> {
+export default class DataBlockVisualizationEditor extends Component<any, any> {
 
     configStyle: BlockStyleModel = new BlockStyleModel();
 
     constructor(props) {
         super(props);
-        const { dashboard, blockSelectedId } = this.props;
-        this.configStyle = dashboard.blocks[blockSelectedId].config.configStyle;
-    }
-    componentDidUpdate(prevProps, prevState, snaphshot) {
-        const { dashboard, blockSelectedId } = this.props;
-        this.configStyle = dashboard.blocks[blockSelectedId].config.configStyle;
+        this.configStyle = this.props.currentBlock.config.configStyle;
     }
 
     onPlotTypeChange = (selectedType: string) => {
@@ -40,6 +35,8 @@ export default class DataBlockVisualization extends Component<any, any> {
         this.props.updateBlockStyleConfig(this.configStyle);
     }
     render() {
+
+        this.configStyle = this.props.currentBlock.config.configStyle;
 
         return (
             <div>
