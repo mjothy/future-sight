@@ -24,6 +24,7 @@ interface DashboardViewProps
   updateBlockStyleConfig: (data: any) => void;
   saveDashboard: () => void;
   updateDashboardMetadata: (data: any) => void;
+  isDraft: boolean;
   readonly?: boolean;
 }
 
@@ -49,8 +50,7 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
       this.props.setEnableSwitchEmbeddedMode(true);
     }
 
-    // Check if the dashboard exist or it's new
-    // Get from dataStorage
+
 
   };
 
@@ -59,6 +59,15 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
       this.props.setEnableSwitchEmbeddedMode(false);
     }
   };
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.isDraft !== this.props.isDraft && this.props.isDraft) {
+      // Check if the dashboard exist or it's new
+      console.log("this.props.isDraft: ", this.props.isDraft);
+      console.log("enter here !!!");
+      this.setState({ isSubmited: true })
+    }
+  }
 
   /**
    * Decide on wich view the user working, SetUpView (To add the metadata of the current dashboard)

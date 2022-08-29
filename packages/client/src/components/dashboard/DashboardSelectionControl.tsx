@@ -24,16 +24,16 @@ export default class DashboardSelectionControl extends Component<
       /**
        * The selected block id
        */
-      blockSelectedId: '',
+      blockSelectedId: "",
       click: 0,
       blockType: '',
+      isDraft: false
     };
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevState.dashboard != this.state.dashboard) {
       localStorage.setItem(this.state.dashboard.id, JSON.stringify(this.state.dashboard));
-      const dashId = localStorage.getItem(this.state.dashboard.id);
     }
   }
 
@@ -44,7 +44,28 @@ export default class DashboardSelectionControl extends Component<
     // check if the id exist in the route exist in localstrorage (if not published)
     // if exist setState of dashbpard
     // if not, create a new dashboard with new id and setState
-    localStorage.setItem(this.state.dashboard.id, JSON.stringify(this.state.dashboard));
+
+    let isDashboardDraft = false;
+    const w_location = window.location.search;
+    const params = new URLSearchParams(w_location);
+    const id = params.get("id");
+
+    Object.keys(localStorage).map(key => {
+      if (key === id) {
+        const dashboardString = localStorage.getItem(key) as string;
+        const dashboard = JSON.parse(dashboardString);
+        this.setState({ dashboard });
+        isDashboardDraft = true;
+        // get last block id
+        const lastId = Object.keys(dashboard.blocks).pop() as string;
+        console.log("lastId: ", lastId);
+        // If dashboard already created (in draft), show directly the dashboard view
+        this.setState({ isDraft: true, click: (parseInt(lastId) + 1).toString() });
+      }
+    })
+
+    if (!isDashboardDraft)
+      localStorage.setItem(this.state.dashboard.id, JSON.stringify(this.state.dashboard));
   }
 
   updateLayout = (layout: LayoutModel[]) => {
@@ -96,7 +117,7 @@ export default class DashboardSelectionControl extends Component<
   }
 
   addBlock = (blockType: string, masterBlockId?: string) => {
-    const layoutItem = new LayoutModel('block' + this.state.click);
+    const layoutItem = new LayoutModel(this.state.click.toString());
     const dashboard = this.state.dashboard;
 
     dashboard.blocks[layoutItem.i] = new BlockModel(layoutItem.i, blockType);
@@ -133,6 +154,7 @@ export default class DashboardSelectionControl extends Component<
         updateBlockStyleConfig={this.updateBlockStyleConfig}
         saveDashboard={this.props.saveData}
         updateDashboardMetadata={this.updateDashboardMetadata}
+        isDraft={this.state.isDraft}
         {...this.props}
       />
     );

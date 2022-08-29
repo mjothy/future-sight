@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Input, Divider } from 'antd';
+import { Button, Input, Divider, Image } from 'antd';
 import { Link } from 'react-router-dom';
 
 const HomeView: React.FC = () => {
@@ -23,6 +23,19 @@ const HomeView: React.FC = () => {
       </Input.Group>
       <Divider />
       <h3>Latest submissions</h3>
+      <Image.PreviewGroup>
+        {
+          Object.keys(localStorage).map(key =>
+            <Link key={key} to={"draft?id=" + key}>          <Image width={200} height={200}
+              src="https://webcolours.ca/wp-content/uploads/2020/10/webcolours-unknown.png"
+            />
+            </Link>
+          )
+        }
+      </Image.PreviewGroup>
+
+
+
     </>
   );
 };

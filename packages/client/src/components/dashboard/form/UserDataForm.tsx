@@ -8,7 +8,7 @@ export default class UserDataForm extends Component<any, any> {
     super(props);
     this.saveInputRef = React.createRef();
     this.state = {
-      tags: this.props.userData.tags,
+      tags: this.props.dashboard.userData.tags,
       inputVisible: false,
       inputValue: '',
     };
@@ -74,12 +74,12 @@ export default class UserDataForm extends Component<any, any> {
 
   render() {
     const { tags, inputVisible, inputValue } = this.state;
-
+    console.log("dashboard: ", this.props.dashboard.userData);
     return (
       <Row justify="space-evenly">
         <Col xs={20} sm={20} md={6} lg={7}>
           <Input
-            defaultValue={this.props.userData.title}
+            value={this.props.dashboard.userData.title}
             name="title"
             prefix={<EditFilled className="site-form-item-icon" />}
             placeholder="Title"
@@ -89,7 +89,7 @@ export default class UserDataForm extends Component<any, any> {
 
         <Col xs={20} sm={20} md={6} lg={7}>
           <Input
-            defaultValue={this.props.userData.author}
+            value={this.props.dashboard.userData.author}
             name="author"
             prefix={<UserOutlined className="site-form-item-icon" />}
             placeholder="Author"

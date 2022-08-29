@@ -5,14 +5,14 @@ import { RoutingProps } from '../app/Routing';
 import DashboardSelectionControl from './DashboardSelectionControl';
 
 export interface DashboardDataConfigurationProps
-  extends ComponentPropsWithDataManager,RoutingProps {
+  extends ComponentPropsWithDataManager, RoutingProps {
 }
 
 /**
  * To dispatch the data to all blocks of dashboard
  */
 class DashboardDataConfiguration extends Component<
-DashboardDataConfigurationProps,
+  DashboardDataConfigurationProps,
   any
 > {
   constructor(props) {
