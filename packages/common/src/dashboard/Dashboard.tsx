@@ -20,10 +20,11 @@ export interface DashboardProps extends ComponentPropsWithDataManager {
   updateBlockMetaData: (data: any) => void;
   updateBlockStyleConfig: (data: any) => void;
   saveDashboard: () => void;
+  submitSetupView: (data: any)=>void
 }
 
-// export default class Dashboard extends Component<DashboardProps, any> {
-  export default class Dashboard extends Component<any, any> {
+export default class Dashboard extends Component<DashboardProps, any> {
+  // export default class Dashboard extends Component<any, any> {
 
   constructor(props) {
     super(props);

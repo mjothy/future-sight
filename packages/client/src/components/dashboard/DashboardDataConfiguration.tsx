@@ -1,23 +1,18 @@
 import { ComponentPropsWithDataManager, DataModel } from '@future-sight/common';
 import React, { Component } from 'react';
 import withDataManager from '../../services/withDataManager';
+import { RoutingProps } from '../app/Routing';
 import DashboardSelectionControl from './DashboardSelectionControl';
 
-/**
- * To fetch data and pass it to all blocks
- */
-export interface DashboardDataConfigurationProps extends ComponentPropsWithDataManager {
-  userData: object;
-  structureData: object;
-  // dashboard: object
-  submitSetupView: (data: boolean) => void;
+export interface DashboardDataConfigurationProps
+  extends ComponentPropsWithDataManager,RoutingProps {
 }
 
 /**
  * To dispatch the data to all blocks of dashboard
  */
 class DashboardDataConfiguration extends Component<
-  any,
+DashboardDataConfigurationProps,
   any
 > {
   constructor(props) {

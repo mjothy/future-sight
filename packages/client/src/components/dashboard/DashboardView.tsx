@@ -1,15 +1,29 @@
 import {
+  BlockModel,
   ComponentPropsWithDataManager,
   Dashboard,
+  DashboardModel,
+  DataModel,
+  LayoutModel,
 } from '@future-sight/common';
 import React from 'react';
-import withDataManager from '../../services/withDataManager';
 import SetupView from './form/SetupView';
 import { RoutingProps } from '../app/Routing';
 
 interface DashboardViewProps
   extends ComponentPropsWithDataManager,
   RoutingProps {
+  dashboard: DashboardModel;
+  addBlock: (blockType: string, masterBlockId?: string) => void;
+  blockSelectedId: string;
+  layout: LayoutModel[];
+  updateLayout: (layout: LayoutModel[]) => void;
+  blocks: { [id: string]: BlockModel };
+  updateSelectedBlock: (blockSelectedId: string) => void;
+  updateBlockMetaData: (data: any) => void;
+  updateBlockStyleConfig: (data: any) => void;
+  saveDashboard: () => void;
+  updateDashboardMetadata: (data: any) => void;
   readonly?: boolean;
 }
 
@@ -17,8 +31,7 @@ interface DashboardViewProps
  * For adding or update a dashboard.
  * It manage set up view and ashboard view for adding/updating a dashboard
  */
-// class DashboardView extends React.Component<DashboardViewProps, any> {
-class DashboardView extends React.Component<any, any> {
+class DashboardView extends React.Component<DashboardViewProps, any> {
   data = {}; // TODO: remove ?
   constructor(props) {
     super(props);
@@ -99,8 +112,6 @@ class DashboardView extends React.Component<any, any> {
     return (
       <Dashboard
         {...this.props}
-        userData={this.state.userData}
-        structureData={this.state.data}
         submitSetupView={this.handleSubmit}
       />
     );
@@ -116,4 +127,4 @@ class DashboardView extends React.Component<any, any> {
   }
 }
 
-export default withDataManager(DashboardView);
+export default DashboardView;

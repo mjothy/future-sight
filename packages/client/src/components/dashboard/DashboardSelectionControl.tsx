@@ -1,18 +1,18 @@
-import { BlockModel, DashboardModel, DataModel, LayoutModel } from '@future-sight/common';
-import React, { Component } from 'react';
+import { BlockModel, ComponentPropsWithDataManager, DashboardModel, DataModel, LayoutModel } from '@future-sight/common';
+import { Component } from 'react';
 import { v1 as uuidv1 } from 'uuid';
+import { RoutingProps } from '../app/Routing';
 
-import { DashboardDataConfigurationProps } from './DashboardDataConfiguration';
 import DashboardView from './DashboardView';
 
 export interface DashboardSelectionControlProps
-  extends DashboardDataConfigurationProps {
+  extends ComponentPropsWithDataManager, RoutingProps {
   getData: (data: DataModel[]) => any[];
   saveData: () => void;
 }
 
 export default class DashboardSelectionControl extends Component<
-  any,
+  DashboardSelectionControlProps,
   any
 > {
   constructor(props) {
@@ -30,8 +30,21 @@ export default class DashboardSelectionControl extends Component<
     };
   }
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevState.dashboard != this.state.dashboard) {
+      localStorage.setItem(this.state.dashboard.id, JSON.stringify(this.state.dashboard));
+      const dashId = localStorage.getItem(this.state.dashboard.id);
+    }
+  }
+
   componentDidMount() {
+    // the url contains /draft/id -> if the dashoard new, it will start by /draft -> create dashboard and redirect to /draft/id
     // check if dashboard is draft (exist in localStorage)
+    // Check if draft mode (by the route)
+    // check if the id exist in the route exist in localstrorage (if not published)
+    // if exist setState of dashbpard
+    // if not, create a new dashboard with new id and setState
+    localStorage.setItem(this.state.dashboard.id, JSON.stringify(this.state.dashboard));
   }
 
   updateLayout = (layout: LayoutModel[]) => {
@@ -41,6 +54,8 @@ export default class DashboardSelectionControl extends Component<
         layout: layout,
       },
     });
+    // Update localStorage
+
   };
 
   updateSelectedBlock = (blockSelectedId: string) => {
@@ -49,6 +64,7 @@ export default class DashboardSelectionControl extends Component<
 
   updateDashboardMetadata = (data) => {
     this.setState({ dashboard: { ...this.state.dashboard, ...data } });
+    // Update localStorage
   }
 
   updateBlockMetaData = (data, idBlock = "") => {
@@ -67,13 +83,15 @@ export default class DashboardSelectionControl extends Component<
     this.setState({
       dashboard: { ...this.state.dashboard, blocks: dashboard.blocks },
     });
+    // Update localStorage
+
   };
 
   updateBlockStyleConfig = (data) => {
     const dashboard = this.state.dashboard;
     dashboard.blocks[this.state.blockSelectedId].config.configStyle = data;
     this.setState({
-      dashboard
+      dashboard: { ...this.state.dashboard, blocks: dashboard.blocks }
     });
   }
 
@@ -97,6 +115,8 @@ export default class DashboardSelectionControl extends Component<
       click: this.state.click + 1,
     };
     this.setState(state);
+    // Update localStorage
+
   };
 
   render() {
