@@ -50,6 +50,9 @@ body {
 .p-20{
   padding: 20px;
 }
+.mt-20{
+  margin-top: 20px;
+}
 
 /* navbar */
 .ant-menu.ant-menu-dark {

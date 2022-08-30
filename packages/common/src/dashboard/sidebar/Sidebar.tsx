@@ -34,11 +34,11 @@ export default class Sidebar extends Component<any, any> {
         }
         extra={
           <Space>
-            <LeftCircleFilled
-              onClick={() => this.props.submitSetupView(false)}
-            />
+              <Button onClick={() => this.props.submitSetupView(false)} value="left">
+              <LeftCircleFilled />             Back to set up
+            </Button>
             <Button onClick={this.props.setPlacement} value="left">
-              <PicLeftOutlined />
+              <PicLeftOutlined /> 
             </Button>
             <Button onClick={this.props.setPlacement} value="right">
               <PicRightOutlined />
