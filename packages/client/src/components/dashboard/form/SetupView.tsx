@@ -5,6 +5,9 @@ import { Button, Divider, Row, Typography } from 'antd';
 
 const { Title } = Typography;
 
+/**
+ * The view for setting dashboard mataData
+ */
 export default class SetupView extends Component<any, any> {
   constructor(props) {
     super(props);

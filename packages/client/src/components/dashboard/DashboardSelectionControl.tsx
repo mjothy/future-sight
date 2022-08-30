@@ -38,34 +38,31 @@ export default class DashboardSelectionControl extends Component<
   }
 
   componentDidMount() {
-    // the url contains /draft/id -> if the dashoard new, it will start by /draft -> create dashboard and redirect to /draft/id
-    // check if dashboard is draft (exist in localStorage)
-    // Check if draft mode (by the route)
-    // check if the id exist in the route exist in localstrorage (if not published)
-    // if exist setState of dashbpard
-    // if not, create a new dashboard with new id and setState
 
+    // Check first if dashboard in draft
     let isDashboardDraft = false;
-    const w_location = window.location.search;
-    const params = new URLSearchParams(w_location);
-    const id = params.get("id");
+    const w_location = window.location.pathname;
+    if (w_location.includes("draft")) {
+      const locationSearch = window.location.search;
+      const params = new URLSearchParams(locationSearch);
+      const id = params.get("id");
 
-    Object.keys(localStorage).map(key => {
-      if (key === id) {
-        const dashboardString = localStorage.getItem(key) as string;
-        const dashboard = JSON.parse(dashboardString);
-        this.setState({ dashboard });
-        isDashboardDraft = true;
-        // get last block id
-        const lastId = Object.keys(dashboard.blocks).pop() as string;
-        console.log("lastId: ", lastId);
-        // If dashboard already created (in draft), show directly the dashboard view
-        this.setState({ isDraft: true, click: (parseInt(lastId) + 1).toString() });
-      }
-    })
+      Object.keys(localStorage).map(key => {
+        if (key === id) {
+          const dashboardString = localStorage.getItem(key) as string;
+          const dashboard = JSON.parse(dashboardString);
+          this.setState({ dashboard });
+          isDashboardDraft = true;
+          // get last block id
+          const lastId = Object.keys(dashboard.blocks).pop() as string;
+          // If dashboard already created (in draft), show directly the dashboard view
+          this.setState({ isDraft: true, click: (parseInt(lastId) + 1).toString() });
+        }
+      })
 
-    if (!isDashboardDraft)
-      localStorage.setItem(this.state.dashboard.id, JSON.stringify(this.state.dashboard));
+      if (!isDashboardDraft)
+        localStorage.setItem(this.state.dashboard.id, JSON.stringify(this.state.dashboard));
+    }
   }
 
   updateLayout = (layout: LayoutModel[]) => {
@@ -75,8 +72,6 @@ export default class DashboardSelectionControl extends Component<
         layout: layout,
       },
     });
-    // Update localStorage
-
   };
 
   updateSelectedBlock = (blockSelectedId: string) => {
@@ -85,9 +80,14 @@ export default class DashboardSelectionControl extends Component<
 
   updateDashboardMetadata = (data) => {
     this.setState({ dashboard: { ...this.state.dashboard, ...data } });
-    // Update localStorage
   }
 
+
+  /**
+   * Update configuration metaData (selected models and scenarios)
+   * @param data Block confi metaData
+   * @param idBlock In case of controling dataBlocks by controlBlock (so the control block is not necessarily selected, we need mandatory the id of controlBlock)
+   */
   updateBlockMetaData = (data, idBlock = "") => {
     const dashboard = this.state.dashboard;
     // store the selected data
@@ -96,7 +96,6 @@ export default class DashboardSelectionControl extends Component<
       blockSelectedId = idBlock;
     } else {
       blockSelectedId = this.state.blockSelectedId;
-
     }
     let metaData = dashboard.blocks[blockSelectedId].config.metaData;
     metaData = { ...metaData, ...data };
@@ -104,7 +103,6 @@ export default class DashboardSelectionControl extends Component<
     this.setState({
       dashboard: { ...this.state.dashboard, blocks: dashboard.blocks },
     });
-    // Update localStorage
 
   };
 
@@ -136,7 +134,6 @@ export default class DashboardSelectionControl extends Component<
       click: this.state.click + 1,
     };
     this.setState(state);
-    // Update localStorage
 
   };
 

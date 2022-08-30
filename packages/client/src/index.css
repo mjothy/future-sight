@@ -183,7 +183,5 @@ body {
 }
 
 .selected-layout-master{
-  border: 1px solid #ffa270;
   box-shadow: inset 0 0 0.5em #fbff2a, 0 0 1em #eaff2a;
-
 }

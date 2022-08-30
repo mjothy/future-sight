@@ -123,8 +123,8 @@ class DashboardConfigView extends Component<any, any> {
           <div
             key={layout.i}
             className={
-              this.props.blockSelectedId === layout.i ? 'selected-layout' : ''
-              // this.props.blockSelectedId === layout.i ? 'selected-layout' : ( blocks[layout.i ].controlBlock === this.props.blockSelectedId ? 'selected-layout-master' : '')
+              blocks[this.props.blockSelectedId]?.blockType === "data" ? (this.props.blockSelectedId === layout.i ? 'selected-layout' : (blocks[this.props.blockSelectedId]?.controlBlock === layout.i ? 'selected-layout-master' : '')
+              ) : (this.props.blockSelectedId === layout.i ? 'selected-layout' : (blocks[layout.i]?.controlBlock === this.props.blockSelectedId && blocks[layout.i]?.controlBlock !== "" ? 'selected-layout-master' : ''))
             }
           >
             <div

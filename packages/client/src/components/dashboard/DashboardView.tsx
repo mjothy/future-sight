@@ -3,7 +3,6 @@ import {
   ComponentPropsWithDataManager,
   Dashboard,
   DashboardModel,
-  DataModel,
   LayoutModel,
 } from '@future-sight/common';
 import React from 'react';
@@ -49,9 +48,6 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
     if (this.props.readonly) {
       this.props.setEnableSwitchEmbeddedMode(true);
     }
-
-
-
   };
 
   componentWillUnmount = () => {
@@ -60,11 +56,9 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
     }
   };
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps, prevState, snapshot) {      
+    // Check if the dashboard exist or it's new
     if (prevProps.isDraft !== this.props.isDraft && this.props.isDraft) {
-      // Check if the dashboard exist or it's new
-      console.log("this.props.isDraft: ", this.props.isDraft);
-      console.log("enter here !!!");
       this.setState({ isSubmited: true })
     }
   }

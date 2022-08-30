@@ -28,7 +28,7 @@ export default class Dashboard extends Component<DashboardProps, any> {
   constructor(props) {
     super(props);
     this.state = {
-      sidebarVisible: true,
+      sidebarVisible: false,
       placement: 'right',
     };
   }

@@ -1,6 +1,9 @@
 import { Table } from 'antd';
 import { Component } from 'react';
 
+/**
+ * To show all meta data selected to work with in the dashboard
+ */
 export default class AnalysisDataTable extends Component<any, any> {
   columns;
 
@@ -21,13 +24,16 @@ export default class AnalysisDataTable extends Component<any, any> {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (this.props.structureData !== prevProps.structureData) {
+    if (this.props.dataStructure !== prevProps.dataStructure) {
       this.prepareDataSource();
     }
   }
 
+  /**
+   * Transform the dataStructure selected in comboBox into representable data (data that antd table can handle)
+   */
   prepareDataSource() {
-    const data = this.props.structureData;
+    const data = this.props.dataStructure;
 
     if (data != null) {
       const dataSource: any[] = [];

@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { Button, Col, Input, Row, Tag, Tooltip } from 'antd';
 import { UserOutlined, TagOutlined, EditFilled } from '@ant-design/icons';
 
+/**
+ * To set dashboard global information (title, author and tags)
+ */
 export default class UserDataForm extends Component<any, any> {
   saveInputRef;
   constructor(props) {
@@ -74,7 +77,6 @@ export default class UserDataForm extends Component<any, any> {
 
   render() {
     const { tags, inputVisible, inputValue } = this.state;
-    console.log("dashboard: ", this.props.dashboard.userData);
     return (
       <Row justify="space-evenly">
         <Col xs={20} sm={20} md={6} lg={7}>

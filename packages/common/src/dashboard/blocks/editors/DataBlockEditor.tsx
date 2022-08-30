@@ -4,6 +4,9 @@ import { Option } from 'antd/lib/mentions';
 import DataBlockTableSelection from './DataBlockTableSelection';
 import BlockModel from '../../../models/BlockModel';
 
+/**
+ * The form in sidebar to add/edit dara block
+ */
 export default class DataBlockEditor extends Component<any, any> {
   variables: string[] = [];
   regions: string[] = [];

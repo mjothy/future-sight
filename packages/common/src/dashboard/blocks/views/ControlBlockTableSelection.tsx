@@ -60,7 +60,7 @@ export default class ControlBlockTableSelection extends Component<any, any> {
      */
     prepareDataTable() {
         const models = this.props.models;
-        const data : any= [];
+        const data: any = [];
         if (models != null) {
             Object.keys(models).map((modelKey) => {
                 models[modelKey].map((scenarioKey) => {
@@ -73,22 +73,22 @@ export default class ControlBlockTableSelection extends Component<any, any> {
             });
         }
 
-        this.setState({data})
+        this.setState({ data })
     }
 
     onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-          const models: { [id: string]: string[] } = {};
-          newSelectedRowKeys.map((row) => {
+        const models: { [id: string]: string[] } = {};
+        newSelectedRowKeys.map((row) => {
             const modelScenario = row.toString().split('/');
             if (models[modelScenario[0]] == null) models[modelScenario[0]] = [];
 
             models[modelScenario[0]].push(modelScenario[1]);
-          });
-          const metaData = this.props.currentBlock.config.metaData;
-          metaData.master['models'].values = models;
-          this.props.updateBlockMetaData({ master: metaData.master }, this.props.currentBlock.id);
-          // Update the selected data variable
-          this.selectedData = this.props.currentBlock.config.metaData.master['models'].values;
+        });
+        const metaData = this.props.currentBlock.config.metaData;
+        metaData.master['models'].values = models;
+        this.props.updateBlockMetaData({ master: metaData.master }, this.props.currentBlock.id);
+        // Update the selected data variable
+        this.selectedData = this.props.currentBlock.config.metaData.master['models'].values;
 
     };
 

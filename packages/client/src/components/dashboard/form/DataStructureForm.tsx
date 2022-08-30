@@ -3,6 +3,9 @@ import { Button, Col, Divider, Row, Select } from 'antd';
 import AnalysisDataTable from './AnalysisDataTable';
 import { Option } from 'antd/lib/mentions';
 
+/**
+ * Make the user selected all metaData of models and scenarios
+ */
 class DataStructureForm extends Component<any, any> {
   data = {};
   scenarioSelectRef = React.createRef();
@@ -35,7 +38,7 @@ class DataStructureForm extends Component<any, any> {
   }
 
   /**
-   * Trigged when the list of selection models changed
+   * Triggered when the list of selection models changed
    * to update the list of scenarios
    */
   modelSelectionChange = (modelSelected: string) => {
@@ -130,7 +133,7 @@ class DataStructureForm extends Component<any, any> {
         <Divider />
 
         <Row justify="center">
-          <AnalysisDataTable structureData={this.props.structureData} />
+          <AnalysisDataTable dataStructure={this.props.dashboard.dataStructure} />
         </Row>
       </div>
     );

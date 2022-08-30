@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-  LeftCircleFilled,
   MenuUnfoldOutlined,
   PicLeftOutlined,
   PicRightOutlined,
@@ -31,7 +30,7 @@ export default class Sidebar extends Component<any, any> {
         width={500}
         visible={this.props.sidebarVisible}
         onClose={this.props.setVisibility}
-        closeIcon={<MenuUnfoldOutlined />}
+        closeIcon={<MenuUnfoldOutlined style={{ fontSize: '20px' }} />}
         maskClosable={true}
         mask={true}
         className={'drawer'}
@@ -40,8 +39,9 @@ export default class Sidebar extends Component<any, any> {
         }
         extra={
           <Space>
-            <Button onClick={backToSetup} value="left">
-              <LeftCircleFilled /> Back to set up
+            <Button onClick={backToSetup} value="left" danger>
+              {/* <LeftCircleFilled />  */}
+              Back to set up
             </Button>
             <Button onClick={this.props.setPlacement} value="left">
               <PicLeftOutlined />

@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import AddButton from './actions/AddButton';
-import { DashboardProps } from '../Dashboard';
 import { Button, Col, Row } from 'antd';
+import { DashboardProps } from '../Dashboard';
 
 const actions = [
   {
@@ -21,8 +21,7 @@ const actions = [
 /**
  * Dashboard control: to set the block type and send a notification to parent (Dashboard) to add/edit block
  */
-// export default class DashboardControl extends Component<DashboardProps, any> {
-export default class DashboardControl extends Component<any, any> {
+export default class DashboardControl extends Component<DashboardProps, any> {
 
   constructor(props) {
     super(props);
@@ -47,11 +46,11 @@ export default class DashboardControl extends Component<any, any> {
           ))}
         </Row>
         <Row>
-            <Col span={24}>
-        <Button type="primary" className='width-100 mt-20' onClick={this.props.saveDashboard}>
-          Publish
-        </Button>
-            </Col>
+          <Col span={24}>
+            <Button type="primary" className='width-100 mt-20' onClick={this.props.saveDashboard}>
+              Publish
+            </Button>
+          </Col>
         </Row>
       </div>
     );

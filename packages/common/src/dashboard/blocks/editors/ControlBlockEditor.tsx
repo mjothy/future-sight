@@ -5,6 +5,9 @@ import { Option } from 'antd/lib/mentions';
 import { Component } from 'react'
 import DataBlockTableSelection from './DataBlockTableSelection';
 
+/**
+ * The form in sidebar to add/edit control block
+ */
 export default class ControlBlockEditor extends Component<any, any> {
 
   variables: string[] = [];
