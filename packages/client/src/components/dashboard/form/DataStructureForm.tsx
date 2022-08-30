@@ -30,6 +30,8 @@ class DataStructureForm extends Component<any, any> {
     this.props.dataManager.fetchModels().then((data) => {
       this.setState({ models: data });
     });
+
+    this.setState({ data: { ...this.props.dashboard.dataStructure } })
   }
 
   /**
@@ -66,7 +68,7 @@ class DataStructureForm extends Component<any, any> {
       const model = this.state.selectedModel;
       this.state.selectedScenarios.map((scenario) => {
         // to set variables and regions
-        data[model][scenario] = this.state.models[model][scenario]
+        data[model][scenario] = this.state.models[model][scenario];
       });
       this.props.handleStructureData(data);
       this.resetForm();
@@ -122,7 +124,7 @@ class DataStructureForm extends Component<any, any> {
         </Row>
         <Row justify="center">
           <Button type="primary" onClick={this.addDataToTable}>
-            Add as analysis data{' '}
+            Add as analysis data
           </Button>
         </Row>
         <Divider />

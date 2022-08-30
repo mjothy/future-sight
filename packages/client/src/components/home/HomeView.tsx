@@ -33,9 +33,6 @@ const HomeView: React.FC = () => {
           )
         }
       </Image.PreviewGroup>
-
-
-
     </>
   );
 };
