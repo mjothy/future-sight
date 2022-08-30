@@ -11,13 +11,13 @@ export default class DataBlockView extends Component<any, any> {
    */
   getPlotData = () => {
     // 2 options: if the block controlled or not
+    // if the models is control, it will take the data from his master
     const { currentBlock } = this.props;
     const metaData: BlockDataModel = currentBlock.config.metaData;
     if (currentBlock.controlBlock !== "") {
       const controlBlock = this.props.blocks[currentBlock.controlBlock].config.metaData;
       if (controlBlock.master["models"].isMaster)
         metaData.models = controlBlock.master["models"].values;
-      console.log("metaData.models1: ", metaData.models);
       if (controlBlock.master["variables"].isMaster)
         metaData.variables = controlBlock.master["variables"].values;
       if (controlBlock.master["regions"].isMaster)
@@ -25,7 +25,6 @@ export default class DataBlockView extends Component<any, any> {
     }
     const data: any[] = [];
     if (metaData.models && metaData.variables && metaData.regions) {
-      console.log("metaData.models2: ", metaData.models);
       Object.keys(metaData.models).map((model) => {
         metaData.models[model].map((scenario) => {
           metaData.variables.map((variable) => {
@@ -84,7 +83,6 @@ export default class DataBlockView extends Component<any, any> {
   }
 
   preparePlotData(dataElement, configStyle) {
-    console.log("dataElement: ", dataElement);
     let obj = {};
     switch (configStyle.graphType) {
       case "area":

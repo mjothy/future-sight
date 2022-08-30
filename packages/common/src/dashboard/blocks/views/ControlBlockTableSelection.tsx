@@ -45,7 +45,6 @@ export default class ControlBlockTableSelection extends Component<any, any> {
     }
 
     extractSelectedRowKeys(data) {
-        console.log("data: ", data);
         const selectedRowKeys: React.Key[] = [];
         Object.keys(data).map((modelKey) => {
             data[modelKey].map((scenario) =>
@@ -61,7 +60,6 @@ export default class ControlBlockTableSelection extends Component<any, any> {
      */
     prepareDataTable() {
         const models = this.props.models;
-        console.log("call and models: ", this.props.models);
         const data : any= [];
         if (models != null) {
             Object.keys(models).map((modelKey) => {
