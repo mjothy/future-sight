@@ -6,7 +6,7 @@ const HomeView: React.FC = () => {
   const [draftFromURL, setDraftFromURL] = useState('');
 
   return (
-    <>
+    <div className='container'>
       <h2>Welcome to FutureSight!</h2>
       <Button type="primary">
         <Link to="draft">Create a new Dashboard</Link>
@@ -33,7 +33,7 @@ const HomeView: React.FC = () => {
           )
         }
       </Image.PreviewGroup>
-    </>
+    </div>
   );
 };
 

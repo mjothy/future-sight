@@ -24,7 +24,8 @@ export default class PlotlyGraph extends Component<any, any> {
             },
             font: {
                 size: 10
-            }
+            },
+            hoverInfo: "djjdjdjd"
         };
         if (currentBlock.config.configStyle.title.isVisible) {
             layout = { ...layout, title: currentBlock.config.configStyle.title.value };

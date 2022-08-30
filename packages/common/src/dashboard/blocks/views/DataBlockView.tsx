@@ -94,6 +94,7 @@ export default class DataBlockView extends Component<any, any> {
           mode: 'none',
           name: dataElement.model + '/' + dataElement.scenario,
           showlegend: configStyle.showLegend,
+          text: this.plotHoverText(dataElement)
         };
         break;
       default:
@@ -103,10 +104,23 @@ export default class DataBlockView extends Component<any, any> {
           y: this.getY(dataElement),
           name: dataElement.model + '/' + dataElement.scenario,
           showlegend: configStyle.showLegend,
+          text: this.plotHoverText(dataElement)
         };
     }
 
     return obj;
+  }
+
+  plotHoverText = (dataElement) => {
+    let textHover = ""
+    const result: string[] = [];
+
+    dataElement.data.map(e => {
+      textHover = dataElement.model + "/" + dataElement.scenario + "<br>" + "region:" + dataElement.region + "<br>" + "variable: " + dataElement.variable;
+      result.push(textHover);
+    })
+
+    return result;
   }
 
   /**
