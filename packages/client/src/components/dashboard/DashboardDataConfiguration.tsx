@@ -5,8 +5,8 @@ import { RoutingProps } from '../app/Routing';
 import DashboardSelectionControl from './DashboardSelectionControl';
 
 export interface DashboardDataConfigurationProps
-  extends ComponentPropsWithDataManager, RoutingProps {
-}
+  extends ComponentPropsWithDataManager,
+    RoutingProps {}
 
 /**
  * To dispatch the data to all blocks of dashboard
@@ -65,8 +65,8 @@ class DashboardDataConfiguration extends Component<
   /**
    * To limit requests to IASA API, we verify if we have already fetched the element
    * Check if this.data contains that element (already fetched by other block)
-   * @param reqData 
-   * @returns Data element if it's exist (null if not) 
+   * @param reqData
+   * @returns Data element if it's exist (null if not)
    */
   isDataExist = (reqData: DataModel) => {
     const data = this.state.data;

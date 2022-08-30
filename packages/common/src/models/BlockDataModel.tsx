@@ -10,18 +10,17 @@ export default class BlockDataModel {
    * If type of block is control
    */
   master = {
-    "models": {
+    models: {
       isMaster: false,
-      values: []
+      values: [],
     },
-    "regions": {
+    regions: {
       isMaster: false,
-      values: []
+      values: [],
     },
-    "variables": {
+    variables: {
       isMaster: false,
-      values: []
+      values: [],
     },
-  }
-
+  };
 }

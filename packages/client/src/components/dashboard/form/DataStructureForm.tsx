@@ -34,7 +34,7 @@ class DataStructureForm extends Component<any, any> {
       this.setState({ models: data });
     });
 
-    this.setState({ data: { ...this.props.dashboard.dataStructure } })
+    this.setState({ data: { ...this.props.dashboard.dataStructure } });
   }
 
   /**
@@ -100,11 +100,11 @@ class DataStructureForm extends Component<any, any> {
               value={this.state.selectedModel}
               onChange={this.modelSelectionChange}
             >
-              {
-                Object.keys(this.state.models).map(model =>
-                  <Option key={model} value={model}>
-                    {model}
-                  </Option>)}
+              {Object.keys(this.state.models).map((model) => (
+                <Option key={model} value={model}>
+                  {model}
+                </Option>
+              ))}
             </Select>
           </Col>
 
@@ -133,7 +133,9 @@ class DataStructureForm extends Component<any, any> {
         <Divider />
 
         <Row justify="center">
-          <AnalysisDataTable dataStructure={this.props.dashboard.dataStructure} />
+          <AnalysisDataTable
+            dataStructure={this.props.dashboard.dataStructure}
+          />
         </Row>
       </div>
     );

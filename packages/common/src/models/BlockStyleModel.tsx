@@ -1,8 +1,8 @@
 export default class BlockStyleModel {
-  graphType = "line";
+  graphType = 'line';
   showLegend = false;
   title = {
-    value: "Title",
-    isVisible: true
-  }
+    value: 'Title',
+    isVisible: true,
+  };
 }

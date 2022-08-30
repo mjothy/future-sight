@@ -6,7 +6,7 @@ const HomeView: React.FC = () => {
   const [draftFromURL, setDraftFromURL] = useState('');
 
   return (
-    <div className='container'>
+    <div className="container">
       <h2>Welcome to FutureSight!</h2>
       <Button type="primary">
         <Link to="draft">Create a new Dashboard</Link>
@@ -24,14 +24,15 @@ const HomeView: React.FC = () => {
       <Divider />
       <h3>Latest submissions</h3>
       <Image.PreviewGroup>
-        {
-          Object.keys(localStorage).map(key =>
-            <Link key={key} to={"draft?id=" + key}>          <Image width={200} height={200}
+        {Object.keys(localStorage).map((key) => (
+          <Link key={key} to={'draft?id=' + key}>
+            <Image
+              width={200}
+              height={200}
               src="https://webcolours.ca/wp-content/uploads/2020/10/webcolours-unknown.png"
             />
-            </Link>
-          )
-        }
+          </Link>
+        ))}
       </Image.PreviewGroup>
     </div>
   );

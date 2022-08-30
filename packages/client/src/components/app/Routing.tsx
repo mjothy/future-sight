@@ -15,7 +15,10 @@ export default class Routing extends React.Component<RoutingProps> {
       <Routes>
         <Route index element={<HomeView />} />
         <Route path="login" element={<Login />} />
-        <Route path="draft" element={<DashboardDataConfiguration {...this.props} />} />
+        <Route
+          path="draft"
+          element={<DashboardDataConfiguration {...this.props} />}
+        />
         <Route
           path="view"
           element={<DashboardDataConfiguration readonly {...this.props} />}

@@ -33,7 +33,10 @@ export default class DataBlockTableSelection extends Component<any, any> {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps.blockSelectedId !== this.props.blockSelectedId && this.props.blockSelectedId != "") {
+    if (
+      prevProps.blockSelectedId !== this.props.blockSelectedId &&
+      this.props.blockSelectedId != ''
+    ) {
       this.selectedData =
         this.props.dashboard.blocks[
           this.props.blockSelectedId
@@ -85,7 +88,10 @@ export default class DataBlockTableSelection extends Component<any, any> {
         this.props.blockSelectedId
       ].config.metaData.models;
 
-    if (this.props.dashboard.blocks[this.props.blockSelectedId].blockType === "data")
+    if (
+      this.props.dashboard.blocks[this.props.blockSelectedId].blockType ===
+      'data'
+    )
       this.props.updateDropdownData();
   };
 

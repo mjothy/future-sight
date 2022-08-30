@@ -1,5 +1,5 @@
 export default class UserDataModel {
-  title = "";
-  author = ""
+  title = '';
+  author = '';
   tags: string[] = [];
 }

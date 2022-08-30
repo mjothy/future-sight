@@ -11,7 +11,7 @@ import { RoutingProps } from '../app/Routing';
 
 interface DashboardViewProps
   extends ComponentPropsWithDataManager,
-  RoutingProps {
+    RoutingProps {
   dashboard: DashboardModel;
   addBlock: (blockType: string, masterBlockId?: string) => void;
   blockSelectedId: string;
@@ -56,10 +56,10 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
     }
   };
 
-  componentDidUpdate(prevProps, prevState, snapshot) {      
+  componentDidUpdate(prevProps, prevState, snapshot) {
     // Check if the dashboard exist or it's new
     if (prevProps.isDraft !== this.props.isDraft && this.props.isDraft) {
-      this.setState({ isSubmited: true })
+      this.setState({ isSubmited: true });
     }
   }
 
@@ -112,12 +112,7 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
   };
 
   dashboardManager = () => {
-    return (
-      <Dashboard
-        {...this.props}
-        submitSetupView={this.handleSubmit}
-      />
-    );
+    return <Dashboard {...this.props} submitSetupView={this.handleSubmit} />;
   };
   render() {
     return (

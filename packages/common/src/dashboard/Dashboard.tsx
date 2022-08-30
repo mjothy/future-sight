@@ -20,11 +20,10 @@ export interface DashboardProps extends ComponentPropsWithDataManager {
   updateBlockMetaData: (data: any) => void;
   updateBlockStyleConfig: (data: any) => void;
   saveDashboard: () => void;
-  submitSetupView: (data: any) => void
+  submitSetupView: (data: any) => void;
 }
 
 export default class Dashboard extends Component<DashboardProps, any> {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -56,7 +55,7 @@ export default class Dashboard extends Component<DashboardProps, any> {
         },
         () => {
           if (this.state.sidebarVisible === false)
-            this.props.updateSelectedBlock("");
+            this.props.updateSelectedBlock('');
         }
       );
     };

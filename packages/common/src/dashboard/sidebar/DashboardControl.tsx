@@ -22,7 +22,6 @@ const actions = [
  * Dashboard control: to set the block type and send a notification to parent (Dashboard) to add/edit block
  */
 export default class DashboardControl extends Component<DashboardProps, any> {
-
   constructor(props) {
     super(props);
   }
@@ -34,7 +33,7 @@ export default class DashboardControl extends Component<DashboardProps, any> {
   render() {
     return (
       <div>
-        <Row justify='space-between'>
+        <Row justify="space-between">
           {actions.map((action) => (
             <Col key={action.type} span="8">
               <AddButton
@@ -47,7 +46,11 @@ export default class DashboardControl extends Component<DashboardProps, any> {
         </Row>
         <Row>
           <Col span={24}>
-            <Button type="primary" className='width-100 mt-20' onClick={this.props.saveDashboard}>
+            <Button
+              type="primary"
+              className="width-100 mt-20"
+              onClick={this.props.saveDashboard}
+            >
               Publish
             </Button>
           </Col>

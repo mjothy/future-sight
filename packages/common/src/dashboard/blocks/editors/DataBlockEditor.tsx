@@ -23,7 +23,10 @@ export default class DataBlockEditor extends Component<any, any> {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     // the second condition to not update the dropdown list of ControlData
-    if (prevProps.blockSelectedId !== this.props.blockSelectedId && this.props.currentBlock.blockType === "data") {
+    if (
+      prevProps.blockSelectedId !== this.props.blockSelectedId &&
+      this.props.currentBlock.blockType === 'data'
+    ) {
       this.updateDropdownData();
       this.checkIfBlockControlled();
     }
@@ -34,14 +37,14 @@ export default class DataBlockEditor extends Component<any, any> {
    */
   checkIfBlockControlled = () => {
     const controlBlockId = this.props.currentBlock.controlBlock;
-    if (controlBlockId !== "") {
+    if (controlBlockId !== '') {
       this.isBlockControlled = true;
       this.controlBlock = this.props.blocks[controlBlockId];
     } else {
       this.isBlockControlled = false;
       this.controlBlock = new BlockModel();
     }
-  }
+  };
 
   /**
    * Update the options of dropdown lists of variables and regions
@@ -85,7 +88,6 @@ export default class DataBlockEditor extends Component<any, any> {
     });
   };
 
-
   variablesSelectionChange = (selectedVariables: string[]) => {
     this.props.updateBlockMetaData({ variables: selectedVariables });
     this.updateDropdownData();
@@ -97,18 +99,19 @@ export default class DataBlockEditor extends Component<any, any> {
   };
 
   render() {
-
     const metaData = this.props.currentBlock.config.metaData;
 
     return (
-
       <div>
-        {
-          (this.isBlockControlled && this.controlBlock.config.metaData.master["models"].isMaster) ?
-            <p>That block is controled by Model/scenario</p>
-            :
-            <DataBlockTableSelection  {...this.props} updateDropdownData={this.updateDropdownData} />
-        }
+        {this.isBlockControlled &&
+        this.controlBlock.config.metaData.master['models'].isMaster ? (
+          <p>That block is controled by Model/scenario</p>
+        ) : (
+          <DataBlockTableSelection
+            {...this.props}
+            updateDropdownData={this.updateDropdownData}
+          />
+        )}
         <Divider />
         {/* adding key, because react not updating the default value on state change */}
         <div>
@@ -119,7 +122,10 @@ export default class DataBlockEditor extends Component<any, any> {
             placeholder="Variables"
             defaultValue={metaData.variables}
             onChange={this.variablesSelectionChange}
-            disabled={this.isBlockControlled && this.controlBlock.config.metaData.master["variables"].isMaster}
+            disabled={
+              this.isBlockControlled &&
+              this.controlBlock.config.metaData.master['variables'].isMaster
+            }
           >
             {this.variables.map((variable) => (
               <Option key={variable} value={variable}>
@@ -137,7 +143,10 @@ export default class DataBlockEditor extends Component<any, any> {
             placeholder="Regions"
             defaultValue={metaData.regions}
             onChange={this.regionsSelectionChange}
-            disabled={this.isBlockControlled && this.controlBlock.config.metaData.master["regions"].isMaster}
+            disabled={
+              this.isBlockControlled &&
+              this.controlBlock.config.metaData.master['regions'].isMaster
+            }
           >
             {this.regions.map((region) => (
               <Option key={region} value={region}>

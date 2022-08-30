@@ -18,11 +18,10 @@ export default class Sidebar extends Component<any, any> {
   }
 
   render() {
-
     const backToSetup = () => {
       this.props.submitSetupView(false);
-      this.props.updateSelectedBlock("");
-    }
+      this.props.updateSelectedBlock('');
+    };
 
     return (
       <Drawer
