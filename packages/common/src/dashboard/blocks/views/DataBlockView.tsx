@@ -14,14 +14,15 @@ export default class DataBlockView extends Component<any, any> {
     // if the models is control, it will take the data from his master
     const { currentBlock } = this.props;
     const metaData: BlockDataModel = currentBlock.config.metaData;
-    if (currentBlock.controlBlock !== "") {
-      const controlBlock = this.props.blocks[currentBlock.controlBlock].config.metaData;
-      if (controlBlock.master["models"].isMaster)
-        metaData.models = controlBlock.master["models"].values;
-      if (controlBlock.master["variables"].isMaster)
-        metaData.variables = controlBlock.master["variables"].values;
-      if (controlBlock.master["regions"].isMaster)
-        metaData.regions = controlBlock.master["regions"].values;
+    if (currentBlock.controlBlock !== '') {
+      const controlBlock =
+        this.props.blocks[currentBlock.controlBlock].config.metaData;
+      if (controlBlock.master['models'].isMaster)
+        metaData.models = controlBlock.master['models'].values;
+      if (controlBlock.master['variables'].isMaster)
+        metaData.variables = controlBlock.master['variables'].values;
+      if (controlBlock.master['regions'].isMaster)
+        metaData.regions = controlBlock.master['regions'].values;
     }
     const data: any[] = [];
     if (metaData.models && metaData.variables && metaData.regions) {
@@ -41,15 +42,16 @@ export default class DataBlockView extends Component<any, any> {
   };
 
   /**
-   * Preparing the fetched data to adapt plotly data OR antd table 
+   * Preparing the fetched data to adapt plotly data OR antd table
    * @returns
    */
   settingPlotData() {
     const data: any[] = this.getPlotData();
     const showData: any[] = [];
-    const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
+    const configStyle: BlockStyleModel =
+      this.props.currentBlock.config.configStyle;
 
-    if (configStyle.graphType === "table") {
+    if (configStyle.graphType === 'table') {
       return this.prepareTableData(data);
     } else {
       data.map((dataElement) => {
@@ -60,24 +62,32 @@ export default class DataBlockView extends Component<any, any> {
   }
 
   prepareTableData(data) {
-    const columns: ColumnsType<any> = [{ title: "model", dataIndex: "model" }, { title: "scenario", dataIndex: "scenario" }, { title: "variable", dataIndex: "variable" }, { title: "region", dataIndex: "region" }];
+    const columns: ColumnsType<any> = [
+      { title: 'model', dataIndex: 'model' },
+      { title: 'scenario', dataIndex: 'scenario' },
+      { title: 'variable', dataIndex: 'variable' },
+      { title: 'region', dataIndex: 'region' },
+    ];
     for (let year = 2005; year <= 2100; year = year + 5) {
       columns.push({
         title: year,
-        dataIndex: year
-      })
+        dataIndex: year,
+      });
     }
     const values: any[] = [];
-    data.map(dataElement => {
-      const obj = {}
-      dataElement.data.map(e => {
+    data.map((dataElement) => {
+      const obj = {};
+      dataElement.data.map((e) => {
         obj[e.year] = e.value;
-      })
-      values.push({
-        model: dataElement.model, scenario: dataElement.scenario, variable: dataElement.variable,
-        region: dataElement.region, ...obj
       });
-    })
+      values.push({
+        model: dataElement.model,
+        scenario: dataElement.scenario,
+        variable: dataElement.variable,
+        region: dataElement.region,
+        ...obj,
+      });
+    });
 
     return { columns, values };
   }
@@ -85,16 +95,16 @@ export default class DataBlockView extends Component<any, any> {
   preparePlotData(dataElement, configStyle) {
     let obj = {};
     switch (configStyle.graphType) {
-      case "area":
+      case 'area':
         obj = {
-          type: "scatter",
+          type: 'scatter',
           fill: 'tozeroy',
           x: this.getX(dataElement),
           y: this.getY(dataElement),
           mode: 'none',
           name: dataElement.model + '/' + dataElement.scenario,
           showlegend: configStyle.showLegend,
-          text: this.plotHoverText(dataElement)
+          text: this.plotHoverText(dataElement),
         };
         break;
       default:
@@ -104,7 +114,7 @@ export default class DataBlockView extends Component<any, any> {
           y: this.getY(dataElement),
           name: dataElement.model + '/' + dataElement.scenario,
           showlegend: configStyle.showLegend,
-          text: this.plotHoverText(dataElement)
+          text: this.plotHoverText(dataElement),
         };
     }
 
@@ -112,16 +122,25 @@ export default class DataBlockView extends Component<any, any> {
   }
 
   plotHoverText = (dataElement) => {
-    let textHover = ""
+    let textHover = '';
     const result: string[] = [];
 
-    dataElement.data.map(e => {
-      textHover = dataElement.model + "/" + dataElement.scenario + "<br>" + "region:" + dataElement.region + "<br>" + "variable: " + dataElement.variable;
+    dataElement.data.map((e) => {
+      textHover =
+        dataElement.model +
+        '/' +
+        dataElement.scenario +
+        '<br>' +
+        'region:' +
+        dataElement.region +
+        '<br>' +
+        'variable: ' +
+        dataElement.variable;
       result.push(textHover);
-    })
+    });
 
     return result;
-  }
+  };
 
   /**
    * Extract the x axis from data

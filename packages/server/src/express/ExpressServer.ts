@@ -8,7 +8,6 @@ import models from '../data/models.json';
 import variables from '../data/variables.json';
 import regions from '../data/regions.json';
 import dashboard from '../data/dashboards.json';
-
 import allData from '../data/test-data.json';
 
 import * as fs from 'fs';
