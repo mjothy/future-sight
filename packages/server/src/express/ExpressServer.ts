@@ -126,6 +126,17 @@ export default class ExpressServer {
       res.send(dashboard);
     });
 
+    this.app.get(`/api/dashboards`, async (req, res, next) => {
+      try {
+        const dashboards = await this.dbClient
+          .getClient()
+          .json.get('dashboards');
+        res.send(dashboards);
+      } catch (e) {
+        next(e);
+      }
+    });
+
     /** START : To delete after Delete */
 
     // Prepare model data from the CSV file

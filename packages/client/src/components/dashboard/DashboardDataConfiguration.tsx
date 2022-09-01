@@ -49,6 +49,7 @@ class DashboardDataConfiguration extends Component<
     if (data) {
       try {
         return await this.props.dataManager.saveDashboard(data);
+        localStorage.removeItem(id);
       } catch (e) {
         console.error(e);
       }

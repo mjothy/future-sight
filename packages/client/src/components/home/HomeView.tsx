@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Input, Divider, Image } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import withDataManager from '../../services/withDataManager';
+import { ComponentPropsWithDataManager } from '@future-sight/common';
 
-const HomeView: React.FC = () => {
+const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
   const [draftFromURL, setDraftFromURL] = useState('');
+  const [publishedDashboards, setPublishedDashboards] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    dataManager.getDashboards().then(setPublishedDashboards);
+  }, []);
 
   return (
     <div className="container">
@@ -24,18 +32,27 @@ const HomeView: React.FC = () => {
       <Divider />
       <h3>Latest submissions</h3>
       <Image.PreviewGroup>
-        {Object.keys(localStorage).map((key) => (
-          <Link key={key} to={'draft?id=' + key}>
+        {Object.keys(publishedDashboards).map((key) => {
+          // Remove the last char, which is the dot added by the datamanager
+          // (see the getDashboards method in the DataManager.tsx)
+          const actualKey = key.slice(0, -1);
+          return (
             <Image
+              key={actualKey}
               width={200}
               height={200}
               src="https://webcolours.ca/wp-content/uploads/2020/10/webcolours-unknown.png"
+              onClick={() => {
+                navigate('view?id=' + actualKey, {
+                  state: { dashboard: publishedDashboards[key] },
+                });
+              }}
             />
-          </Link>
-        ))}
+          );
+        })}
       </Image.PreviewGroup>
     </div>
   );
 };
 
-export default HomeView;
+export default withDataManager(HomeView);
