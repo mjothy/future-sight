@@ -88,8 +88,8 @@ export default class DataManager implements IDataManager {
       .catch(console.error);
   };
 
-  getDashboard = () => {
-    return fetch(`${this.getBaseUrl()}/dashboard`)
+  getDashboard = (id: string) => {
+    return fetch(`${this.getBaseUrl()}/dashboards/${id}`)
       .then((response) => response.json())
       .then((data) => {
         return data;

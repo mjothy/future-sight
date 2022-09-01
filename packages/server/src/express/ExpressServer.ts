@@ -111,8 +111,9 @@ export default class ExpressServer {
           .getClient()
           .json.set('dashboards', `.${id}`, req.body);
         res.send(JSON.stringify({ id: id }));
-      } catch (e) {
-        next(e);
+      } catch (err) {
+        console.error(err);
+        next(err);
       }
     });
 
@@ -126,14 +127,28 @@ export default class ExpressServer {
       res.send(dashboard);
     });
 
+    this.app.get(`/api/dashboards/:id`, async (req, res, next) => {
+      try {
+        const id = req.params.id;
+        const dashboard = await this.dbClient
+          .getClient()
+          .json.get('dashboards', { path: [`.${id}`] });
+        res.send(dashboard);
+      } catch (err) {
+        console.error(err);
+        next(err);
+      }
+    });
+
     this.app.get(`/api/dashboards`, async (req, res, next) => {
       try {
         const dashboards = await this.dbClient
           .getClient()
           .json.get('dashboards');
         res.send(dashboards);
-      } catch (e) {
-        next(e);
+      } catch (err) {
+        console.error(err);
+        next(err);
       }
     });
 

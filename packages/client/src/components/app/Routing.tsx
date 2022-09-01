@@ -1,5 +1,4 @@
 import { Route, Routes } from 'react-router-dom';
-import DashboardView from '../dashboard/DashboardView';
 import Login from '../login/Login';
 import React from 'react';
 import HomeView from '../home/HomeView';

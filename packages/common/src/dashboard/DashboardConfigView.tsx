@@ -10,7 +10,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
  */
 class DashboardConfigView extends Component<any, any> {
   static propTypes = {
-    layouts: PropTypes.arrayOf(PropTypes.object),
+    layout: PropTypes.arrayOf(PropTypes.object),
     updateLayout: PropTypes.func,
     updateSelectedBlock: PropTypes.func,
   };

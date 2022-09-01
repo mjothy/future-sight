@@ -1,4 +1,8 @@
-import { ComponentPropsWithDataManager, DataModel } from '@future-sight/common';
+import {
+  ComponentPropsWithDataManager,
+  DataModel,
+  ReadOnlyDashboard,
+} from '@future-sight/common';
 import React, { Component } from 'react';
 import withDataManager from '../../services/withDataManager';
 import { RoutingProps } from '../app/Routing';
@@ -6,7 +10,9 @@ import DashboardSelectionControl from './DashboardSelectionControl';
 
 export interface DashboardDataConfigurationProps
   extends ComponentPropsWithDataManager,
-    RoutingProps {}
+    RoutingProps {
+  readonly?: boolean;
+}
 
 /**
  * To dispatch the data to all blocks of dashboard
@@ -89,7 +95,11 @@ class DashboardDataConfiguration extends Component<
   };
 
   render() {
-    return (
+    const { readonly } = this.props;
+
+    return readonly ? (
+      <ReadOnlyDashboard getData={this.getData} {...this.props} />
+    ) : (
       <DashboardSelectionControl
         getData={this.getData}
         saveData={this.saveData}

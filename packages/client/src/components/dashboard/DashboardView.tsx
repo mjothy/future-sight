@@ -44,18 +44,6 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
     };
   }
 
-  componentDidMount = () => {
-    if (this.props.readonly) {
-      this.props.setEnableSwitchEmbeddedMode(true);
-    }
-  };
-
-  componentWillUnmount = () => {
-    if (this.props.readonly) {
-      this.props.setEnableSwitchEmbeddedMode(false);
-    }
-  };
-
   componentDidUpdate(prevProps, prevState, snapshot) {
     // Check if the dashboard exist or it's new
     if (prevProps.isDraft !== this.props.isDraft && this.props.isDraft) {
