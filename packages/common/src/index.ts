@@ -8,3 +8,4 @@ export type { default as DataModel } from './models/DataModel';
 export { default as DashboardModel } from './models/DashboardModel';
 export { default as BlockModel } from './models/BlockModel';
 export { default as LayoutModel } from './models/LayoutModel';
+export type { DashboardProps } from './dashboard/Dashboard';

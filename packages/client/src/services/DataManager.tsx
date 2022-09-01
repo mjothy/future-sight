@@ -21,7 +21,7 @@ export default class DataManager implements IDataManager {
       .then((data) => {
         return data;
       })
-      .catch((err) => err);
+      .catch(console.error);
   };
 
   fetchAllData = () => {
@@ -35,7 +35,7 @@ export default class DataManager implements IDataManager {
       .then((data) => {
         return data;
       })
-      .catch((err) => err);
+      .catch(console.error);
   };
 
   fetchModels = () => {
@@ -44,7 +44,7 @@ export default class DataManager implements IDataManager {
       .then((data) => {
         return data;
       })
-      .catch((err) => err);
+      .catch(console.error);
   };
 
   fetchVariables = (data: ModelScenarioData) => {
@@ -57,7 +57,7 @@ export default class DataManager implements IDataManager {
       .then((data) => {
         return data;
       })
-      .catch((err) => err);
+      .catch(console.error);
   };
 
   fetchRegions = (data: ModelScenarioData) => {
@@ -70,7 +70,7 @@ export default class DataManager implements IDataManager {
       .then((data) => {
         return data;
       })
-      .catch((err) => err);
+      .catch(console.error);
   };
 
   addDashboard = (data) => {
@@ -85,7 +85,7 @@ export default class DataManager implements IDataManager {
       .then((data) => {
         return data;
       })
-      .catch((err) => err);
+      .catch(console.error);
   };
 
   getDashboard = () => {
@@ -94,7 +94,7 @@ export default class DataManager implements IDataManager {
       .then((data) => {
         return data;
       })
-      .catch((err) => err);
+      .catch(console.error);
   };
 
   saveDashboard = async (data) => {

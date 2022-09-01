@@ -15,7 +15,7 @@ export interface DashboardSelectionControlProps
   extends ComponentPropsWithDataManager,
     RoutingProps {
   getData: (data: DataModel[]) => any[];
-  saveData: () => void;
+  saveData: (id: string) => Promise<any>;
 }
 
 export default class DashboardSelectionControl extends Component<
@@ -149,6 +149,14 @@ export default class DashboardSelectionControl extends Component<
     this.setState(state);
   };
 
+  saveData = async (callback?: () => void) => {
+    const { id } = this.state.dashboard;
+    await this.props.saveData(id);
+    if (callback) {
+      callback();
+    }
+  };
+
   render() {
     return (
       <DashboardView
@@ -161,7 +169,7 @@ export default class DashboardSelectionControl extends Component<
         updateSelectedBlock={this.updateSelectedBlock}
         updateBlockMetaData={this.updateBlockMetaData}
         updateBlockStyleConfig={this.updateBlockStyleConfig}
-        saveDashboard={this.props.saveData}
+        saveDashboard={this.saveData}
         updateDashboardMetadata={this.updateDashboardMetadata}
         isDraft={this.state.isDraft}
         {...this.props}

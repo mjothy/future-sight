@@ -44,11 +44,14 @@ class DashboardDataConfiguration extends Component<
     return this.settingPlotData(data);
   };
 
-  saveData = async () => {
-    const data = localStorage.getItem('data');
+  saveData = async (id: string) => {
+    const data = localStorage.getItem(id);
     if (data) {
-      const res = await this.props.dataManager.saveDashboard(data);
-      console.log(res);
+      try {
+        return await this.props.dataManager.saveDashboard(data);
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 
