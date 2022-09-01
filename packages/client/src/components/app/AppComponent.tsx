@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { notification } from 'antd';
 import Navbar from '../navbar/Navbar';
 import Routing from './Routing';
@@ -11,9 +11,7 @@ const AppComponent: React.FC = () => {
   const [isEmbedded, setIsEmbedded] = useState(false);
   const [enableSwitchEmbeddedMode, setEnableSwitchEmbeddedMode] =
     useState(false);
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Escape key press handler to exit embedded mode if activated
   const handleEscKeyPress = (evt) => {
@@ -22,9 +20,8 @@ const AppComponent: React.FC = () => {
       escPressed = evt.key === 'Escape' || evt.key === 'Esc';
     }
     if (escPressed && isEmbedded) {
-      navigate({
-        pathname: location.pathname,
-      });
+      searchParams.delete('embedded');
+      setSearchParams(searchParams);
     }
   };
 
