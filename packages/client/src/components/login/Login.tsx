@@ -15,12 +15,8 @@ class Login extends React.Component {
 
   render() {
     return (
-      <div className="loginForm">
-        <Form
-          onFinish={this.onFinish}
-          labelCol={{ span: 4 }}
-          wrapperCol={{ span: 8 }}
-        >
+      <div className="loginFormWrapper">
+        <Form className="loginForm" onFinish={this.onFinish}>
           <Form.Item
             label="Username"
             name="username"
@@ -37,7 +33,7 @@ class Login extends React.Component {
             <Input.Password />
           </Form.Item>
 
-          <Form.Item wrapperCol={{ offset: 4, span: 8 }}>
+          <Form.Item className="loginFormButton">
             <Button type="primary" htmlType="submit">
               Submit
             </Button>
