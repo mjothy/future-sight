@@ -4,6 +4,7 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
 import DashboardModel from '../models/DashboardModel';
 import DataModel from '../models/DataModel';
+import LayoutModel from '../models/LayoutModel';
 import DashboardConfigView from './DashboardConfigView';
 
 interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
@@ -20,6 +21,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = ({
 }) => {
   const [dashboard, setDashboard] = useState<DashboardModel | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [blockSelectedId, setBlockSelectedId] = useState('');
   const location = useLocation();
   const [searchParams] = useSearchParams();
 
@@ -51,12 +53,29 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = ({
             layout={dashboard.layout}
             blocks={dashboard.blocks}
             getData={getData}
-            updateLayout={() => {
-              // do nothing
+            updateLayout={(layout: LayoutModel[]) => {
+              setDashboard({ ...dashboard, layout: layout });
             }}
-            updateSelectedBlock={() => {
-              // do nothing
+            updateSelectedBlock={(blockSelectedId: string) => {
+              setBlockSelectedId(blockSelectedId);
             }}
+            blockSelectedId={blockSelectedId}
+            updateBlockMetaData={(data, idBlock) => {
+              if (blockSelectedId === '') {
+                setBlockSelectedId(idBlock);
+              }
+              let metaData = dashboard.blocks[idBlock].config.metaData;
+              metaData = { ...metaData, ...data };
+              dashboard.blocks[blockSelectedId].config.metaData = metaData;
+              setDashboard({ ...dashboard, blocks: dashboard.blocks });
+            }}
+            updateBlockStyleConfig={(data) => {
+              dashboard.blocks[blockSelectedId].config.configStyle = data;
+              setDashboard({ ...dashboard, blocks: dashboard.blocks });
+            }}
+            updateDashboardMetadata={(data) =>
+              setDashboard({ ...dashboard, ...data })
+            }
           />
         )}
       </div>
