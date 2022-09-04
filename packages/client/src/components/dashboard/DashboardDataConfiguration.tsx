@@ -3,7 +3,7 @@ import {
   DataModel,
   ReadOnlyDashboard,
 } from '@future-sight/common';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import withDataManager from '../../services/withDataManager';
 import { RoutingProps } from '../app/Routing';
 import DashboardSelectionControl from './DashboardSelectionControl';
@@ -54,8 +54,9 @@ class DashboardDataConfiguration extends Component<
     const data = localStorage.getItem(id);
     if (data) {
       try {
-        return await this.props.dataManager.saveDashboard(data);
+        const res = await this.props.dataManager.saveDashboard(data);
         localStorage.removeItem(id);
+        return res;
       } catch (e) {
         console.error(e);
       }
