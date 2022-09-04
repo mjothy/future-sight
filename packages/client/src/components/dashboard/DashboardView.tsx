@@ -21,7 +21,7 @@ interface DashboardViewProps
   updateSelectedBlock: (blockSelectedId: string) => void;
   updateBlockMetaData: (data: any) => void;
   updateBlockStyleConfig: (data: any) => void;
-  saveDashboard: () => void;
+  saveDashboard: (callback: () => void) => void;
   updateDashboardMetadata: (data: any) => void;
   isDraft: boolean;
   readonly?: boolean;
@@ -43,18 +43,6 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
       data: [],
     };
   }
-
-  componentDidMount = () => {
-    if (this.props.readonly) {
-      this.props.setEnableSwitchEmbeddedMode(true);
-    }
-  };
-
-  componentWillUnmount = () => {
-    if (this.props.readonly) {
-      this.props.setEnableSwitchEmbeddedMode(false);
-    }
-  };
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     // Check if the dashboard exist or it's new

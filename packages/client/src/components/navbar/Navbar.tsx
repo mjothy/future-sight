@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Menu, Tooltip, Switch } from 'antd';
 import {
   HomeOutlined,
@@ -23,20 +23,12 @@ const Navbar: React.FC<NavbarProps> = ({
   const normalModeTitle = 'Switch to normal mode';
   const [embeddedTooltipTitle, setEmbeddedTooltipTitle] =
     useState(embeddedModeTitle);
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const switchEmbeddedMode = (checked) => {
     if (checked) {
-      navigate({
-        pathname: location.pathname,
-        search: '?embedded',
-      });
+      searchParams.append('embedded', '');
+      setSearchParams(searchParams);
       setEmbeddedTooltipTitle(normalModeTitle);
-    } else {
-      navigate({
-        pathname: location.pathname,
-      });
-      setEmbeddedTooltipTitle(embeddedModeTitle);
     }
   };
 

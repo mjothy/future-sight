@@ -14,10 +14,8 @@ export default class RedisClient {
   initialize = async () => {
     try {
       const dashboards = await this.client.json.get('dashboards', '$');
-      console.log(dashboards);
       if (!dashboards) {
-        const res = await this.client.json.set('dashboards', '$', []);
-        console.log(res);
+        await this.client.json.set('dashboards', '$', {});
       }
     } catch (err) {
       console.error(err);

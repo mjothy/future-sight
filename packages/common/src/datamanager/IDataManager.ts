@@ -16,7 +16,9 @@ export default interface IDataManager {
 
   addDashboard: (data: DataModel) => Promise<any>;
 
-  getDashboard: () => Promise<any>;
+  getDashboard: (id: string) => Promise<any>;
+
+  getDashboards: () => Promise<any>;
 
   saveDashboard: (data: any) => Promise<any>;
 }

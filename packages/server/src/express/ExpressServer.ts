@@ -13,6 +13,9 @@ import allData from '../data/test-data.json';
 import * as fs from 'fs';
 import RedisClient from '../redis/RedisClient';
 
+import util from 'util';
+const setTimeoutPromise = util.promisify(setTimeout);
+
 export default class ExpressServer {
   private app: any;
   private readonly port: number;
@@ -68,7 +71,8 @@ export default class ExpressServer {
           res.status(200).send(e);
         }
       });
-      res.status(404).send([]);
+      // Commenting the following line because it causes the front to crash somehow...
+      // res.status(404).send([]);
     });
 
     this.app.get('/api/models', (req, res) => {
@@ -100,12 +104,18 @@ export default class ExpressServer {
     });
 
     // Posts methods
-    this.app.post(`/api/dashboard/save`, async (req, res) => {
-      const data = JSON.parse(req.body);
-      const id = await this.dbClient.getClient().incr('dashboards:id');
-      // TODO: change id in data ?
-      // await this.dbClient.getClient().json.arrAppend('dashboards', '.', data);
-      res.send(id);
+    this.app.post(`/api/dashboard/save`, async (req, res, next) => {
+      try {
+        await setTimeoutPromise(1000);
+        const id = await this.dbClient.getClient().incr('dashboards:id');
+        await this.dbClient
+          .getClient()
+          .json.set('dashboards', `.${id}`, req.body);
+        res.send(JSON.stringify({ id: id }));
+      } catch (err) {
+        console.error(err);
+        next(err);
+      }
     });
 
     this.app.post(`/api/dashboard`, (req, res) => {
@@ -116,6 +126,31 @@ export default class ExpressServer {
 
     this.app.get(`/api/dashboard`, (req, res) => {
       res.send(dashboard);
+    });
+
+    this.app.get(`/api/dashboards/:id`, async (req, res, next) => {
+      try {
+        const id = req.params.id;
+        const dashboard = await this.dbClient
+          .getClient()
+          .json.get('dashboards', { path: [`.${id}`] });
+        res.send(dashboard);
+      } catch (err) {
+        console.error(err);
+        next(err);
+      }
+    });
+
+    this.app.get(`/api/dashboards`, async (req, res, next) => {
+      try {
+        const dashboards = await this.dbClient
+          .getClient()
+          .json.get('dashboards');
+        res.send(dashboards);
+      } catch (err) {
+        console.error(err);
+        next(err);
+      }
     });
 
     /** START : To delete after Delete */
