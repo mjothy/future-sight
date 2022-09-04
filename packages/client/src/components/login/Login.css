@@ -1,19 +1,7 @@
 .loginFormWrapper {
   width: 100%;
-  height: 100%;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-}
-
-.loginForm {
-  width: 33%;
-  display: flex;
   flex-direction: column;
-}
-
-.loginFormButton .ant-form-item-control-input-content {
-  display: flex;
-  justify-content: center;
 }

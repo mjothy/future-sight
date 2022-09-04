@@ -1,6 +1,7 @@
 .content-wrapper {
-  height: calc(100% - (60px + 60px));
+  /* height: 1px; */
   min-height: calc(
     100% - (60px + 60px)
   ); /* 100% minus the navbar and the footer's height */
+  padding: 40px 40px;
 }
