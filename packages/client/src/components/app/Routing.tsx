@@ -1,9 +1,9 @@
 import { Route, Routes } from 'react-router-dom';
-import DashboardView from '../dashboard/DashboardView';
 import Login from '../login/Login';
 import React from 'react';
 import HomeView from '../home/HomeView';
 import DashboardDataConfiguration from '../dashboard/DashboardDataConfiguration';
+import DraftsView from '../drafts/DraftsView';
 
 export interface RoutingProps {
   setEnableSwitchEmbeddedMode: (enable: boolean) => void;
@@ -15,6 +15,7 @@ export default class Routing extends React.Component<RoutingProps> {
       <Routes>
         <Route index element={<HomeView />} />
         <Route path="login" element={<Login />} />
+        <Route path="drafts" element={<DraftsView />} />
         <Route
           path="draft"
           element={<DashboardDataConfiguration {...this.props} />}
