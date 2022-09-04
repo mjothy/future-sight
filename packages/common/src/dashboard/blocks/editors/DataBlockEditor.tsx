@@ -1,8 +1,9 @@
 import { Component } from 'react';
 import { Divider, Select } from 'antd';
-import { Option } from 'antd/lib/mentions';
 import DataBlockTableSelection from './DataBlockTableSelection';
 import BlockModel from '../../../models/BlockModel';
+
+const { Option } = Select;
 
 /**
  * The form in sidebar to add/edit dara block

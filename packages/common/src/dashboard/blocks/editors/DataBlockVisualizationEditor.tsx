@@ -1,8 +1,9 @@
 import { Col, Input, Row, Select } from 'antd';
 import Checkbox from 'antd/es/checkbox';
-import { Option } from 'antd/lib/mentions';
 import { Component } from 'react';
 import BlockStyleModel from '../../../models/BlockStyleModel';
+
+const { Option } = Select;
 
 const plotTypes = ['line', 'bar', 'area', 'table'];
 

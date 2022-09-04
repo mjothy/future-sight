@@ -1,9 +1,9 @@
-import { Button } from 'antd';
-import { Col, Row, Select } from 'antd';
+import { Button, Col, Row, Select } from 'antd';
 import Checkbox from 'antd/es/checkbox';
-import { Option } from 'antd/lib/mentions';
 import { Component } from 'react';
 import DataBlockTableSelection from './DataBlockTableSelection';
+
+const { Option } = Select;
 
 /**
  * The form in sidebar to add/edit control block
