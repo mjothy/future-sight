@@ -2,6 +2,7 @@ import { Component } from 'react';
 import { Divider, Select } from 'antd';
 import DataBlockTableSelection from './DataBlockTableSelection';
 import BlockModel from '../../../models/BlockModel';
+import ConfigurationModel from '../../../models/ConfigurationModel';
 
 const { Option } = Select;
 
@@ -105,7 +106,9 @@ export default class DataBlockEditor extends Component<any, any> {
     return (
       <div>
         {this.isBlockControlled &&
-        this.controlBlock.config.metaData.master['models'].isMaster ? (
+        (this.controlBlock.config as ConfigurationModel).metaData.master[
+          'models'
+        ].isMaster ? (
           <p>That block is controled by Model/scenario</p>
         ) : (
           <DataBlockTableSelection
@@ -125,7 +128,9 @@ export default class DataBlockEditor extends Component<any, any> {
             onChange={this.variablesSelectionChange}
             disabled={
               this.isBlockControlled &&
-              this.controlBlock.config.metaData.master['variables'].isMaster
+              (this.controlBlock.config as ConfigurationModel).metaData.master[
+                'variables'
+              ].isMaster
             }
           >
             {this.variables.map((variable) => (
@@ -146,7 +151,9 @@ export default class DataBlockEditor extends Component<any, any> {
             onChange={this.regionsSelectionChange}
             disabled={
               this.isBlockControlled &&
-              this.controlBlock.config.metaData.master['regions'].isMaster
+              (this.controlBlock.config as ConfigurationModel).metaData.master[
+                'regions'
+              ].isMaster
             }
           >
             {this.regions.map((region) => (

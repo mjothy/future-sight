@@ -2,6 +2,7 @@ import { Spin } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
+import ConfigurationModel from '../models/ConfigurationModel';
 import DashboardModel from '../models/DashboardModel';
 import DataModel from '../models/DataModel';
 import LayoutModel from '../models/LayoutModel';
@@ -64,14 +65,17 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = ({
               if (blockSelectedId === '') {
                 setBlockSelectedId(idBlock);
               }
-              let metaData =
-                dashboard.blocks[blockSelectedId]?.config?.metaData;
+              const config = dashboard.blocks[blockSelectedId]
+                .config as ConfigurationModel;
+              let metaData = config.metaData;
               metaData = { ...metaData, ...data };
-              dashboard.blocks[blockSelectedId].config.metaData = metaData;
+              config.metaData = metaData;
               setDashboard({ ...dashboard, blocks: dashboard.blocks });
             }}
             updateBlockStyleConfig={(data) => {
-              dashboard.blocks[blockSelectedId].config.configStyle = data;
+              (
+                dashboard.blocks[blockSelectedId].config as ConfigurationModel
+              ).configStyle = data;
               setDashboard({ ...dashboard, blocks: dashboard.blocks });
             }}
             updateDashboardMetadata={(data) =>

@@ -1,7 +1,12 @@
-import React, { Component } from 'react';
+import React from 'react';
+import MDEditor from '@uiw/react-md-editor';
 
-export default class TextBlockView extends Component {
-  render() {
-    return <div>TextBlockView</div>;
-  }
+interface TextBlockViewProps {
+  currentBlock: any;
 }
+
+const TextBlockView: React.FC<TextBlockViewProps> = ({ currentBlock }) => {
+  return <MDEditor.Markdown source={currentBlock.config.value} />;
+};
+
+export default TextBlockView;

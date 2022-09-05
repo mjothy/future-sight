@@ -1,7 +1,20 @@
-import React, { Component } from 'react';
+import React from 'react';
+import MDEditor from '@uiw/react-md-editor';
+import rehypeSanitize from 'rehype-sanitize';
 
-export default class TextBlockEditor extends Component<any, any> {
-  render() {
-    return <div>TextBlock</div>;
-  }
-}
+const TextBlockEditor: React.FC<any> = (props) => {
+  return (
+    <MDEditor
+      value={props.currentBlock.config.value}
+      onChange={(value?: string | undefined) => {
+        props.updateBlockMetaData(value, props.currentBlock['id']);
+      }}
+      previewOptions={{
+        rehypePlugins: [[rehypeSanitize]],
+      }}
+      preview="edit"
+    />
+  );
+};
+
+export default TextBlockEditor;
