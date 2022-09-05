@@ -7,6 +7,7 @@ import DraftsView from '../drafts/DraftsView';
 import DefaultLayout from './DefaultLayout';
 
 export interface RoutingProps {
+  isEmbedded: boolean
   setEnableSwitchEmbeddedMode: (enable: boolean) => void;
 }
 

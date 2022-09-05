@@ -11,6 +11,7 @@ import DashboardConfigView from './DashboardConfigView';
 interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
   getData: (data: DataModel[]) => any[];
   setEnableSwitchEmbeddedMode: (enable: boolean) => void;
+  isEmbedded?: boolean;
 }
 
 type LocationState = { dashboard: DashboardModel };
@@ -19,6 +20,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = ({
   getData,
   dataManager,
   setEnableSwitchEmbeddedMode,
+  isEmbedded,
 }) => {
   const [dashboard, setDashboard] = useState<DashboardModel | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,7 +47,10 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = ({
   }, []);
 
   return (
-    <div className="dashboard">
+    <div
+      className="dashboard"
+      style={{ height: isEmbedded ? '100%' : undefined }}
+    >
       <div className="dashboard-content">
         {(isLoading || !dashboard) && <Spin />}
         {dashboard && (

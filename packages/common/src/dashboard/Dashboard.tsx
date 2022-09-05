@@ -21,6 +21,7 @@ export interface DashboardProps extends ComponentPropsWithDataManager {
   updateBlockStyleConfig: (data: any) => void;
   saveDashboard: (callback: () => void) => void;
   submitSetupView: (data: any) => void;
+  isEmbedded?: boolean;
 }
 
 export default class Dashboard extends Component<DashboardProps, any> {
@@ -65,7 +66,10 @@ export default class Dashboard extends Component<DashboardProps, any> {
     };
 
     return (
-      <div className="dashboard">
+      <div
+        className="dashboard"
+        style={{ height: this.props.isEmbedded ? '100%' : undefined }}
+      >
         <Sidebar
           sidebarVisible={this.state.sidebarVisible}
           placement={this.state.placement}
