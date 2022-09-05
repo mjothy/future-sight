@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Input, Divider, Image } from 'antd';
+import { Button, Input, Divider, Image, notification } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import withDataManager from '../../services/withDataManager';
 import { ComponentPropsWithDataManager } from '@future-sight/common';
+import { v1 as uuidv1 } from 'uuid';
 import './HomeView.css';
 
 const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
@@ -26,6 +27,29 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
     }
   };
 
+  const draftFromURLOnClick = () => {
+    const parse = new URL(draftFromURL).searchParams.get('id');
+    console.log(parse);
+    if (parse) {
+      const find = Object.keys(publishedDashboards).find(
+        (key) => key === `${parse}.`
+      );
+      if (find) {
+        let uuid = uuidv1();
+        // Make sure that the key is not already took
+        while (localStorage.getItem(uuid)) {
+          uuid = uuidv1();
+        }
+        localStorage.setItem(uuid, JSON.stringify(publishedDashboards[find]));
+        navigate('draft?id=' + uuid);
+      }
+    }
+    notification.error({
+      message: 'Could not find the dashboard',
+      description: 'Please check the url',
+    });
+  };
+
   return (
     <div className="home-view-wrapper">
       <h2>Welcome to FutureSight!</h2>
@@ -37,7 +61,11 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
           {getDraftsElement()}
         </div>
         <Input.Group style={{ display: 'flex', flexDirection: 'row' }}>
-          <Button type="primary" disabled={!draftFromURL}>
+          <Button
+            type="primary"
+            disabled={!draftFromURL}
+            onClick={draftFromURLOnClick}
+          >
             Start from another Dashboard
           </Button>
           <Input
