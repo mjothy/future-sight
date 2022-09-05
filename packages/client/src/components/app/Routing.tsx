@@ -4,6 +4,7 @@ import React from 'react';
 import HomeView from '../home/HomeView';
 import DashboardDataConfiguration from '../dashboard/DashboardDataConfiguration';
 import DraftsView from '../drafts/DraftsView';
+import DefaultLayout from './DefaultLayout';
 
 export interface RoutingProps {
   setEnableSwitchEmbeddedMode: (enable: boolean) => void;
@@ -13,9 +14,12 @@ export default class Routing extends React.Component<RoutingProps> {
   render() {
     return (
       <Routes>
-        <Route index element={<HomeView />} />
-        <Route path="login" element={<Login />} />
-        <Route path="drafts" element={<DraftsView />} />
+        <Route element={<DefaultLayout />}>
+          {/* <Route path="login" element={<Login />} /> */}
+          <Route path="drafts" element={<DraftsView />} />
+          <Route index element={<HomeView />} />
+        </Route>
+
         <Route
           path="draft"
           element={<DashboardDataConfiguration {...this.props} />}

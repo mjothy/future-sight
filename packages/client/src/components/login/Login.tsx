@@ -15,11 +15,13 @@ class Login extends React.Component {
 
   render() {
     return (
-      <div className="loginForm">
+      <div className="loginFormWrapper">
+        <h2>Log in to FutureSight</h2>
         <Form
+          labelCol={{ span: 8 }}
+          wrapperCol={{ span: 16 }}
           onFinish={this.onFinish}
-          labelCol={{ span: 4 }}
-          wrapperCol={{ span: 8 }}
+          style={{ margin: '1%' }}
         >
           <Form.Item
             label="Username"
@@ -37,7 +39,7 @@ class Login extends React.Component {
             <Input.Password />
           </Form.Item>
 
-          <Form.Item wrapperCol={{ offset: 4, span: 8 }}>
+          <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
             <Button type="primary" htmlType="submit">
               Submit
             </Button>

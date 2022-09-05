@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Button, Col, Divider, Row, Select } from 'antd';
 import AnalysisDataTable from './AnalysisDataTable';
-import { Option } from 'antd/lib/mentions';
+
+const { Option } = Select;
 
 /**
  * Make the user selected all metaData of models and scenarios

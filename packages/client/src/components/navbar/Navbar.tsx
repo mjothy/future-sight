@@ -39,7 +39,11 @@ const Navbar: React.FC<NavbarProps> = ({
           <img src={Logo} alt="Logo" />
         </Menu.Item>
 
-        <Menu.Item key="home" icon={<HomeOutlined />}>
+        <Menu.Item
+          key="home"
+          icon={<HomeOutlined />}
+          style={{ backgroundColor: '#001529' }}
+        >
           <Link to={'/'}>Home</Link>
         </Menu.Item>
 
@@ -56,9 +60,9 @@ const Navbar: React.FC<NavbarProps> = ({
           </Menu.Item>
         )}
 
-        <Menu.Item key="login" icon={<LoginOutlined />}>
+        {/* <Menu.Item key="login" icon={<LoginOutlined />}>
           <Link to={'/login'}>Login</Link>
-        </Menu.Item>
+        </Menu.Item> */}
       </Menu>
     </div>
   );

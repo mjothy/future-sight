@@ -88,14 +88,16 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
 
   dashboardAddForm = () => {
     return (
-      <SetupView
-        {...this.props}
-        userData={this.props.dashboard.userData}
-        structureData={this.props.dashboard.dataStructure}
-        submitEvent={this.handleSubmit}
-        updateUserData={this.handleUserData}
-        handleStructureData={this.handleStructureData}
-      />
+      <div className="content-wrapper">
+        <SetupView
+          {...this.props}
+          userData={this.props.dashboard.userData}
+          structureData={this.props.dashboard.dataStructure}
+          submitEvent={this.handleSubmit}
+          updateUserData={this.handleUserData}
+          handleStructureData={this.handleStructureData}
+        />
+      </div>
     );
   };
 
@@ -104,11 +106,11 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
   };
   render() {
     return (
-      <div className="height-100">
+      <>
         {this.state.isSubmited
           ? this.dashboardManager()
           : this.dashboardAddForm()}
-      </div>
+      </>
     );
   }
 }

@@ -1,7 +1,9 @@
 import { Col, Row, Select } from 'antd';
-import { Option } from 'antd/lib/mentions';
 import { Component } from 'react';
 import ControlBlockTableSelection from './ControlBlockTableSelection';
+
+const { Option } = Select;
+
 export default class ControlBlockView extends Component<any, any> {
   render() {
     const { currentBlock } = this.props;
