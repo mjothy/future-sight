@@ -64,7 +64,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = ({
               if (blockSelectedId === '') {
                 setBlockSelectedId(idBlock);
               }
-              let metaData = dashboard.blocks[idBlock].config.metaData;
+              let metaData = dashboard.blocks[blockSelectedId]?.config?.metaData;
               metaData = { ...metaData, ...data };
               dashboard.blocks[blockSelectedId].config.metaData = metaData;
               setDashboard({ ...dashboard, blocks: dashboard.blocks });
