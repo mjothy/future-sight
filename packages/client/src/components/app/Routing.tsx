@@ -1,15 +1,35 @@
-import {Route, Routes} from 'react-router-dom'
-import DashboardView from "../dashboard/DashboardView";
-import Login from './Login';
-import React from "react";
+import { Route, Routes } from 'react-router-dom';
+import Login from '../login/Login';
+import React from 'react';
+import HomeView from '../home/HomeView';
+import DashboardDataConfiguration from '../dashboard/DashboardDataConfiguration';
+import DraftsView from '../drafts/DraftsView';
+import DefaultLayout from './DefaultLayout';
 
-export default class Routing extends React.Component {
-    render () {
-        return (
-            <Routes>
-                <Route index element={<DashboardView />} />
-                <Route path="login" element={<Login />} />
-            </Routes>
-        )
-    }
+export interface RoutingProps {
+  isEmbedded: boolean
+  setEnableSwitchEmbeddedMode: (enable: boolean) => void;
+}
+
+export default class Routing extends React.Component<RoutingProps> {
+  render() {
+    return (
+      <Routes>
+        <Route element={<DefaultLayout />}>
+          {/* <Route path="login" element={<Login />} /> */}
+          <Route path="drafts" element={<DraftsView />} />
+          <Route index element={<HomeView />} />
+        </Route>
+
+        <Route
+          path="draft"
+          element={<DashboardDataConfiguration {...this.props} />}
+        />
+        <Route
+          path="view"
+          element={<DashboardDataConfiguration readonly {...this.props} />}
+        />
+      </Routes>
+    );
+  }
 }

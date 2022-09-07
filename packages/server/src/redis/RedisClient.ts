@@ -1,25 +1,37 @@
 import { createClient } from 'redis';
 
-
-
 export default class RedisClient {
-    private client: any;
-    constructor(url) {
-        this.client = createClient({
-            url: url
-        });
+  private client: any;
 
-        this.client.on('error', this.onError);
-    }
+  constructor(url) {
+    this.client = createClient({
+      url: url,
+    });
 
-    startup = async () => {
-        await this.client.connect();
-    }
+    this.client.on('error', this.onError);
+  }
 
-    onError = (err) => {
-        console.log('Redis Client Error', err)
+  initialize = async () => {
+    try {
+      const dashboards = await this.client.json.get('dashboards', '$');
+      if (!dashboards) {
+        await this.client.json.set('dashboards', '$', {});
+      }
+    } catch (err) {
+      console.error(err);
     }
-    getClient = () => {
-        return this.client;
-    }
+  };
+
+  startup = async () => {
+    await this.client.connect();
+    await this.initialize();
+  };
+
+  onError = (err) => {
+    console.log('Redis Client Error', err);
+  };
+
+  getClient = () => {
+    return this.client;
+  };
 }

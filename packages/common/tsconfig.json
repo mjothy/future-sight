@@ -7,7 +7,5 @@
     "rootDir": "src",
     "outDir": "build"
   },
-  "include": [
-    "src","assets"
-  ]
+  "include": ["src", "assets"]
 }

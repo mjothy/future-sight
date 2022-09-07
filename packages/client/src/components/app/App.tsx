@@ -1,20 +1,20 @@
-import { useState } from "react";
-import {BrowserRouter} from "react-router-dom";
-import DataManager from "../../services/DataManager";
-import DataManagerContextProvider from "../../services/DataManagerContextProvider";
+import { useState } from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import DataManager from '../../services/DataManager';
+import DataManagerContextProvider from '../../services/DataManagerContextProvider';
 
-import "./App.css";
-import AppComponent from "./AppComponent";
+import './App.css';
+import AppComponent from './AppComponent';
 
 const dataManager = new DataManager();
 
 export default function App() {
-  const [apiResponse, setApiResponse] = useState("");
+  const [apiResponse, setApiResponse] = useState('');
 
   const onCallApi = async () => {
     try {
-      const response = await fetch("/api", {
-        method: "GET",
+      const response = await fetch('/api', {
+        method: 'GET',
       });
       const text = await response.text();
       console.log(text);
@@ -23,10 +23,10 @@ export default function App() {
       console.error(error);
       throw error;
     }
-  }
+  };
 
   return (
-    <div className="App">
+    <div className="app">
       <BrowserRouter>
         <DataManagerContextProvider dataManager={dataManager}>
           <AppComponent />

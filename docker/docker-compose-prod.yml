@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  redis:
+    image: redislabs/rejson:2.2.0
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - redis_data:/data
+volumes:
+  redis_data:
+    driver: local

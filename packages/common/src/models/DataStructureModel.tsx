@@ -1,4 +1,1 @@
-
-export default class DataStructureModel {
-
-}
+export default class DataStructureModel {}

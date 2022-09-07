@@ -1,12 +1,18 @@
-import ConfigurationModel from "./ConfigurationModel";
+import ConfigurationModel from './ConfigurationModel';
+import TextConfigurationModel from './TextConfigurationModel';
 
 export default class BlockModel {
-    constructor(id?:string, blockType?:string){
-        this.id = id;
-        this.blockType = blockType;
+  constructor(id?: string, blockType?: string) {
+    this.id = id;
+    this.blockType = blockType;
+    if (blockType === 'text') {
+      this.config = new TextConfigurationModel();
+    } else {
+      this.config = new ConfigurationModel();
     }
-    id:string|undefined;
-    blockType:string | undefined;
-    config:ConfigurationModel = new ConfigurationModel();
-    controlBlock: string | undefined;
+  }
+  id: string | undefined;
+  blockType: string | undefined;
+  config: ConfigurationModel | TextConfigurationModel;
+  controlBlock = '';
 }
