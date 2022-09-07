@@ -1,8 +1,4 @@
-.App {
-  text-align: center;
-  margin-top: 10%;
-}
-
-.icon {
-  margin-left: 5px;
+.app {
+    height: 100vh;
+    width: 100vw;
 }

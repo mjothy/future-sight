@@ -1,26 +1,31 @@
-import express from 'express';
-import cors from 'cors';
-import { join } from 'path';
+import RedisClient from "./redis/RedisClient";
+import ExpressServer from "./express/ExpressServer";
+import basicAuth from 'express-basic-auth'
 
-import { App_Name } from '@future-sight/common';
-const clientPath = '../../client/build';
-const app = express();
-app.use(cors());
-const port = 8080; // default port to listen
+const DEFAULT_PORT = 8080
+const DEFAULT_COOKIE_KEY = "8azoijuem2aois3Qsjeir"
+const DEV_REDIS_URL = 'redis://localhost:6379'
+// Environment parsing
+const username = process.env.USERNAME;
+const password = process.env.PASSWORD;
+const port = process.env.PORT ? process.env.PORT : DEFAULT_PORT
+const cookieKey = process.env.COOKIE_KEY ? process.env.COOKIE_KEY : DEFAULT_COOKIE_KEY
+const clientPath = process.env.NODE_ENV ==='production' ? './public' : '../../../client/public';
+const redisUrl = process.env.REDIS ? process.env.REDIS : DEV_REDIS_URL;
+// redis initialisation
+const redisClient = new RedisClient(redisUrl)
 
-// Serve static resources from the "public" folder (ex: when there are images to display)
-app.use(express.static(join(__dirname, clientPath)));
+// Backend initialisation
+let auth;
+if (username && password ) {
+    auth = basicAuth({
+        users: { [username]: password },
+        challenge: true
+    })
+}
+const app = new ExpressServer(port, cookieKey, auth, clientPath)
 
-app.get('/api', (req, res) => {
-    res.send(`Hello ${App_Name}, From server`);
-});
-
-// Serve the HTML page
-app.get('*', (req: any, res: any) => {
-    res.sendFile(join(__dirname, clientPath, 'index.html'));
-});
-
-// start the Express server
-app.listen(port, () => {
-    console.log(`app ${App_Name} started at http://localhost:${port}` );
-});
+// Startup
+redisClient.startup().then(r => {
+    app.startup()
+})

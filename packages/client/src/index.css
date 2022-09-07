@@ -1,13 +1,147 @@
+@import '~antd/dist/antd.css';
+@import '~react-grid-layout/css/styles.css';
+@import '~react-resizable/css/styles.css';
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  max-height: 100vh;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.App {
+  max-height: 100vh;
+}
+
+.center {
+  text-align: center;
+}
+
+.width-100 {
+  width: 100%;
+}
+
+.width-90 {
+  width: 90%;
+}
+
+.width-80 {
+  width: 80%;
+}
+
+.width-60 {
+  width: 60%;
+}
+
+.height-100 {
+  height: 100%;
+}
+
+.bg-secondry {
+  background-color: #F6F8FA;
+}
+
+.bg-primary {
+  background-color: #001529;
+}
+
+.height-100 {
+  height: 100%;
+}
+
+/* navbar */
+.ant-menu.ant-menu-dark {
+  position: fixed;
+  z-index: 1;
+  width: 100%;
+  height: 60px;
+  padding: 5px;
+}
+
+.menu-navbar {
+  padding: 0 20px;
+  justify-content: flex-end;
+}
+
+.content {
+  margin: 2% 10%;
+  padding-top: 1%;
+  padding-bottom: 1%;
+}
+
+/* Dashboard */
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.dashboard .sidebar {
+  background-color: #001529;
+  padding: 20px;
+  min-height: 100%;
+}
+
+.dashboard .dashboard-content {
+  margin: 10px;
+  padding: 10px;
+  background-color: azure;
+  width: 100%;
+}
+
+.dashboard .sidebar-resizer {
+  background-color: #c1c3c5b4;
+  min-height: 100%;
+  width: 8px;
+  cursor: col-resize;
+  resize: horizontal;
+}
+
+.dashboard .sidebar-resizer:hover {
+  width: 10px;
+  background: #c1c3c5b4;
+}
+
+.hide-sidebar {
+  display: none;
+}
+
+/* Table */
+.ant-table-thead>tr>th,
+.ant-table-tbody>tr>td,
+.ant-table tfoot>tr>th,
+.ant-table tfoot>tr>td {
+  padding: 6px;
+}
+
+/* Tag input */
+.tag-input-content {
+  padding: 4px 11px;
+  font-size: 14px;
+  line-height: 1.5715;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+  transition: all 0.3s;
+  display: inline-flex;
+  height: auto;
+  width: 100%;
+}
+
+.tag-input {
+  width: 30% !important;
+}
+
+/* Drawer */
+.drawer {
+  margin-top: 60px;
+  width: 30% !important;
+}
+
+.space-div {
+  min-height: 60px;
+}
+
+.selected-layout {
+  border: 1px solid #8d70ff;
+  box-shadow: inset 0 0 0.5em #2a8bff, 0 0 1em #2a8bff;
 }

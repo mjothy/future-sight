@@ -1,18 +1,19 @@
-import React , { useState } from 'react';
-import { Grid, TextField, Fab } from '@material-ui/core';
+import { useState } from "react";
+import {BrowserRouter} from "react-router-dom";
+import DataManager from "../../services/DataManager";
+import DataManagerContextProvider from "../../services/DataManagerContextProvider";
 
-import { CloudDownloadRounded } from '@material-ui/icons';
+import "./App.css";
+import AppComponent from "./AppComponent";
 
-import { App_Name } from '@future-sight/common';
-
-import './App.css';
+const dataManager = new DataManager();
 
 export default function App() {
   const [apiResponse, setApiResponse] = useState("");
 
   const onCallApi = async () => {
     try {
-      const response = await fetch('/api', {
+      const response = await fetch("/api", {
         method: "GET",
       });
       const text = await response.text();
@@ -23,24 +24,14 @@ export default function App() {
       throw error;
     }
   }
+
   return (
     <div className="App">
-      <Grid container spacing={6} justifyContent="center" direction="column">
-        <Grid item>
-          {`Client App Name - ${ App_Name } `}
-        </Grid>
-        <Grid item>
-          <Fab variant="extended" color="primary" onClick={onCallApi}>
-            <CloudDownloadRounded className="icon"/>
-            Call API
-          </Fab>
-        </Grid>
-        {apiResponse &&
-          <Grid item>
-            {`Server Response - ${ apiResponse } `}
-          </Grid>
-        }
-      </Grid>
+      <BrowserRouter>
+        <DataManagerContextProvider dataManager={dataManager}>
+          <AppComponent />
+        </DataManagerContextProvider>
+      </BrowserRouter>
     </div>
   );
 }

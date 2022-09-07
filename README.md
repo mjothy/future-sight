@@ -79,6 +79,12 @@ This enables running client react app at http://localhost:3000 with proxy to run
 
 - See [link](https://create-react-app.dev/docs/proxying-api-requests-in-development/) for more information.
 
+You will need to launch the redis server provided by the docker-compose-redis.yml file :
+In the docker/ folder, run:
+```
+docker-compose -f docker-compose-redis.yml up -d
+```
+
 ### Production mode
 
 Running <code>yarn server start</code> runs the web application with transpiled code of its workspaces.

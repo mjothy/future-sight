@@ -5,16 +5,28 @@
   "license": "MIT",
   "private": true,
   "workspaces": [
-     "packages/*"
+    "packages/*"
   ],
   "devDependencies": {
-    "lerna": "^4.0.0"
+    "@types/copyfiles": "^2.4.1",
+    "@types/node": "^18.7.1",
+    "@types/rimraf": "^3.0.2",
+    "esbuild": "^0.15.1",
+    "esbuild-css-modules-plugin": "^2.5.1",
+    "lerna": "^4.0.0",
+    "rimraf": "^3.0.2",
+    "shx": "^0.3.4",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4"
   },
   "scripts": {
     "client": "yarn workspace @future-sight/client dev",
-    "common": "yarn workspace @future-sight/common",
+    "common": "yarn workspace @future-sight/common watch",
     "server": "yarn workspace @future-sight/server dev",
-    "dev": "yarn client & yarn server --verbose",
-    "start": "yarn server start"
+    "clean": "shx rm -rf build",
+    "copy": "shx cp -r packages/client/build build/public",
+    "build": "ts-node ./scripts/build.ts",
+    "build-all": "yarn clean && yarn build && yarn workspace @future-sight/client build && yarn copy",
+    "serve": "node ./build/index.js"
   }
 }
