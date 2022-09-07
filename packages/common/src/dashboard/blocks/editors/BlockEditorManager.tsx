@@ -33,7 +33,12 @@ export default class BlockEditorManager extends Component<any, any> {
             />
           );
       case 'text':
-        return <TextBlockEditor {...this.props} currentBlock={currentBlock} />;
+        return (
+          <TextBlockEditor
+            {...this.props}
+            currentBlock={currentBlock}
+          />
+        );
       case 'control':
         return (
           <ControlBlockEditor {...this.props} currentBlock={currentBlock} />
