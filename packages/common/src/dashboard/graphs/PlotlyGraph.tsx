@@ -1,45 +1,57 @@
-import React, { Component } from 'react'
+import { Table } from 'antd';
+import React, { Component } from 'react';
 import Plot from 'react-plotly.js';
 
-// get masters of the block and render only the filter informations
 export default class PlotlyGraph extends Component<any, any> {
-
-    data: any[] = [];
-    constructor(props) {
-        super(props);
+  render() {
+    const { currentBlock } = this.props;
+    const config = {
+      displayModeBar: false, // this is the line that hides the bar.
+      editable: false,
+      showlegend: currentBlock.config.configStyle.showLegend,
+      showTitle: false,
+    };
+    let layout: any = {
+      width: this.props.width,
+      height: this.props.height,
+      legend: { orientation: 'h' },
+      autosize: false,
+      margin: {
+        l: 40,
+        r: 40,
+        b: 40,
+        t: 40,
+        pad: 4,
+      },
+      font: {
+        size: 10,
+      },
+      hoverInfo: 'djjdjdjd',
+    };
+    if (currentBlock.config.configStyle.title.isVisible) {
+      layout = {
+        ...layout,
+        title: currentBlock.config.configStyle.title.value,
+      };
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        const data = this.props.data;
-        if (data) {
-            console.log("visualizeData: ", data.visualizeData);
-            data.visualizeData.map(dataElement => {
-                const obj = {
-                    type: "line",
-                    x: this.getX(dataElement),
-                    y: this.getY(dataElement)
-                };
-                this.data.push(obj);
-            })
-        }
-    }
-    getX = (data) => {
-        const x: string[] = [];
-        data.data.map(d => x.push(d.year))
-        return x;
-    }
-
-    getY = (data) => {
-        const y: string[] = [];
-        data.data.map(d => y.push(d.value))
-        return y;
-    }
-    render() {
-        return (
-            <Plot
-                data={this.data}
-                layout={{ width: this.props.width, height: this.props.height }}
-            />
-        )
-    }
+    return currentBlock.config.configStyle.graphType === 'table' ? (
+      <Table
+        // Make the height 100% of the div (not working)
+        style={{ minHeight: '100%' }}
+        columns={this.props.data.columns}
+        dataSource={this.props.data.values}
+        pagination={false}
+        scroll={{ x: 3000, y: this.props.height - 40 }}
+        bordered
+      />
+    ) : (
+      <Plot
+        key={this.props.currentBlock.id}
+        data={this.props.data}
+        layout={layout}
+        config={config}
+      />
+    );
+  }
 }

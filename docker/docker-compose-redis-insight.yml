@@ -1,0 +1,6 @@
+version: "3.8"
+services:
+  redisinsight:
+    image: redislabs/redisinsight
+    ports:
+      - "8001:8001"

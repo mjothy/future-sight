@@ -1,0 +1,15 @@
+.navbar {
+  height: 60px;
+}
+
+.navbar .logo-wrapper {
+  pointer-events: none;
+}
+
+.navbar img {
+  height: 45px;
+}
+
+.right-navbar {
+  justify-content: flex-end;
+}
