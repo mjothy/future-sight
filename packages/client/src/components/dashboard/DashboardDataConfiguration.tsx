@@ -7,6 +7,7 @@ import { Component } from 'react';
 import withDataManager from '../../services/withDataManager';
 import { RoutingProps } from '../app/Routing';
 import DashboardSelectionControl from './DashboardSelectionControl';
+import {getDraft, removeDraft} from "../drafts/DraftUtils";
 
 export interface DashboardDataConfigurationProps
   extends ComponentPropsWithDataManager,
@@ -51,11 +52,11 @@ class DashboardDataConfiguration extends Component<
   };
 
   saveData = async (id: string) => {
-    const data = localStorage.getItem(id);
+    const data = getDraft(id);
     if (data) {
       try {
         const res = await this.props.dataManager.saveDashboard(data);
-        localStorage.removeItem(id);
+        removeDraft(id)
         return res;
       } catch (e) {
         console.error(e);

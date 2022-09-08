@@ -10,6 +10,8 @@ import { v1 as uuidv1 } from 'uuid';
 import { RoutingProps } from '../app/Routing';
 
 import DashboardView from './DashboardView';
+import {getDraft, setDraft} from "../drafts/DraftUtils";
+import { Spin } from 'antd';
 
 export interface DashboardSelectionControlProps
   extends ComponentPropsWithDataManager,
@@ -25,7 +27,7 @@ export default class DashboardSelectionControl extends Component<
   constructor(props) {
     super(props);
     this.state = {
-      dashboard: new DashboardModel(uuidv1()),
+      dashboard: undefined,
       sidebarVisible: false,
 
       /**
@@ -40,43 +42,33 @@ export default class DashboardSelectionControl extends Component<
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevState.dashboard != this.state.dashboard) {
-      localStorage.setItem(
-        this.state.dashboard.id,
-        JSON.stringify(this.state.dashboard)
-      );
+      setDraft(this.state.dashboard.id, this.state.dashboard);
     }
   }
 
   componentDidMount() {
     // Check first if dashboard in draft
-    let isDashboardDraft = false;
     const w_location = window.location.pathname;
     if (w_location.includes('draft')) {
       const locationSearch = window.location.search;
       const params = new URLSearchParams(locationSearch);
       const id = params.get('id');
-
-      Object.keys(localStorage).map((key) => {
-        if (key === id) {
-          const dashboardString = localStorage.getItem(key) as string;
-          const dashboard = JSON.parse(dashboardString);
-          this.setState({ dashboard });
-          isDashboardDraft = true;
-          // get last block id
-          const lastId = Object.keys(dashboard.blocks).pop() as string;
-          // If dashboard already created (in draft), show directly the dashboard view
-          this.setState({
-            isDraft: true,
-            click: (parseInt(lastId) + 1).toString(),
-          });
+      const dashboardJson = getDraft(id);
+      if (dashboardJson) {
+        this.setState({ dashboard: dashboardJson });
+        // get last block id
+        let lastId = "0"
+        if (dashboardJson.blocks.length > 0) {
+          lastId = Object.keys(dashboardJson.blocks).pop() as string;
         }
-      });
-
-      if (!isDashboardDraft)
-        localStorage.setItem(
-          this.state.dashboard.id,
-          JSON.stringify(this.state.dashboard)
-        );
+        // If dashboard already created (in draft), show directly the dashboard view
+        this.setState({
+          isDraft: true,
+          click: (parseInt(lastId) + 1).toString(),
+        });
+      } else {
+        console.error("no draft found with id" + id)
+      }
     }
   }
 
@@ -163,6 +155,9 @@ export default class DashboardSelectionControl extends Component<
   };
 
   render() {
+    if (!this.state.dashboard) {
+      return <div className="dashboard"><Spin className="centered"/></div>
+    }
     return (
       <DashboardView
         dashboard={this.state.dashboard}

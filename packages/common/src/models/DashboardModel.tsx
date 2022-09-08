@@ -7,6 +7,15 @@ export default class DashboardModel {
     this.id = id;
   }
 
+  static fromJson(json) : DashboardModel {
+    const ret = new DashboardModel(json.id)
+    ret.layout = json.layout
+    ret.dataStructure = json.dataStructure
+    ret.blocks = json.blocks
+    ret.userData = UserDataModel.fromJson(json.userData)
+    return ret
+  }
+
   id?: string;
   userData: UserDataModel = new UserDataModel();
   // Dict of data: keys are models

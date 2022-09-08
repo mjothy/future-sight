@@ -16,7 +16,6 @@ export default class Routing extends React.Component<RoutingProps> {
     return (
       <Routes>
         <Route element={<DefaultLayout />}>
-          {/* <Route path="login" element={<Login />} /> */}
           <Route path="drafts" element={<DraftsView />} />
           <Route index element={<HomeView />} />
         </Route>

@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Button, Input, Divider, Image, notification } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import withDataManager from '../../services/withDataManager';
-import { ComponentPropsWithDataManager } from '@future-sight/common';
-import { v1 as uuidv1 } from 'uuid';
+import { ComponentPropsWithDataManager, DashboardModel } from '@future-sight/common';
 import './HomeView.css';
+import {createUUID, getDrafts, setDraft} from "../drafts/DraftUtils";
 
 const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
   const [draftFromURL, setDraftFromURL] = useState('');
@@ -16,25 +16,16 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
   }, []);
 
   const getDraftsElement = () => {
-    if (localStorage.length > 1) {
+    const drafts = getDrafts();
+    if (Object.keys(drafts).length > 1) {
       return <Link to="drafts">Continue from a draft</Link>;
-    }
-    if (localStorage.length === 1) {
-      const url = `draft?id=${localStorage.key(0)}`;
+    } else if (Object.keys(drafts).length === 1) {
+      const url = `draft?id=${Object.keys(drafts)[0]}`;
       return <Link to={url}>Continue from the last draft</Link>;
     } else {
       return null;
     }
   };
-
-  const createUUID = () => {
-    let uuid = uuidv1();
-    // Make sure that the key is not already taken
-    while (localStorage.getItem(uuid)) {
-      uuid = uuidv1();
-    }
-    return uuid
-  }
 
   const draftFromURLOnClick = () => {
     const parse = new URL(draftFromURL).searchParams.get('id');
@@ -44,7 +35,7 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
       );
       if (find) {
         const uuid = createUUID()
-        localStorage.setItem(uuid, JSON.stringify(publishedDashboards[find]));
+        setDraft(uuid, publishedDashboards[find]);
         navigate('draft?id=' + uuid);
       }
     } else {
@@ -55,13 +46,19 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
     }
   };
 
+  const newDraft = () => {
+    const uuid = createUUID()
+    setDraft(uuid, new DashboardModel(uuid));
+    navigate('draft?id=' + uuid);
+  }
+
   return (
     <div className="home-view-wrapper">
       <h2>Welcome to FutureSight!</h2>
       <div className="create-container">
         <div className="drafts">
-          <Button type="primary">
-            <Link to={"draft?id=" + createUUID()}>Create a new Dashboard</Link>
+          <Button type="primary" onClick={newDraft}>
+            Create a new Dashboard
           </Button>
           {getDraftsElement()}
         </div>
