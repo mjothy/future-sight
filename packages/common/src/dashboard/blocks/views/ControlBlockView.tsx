@@ -27,7 +27,7 @@ export default class ControlBlockView extends Component<any, any> {
     };
 
     return (
-      <div className="p-20" style={{ maxHeight: this.props.height - 30 }}>
+      <div className="p-10" style={{ maxHeight: this.props.height - 30 }}>
         {metaData.master['models'].isMaster && (
           <Row>
             <Col span={24}>
@@ -41,7 +41,7 @@ export default class ControlBlockView extends Component<any, any> {
 
         {metaData.master['variables'].isMaster && (
           <Row className="mb-10">
-            <Col span={16}>
+            <Col span={24}>
               <Select
                 mode="multiple"
                 className="width-100"

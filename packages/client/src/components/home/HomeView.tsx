@@ -27,27 +27,32 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
     }
   };
 
+  const createUUID = () => {
+    let uuid = uuidv1();
+    // Make sure that the key is not already taken
+    while (localStorage.getItem(uuid)) {
+      uuid = uuidv1();
+    }
+    return uuid
+  }
+
   const draftFromURLOnClick = () => {
     const parse = new URL(draftFromURL).searchParams.get('id');
-    console.log(parse);
     if (parse) {
       const find = Object.keys(publishedDashboards).find(
         (key) => key === `${parse}.`
       );
       if (find) {
-        let uuid = uuidv1();
-        // Make sure that the key is not already took
-        while (localStorage.getItem(uuid)) {
-          uuid = uuidv1();
-        }
+        const uuid = createUUID()
         localStorage.setItem(uuid, JSON.stringify(publishedDashboards[find]));
         navigate('draft?id=' + uuid);
       }
+    } else {
+      notification.error({
+        message: 'Could not find the dashboard',
+        description: 'Please check the url',
+      });
     }
-    notification.error({
-      message: 'Could not find the dashboard',
-      description: 'Please check the url',
-    });
   };
 
   return (
@@ -56,7 +61,7 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
       <div className="create-container">
         <div className="drafts">
           <Button type="primary">
-            <Link to="draft">Create a new Dashboard</Link>
+            <Link to={"draft?id=" + createUUID()}>Create a new Dashboard</Link>
           </Button>
           {getDraftsElement()}
         </div>

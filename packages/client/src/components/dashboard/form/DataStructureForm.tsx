@@ -124,15 +124,12 @@ class DataStructureForm extends Component<any, any> {
               ))}
             </Select>
           </Col>
-          <Divider />
         </Row>
-        <Row justify="center">
+        <Row justify="center" className="p-20">
           <Button type="primary" onClick={this.addDataToTable}>
             Add as analysis data
           </Button>
         </Row>
-        <Divider />
-
         <Row justify="center">
           <AnalysisDataTable
             dataStructure={this.props.dashboard.dataStructure}

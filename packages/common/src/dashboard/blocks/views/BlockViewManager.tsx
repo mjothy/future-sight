@@ -3,6 +3,8 @@ import ControlBlockView from './ControlBlockView';
 import DataBlockView from './DataBlockView';
 import TextBlockView from './TextBlockView';
 
+
+
 /**
  * Render the view of block in Grid Layout
  */

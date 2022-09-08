@@ -5,8 +5,9 @@ interface TextBlockViewProps {
   currentBlock: any;
 }
 
-const TextBlockView: React.FC<TextBlockViewProps> = ({ currentBlock }) => {
-  return <MDEditor.Markdown source={currentBlock.config.value} />;
-};
 
-export default TextBlockView;
+export default class TextBlockView extends React.Component<any, any> {
+  render() {
+    return <MDEditor.Markdown source={this.props.currentBlock.config.value} />;
+  }
+}
