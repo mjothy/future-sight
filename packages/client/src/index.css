@@ -158,13 +158,15 @@ body {
 }
 
 .sidebar-left {
-  display: flex;
-  justify-content: start;
+  position: relative;
+  float: left;
+  z-index: 1;
 }
 
 .sidebar-right {
-  display: flex;
-  justify-content: end;
+  position: relative;
+  float: right;
+  z-index: 1;
 }
 
 .mb-10 {
