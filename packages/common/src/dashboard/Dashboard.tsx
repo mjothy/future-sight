@@ -28,7 +28,7 @@ export default class Dashboard extends Component<DashboardProps, any> {
   constructor(props) {
     super(props);
     this.state = {
-      sidebarVisible: false,
+      sidebarVisible: true,
       placement: 'right',
     };
   }
@@ -80,13 +80,12 @@ export default class Dashboard extends Component<DashboardProps, any> {
           <DashboardConfigControl {...this.props} />
         </Sidebar>
         <div className="dashboard-content">
-          <div>
-            {!this.state.sidebarVisible &&
-              React.createElement(MenuFoldOutlined, {
-                className: 'sidebar-' + this.state.placement,
-                onClick: () => setVisibility(),
-              })}
-          </div>
+          {!this.state.sidebarVisible && (
+            <MenuFoldOutlined
+              className={'sidebar-' + this.state.placement}
+              onClick={() => setVisibility()}
+            />
+          )}
           <DashboardConfigView {...this.props} />
         </div>
       </div>
