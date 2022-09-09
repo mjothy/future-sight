@@ -13,9 +13,6 @@ import allData from '../data/test-data.json';
 import * as fs from 'fs';
 import RedisClient from '../redis/RedisClient';
 
-import util from 'util';
-const setTimeoutPromise = util.promisify(setTimeout);
-
 export default class ExpressServer {
   private app: any;
   private readonly port: number;
@@ -106,7 +103,6 @@ export default class ExpressServer {
     // Posts methods
     this.app.post(`/api/dashboard/save`, async (req, res, next) => {
       try {
-        await setTimeoutPromise(1000);
         const id = await this.dbClient.getClient().incr('dashboards:id');
         await this.dbClient
           .getClient()
