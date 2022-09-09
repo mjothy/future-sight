@@ -120,7 +120,7 @@ export default class DataManager implements IDataManager {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: data,
+        body: JSON.stringify(data),
       });
     } catch (err) {
       console.error(err);
