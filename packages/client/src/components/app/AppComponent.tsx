@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import { notification } from 'antd';
 import Navbar from '../navbar/Navbar';
 import Routing from './Routing';
-import Footer from '../footer/Footer';
 import './AppComponent.css';
 
 const AppComponent: React.FC = () => {

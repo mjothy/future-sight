@@ -14,8 +14,8 @@ export default class Preview extends React.Component<any, any> {
                     />
                 }>
                     <Card.Meta
-                        title={this.props.conf.title}
-                        description={this.props.conf.author}
+                        title={this.props.conf.userData.title}
+                        description={"Author:" + this.props.conf.userData.author}
                     />
                 </Card>
             </Link>

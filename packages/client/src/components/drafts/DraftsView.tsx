@@ -1,16 +1,48 @@
 import React from 'react';
-import {Image} from 'antd';
+import {Col, Image, Row} from 'antd';
 import './DraftsView.css';
 import Preview from "../Preview";
 import {getDrafts} from "./DraftUtils";
 
 export default class DraftsView extends React.Component<any, any> {
     objectMap = (obj, fn) => {
-        return Object.fromEntries(
+        const ret = Object.fromEntries(
             Object.entries(obj).map(
-                ([k, v], i) => [k, fn(v, k, i)]
+                ([k, v], i) => [k, fn(k, v, i)]
             )
-        )
+        );
+        return Object.values(ret);
+    }
+
+    renderPreviews = () => {
+        const ret: JSX.Element[] = []
+        const drafts = getDrafts();
+        let i = 1
+        let bucket: JSX.Element[] = []
+        for (const [key, value] of Object.entries(drafts)) {
+            bucket.push(
+                <Col>
+                    <Preview key={i} id={key} conf={value}/>
+                </Col>
+            )
+            if(i % 6 === 0) {
+                ret.push(
+                    <Row>
+                        {bucket}
+                    </Row>
+                )
+                bucket = []
+            }
+            i++
+        }
+        if(bucket.length > 0) {
+            ret.push(
+                <Row>
+                    {bucket}
+                </Row>
+            )
+        }
+        return ret;
     }
 
     render() {
@@ -20,9 +52,7 @@ export default class DraftsView extends React.Component<any, any> {
                 <div className="drafts-container">
                     <div className="drafts-wrapper">
                         <Image.PreviewGroup>
-                            {this.objectMap(getDrafts(), (key, value, i) => (
-                                <Preview key={key} id={key} conf={value}/>
-                            ))}
+                            {this.renderPreviews()}
                         </Image.PreviewGroup>
                     </div>
                 </div>
