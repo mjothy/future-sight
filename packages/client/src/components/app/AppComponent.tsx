@@ -55,7 +55,6 @@ const AppComponent: React.FC = () => {
         <Navbar enableSwitchEmbeddedMode={enableSwitchEmbeddedMode} />
       )}
       <Routing isEmbedded={isEmbedded} setEnableSwitchEmbeddedMode={setEnableSwitchEmbeddedMode} />
-      {!isEmbedded && <Footer />}
     </>
   );
 };

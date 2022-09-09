@@ -1,5 +1,5 @@
 .home-view-wrapper {
-  height: 100%;
+  height: calc(100% - 40px); /* minus footer's height */
   display: flex;
   flex-direction: column;
   justify-content: center;

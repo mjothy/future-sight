@@ -5,6 +5,7 @@ import withDataManager from '../../services/withDataManager';
 import { ComponentPropsWithDataManager, DashboardModel } from '@future-sight/common';
 import './HomeView.css';
 import {createUUID, getDrafts, setDraft} from "../drafts/DraftUtils";
+import Footer from "../footer/Footer";
 
 const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
   const [draftFromURL, setDraftFromURL] = useState('');
@@ -53,6 +54,7 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
   }
 
   return (
+    <>
     <div className="home-view-wrapper">
       <h2>Welcome to FutureSight!</h2>
       <div className="create-container">
@@ -102,6 +104,8 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
         </Image.PreviewGroup>
       </div>
     </div>
+    <Footer/>
+    </>
   );
 };
 
