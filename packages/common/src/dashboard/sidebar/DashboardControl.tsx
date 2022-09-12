@@ -70,17 +70,13 @@ const DashboardControl: React.FC<DashboardProps> = ({
       <Row>
         <Col span={24}>
           <Button
-            type="default"
+            type="primary"
+            danger
             className="width-100"
             onClick={() =>
               Modal.confirm({
-                content: (
-                  <span>
-                    {
-                      "The dashboard won't be editable. Do you want to publish the dashboard?"
-                    }
-                  </span>
-                ),
+                title: 'Do you want to publish the dashboard?',
+                content: "The dashboard won't be editable.",
                 onOk() {
                   onClickHandler();
                 },
