@@ -158,7 +158,15 @@ export default class ExpressServer {
         const dashboards = await this.dbClient
           .getClient()
           .json.get('dashboards');
-        res.send(dashboards);
+        const result = Object.keys(dashboards)
+          .reverse() // Reverse the order as the lastest publications have the greatest ids
+          .slice(0, 5) // Limit to 5 elements
+          .reduce((obj, id) => {
+            // As the id is a number, we add a dot to keep the insertion order
+            obj[`${id}.`] = dashboards[id];
+            return obj;
+          }, {});
+        res.send(result);
       } catch (err) {
         console.error(err);
         next(err);

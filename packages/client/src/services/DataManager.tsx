@@ -116,15 +116,7 @@ export default class DataManager implements IDataManager {
     return fetch(`${this.getBaseUrl()}/dashboards`)
       .then((response) => response.json())
       .then((data) => {
-        // Reverse the order as the lastest publications have the greatest ids
-        return Object.keys(data)
-          .reverse()
-          .slice(0, 5) // Limit to 5 dashboards
-          .reduce((obj, id) => {
-            // As the id is a number, we add a dot to the id otherwise the browser may not key the insertion order
-            obj[`${id}.`] = data[id];
-            return obj;
-          }, {});
+        return data;
       })
       .catch(console.error);
   };
