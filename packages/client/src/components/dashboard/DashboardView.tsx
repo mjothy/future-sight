@@ -23,6 +23,7 @@ interface DashboardViewProps
   updateBlockStyleConfig: (data: any) => void;
   saveDashboard: (callback: () => void) => void;
   updateDashboardMetadata: (data: any) => void;
+  deleteBlock: (bockId: string) => void;
   isDraft: boolean;
   readonly?: boolean;
 }

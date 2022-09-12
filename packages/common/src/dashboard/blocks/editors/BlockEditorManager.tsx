@@ -1,9 +1,14 @@
 import React, { Component } from 'react';
-import { Button, Col, Divider, Row } from 'antd';
+import { Button, Col, Divider, Popconfirm, Row, Tooltip } from 'antd';
 import DataBlockEditor from './DataBlockEditor';
 import TextBlockEditor from './TextBlockEditor';
 import ControlBlockEditor from './ControlBlockEditor';
 import DataBlockVisualizationEditor from './DataBlockVisualizationEditor';
+import {
+  DeleteOutlined,
+  BackwardOutlined
+} from '@ant-design/icons';
+
 
 /**
  * Render the view edit block according the the selected type
@@ -61,6 +66,15 @@ export default class BlockEditorManager extends Component<any, any> {
               : 'end'
           }
         >
+          <Col>
+            <Tooltip title="Back to blocks control">
+              <Button
+                  type="primary"
+                  onClick={() => this.props.updateSelectedBlock('')}
+                  icon={<BackwardOutlined />}
+              />
+            </Tooltip>
+          </Col>
           {this.props.blocks[this.props.blockSelectedId].blockType ===
             'data' && (
             <Col span={20}>
@@ -79,12 +93,19 @@ export default class BlockEditorManager extends Component<any, any> {
             </Col>
           )}
           <Col>
-            <Button
-              type="default"
-              onClick={() => this.props.updateSelectedBlock('')}
+            <Popconfirm
+                title="Are you sure you want to delete this block ?"
+                onConfirm={this.props.deleteBlock}
+                okText="Yes"
+                cancelText="No"
             >
-              X
-            </Button>
+              <Tooltip title="Delete block">
+                <Button
+                    type="default"
+                    icon={<DeleteOutlined />}
+                />
+              </Tooltip>
+            </Popconfirm>
           </Col>
         </Row>
 

@@ -34,7 +34,7 @@ export default class DashboardSelectionControl extends Component<
        * The selected block id
        */
       blockSelectedId: '',
-      click: 0,
+      nextId: 0,
       blockType: '',
       isDraft: false,
     };
@@ -64,7 +64,7 @@ export default class DashboardSelectionControl extends Component<
         // If dashboard already created (in draft), show directly the dashboard view
         this.setState({
           isDraft: true,
-          click: (parseInt(lastId) + 1).toString(),
+          nextId: (parseInt(lastId) + 1).toString(),
         });
       } else {
         console.error("no draft found with id" + id)
@@ -125,14 +125,15 @@ export default class DashboardSelectionControl extends Component<
   };
 
   addBlock = (blockType: string, masterBlockId?: string) => {
-    const layoutItem = new LayoutModel(this.state.click.toString());
+    const layoutItem = new LayoutModel(this.state.nextId.toString());
     const dashboard = this.state.dashboard;
 
     dashboard.blocks[layoutItem.i] = new BlockModel(layoutItem.i, blockType);
     dashboard.layout = [layoutItem, ...dashboard.layout];
 
-    if (masterBlockId)
+    if (masterBlockId) {
       dashboard.blocks[layoutItem.i].controlBlock = masterBlockId;
+    }
 
     const state = {
       dashboard: {
@@ -141,10 +142,26 @@ export default class DashboardSelectionControl extends Component<
         layout: dashboard.layout,
       },
       blockSelectedId: layoutItem.i,
-      click: this.state.click + 1,
+      nextId: this.state.nextId + 1,
     };
     this.setState(state);
   };
+
+  deleteBlock = (blockId: string) => {
+    const blocks = this.state.dashboard.blocks;
+    delete blocks[blockId]
+    const layout = this.state.dashboard.layout;
+    const index = layout.findIndex((element) => element.i === blockId);
+    layout.splice(index, 1);
+    this.setState({
+      dashboard: {
+        ...this.state.dashboard,
+        blocks: blocks,
+        layout: layout,
+      },
+      blockSelectedId: ""
+    })
+  }
 
   saveData = async (callback?: () => void) => {
     const { id } = this.state.dashboard;
@@ -171,6 +188,7 @@ export default class DashboardSelectionControl extends Component<
         updateBlockStyleConfig={this.updateBlockStyleConfig}
         saveDashboard={this.saveData}
         updateDashboardMetadata={this.updateDashboardMetadata}
+        deleteBlock={this.deleteBlock}
         isDraft={this.state.isDraft}
         {...this.props}
       />
