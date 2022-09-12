@@ -79,6 +79,14 @@ class DataStructureForm extends Component<any, any> {
     }
   };
 
+  deleteRow = (record) => {
+    const data = this.state.data;
+    delete data[record.model]
+    this.props.handleStructureData(data, record);
+    this.resetForm();
+    //add block suppression popup
+  }
+
   /**
    * Reset the drop down lists
    */
@@ -133,6 +141,7 @@ class DataStructureForm extends Component<any, any> {
         <Row justify="center">
           <AnalysisDataTable
             dataStructure={this.props.dashboard.dataStructure}
+            deleteRow={this.deleteRow}
           />
         </Row>
       </div>
