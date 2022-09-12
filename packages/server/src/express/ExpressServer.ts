@@ -55,6 +55,9 @@ export default class ExpressServer {
       res.send(`Hello , From server`);
     });
 
+    /**
+     * @deprecated This is broken, should not be used as is
+     */
     this.app.post('/api/data', (req, res) => {
       const body = req.body;
       console.log('body: ', JSON.stringify(req.body));
@@ -68,8 +71,21 @@ export default class ExpressServer {
           res.status(200).send(e);
         }
       });
-      // Commenting the following line because it causes the front to crash somehow...
-      // res.status(404).send([]);
+      res.status(404).send([]);
+    });
+
+    this.app.post('/api/plotData', (req, res) => {
+      const body = req.body;
+      const response: any[] = [];
+      for (const reqData of body) {
+        const element = data.find(
+          (e) => e.model === reqData.model && e.scenario === reqData.scenario
+        );
+        if (element) {
+          response.push(element);
+        }
+      }
+      res.status(200).send(response);
     });
 
     this.app.get('/api/models', (req, res) => {

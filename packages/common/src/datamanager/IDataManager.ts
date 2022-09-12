@@ -6,6 +6,8 @@ export default interface IDataManager {
 
   fetchData: (data: DataModel) => Promise<any>;
 
+  fetchPlotData: (data: DataModel) => Promise<any>;
+
   fetchAllData: () => Promise<any>;
 
   fetchModels: () => Promise<any>;

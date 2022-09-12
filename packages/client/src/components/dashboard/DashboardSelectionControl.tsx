@@ -10,7 +10,7 @@ import { v1 as uuidv1 } from 'uuid';
 import { RoutingProps } from '../app/Routing';
 
 import DashboardView from './DashboardView';
-import {getDraft, setDraft} from "../drafts/DraftUtils";
+import { getDraft, setDraft } from '../drafts/DraftUtils';
 import { Spin } from 'antd';
 
 export interface DashboardSelectionControlProps
@@ -18,6 +18,7 @@ export interface DashboardSelectionControlProps
     RoutingProps {
   getData: (data: DataModel[]) => any[];
   saveData: (id: string) => Promise<any>;
+  setDashboardModelScenario: (selection) => void;
 }
 
 export default class DashboardSelectionControl extends Component<
@@ -43,6 +44,11 @@ export default class DashboardSelectionControl extends Component<
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevState.dashboard != this.state.dashboard) {
       setDraft(this.state.dashboard.id, this.state.dashboard);
+      if (this.state.dashboard) {
+        this.props.setDashboardModelScenario(
+          this.state.dashboard.dataStructure
+        );
+      }
     }
   }
 
@@ -57,7 +63,7 @@ export default class DashboardSelectionControl extends Component<
       if (dashboardJson) {
         this.setState({ dashboard: dashboardJson });
         // get last block id
-        let lastId = "0"
+        let lastId = '0';
         if (dashboardJson.blocks.length > 0) {
           lastId = Object.keys(dashboardJson.blocks).pop() as string;
         }
@@ -67,7 +73,7 @@ export default class DashboardSelectionControl extends Component<
           nextId: (parseInt(lastId) + 1).toString(),
         });
       } else {
-        console.error("no draft found with id" + id)
+        console.error('no draft found with id' + id);
       }
     }
   }
@@ -173,7 +179,11 @@ export default class DashboardSelectionControl extends Component<
 
   render() {
     if (!this.state.dashboard) {
-      return <div className="dashboard"><Spin className="centered"/></div>
+      return (
+        <div className="dashboard">
+          <Spin className="centered" />
+        </div>
+      );
     }
     return (
       <DashboardView
