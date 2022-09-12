@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AddButton from './actions/AddButton';
-import { Button, Col, Row, notification } from 'antd';
+import { Button, Col, Row, notification, Modal } from 'antd';
 import { DashboardProps } from '../Dashboard';
 import { useNavigate } from 'react-router-dom';
 
@@ -48,7 +48,14 @@ const DashboardControl: React.FC<DashboardProps> = ({
   };
 
   return (
-    <div>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: 'calc(100% - 64px)',
+        justifyContent: 'space-between',
+      }}
+    >
       <Row justify="space-between">
         {actions.map((action) => (
           <Col key={action.type} span="8">
@@ -63,9 +70,22 @@ const DashboardControl: React.FC<DashboardProps> = ({
       <Row>
         <Col span={24}>
           <Button
-            type="primary"
-            className="width-100 mt-20"
-            onClick={onClickHandler}
+            type="default"
+            className="width-100"
+            onClick={() =>
+              Modal.confirm({
+                content: (
+                  <span>
+                    {
+                      "The dashboard won't be editable. Do you want to publish the dashboard?"
+                    }
+                  </span>
+                ),
+                onOk() {
+                  onClickHandler();
+                },
+              })
+            }
             loading={publishing}
           >
             Publish
