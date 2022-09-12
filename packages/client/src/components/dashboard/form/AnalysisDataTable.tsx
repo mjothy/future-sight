@@ -1,38 +1,20 @@
-import { Table } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
+import {Button, Popconfirm, Table } from 'antd';
 import { Component } from 'react';
 
 /**
  * To show all meta data selected to work with in the dashboard
  */
 export default class AnalysisDataTable extends Component<any, any> {
-  columns;
 
   constructor(props) {
     super(props);
-    this.state = {
-      dataSource: [],
-    };
-
-    /**
-     * return the table columns
-     */
-    this.columns = this.setColumns();
-  }
-
-  componentDidMount() {
-    this.prepareDataSource();
-  }
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (this.props.dataStructure !== prevProps.dataStructure) {
-      this.prepareDataSource();
-    }
   }
 
   /**
    * Transform the dataStructure selected in comboBox into representable data (data that antd table can handle)
    */
-  prepareDataSource() {
+  prepareDataSource = () => {
     const data = this.props.dataStructure;
 
     if (data != null) {
@@ -49,24 +31,16 @@ export default class AnalysisDataTable extends Component<any, any> {
 
         dataSource.push(dataObject);
       });
-      this.setState({ dataSource });
-      this.columns = this.setColumns();
+      return dataSource;
     }
+    return undefined;
   }
-
-  /**
-   * return the table datasource
-   * @returns {*}
-   */
-  dataSource = () => {
-    return this.state.dataSource;
-  };
 
   /**
    * Set table columns
    */
-  setColumns = () => {
-    const columns = [
+  columns = () => {
+    return [
       {
         title: 'Model',
         dataIndex: 'model',
@@ -79,16 +53,30 @@ export default class AnalysisDataTable extends Component<any, any> {
         render: (scenarios) =>
           scenarios.map((scenario) => <p key={scenario}>{scenario}</p>),
       },
+      {
+        title: 'Action',
+        key: 'Action',
+        render: (_, record) => (
+            <Popconfirm
+                title="Deleting this model will delete ALL blocks that use it, continue ?"
+                onConfirm={() => this.props.deleteRow(record)}
+                okText="Yes"
+                cancelText="No"
+                key={record.model}
+            >
+              <Button icon={<DeleteOutlined />}/>
+            </Popconfirm>
+        ),
+      },
     ];
-    return columns;
   };
 
   render() {
     return (
       <Table
         className="width-60"
-        dataSource={this.dataSource()}
-        columns={this.columns}
+        dataSource={this.prepareDataSource()}
+        columns={this.columns()}
       />
     );
   }

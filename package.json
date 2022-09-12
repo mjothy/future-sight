@@ -21,8 +21,11 @@
   },
   "scripts": {
     "client": "yarn workspace @future-sight/client dev",
+    "wclient": "yarn workspace @future-sight/client",
     "common": "yarn workspace @future-sight/common watch",
+    "wcommon": "yarn workspace @future-sight/common",
     "server": "yarn workspace @future-sight/server dev",
+    "wserver": "yarn workspace @future-sight/server",
     "clean": "shx rm -rf build",
     "copy": "shx cp -r packages/client/build build/public",
     "build": "ts-node ./scripts/build.ts",

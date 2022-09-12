@@ -22,7 +22,7 @@ interface DashboardViewProps
   updateBlockMetaData: (data: any) => void;
   updateBlockStyleConfig: (data: any) => void;
   saveDashboard: (callback: () => void) => void;
-  updateDashboardMetadata: (data: any) => void;
+  updateDashboardMetadata: (data: any, deletion?: any) => void;
   deleteBlock: (bockId: string) => void;
   isDraft: boolean;
   readonly?: boolean;
@@ -82,9 +82,8 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
     this.props.updateDashboardMetadata({ userData });
   };
 
-  handleStructureData = (data) => {
-    // this.setState({ data });
-    this.props.updateDashboardMetadata({ dataStructure: data });
+  handleStructureData = (data, deletion = undefined) => {
+    this.props.updateDashboardMetadata({ dataStructure: data }, deletion);
   };
 
   dashboardAddForm = () => {

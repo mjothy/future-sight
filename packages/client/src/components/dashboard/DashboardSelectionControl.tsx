@@ -85,8 +85,34 @@ export default class DashboardSelectionControl extends Component<
     this.setState({ blockSelectedId });
   };
 
-  updateDashboardMetadata = (data) => {
-    this.setState({ dashboard: { ...this.state.dashboard, ...data } });
+  updateDashboardMetadata = (data, deletion?:any) => {
+    if(deletion) {
+      //remove all blocks associated to deletion.model
+      const blocks = this.state.dashboard.blocks;
+      const layout = this.state.dashboard.layout;
+      const toRemove:string[] = []
+      for (const blockId in blocks) {
+        const block = blocks[blockId];
+        if (deletion.model in block.config.metaData.models) {
+          toRemove.push(blockId)
+        }
+      }
+      for (const blockId of toRemove) {
+        delete blocks[blockId];
+        const index = layout.findIndex((element) => element.i === blockId);
+        layout.splice(index, 1);
+      }
+      this.setState({
+        dashboard: {
+          ...this.state.dashboard,
+          blocks: blocks,
+          layout: layout,
+          ...data
+        }
+      })
+    } else {
+      this.setState({ dashboard: { ...this.state.dashboard, ...data } });
+    }
   };
 
   /**
