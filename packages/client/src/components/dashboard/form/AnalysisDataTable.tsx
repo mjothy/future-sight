@@ -38,8 +38,9 @@ export default class AnalysisDataTable extends Component<any, any> {
     if (data != null) {
       const dataSource: any[] = [];
 
-      Object.keys(data).map((key) => {
+      Object.keys(data).map((key, idx) => {
         const dataObject = {
+          key: idx,
           model: '',
           scenarios: new Array<string>(),
         };
