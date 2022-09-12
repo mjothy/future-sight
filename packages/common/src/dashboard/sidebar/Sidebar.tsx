@@ -18,10 +18,10 @@ export default class Sidebar extends Component<any, any> {
   }
 
   render() {
-    const backToSetup = () => {
-      this.props.submitSetupView(false);
-      this.props.updateSelectedBlock('');
-    };
+    // const backToSetup = () => {
+    //   this.props.submitSetupView(false);
+    //   this.props.updateSelectedBlock('');
+    // };
 
     return (
       <Drawer
@@ -38,10 +38,6 @@ export default class Sidebar extends Component<any, any> {
         }
         extra={
           <Space>
-            <Button onClick={backToSetup} value="left" danger>
-              {/* <LeftCircleFilled />  */}
-              Back to set up
-            </Button>
             <Button onClick={this.props.setPlacement} value="left">
               <PicLeftOutlined />
             </Button>

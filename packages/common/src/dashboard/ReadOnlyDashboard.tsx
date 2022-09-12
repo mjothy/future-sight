@@ -17,13 +17,9 @@ interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
 
 type LocationState = { dashboard: DashboardModel };
 
-const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = ({
-  getData,
-  dataManager,
-  setEnableSwitchEmbeddedMode,
-  isEmbedded,
-  setDashboardModelScenario,
-}) => {
+const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
+  props: ReadOnlyDashboardProps
+) => {
   const [dashboard, setDashboard] = useState<DashboardModel | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [blockSelectedId, setBlockSelectedId] = useState('');
@@ -34,28 +30,28 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = ({
     const locationState = location.state as LocationState;
     if (locationState?.dashboard) {
       setDashboard(locationState.dashboard);
-      setDashboardModelScenario(locationState.dashboard.dataStructure);
+      props.setDashboardModelScenario(locationState.dashboard.dataStructure);
     } else {
       const id = searchParams.get('id') as string;
       const fetchDashboard = async (id: string) => {
-        await dataManager.getDashboard(id).then((dashboard) => {
+        await props.dataManager.getDashboard(id).then((dashboard) => {
           setDashboard(dashboard);
-          setDashboardModelScenario(dashboard.dataStructure);
+          props.setDashboardModelScenario(dashboard.dataStructure);
         });
       };
       fetchDashboard(id);
     }
     setIsLoading(false);
-    setEnableSwitchEmbeddedMode(true);
+    props.setEnableSwitchEmbeddedMode(true);
     return () => {
-      setEnableSwitchEmbeddedMode(false);
+      props.setEnableSwitchEmbeddedMode(false);
     };
   }, []);
 
   return (
     <div
       className="dashboard"
-      style={{ height: isEmbedded ? '100%' : undefined }}
+      style={{ height: props.isEmbedded ? '100%' : undefined }}
     >
       <div className="dashboard-content">
         {(isLoading || !dashboard) && <Spin />}
@@ -64,7 +60,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = ({
             dashboard={dashboard}
             layout={dashboard.layout}
             blocks={dashboard.blocks}
-            getData={getData}
+            getData={props.getData}
             updateLayout={(layout: LayoutModel[]) => {
               setDashboard({ ...dashboard, layout: layout });
             }}

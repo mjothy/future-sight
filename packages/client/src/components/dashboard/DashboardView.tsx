@@ -108,7 +108,7 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
   render() {
     return (
       <>
-        {this.state.isSubmited
+        {this.state.isSubmited || !this.props.setupConfigMode
           ? this.dashboardManager()
           : this.dashboardAddForm()}
       </>
