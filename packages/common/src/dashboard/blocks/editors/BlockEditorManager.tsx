@@ -116,7 +116,6 @@ export default class BlockEditorManager extends Component<any, any> {
 
         <div className="width-100">
           {this.blockByType()}
-          <div className="space-div"></div>
         </div>
       </>
     );

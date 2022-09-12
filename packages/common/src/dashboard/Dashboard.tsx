@@ -27,65 +27,25 @@ export interface DashboardProps extends ComponentPropsWithDataManager {
 export default class Dashboard extends Component<DashboardProps, any> {
   constructor(props) {
     super(props);
-    this.state = {
-      sidebarVisible: true,
-      placement: 'right',
-    };
   }
 
   componentDidMount() {
     window.scrollTo(0, 0);
   }
 
-  componentDidUpdate(prevProps, prevState, snaphshot) {
-    if (
-      this.props.blockSelectedId != prevProps.blockSelectedId &&
-      this.props.blockSelectedId !== ''
-    ) {
-      this.setState({
-        sidebarVisible: true,
-      });
-    }
-  }
-
   render() {
-    const setVisibility = () => {
-      this.setState(
-        {
-          sidebarVisible: !this.state.sidebarVisible,
-        },
-        () => {
-          if (this.state.sidebarVisible === false)
-            this.props.updateSelectedBlock('');
-        }
-      );
-    };
-
-    const setPlacement = (e) => {
-      this.setState({ placement: e.currentTarget.value });
-    };
-
     return (
       <div
         className="dashboard"
         style={{ height: this.props.isEmbedded ? '100%' : undefined }}
       >
         <Sidebar
-          sidebarVisible={this.state.sidebarVisible}
-          placement={this.state.placement}
-          setVisibility={setVisibility}
-          setPlacement={setPlacement}
+          onClose={() => this.props.updateSelectedBlock('')}
           {...this.props}
         >
           <DashboardConfigControl {...this.props} />
         </Sidebar>
         <div className="dashboard-content">
-          {!this.state.sidebarVisible && (
-            <MenuFoldOutlined
-              className={'sidebar-' + this.state.placement}
-              onClick={() => setVisibility()}
-            />
-          )}
           <DashboardConfigView {...this.props} />
         </div>
       </div>

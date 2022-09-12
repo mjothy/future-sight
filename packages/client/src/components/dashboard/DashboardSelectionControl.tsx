@@ -35,7 +35,6 @@ export default class DashboardSelectionControl extends Component<
        * The selected block id
        */
       blockSelectedId: '',
-      nextId: 0,
       blockType: '',
       isDraft: false,
     };
@@ -61,21 +60,23 @@ export default class DashboardSelectionControl extends Component<
       const id = params.get('id');
       const dashboardJson = getDraft(id);
       if (dashboardJson) {
-        this.setState({ dashboard: dashboardJson });
-        // get last block id
-        let lastId = '0';
-        if (dashboardJson.blocks.length > 0) {
-          lastId = Object.keys(dashboardJson.blocks).pop() as string;
-        }
-        // If dashboard already created (in draft), show directly the dashboard view
         this.setState({
-          isDraft: true,
-          nextId: (parseInt(lastId) + 1).toString(),
+          dashboard: dashboardJson,
+          isDraft: true
         });
       } else {
         console.error('no draft found with id' + id);
       }
     }
+  }
+
+  getLastId = () => {
+    const dashboardJson = this.state.dashboard;
+    let lastId = 0;
+    if (Object.keys(dashboardJson.blocks).length > 0) {
+      lastId = Math.max(...Object.keys(dashboardJson.blocks).map((key => parseInt(key))));
+    }
+    return lastId;
   }
 
   updateLayout = (layout: LayoutModel[]) => {
@@ -157,7 +158,7 @@ export default class DashboardSelectionControl extends Component<
   };
 
   addBlock = (blockType: string, masterBlockId?: string) => {
-    const layoutItem = new LayoutModel(this.state.nextId.toString());
+    const layoutItem = new LayoutModel((this.getLastId()+1).toString());
     const dashboard = this.state.dashboard;
 
     dashboard.blocks[layoutItem.i] = new BlockModel(layoutItem.i, blockType);
@@ -173,8 +174,7 @@ export default class DashboardSelectionControl extends Component<
         blocks: dashboard.blocks,
         layout: dashboard.layout,
       },
-      blockSelectedId: layoutItem.i,
-      nextId: this.state.nextId + 1,
+      blockSelectedId: layoutItem.i
     };
     this.setState(state);
   };
