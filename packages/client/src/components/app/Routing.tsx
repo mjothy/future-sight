@@ -7,8 +7,9 @@ import DraftsView from '../drafts/DraftsView';
 import DefaultLayout from './DefaultLayout';
 
 export interface RoutingProps {
-  isEmbedded: boolean
+  isEmbedded: boolean;
   setEnableSwitchEmbeddedMode: (enable: boolean) => void;
+  setupConfigMode: boolean;
 }
 
 export default class Routing extends React.Component<RoutingProps> {

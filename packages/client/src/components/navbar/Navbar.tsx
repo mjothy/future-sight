@@ -6,21 +6,26 @@ import {
   LoginOutlined,
   CheckOutlined,
   CloseOutlined,
+  UserOutlined,
+  EditOutlined,
 } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import './Navbar.css';
 import Logo from '../../assets/images/ECEMF_logo.png';
 
 interface NavbarProps {
   enableSwitchEmbeddedMode: boolean;
+  setupConfigMode: boolean;
+  setSetupConfigMode: (mode: boolean) => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({
-  enableSwitchEmbeddedMode,
-}: NavbarProps) => {
+const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
+  const location = useLocation();
+
   const embeddedModeTitle = 'Switch to embedded mode';
   const normalModeTitle = 'Switch to normal mode';
+
   const [embeddedTooltipTitle, setEmbeddedTooltipTitle] =
     useState(embeddedModeTitle);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -29,6 +34,21 @@ const Navbar: React.FC<NavbarProps> = ({
       searchParams.append('embedded', '');
       setSearchParams(searchParams);
       setEmbeddedTooltipTitle(normalModeTitle);
+    }
+  };
+
+  const backToSetupTitle = 'Switch to set up mode';
+  const backToConfigTitle = 'Switch to configuration mode';
+
+  const [switchSetupConfigTooltipTitle, setSwitchSetupConfigTooltipTitle] =
+    useState(backToConfigTitle);
+  const switchSetupConfigMode = (checked) => {
+    if (checked) {
+      setSwitchSetupConfigTooltipTitle(backToConfigTitle);
+      props.setSetupConfigMode(true);
+    } else {
+      setSwitchSetupConfigTooltipTitle(backToSetupTitle);
+      props.setSetupConfigMode(false);
     }
   };
 
@@ -47,7 +67,7 @@ const Navbar: React.FC<NavbarProps> = ({
           <Link to={'/'}>Home</Link>
         </Menu.Item>
 
-        {enableSwitchEmbeddedMode && (
+        {props.enableSwitchEmbeddedMode && (
           <Menu.Item key="embedded" style={{ backgroundColor: '#001529' }}>
             <Tooltip placement="bottom" title={embeddedTooltipTitle}>
               <Switch
@@ -55,6 +75,23 @@ const Navbar: React.FC<NavbarProps> = ({
                 checkedChildren={<CheckOutlined />}
                 unCheckedChildren={<CloseOutlined />}
                 onChange={switchEmbeddedMode}
+              />
+            </Tooltip>
+          </Menu.Item>
+        )}
+
+        {location.pathname === '/draft' && (
+          <Menu.Item
+            key="setupConfigSwitch"
+            style={{ backgroundColor: '#001529' }}
+          >
+            <Tooltip placement="bottom" title={switchSetupConfigTooltipTitle}>
+              <Switch
+                size="small"
+                checkedChildren={<UserOutlined />}
+                unCheckedChildren={<EditOutlined />}
+                onChange={switchSetupConfigMode}
+                checked={props.setupConfigMode}
               />
             </Tooltip>
           </Menu.Item>
