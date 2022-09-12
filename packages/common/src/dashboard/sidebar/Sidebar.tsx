@@ -51,10 +51,6 @@ export default class Sidebar extends Component<any, any> {
             icon={this.state.visible ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             onClick={this.toggleVisible}
         />
-        <Button className={'back-to-setup'} onClick={this.backToSetup} value="left">
-          {/* <LeftCircleFilled />  */}
-          Back to setup
-        </Button>
         <Drawer
             placement={this.state.placement}
             width={500}

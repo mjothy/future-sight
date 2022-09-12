@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Menu, Tooltip, Switch } from 'antd';
+import { Menu, Tooltip, Switch, Radio } from 'antd';
 import {
   HomeOutlined,
   LoginOutlined,
@@ -43,7 +43,7 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
   const [switchSetupConfigTooltipTitle, setSwitchSetupConfigTooltipTitle] =
     useState(backToConfigTitle);
   const switchSetupConfigMode = (checked) => {
-    if (checked) {
+    if (checked.target.value === "setup") {
       setSwitchSetupConfigTooltipTitle(backToConfigTitle);
       props.setSetupConfigMode(true);
     } else {
@@ -85,15 +85,13 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
             key="setupConfigSwitch"
             style={{ backgroundColor: '#001529' }}
           >
-            <Tooltip placement="bottom" title={switchSetupConfigTooltipTitle}>
-              <Switch
-                size="small"
-                checkedChildren={<UserOutlined />}
-                unCheckedChildren={<EditOutlined />}
+            <Radio.Group
+                value={props.setupConfigMode?"setup":"dashboard"}
                 onChange={switchSetupConfigMode}
-                checked={props.setupConfigMode}
-              />
-            </Tooltip>
+                buttonStyle="solid">
+              <Radio.Button value="setup">Setup</Radio.Button>
+              <Radio.Button value="dashboard">Dashboard</Radio.Button>
+            </Radio.Group>
           </Menu.Item>
         )}
 

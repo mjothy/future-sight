@@ -56,11 +56,11 @@ export default class BlockEditorManager extends Component<any, any> {
     }
   };
 
-  render() {
-    const tabsToggle = (tabType) => {
-      this.setState({ tab: tabType });
-    };
+  tabsToggle = (tabType) => {
+    this.setState({ tab: tabType });
+  };
 
+  render() {
     return (
       <>
         <Row
@@ -80,15 +80,12 @@ export default class BlockEditorManager extends Component<any, any> {
               />
             </Tooltip>
           </Col>
-          {this.props.blocks[this.props.blockSelectedId].blockType ===
-            'data' && (
+          {this.props.blocks[this.props.blockSelectedId].blockType === 'data' && (
             <Col>
-              <Tabs type="card" onChange={(activeKey) => tabsToggle(activeKey)}>
+              <Tabs type="card" onChange={(activeKey) => this.tabsToggle(activeKey)}>
                 {this.tabsTypes.map((tab) => {
                   return (
-                    <TabPane
-                      key={tab.type}
-                      tab={
+                    <TabPane key={tab.type} tab={
                         <span>
                           {tab.icon}
                           {tab.title}
