@@ -8,6 +8,7 @@ import {
 import React from 'react';
 import SetupView from './form/SetupView';
 import { RoutingProps } from '../app/Routing';
+import { Radio } from 'antd';
 
 interface DashboardViewProps
   extends ComponentPropsWithDataManager,
@@ -26,8 +27,6 @@ interface DashboardViewProps
   deleteBlock: (bockId: string) => void;
   isDraft: boolean;
   readonly?: boolean;
-  setupConfigMode: boolean;
-  setSetupConfigMode: (setup: boolean) => void;
 }
 
 /**
@@ -44,6 +43,7 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
        * Selected data to work with in dashboard {model: {scenario: { variables: [], regions: []}}}
        */
       data: [],
+      setupDashboardMode: 'setup'
     };
   }
 
@@ -79,30 +79,42 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
     this.props.updateDashboardMetadata({ dataStructure: data }, deletion);
   };
 
-  dashboardAddForm = () => {
+  setupView = () => {
     return (
-      <div className="content-wrapper">
-        <SetupView
-          {...this.props}
-          userData={this.props.dashboard.userData}
-          structureData={this.props.dashboard.dataStructure}
-          submitEvent={this.props.setSetupConfigMode}
-          updateUserData={this.handleUserData}
-          handleStructureData={this.handleStructureData}
-        />
-      </div>
+      <SetupView
+        {...this.props}
+        userData={this.props.dashboard.userData}
+        structureData={this.props.dashboard.dataStructure}
+        submitEvent={this.switchSetupDashboardMode}
+        updateUserData={this.handleUserData}
+        handleStructureData={this.handleStructureData}
+      />
     );
   };
 
   dashboardManager = () => {
     return <Dashboard {...this.props} />;
   };
+
+  switchSetupDashboardMode = (view) => {
+    this.setState({setupDashboardMode: view})
+  }
+
   render() {
     return (
       <>
-        {this.state.isSubmited || !this.props.setupConfigMode
+        <div className="back-to-setup">
+          <Radio.Group
+              value={this.state.setupDashboardMode}
+              onChange={(e) => this.switchSetupDashboardMode(e.target.value)}
+              buttonStyle="solid">
+            <Radio.Button value="setup">Setup</Radio.Button>
+            <Radio.Button value="dashboard">Dashboard</Radio.Button>
+          </Radio.Group>
+        </div>
+        {this.state.isSubmited || this.state.setupDashboardMode === 'dashboard'
           ? this.dashboardManager()
-          : this.dashboardAddForm()}
+          : this.setupView()}
       </>
     );
   }

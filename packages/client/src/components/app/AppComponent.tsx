@@ -24,8 +24,6 @@ const AppComponent: React.FC = () => {
     }
   };
 
-  const [setupConfigMode, setSetupConfigMode] = useState(true);
-
   // Effect to handle embedded mode
   useEffect(() => {
     if (searchParams.get('embedded') !== null) {
@@ -53,17 +51,11 @@ const AppComponent: React.FC = () => {
   return (
     <>
       {!isEmbedded && (
-        <Navbar
-          enableSwitchEmbeddedMode={enableSwitchEmbeddedMode}
-          setupConfigMode={setupConfigMode}
-          setSetupConfigMode={setSetupConfigMode}
-        />
+        <Navbar enableSwitchEmbeddedMode={enableSwitchEmbeddedMode}/>
       )}
       <Routing
         isEmbedded={isEmbedded}
         setEnableSwitchEmbeddedMode={setEnableSwitchEmbeddedMode}
-        setupConfigMode={setupConfigMode}
-        setSetupConfigMode={setSetupConfigMode}
       />
     </>
   );
