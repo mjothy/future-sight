@@ -10,6 +10,7 @@ export interface RoutingProps {
   isEmbedded: boolean;
   setEnableSwitchEmbeddedMode: (enable: boolean) => void;
   setupConfigMode: boolean;
+  setSetupConfigMode: (setup: boolean) => void;
 }
 
 export default class Routing extends React.Component<RoutingProps> {

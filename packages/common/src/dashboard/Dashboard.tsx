@@ -20,7 +20,6 @@ export interface DashboardProps extends ComponentPropsWithDataManager {
   updateBlockMetaData: (data: any) => void;
   updateBlockStyleConfig: (data: any) => void;
   saveDashboard: (callback: () => void) => void;
-  submitSetupView: (data: any) => void;
   isEmbedded?: boolean;
 }
 

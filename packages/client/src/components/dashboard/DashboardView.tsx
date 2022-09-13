@@ -26,6 +26,8 @@ interface DashboardViewProps
   deleteBlock: (bockId: string) => void;
   isDraft: boolean;
   readonly?: boolean;
+  setupConfigMode: boolean;
+  setSetupConfigMode: (setup: boolean) => void;
 }
 
 /**
@@ -51,15 +53,6 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
       this.setState({ isSubmited: true });
     }
   }
-
-  /**
-   * Decide on wich view the user working, SetUpView (To add the metadata of the current dashboard)
-   * OR Dashbard to add and edit the dashboard blocks
-   * @param data  True if the user sumbit the metaData, OR False to back for updating the metaData
-   */
-  handleSubmit = (data: boolean) => {
-    this.setState({ isSubmited: data });
-  };
 
   /**
    * Geting and update the value the user data
@@ -93,7 +86,7 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
           {...this.props}
           userData={this.props.dashboard.userData}
           structureData={this.props.dashboard.dataStructure}
-          submitEvent={this.handleSubmit}
+          submitEvent={this.props.setSetupConfigMode}
           updateUserData={this.handleUserData}
           handleStructureData={this.handleStructureData}
         />
@@ -102,7 +95,7 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
   };
 
   dashboardManager = () => {
-    return <Dashboard {...this.props} submitSetupView={this.handleSubmit} />;
+    return <Dashboard {...this.props} />;
   };
   render() {
     return (

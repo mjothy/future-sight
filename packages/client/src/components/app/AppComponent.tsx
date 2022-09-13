@@ -63,6 +63,7 @@ const AppComponent: React.FC = () => {
         isEmbedded={isEmbedded}
         setEnableSwitchEmbeddedMode={setEnableSwitchEmbeddedMode}
         setupConfigMode={setupConfigMode}
+        setSetupConfigMode={setSetupConfigMode}
       />
     </>
   );

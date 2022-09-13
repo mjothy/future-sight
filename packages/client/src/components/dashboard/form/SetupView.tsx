@@ -17,7 +17,7 @@ export default class SetupView extends Component<any, any> {
    * Submit the meta data to send it to dashboard
    */
   handleSubmit = () => {
-    this.props.submitEvent(true);
+    this.props.submitEvent(false);
   };
 
   /**
