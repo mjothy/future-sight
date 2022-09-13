@@ -5,7 +5,7 @@ import {Link} from 'react-router-dom';
 export default class Preview extends React.Component<any, any> {
     render() {
         return (
-            <Link to={'/draft?id=' + this.props.id}>
+            <Link to={this.props.urlPrefix + this.props.id}>
                 <Card cover={
                     <Image
                         width={200}

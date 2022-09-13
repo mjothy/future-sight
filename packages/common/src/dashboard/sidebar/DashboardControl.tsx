@@ -35,14 +35,14 @@ const DashboardControl: React.FC<DashboardProps> = ({
 
   const onClickHandler = () => {
     setPublishing(true);
-    saveDashboard(() => {
+    saveDashboard((idPermanent) => {
       setPublishing(false);
       notification.success({
         message: 'The dashboard has been correctly published',
         placement: 'topRight',
       });
       setTimeout(() => {
-        navigate('/');
+        navigate('/view?id=' + idPermanent);
       }, 1000);
     });
   };
@@ -76,7 +76,7 @@ const DashboardControl: React.FC<DashboardProps> = ({
             onClick={() =>
               Modal.confirm({
                 title: 'Do you want to publish the dashboard?',
-                content: "The dashboard won't be editable.",
+                content: "The dashboard won't be editable anymore.",
                 onOk() {
                   onClickHandler();
                 },

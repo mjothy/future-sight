@@ -195,11 +195,11 @@ export default class DashboardSelectionControl extends Component<
     })
   }
 
-  saveData = async (callback?: () => void) => {
+  saveData = async (callback?: (idPermanent) => void) => {
     const { id } = this.state.dashboard;
-    await this.props.saveData(id);
+    const idPermanent = await this.props.saveData(id);
     if (callback) {
-      callback();
+      callback(idPermanent);
     }
   };
 

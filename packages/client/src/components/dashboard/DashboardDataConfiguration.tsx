@@ -142,7 +142,7 @@ class DashboardDataConfiguration extends Component<
       try {
         const res = await this.props.dataManager.saveDashboard(data);
         removeDraft(id);
-        return res;
+        return res.id;
       } catch (e) {
         console.error(e);
       }
