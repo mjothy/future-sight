@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Menu, Tooltip, Switch, Space, Button } from 'antd';
 import {
+  FullscreenOutlined,
   HomeOutlined, ShareAltOutlined
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
@@ -37,8 +38,8 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
 
         {props.enableSwitchEmbeddedMode && (
           <Menu.Item key="embedded" style={{ backgroundColor: '#001529' }}>
-            <Button type="primary" icon={<ShareAltOutlined />} onClick={switchEmbeddedMode} style={{ backgroundColor: '#001529' }}>
-              Embedded Mode
+            <Button type="primary" icon={<FullscreenOutlined />} onClick={switchEmbeddedMode} style={{ backgroundColor: '#001529' }}>
+              Full Screen Mode
             </Button>
           </Menu.Item>
         )}
