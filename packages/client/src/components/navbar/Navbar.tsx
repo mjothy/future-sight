@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Menu, Tooltip, Switch } from 'antd';
+import { Menu, Tooltip, Switch, Space, Button } from 'antd';
 import {
-  HomeOutlined,
-  CheckOutlined,
-  CloseOutlined,
+  HomeOutlined, ShareAltOutlined
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 
@@ -16,19 +14,10 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
-
-  const embeddedModeTitle = 'Switch to embedded mode';
-  const normalModeTitle = 'Switch to normal mode';
-
-  const [embeddedTooltipTitle, setEmbeddedTooltipTitle] =
-    useState(embeddedModeTitle);
   const [searchParams, setSearchParams] = useSearchParams();
-  const switchEmbeddedMode = (checked) => {
-    if (checked) {
-      searchParams.append('embedded', '');
-      setSearchParams(searchParams);
-      setEmbeddedTooltipTitle(normalModeTitle);
-    }
+  const switchEmbeddedMode = () => {
+    searchParams.append('embedded', '');
+    setSearchParams(searchParams);
   };
 
   return (
@@ -48,14 +37,9 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
 
         {props.enableSwitchEmbeddedMode && (
           <Menu.Item key="embedded" style={{ backgroundColor: '#001529' }}>
-            <Tooltip placement="bottom" title={embeddedTooltipTitle}>
-              <Switch
-                size="small"
-                checkedChildren={<CheckOutlined />}
-                unCheckedChildren={<CloseOutlined />}
-                onChange={switchEmbeddedMode}
-              />
-            </Tooltip>
+            <Button icon={<ShareAltOutlined />} onClick={switchEmbeddedMode}>
+              Embedded Mode
+            </Button>
           </Menu.Item>
         )}
       </Menu>
