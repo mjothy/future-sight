@@ -30,11 +30,6 @@ export default class Sidebar extends Component<any, any> {
     }
   }
 
-  backToSetup = () => {
-    this.props.submitSetupView(false);
-    this.props.updateSelectedBlock('');
-  };
-
   toggleVisible = () => {
     this.setState({visible: !this.state.visible});
   }

@@ -17,10 +17,10 @@ export default class PlotlyGraph extends Component<any, any> {
       legend: { orientation: 'h' },
       autosize: false,
       margin: {
-        l: 40,
-        r: 40,
-        b: 40,
-        t: 40,
+        l: 30,
+        r: 30,
+        b: 25,
+        t: 25,
         pad: 4,
       },
       font: {

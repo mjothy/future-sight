@@ -61,33 +61,12 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
             layout={dashboard.layout}
             blocks={dashboard.blocks}
             getData={props.getData}
-            updateLayout={(layout: LayoutModel[]) => {
-              setDashboard({ ...dashboard, layout: layout });
-            }}
-            updateSelectedBlock={(blockSelectedId: string) => {
-              setBlockSelectedId(blockSelectedId);
-            }}
-            blockSelectedId={blockSelectedId}
-            updateBlockMetaData={(data, idBlock) => {
-              if (blockSelectedId === '') {
-                setBlockSelectedId(idBlock);
-              }
-              const config = dashboard.blocks[blockSelectedId]
-                .config as ConfigurationModel;
-              let metaData = config.metaData;
-              metaData = { ...metaData, ...data };
-              config.metaData = metaData;
-              setDashboard({ ...dashboard, blocks: dashboard.blocks });
-            }}
-            updateBlockStyleConfig={(data) => {
-              (
-                dashboard.blocks[blockSelectedId].config as ConfigurationModel
-              ).configStyle = data;
-              setDashboard({ ...dashboard, blocks: dashboard.blocks });
-            }}
-            updateDashboardMetadata={(data) =>
-              setDashboard({ ...dashboard, ...data })
-            }
+            updateSelectedBlock={(blockSelectedId: string) => {}}
+            blockSelectedId={undefined}
+            updateBlockMetaData={(data, idBlock) => {}}
+            updateBlockStyleConfig={(data) => {}}
+            updateDashboardMetadata={(data) => {}}
+            readonly
           />
         )}
       </div>

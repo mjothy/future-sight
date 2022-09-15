@@ -2,6 +2,8 @@ import { Component } from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import BlockViewManager from './blocks/views/BlockViewManager';
 import PropTypes from 'prop-types';
+import ComponentPropsWithDataManager from "../datamanager/ComponentPropsWithDataManager";
+import DataModel from "../models/DataModel";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -13,7 +15,12 @@ class DashboardConfigView extends Component<any, any> {
     layout: PropTypes.arrayOf(PropTypes.object),
     updateLayout: PropTypes.func,
     updateSelectedBlock: PropTypes.func,
+    readonly: PropTypes.bool
   };
+
+  static defaultProps = {
+    readonly: false
+  }
 
   /**
    * Array of references of all blocks on LayoutGrid
@@ -58,8 +65,10 @@ class DashboardConfigView extends Component<any, any> {
    * @param layouts the update layouts
    */
   onLayoutChange = (layout) => {
-    this.props.updateLayout(layout);
-    this.updateAllLayoutsView();
+    if(!this.props.readonly) {
+      this.props.updateLayout(layout);
+      this.updateAllLayoutsView();
+    }
   };
 
   /**
@@ -97,8 +106,9 @@ class DashboardConfigView extends Component<any, any> {
   };
 
   onBlockClick = (e) => {
-    if (e.currentTarget.id) this.props.updateSelectedBlock(e.currentTarget.id);
-    else alert('No block selected !');
+    if (e.currentTarget.id) {
+      this.props.updateSelectedBlock(e.currentTarget.id);
+    }
   };
 
   render() {
@@ -108,8 +118,8 @@ class DashboardConfigView extends Component<any, any> {
         className="layout"
         layouts={{ lg: layout }}
         autoSize={true}
-        isDraggable={true}
-        isResizable={true}
+        isDraggable={!this.props.readonly}
+        isResizable={!this.props.readonly}
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
         cols={{ lg: 12, md: 12, sm: 12, xs: 12, xxs: 12 }}
         rowHeight={50}
