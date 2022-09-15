@@ -21,9 +21,7 @@ export default class DraftsView extends React.Component<any, any> {
                 <h2>Your drafts</h2>
                 <div className="drafts-container">
                     <div className="drafts-wrapper">
-                        <Image.PreviewGroup>
-                            <PreviewGroup dashboards={getDrafts()} urlPrefix={'/draft?id='} />
-                        </Image.PreviewGroup>
+                        <PreviewGroup dashboards={getDrafts()} urlPrefix={'/draft?id='} />
                     </div>
                 </div>
             </div>
