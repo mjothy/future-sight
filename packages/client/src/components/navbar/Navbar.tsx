@@ -37,7 +37,7 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
 
         {props.enableSwitchEmbeddedMode && (
           <Menu.Item key="embedded" style={{ backgroundColor: '#001529' }}>
-            <Button icon={<ShareAltOutlined />} onClick={switchEmbeddedMode}>
+            <Button type="primary" icon={<ShareAltOutlined />} onClick={switchEmbeddedMode} style={{ backgroundColor: '#001529' }}>
               Embedded Mode
             </Button>
           </Menu.Item>
