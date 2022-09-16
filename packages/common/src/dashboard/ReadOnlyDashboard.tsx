@@ -1,12 +1,18 @@
 import { Spin } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
+import { Button, Card, Tooltip } from 'antd';
+import {
+  InfoCircleOutlined,
+  CloseOutlined,
+  DownloadOutlined,
+} from '@ant-design/icons';
 import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
-import ConfigurationModel from '../models/ConfigurationModel';
 import DashboardModel from '../models/DashboardModel';
 import DataModel from '../models/DataModel';
-import LayoutModel from '../models/LayoutModel';
 import DashboardConfigView from './DashboardConfigView';
+
+const { Meta } = Card;
 
 interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
   getData: (data: DataModel[]) => any[];
@@ -22,7 +28,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
 ) => {
   const [dashboard, setDashboard] = useState<DashboardModel | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [blockSelectedId, setBlockSelectedId] = useState('');
+  const [idCardVisible, setIdCardVisible] = useState(false);
   const location = useLocation();
   const [searchParams] = useSearchParams();
 
@@ -55,6 +61,43 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
     >
       <div className="dashboard-content">
         {(isLoading || !dashboard) && <Spin />}
+        {dashboard && !idCardVisible && (
+          <Tooltip placement="bottomRight" title="Show information">
+            <Button
+              type="primary"
+              className="id-button"
+              icon={<InfoCircleOutlined />}
+              onClick={() => {
+                setIdCardVisible(true);
+              }}
+            />
+          </Tooltip>
+        )}
+        {dashboard && idCardVisible && (
+          <Card
+            className="id-card"
+            actions={[
+              <Tooltip
+                key="download"
+                placement="bottom"
+                title="Download the data"
+              >
+                <DownloadOutlined />
+              </Tooltip>,
+            ]}
+          >
+            <CloseOutlined
+              className="id-card-close"
+              onClick={() => {
+                setIdCardVisible(false);
+              }}
+            />
+            <Meta
+              title={dashboard.userData.title}
+              description={`Author: ${dashboard.userData.author}`}
+            />
+          </Card>
+        )}
         {dashboard && (
           <DashboardConfigView
             dashboard={dashboard}

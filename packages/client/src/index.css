@@ -96,17 +96,44 @@ body {
   width: 100%;
 }
 
+.dashboard .dashboard-content .id-card {
+  z-index: 1;
+  float: right;
+  margin-top: 10px;
+  margin-right: 10px;
+  width: 300px;
+  position: relative;
+}
+
+.dashboard .dashboard-content .id-card .id-card-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.dashboard .dashboard-content .id-button {
+  z-index: 1;
+  float: right;
+  margin-top: 10px;
+  margin-right: 10px;
+  opacity: 0.3;
+}
+
+.dashboard .dashboard-content .id-button:hover {
+  opacity: 0.9;
+}
+
 .sidebar-toggle {
   position: fixed;
-  top:15px;
-  right:15px;
+  top: 15px;
+  right: 15px;
   z-index: 2;
 }
 
 .back-to-setup {
   position: fixed;
-  top:15px;
-  right:55px;
+  top: 15px;
+  right: 55px;
   z-index: 2;
 }
 
