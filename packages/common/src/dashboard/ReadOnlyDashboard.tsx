@@ -1,11 +1,9 @@
-import { Spin } from 'antd';
-import React, { useState, useEffect } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import {Spin} from 'antd';
+import React, {useEffect, useState} from 'react';
+import {useLocation, useSearchParams} from 'react-router-dom';
 import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
-import ConfigurationModel from '../models/ConfigurationModel';
 import DashboardModel from '../models/DashboardModel';
 import DataModel from '../models/DataModel';
-import LayoutModel from '../models/LayoutModel';
 import DashboardConfigView from './DashboardConfigView';
 
 interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {

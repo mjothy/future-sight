@@ -1,6 +1,7 @@
 import { Col, Row, Select } from 'antd';
 import { Component } from 'react';
-import ControlBlockTableSelection from './ControlBlockTableSelection';
+import ControlBlockTableSelection from '../component/ControlBlockTableSelection';
+import BlockStyleModel from "../../../models/BlockStyleModel";
 
 const { Option } = Select;
 
@@ -25,9 +26,17 @@ export default class ControlBlockView extends Component<any, any> {
         this.props.currentBlock.id
       );
     };
-
+    const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
     return (
       <div className="p-10" style={{ maxHeight: this.props.height - 30 }}>
+        {configStyle.title.isVisible ? (
+            <Row>
+              <Col span={24}>
+                <h1>{configStyle.title.value}</h1>
+              </Col>
+            </Row>
+          ) : undefined
+        }
         {metaData.master['models'].isMaster && (
           <Row>
             <Col span={24}>

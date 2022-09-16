@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import BlockViewManager from './blocks/views/BlockViewManager';
+import BlockViewManager from './blocks/BlockViewManager';
 import PropTypes from 'prop-types';
 import ComponentPropsWithDataManager from "../datamanager/ComponentPropsWithDataManager";
 import DataModel from "../models/DataModel";

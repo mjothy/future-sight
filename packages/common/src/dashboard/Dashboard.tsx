@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import DashboardConfigView from './DashboardConfigView';
 import DashboardConfigControl from './DashboardConfigControl';
-import { MenuFoldOutlined } from '@ant-design/icons';
 import Sidebar from './sidebar/Sidebar';
 import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
 

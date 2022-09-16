@@ -53,8 +53,7 @@ export default class DataBlockView extends Component<any, any> {
   settingPlotData = () => {
     const data: any[] = this.getPlotData();
     const showData: any[] = [];
-    const configStyle: BlockStyleModel =
-      this.props.currentBlock.config.configStyle;
+    const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
     if (configStyle.graphType === 'table') {
       return this.prepareTableData(data);

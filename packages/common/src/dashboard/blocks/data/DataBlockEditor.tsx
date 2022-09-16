@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { Divider, Select } from 'antd';
-import DataBlockTableSelection from './DataBlockTableSelection';
+import DataBlockTableSelection from '../component/DataBlockTableSelection';
 import BlockModel from '../../../models/BlockModel';
 import ConfigurationModel from '../../../models/ConfigurationModel';
 
