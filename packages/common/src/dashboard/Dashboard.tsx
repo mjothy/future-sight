@@ -19,7 +19,7 @@ export interface DashboardProps extends ComponentPropsWithDataManager {
   updateSelectedBlock: (blockSelectedId: string) => void;
   updateBlockMetaData: (data: any) => void;
   updateBlockStyleConfig: (data: any) => void;
-  saveDashboard: (callback: (idPermanent) => void) => void;
+  saveDashboard: (callback: (idPermanent) => void, image?: string) => void;
   isEmbedded?: boolean;
 }
 

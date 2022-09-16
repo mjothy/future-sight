@@ -3,6 +3,10 @@ import AddButton from './actions/AddButton';
 import { Button, Col, Row, notification, Modal } from 'antd';
 import { DashboardProps } from '../Dashboard';
 import { useNavigate } from 'react-router-dom';
+import html2canvas from 'html2canvas'
+
+const DEFAULT_PREVIEW_WIDTH = 800;
+const DEFAULT_PREVIEW_HEIGHT = 450;
 
 const actions = [
   {
@@ -35,6 +39,51 @@ const DashboardControl: React.FC<DashboardProps> = ({
 
   const onClickHandler = () => {
     setPublishing(true);
+    const dashboard = document.querySelector(".dashboard") as HTMLElement
+    if (dashboard) {
+      makeAndResizePreview(dashboard).then(function(dataURL) {
+        save(dataURL);
+      });
+    } else {
+      save()
+    }
+  };
+
+  const makeAndResizePreview = (dashboard) => {
+    return html2canvas(dashboard).then((function(canvas) {
+      const dataURL = canvas.toDataURL();
+      return resizeDataURL(dataURL, DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT)
+    }));
+  }
+
+  function resizeDataURL(datas, wantedWidth, wantedHeight) {
+    return new Promise<any>(async function (resolve, reject){
+      // We create an image to receive the Data URI
+      const img = document.createElement('img');
+
+      // When the event "onload" is triggered we can resize the image.
+      img.onload = function()
+      {
+        // We create a canvas and get its context.
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // We set the dimensions at the wanted size.
+        canvas.width = wantedWidth;
+        canvas.height = wantedHeight;
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, wantedWidth, wantedHeight);
+          const dataURI = canvas.toDataURL("image/jpeg");
+          resolve(dataURI);
+        } else {
+          resolve(undefined);
+        }
+      };
+      img.src = datas;
+    })
+  }
+
+  const save = (image ?: string) => {
     saveDashboard((idPermanent) => {
       setPublishing(false);
       notification.success({
@@ -44,8 +93,8 @@ const DashboardControl: React.FC<DashboardProps> = ({
       setTimeout(() => {
         navigate('/view?id=' + idPermanent);
       }, 1000);
-    });
-  };
+    }, image);
+  }
 
   return (
     <div

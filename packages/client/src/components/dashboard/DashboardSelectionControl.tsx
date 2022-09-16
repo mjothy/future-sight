@@ -17,7 +17,7 @@ export interface DashboardSelectionControlProps
   extends ComponentPropsWithDataManager,
     RoutingProps {
   getData: (data: DataModel[]) => any[];
-  saveData: (id: string) => Promise<any>;
+  saveData: (id: string, image?: string) => Promise<any>;
   setDashboardModelScenario: (selection) => void;
 }
 
@@ -195,9 +195,9 @@ export default class DashboardSelectionControl extends Component<
     })
   }
 
-  saveData = async (callback?: (idPermanent) => void) => {
+  saveData = async (callback?: (idPermanent) => void, image?: string) => {
     const { id } = this.state.dashboard;
-    const idPermanent = await this.props.saveData(id);
+    const idPermanent = await this.props.saveData(id, image);
     if (callback) {
       callback(idPermanent);
     }

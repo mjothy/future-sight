@@ -136,9 +136,12 @@ class DashboardDataConfiguration extends Component<
     return this.settingPlotData(data);
   };
 
-  saveData = async (id: string) => {
+  saveData = async (id: string, image?: string) => {
     const data = getDraft(id);
     if (data) {
+      if(image) {
+        data.preview = image
+      }
       try {
         const res = await this.props.dataManager.saveDashboard(data);
         removeDraft(id);
