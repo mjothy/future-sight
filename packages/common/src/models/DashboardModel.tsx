@@ -1,4 +1,5 @@
 import BlockModel from './BlockModel';
+import DataStructureModel from './DataStructureModel';
 import LayoutModel from './LayoutModel';
 import UserDataModel from './UserDataModel';
 
@@ -20,7 +21,7 @@ export default class DashboardModel {
   id?: string;
   userData: UserDataModel = new UserDataModel();
   // Dict of data: keys are models
-  dataStructure: object = {};
+  dataStructure: DataStructureModel = new DataStructureModel();
   layout: LayoutModel[] = [];
   blocks: { [id: string]: BlockModel } = {};
   date?: Date |string;

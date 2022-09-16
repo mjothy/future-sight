@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import {ColumnsType} from 'antd/lib/table';
 import React, {Component} from 'react';
 import BlockDataModel from '../../../models/BlockDataModel';
@@ -30,9 +31,9 @@ export default class DataBlockView extends Component<any, any> {
         metaData.regions = controlBlock.master['regions'].values;
     }
     const data: any[] = [];
-    if (metaData.models && metaData.variables && metaData.regions) {
-      Object.keys(metaData.models).map((model) => {
-        metaData.models[model].map((scenario) => {
+    if (metaData.models && metaData.variables && metaData.variables && metaData.regions) {
+      metaData.models.map((model) => {
+        metaData.scenarios.map((scenario) => {
           metaData.variables.map((variable) => {
             metaData.regions.map((region) => {
               data.push({ model, scenario, variable, region });
@@ -41,7 +42,11 @@ export default class DataBlockView extends Component<any, any> {
         });
       });
 
-      return this.props.getData(data);
+      console.log("data: ", data)
+
+      const returnData = this.props.getData(data);
+      console.log("returnData: ", returnData);
+      return returnData;
     }
   };
 

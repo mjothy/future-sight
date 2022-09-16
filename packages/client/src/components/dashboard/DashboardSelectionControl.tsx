@@ -34,6 +34,7 @@ export default class DashboardSelectionControl extends Component<
        */
       blockSelectedId: '',
       isDraft: false,
+      selectedFilter: ""
     };
   }
 
@@ -200,6 +201,10 @@ export default class DashboardSelectionControl extends Component<
     }
   };
 
+  updateSelectedFilter = (selectedFilter) => {
+    this.setState({ selectedFilter })
+  }
+
   render() {
     if (!this.state.dashboard) {
       return (
@@ -223,6 +228,8 @@ export default class DashboardSelectionControl extends Component<
         updateDashboardMetadata={this.updateDashboardMetadata}
         deleteBlock={this.deleteBlock}
         isDraft={this.state.isDraft}
+        updateSelectedFilter={this.updateSelectedFilter}
+        selectedFilter={this.state.selectedFilter}
         {...this.props}
       />
     );

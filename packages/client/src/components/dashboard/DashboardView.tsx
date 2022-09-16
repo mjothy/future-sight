@@ -12,7 +12,7 @@ import { Radio } from 'antd';
 
 interface DashboardViewProps
   extends ComponentPropsWithDataManager,
-    RoutingProps {
+  RoutingProps {
   dashboard: DashboardModel;
   addBlock: (blockType: string, masterBlockId?: string) => void;
   blockSelectedId: string;
@@ -27,6 +27,8 @@ interface DashboardViewProps
   deleteBlock: (bockId: string) => void;
   isDraft: boolean;
   readonly?: boolean;
+  updateSelectedFilter:(filter:string)=>void;
+  selectedFilter:string;
 }
 
 /**
@@ -43,7 +45,7 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
        * Selected data to work with in dashboard {model: {scenario: { variables: [], regions: []}}}
        */
       data: [],
-      setupDashboardMode: 'setup'
+      setupDashboardMode: 'dashboard'
     };
   }
 
@@ -84,10 +86,10 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
       <SetupView
         {...this.props}
         userData={this.props.dashboard.userData}
-        structureData={this.props.dashboard.dataStructure}
         submitEvent={this.switchSetupDashboardMode}
         updateUserData={this.handleUserData}
         handleStructureData={this.handleStructureData}
+        visible={this.state.setupDashboardMode === 'setup'}
       />
     );
   };
@@ -97,7 +99,8 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
   };
 
   switchSetupDashboardMode = (view) => {
-    this.setState({setupDashboardMode: view})
+    console.log("called: ", view);
+    this.setState({ setupDashboardMode: view })
   }
 
   hasFilledStructure = () => {
@@ -109,16 +112,22 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
       <>
         <div className="back-to-setup">
           <Radio.Group
-              value={this.state.setupDashboardMode}
-              onChange={(e) => this.switchSetupDashboardMode(e.target.value)}
-              buttonStyle="solid">
-            <Radio.Button value="setup">Setup</Radio.Button>
-            <Radio.Button value="dashboard" disabled={!this.hasFilledStructure()}>Dashboard</Radio.Button>
+            value={this.state.setupDashboardMode}
+            onChange={(e) => this.switchSetupDashboardMode(e.target.value)}
+            buttonStyle="solid">
+            <Radio.Button value="setup">Filter data</Radio.Button>
+            <Radio.Button value="dashboard">Dashboard</Radio.Button>
           </Radio.Group>
         </div>
-        {this.state.isSubmited || this.state.setupDashboardMode === 'dashboard'
-          ? this.dashboardManager()
-          : this.setupView()}
+        <Dashboard {...this.props} />
+        <SetupView
+        {...this.props}
+        userData={this.props.dashboard.userData}
+        submitEvent={this.switchSetupDashboardMode}
+        updateUserData={this.handleUserData}
+        handleStructureData={this.handleStructureData}
+        visible={this.state.setupDashboardMode === 'setup'}
+      />
       </>
     );
   }
