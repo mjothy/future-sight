@@ -157,6 +157,7 @@ body {
 /* Drawer */
 .drawer {
   margin-top: 60px;
+  z-index: 0;
 }
 
 .selected-layout {
@@ -185,4 +186,21 @@ body {
 
 .selected-layout-master {
   box-shadow: inset 0 0 0.5em #fbff2a, 0 0 1em #eaff2a;
+}
+
+/* Block editors */
+.block-flex{
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.top-filter{
+  order: 0;
+  -webkit-order: 0;
+}
+
+.other-filter{
+  order: 1;
+  -webkit-order: 1;
 }

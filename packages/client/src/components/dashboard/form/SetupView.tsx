@@ -1,9 +1,6 @@
 import { Component } from 'react';
-import UserDataForm from './UserDataForm';
-import DataStructureForm from './DataStructureForm';
-import { Button, Divider, Row, Typography } from 'antd';
-
-const { Title } = Typography;
+import Modal from 'antd/lib/modal/Modal';
+import PopupFilterContent from './PopupFilterContent';
 
 /**
  * The view for setting dashboard mataData
@@ -11,15 +8,21 @@ const { Title } = Typography;
 export default class SetupView extends Component<any, any> {
   constructor(props) {
     super(props);
+    this.state = {
+      dataStructure: structuredClone(this.props.dashboard.dataStructure),
+      selectedFilter: "",
+    }
   }
 
-  /**
-   * Submit the meta data to send it to dashboard
-   */
-  handleSubmit = () => {
-    this.props.submitEvent('dashboard');
-  };
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (this.props.visible !== prevProps.visible) {
+      Object.keys(this.props.dashboard.dataStructure).map(key => {
+        if (this.props.dashboard.dataStructure[key].isFilter)
+          this.props.updateSelectedFilter(key);
+      });
+    }
+  }
   /**
    * Receive the user data from UserDataForm and send it to DashboardView to update the parent state
    * @param data contains the information of the dashboard {title, author and tags}
@@ -28,32 +31,39 @@ export default class SetupView extends Component<any, any> {
     this.props.updateUserData(data);
   };
 
+
   render() {
+
+    const handleOk = () => {
+      // show notif
+      this.setState({ visible: false });
+      this.props.updateDashboardMetadata({ dataStructure: this.state.dataStructure });
+      this.props.submitEvent('dashboard');
+
+    };
+
+    const handleCancel = () => {
+      // Show notification
+      this.setState({ visible: false, selectedFilter: "", dataStructure: structuredClone(this.props.dashboard.dataStructure) });
+      this.props.updateSelectedFilter("");
+      this.props.submitEvent('dashboard');
+
+    };
+
+    const updateDataStructure = (dataStructure) => {
+      this.setState({ dataStructure });
+    }
+
+
+
     return (
-      <div className="content">
-        <UserDataForm
-          {...this.props}
-          handleUserData={this.handleUserData}
-          userData={this.props.userData}
-        />
-        <Divider />
-
-        <Title level={4} className="center">
-          Data Structure
-        </Title>
-        <DataStructureForm
-          {...this.props}
+      <Modal title="Set up filter data" visible={this.props.visible} onOk={handleOk} onCancel={handleCancel} closable={false} maskClosable={false} zIndex={2} okText={"submit"}>
+        <PopupFilterContent {...this.props}
           handleStructureData={this.props.handleStructureData}
-          structureData={this.props.structureData}
-        />
-
-        <Divider />
-        <Row justify="end">
-          <Button type="primary" onClick={this.handleSubmit}>
-            Submit
-          </Button>
-        </Row>
-      </div>
+          dataStructure={this.state.dataStructure}
+          updateDataStructure={updateDataStructure}
+          handleOk={handleOk} />
+      </Modal>
     );
   }
 }

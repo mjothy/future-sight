@@ -5,7 +5,7 @@ import { join } from 'path';
 
 import data from '../data/data.json';
 import models from '../data/models.json';
-import variables from '../data/variables.json';
+import filterData from '../data/filter.json'
 import regions from '../data/regions.json';
 import dashboard from '../data/dashboards.json';
 import allData from '../data/test-data.json';
@@ -89,31 +89,112 @@ export default class ExpressServer {
     });
 
     this.app.get('/api/models', (req, res) => {
+      let models: string[] = [];
+      filterData.forEach((data) => {
+        models.push(data.model);
+      });
+
+      models = [...new Set(models)];
+
       res.send(models);
     });
 
-    this.app.get(`/api/variables`, (req, res) => {
-      const model = req.query.model;
-      const scenario = req.query.scenario;
-
-      variables.forEach((variable) => {
-        if (variable.model === model && variable.scenario === scenario)
-          res.send({ ...variable });
+    this.app.get('/api/scenarios', (req, res) => {
+      let scenarios: string[] = [];
+      filterData.forEach((data) => {
+        scenarios.push(data.scenario);
       });
 
-      res.status(404).send('No data found');
+      scenarios = [...new Set(scenarios)];
+
+      res.send(scenarios);
+    });
+
+    this.app.get(`/api/variables`, (req, res) => {
+
+      let variables: string[] = [];
+      filterData.forEach((data) => {
+        variables.push(data.variable);
+      });
+
+      variables = [...new Set(variables)];
+
+      res.send(variables);
     });
 
     this.app.get(`/api/regions`, (req, res) => {
-      const model = req.query.model;
-      const scenario = req.query.scenario;
-
-      let allRegions: any[] = [];
-      regions.forEach((region) => {
-        if (region.model === model && region.scenario === scenario)
-          allRegions = [...allRegions, ...region.regions];
+      let regions: string[] = [];
+      filterData.forEach((data) => {
+        regions.push(data.region);
       });
-      res.send(allRegions);
+
+      regions = [...new Set(regions)];
+
+      res.send(regions);
+    });
+
+    this.app.post(`/api/filter`, (req, res) => {
+      const data = req.body;
+      const result: { [id: string]: string[] } = {
+        "regions": [],
+        "models": [],
+        "scenarios": [],
+        "variables": []
+      }
+      switch (data.type) {
+        case "regions":
+          data.data.map(region => {
+            const filtered: any[] = filterData.filter(dataElement => dataElement.region === region).map(e => e);
+            const models = filtered.map(data => data.model) as string[];
+            const scenarios = filtered.map(data => data.scenario) as string[];
+            const variables = filtered.map(data => data.variable) as string[];
+
+            result["models"] = [...new Set([...result["models"], ...models])];
+            result["scenarios"] = [...new Set([...result["scenarios"], ...scenarios])];
+            result["variables"] = [...new Set([...result["variables"], ...variables])];
+          });
+          break;
+
+        case "variables":
+          data.data.map(variable => {
+            const filtered: any[] = filterData.filter(dataElement => dataElement.variable === variable).map(e => e);
+            const models = filtered.map(data => data.model) as string[];
+            const scenarios = filtered.map(data => data.scenario) as string[];
+            const regions = filtered.map(data => data.region) as string[];
+
+            result["models"] = [...new Set([...result["models"], ...models])];
+            result["scenarios"] = [...new Set([...result["scenarios"], ...scenarios])];
+            result["regions"] = [...new Set([...result["regions"], ...regions])];
+          })
+          break;
+
+        case "scenarios":
+          data.data.map(scenario => {
+            const filtered: any[] = filterData.filter(dataElement => dataElement.scenario === scenario).map(e => e);
+            const models = filtered.map(data => data.model) as string[];
+            const variables = filtered.map(data => data.scenario) as string[];
+            const regions = filtered.map(data => data.region) as string[];
+
+            result["models"] = [...new Set([...result["models"], ...models])];
+            result["variables"] = [...new Set([...result["variables"], ...variables])];
+            result["regions"] = [...new Set([...result["regions"], ...regions])];
+          })
+          break;
+
+        case "models":
+          data.data.map(model => {
+            const filtered: any[] = filterData.filter(dataElement => dataElement.model === model).map(e => e);
+            const scenarios = filtered.map(data => data.scenario) as string[];
+            const variables = filtered.map(data => data.variable) as string[];
+            const regions = filtered.map(data => data.region) as string[];
+
+            result["scenarios"] = [...new Set([...result["scenarios"], ...scenarios])];
+            result["variables"] = [...new Set([...result["variables"], ...variables])];
+            result["regions"] = [...new Set([...result["regions"], ...regions])];
+          })
+          break;
+      }
+      res.send(result);
     });
 
     // Posts methods
@@ -172,68 +253,6 @@ export default class ExpressServer {
         next(err);
       }
     });
-
-    /** START : To delete after Delete */
-
-    // Prepare model data from the CSV file
-    this.app.get(`/api/modelData`, (req, res) => {
-      // get the models with scenarios
-      const obj = {};
-      allData.map((data) => {
-        obj[data.Model] = {};
-        allData.map((data2) => {
-          if (data2.Model === data.Model) {
-            if (obj[data.Model][data2.Scenario] == null) {
-              obj[data.Model][data2.Scenario] = {
-                variables: [],
-                regions: [],
-              };
-            }
-            obj[data.Model][data2.Scenario].variables.push(data2.Variable);
-            obj[data.Model][data2.Scenario].regions.push(data2.Region);
-            // uniques values:
-            obj[data.Model][data2.Scenario].variables = [
-              ...new Set(obj[data.Model][data2.Scenario].variables),
-            ];
-            obj[data.Model][data2.Scenario].regions = [
-              ...new Set(obj[data.Model][data2.Scenario].regions),
-            ];
-          }
-        });
-      });
-      fs.writeFile('./models1.json', JSON.stringify(obj), (err) => {
-        console.log(err);
-      });
-    });
-
-    // Prepare the data with timeseries
-    this.app.get(`/api/allData`, (req, res) => {
-      const result: any = [];
-      allData.map((data) => {
-        const obj: any = {
-          model: data.Model,
-          scenario: data.Scenario,
-          region: data.Region,
-          variable: data.Variable,
-          unit: data.Unit,
-          data: [],
-        };
-        for (let i = 2005; i <= 2100; i = i + 5) {
-          const valStr = i.toString();
-          if (data[valStr] == null) data[valStr] = '';
-          const valObj = {
-            year: i,
-            value: data[valStr],
-          };
-          obj.data.push(valObj);
-        }
-        result.push(obj);
-      });
-      fs.writeFile('./result.json', JSON.stringify(result), (err) => {
-        console.log(err);
-      });
-    });
-    /** END : To delete after Delete */
 
     // Serve the HTML page
     this.app.get('*', (req: any, res: any) => {

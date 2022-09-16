@@ -11,7 +11,7 @@ import { getDraft, removeDraft } from '../drafts/DraftUtils';
 
 export interface DashboardDataConfigurationProps
   extends ComponentPropsWithDataManager,
-    RoutingProps {
+  RoutingProps {
   readonly?: boolean;
 }
 
@@ -158,7 +158,6 @@ class DashboardDataConfiguration extends Component<
       const existData = this.isDataExist(dataElement);
       if (existData !== null) plotData.push(existData);
     });
-
     return plotData;
   }
 
