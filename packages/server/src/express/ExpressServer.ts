@@ -134,6 +134,10 @@ export default class ExpressServer {
     });
 
     this.app.post(`/api/filter`, (req, res) => {
+      /**
+       * data = {type:string, data:string[]}
+       * Check dataManager
+       */
       const data = req.body;
       const result: { [id: string]: string[] } = {
         "regions": [],

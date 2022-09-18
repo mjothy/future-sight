@@ -98,15 +98,15 @@ body {
 
 .sidebar-toggle {
   position: fixed;
-  top:15px;
-  right:15px;
+  top: 15px;
+  right: 15px;
   z-index: 2;
 }
 
 .back-to-setup {
   position: fixed;
-  top:15px;
-  right:55px;
+  top: 15px;
+  right: 55px;
   z-index: 2;
 }
 
@@ -189,18 +189,18 @@ body {
 }
 
 /* Block editors */
-.block-flex{
+.block-flex {
   display: flex;
   flex-direction: column;
   flex: 1;
 }
 
-.top-filter{
+.top-filter {
   order: 0;
   -webkit-order: 0;
 }
 
-.other-filter{
+.other-filter {
   order: 1;
   -webkit-order: 1;
 }

@@ -11,7 +11,7 @@ import { getDraft, removeDraft } from '../drafts/DraftUtils';
 
 export interface DashboardDataConfigurationProps
   extends ComponentPropsWithDataManager,
-  RoutingProps {
+    RoutingProps {
   readonly?: boolean;
 }
 
@@ -73,6 +73,7 @@ class DashboardDataConfiguration extends Component<
    */
   setDashboardModelScenario = (selection) => {
     const modelScenarios: any[] = [];
+    console.log('selection: ', selection);
     Object.keys(selection).forEach((model) => {
       Object.keys(selection[model]).forEach((scenario) => {
         modelScenarios.push({ model, scenario });
@@ -139,8 +140,8 @@ class DashboardDataConfiguration extends Component<
   saveData = async (id: string, image?: string) => {
     const data = getDraft(id);
     if (data) {
-      if(image) {
-        data.preview = image
+      if (image) {
+        data.preview = image;
       }
       try {
         const res = await this.props.dataManager.saveDashboard(data);

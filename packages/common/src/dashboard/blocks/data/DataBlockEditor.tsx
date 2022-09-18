@@ -1,6 +1,5 @@
 import { Component } from 'react';
 import { Divider, Select } from 'antd';
-import DataBlockTableSelection from '../component/DataBlockTableSelection';
 import BlockModel from '../../../models/BlockModel';
 import ConfigurationModel from '../../../models/ConfigurationModel';
 
@@ -45,7 +44,7 @@ export default class DataBlockEditor extends Component<any, any> {
       const data = this.state.data;
       data[this.filterOption] =
         this.props.dashboard.dataStructure[this.filterOption].selection;
-        this.setState({ data });
+      this.setState({ data });
     }
   }
 
@@ -166,15 +165,16 @@ export default class DataBlockEditor extends Component<any, any> {
                 (this.isBlockControlled &&
                   (this.controlBlock.config as ConfigurationModel).metaData
                     .master['regions'].isMaster) ||
-                (this.filterOption !== "" && this.filterOption !== 'regions' &&
+                (this.filterOption !== '' &&
+                  this.filterOption !== 'regions' &&
                   metaData[this.filterOption].length <= 0)
               }
-            // status={
-            //   this.filterOption !== "" && this.filterOption !== 'regions' &&
-            //     metaData[this.filterOption].length <= 0
-            //     ? 'warning'
-            //     : ''
-            // }
+              // status={
+              //   this.filterOption !== "" && this.filterOption !== 'regions' &&
+              //     metaData[this.filterOption].length <= 0
+              //     ? 'warning'
+              //     : ''
+              // }
             >
               {this.state.data['regions'].map((region) => (
                 <Option key={region} value={region}>
@@ -199,7 +199,8 @@ export default class DataBlockEditor extends Component<any, any> {
                 (this.isBlockControlled &&
                   (this.controlBlock.config as ConfigurationModel).metaData
                     .master['variables'].isMaster) ||
-                (this.filterOption !== "" && this.filterOption !== 'variables' &&
+                (this.filterOption !== '' &&
+                  this.filterOption !== 'variables' &&
                   metaData[this.filterOption].length <= 0)
               }
             >
@@ -227,7 +228,8 @@ export default class DataBlockEditor extends Component<any, any> {
                 (this.isBlockControlled &&
                   (this.controlBlock.config as ConfigurationModel).metaData
                     .master['scenarios'].isMaster) ||
-                (this.filterOption !== "" && this.filterOption !== 'scenarios' &&
+                (this.filterOption !== '' &&
+                  this.filterOption !== 'scenarios' &&
                   metaData[this.filterOption].length <= 0)
               }
             >
@@ -254,7 +256,8 @@ export default class DataBlockEditor extends Component<any, any> {
                 (this.isBlockControlled &&
                   (this.controlBlock.config as ConfigurationModel).metaData
                     .master['models'].isMaster) ||
-                (this.filterOption !== "" && this.filterOption !== 'models' &&
+                (this.filterOption !== '' &&
+                  this.filterOption !== 'models' &&
                   metaData[this.filterOption].length <= 0)
               }
             >
