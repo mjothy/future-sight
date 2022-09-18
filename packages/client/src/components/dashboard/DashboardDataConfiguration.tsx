@@ -12,7 +12,7 @@ import Utils from '../../services/Utils';
 
 export interface DashboardDataConfigurationProps
   extends ComponentPropsWithDataManager,
-  RoutingProps {
+    RoutingProps {
   readonly?: boolean;
 }
 
@@ -74,6 +74,7 @@ class DashboardDataConfiguration extends Component<
    */
   setDashboardModelScenario = (selection) => {
     const modelScenarios: any[] = [];
+    console.log('selection: ', selection);
     Object.keys(selection).forEach((model) => {
       Object.keys(selection[model]).forEach((scenario) => {
         modelScenarios.push({ model, scenario });

@@ -10,14 +10,14 @@ export default class SetupView extends Component<any, any> {
     super(props);
     this.state = {
       dataStructure: structuredClone(this.props.dashboard.dataStructure),
-      selectedFilter: "",
-    }
+      selectedFilter: '',
+    };
   }
 
-
   componentDidUpdate(prevProps, prevState, snapshot) {
+    // Update the filter state after modal open/close
     if (this.props.visible !== prevProps.visible) {
-      Object.keys(this.props.dashboard.dataStructure).map(key => {
+      Object.keys(this.props.dashboard.dataStructure).map((key) => {
         if (this.props.dashboard.dataStructure[key].isFilter)
           this.props.updateSelectedFilter(key);
       });
@@ -36,36 +36,45 @@ export default class SetupView extends Component<any, any> {
   }
 
   render() {
-
     const handleOk = () => {
-      // show notif
       this.setState({ visible: false });
-      this.props.updateDashboardMetadata({ dataStructure: this.state.dataStructure });
+      this.props.updateDashboardMetadata({
+        dataStructure: this.state.dataStructure,
+      });
       this.props.submitEvent('dashboard');
-
     };
 
     const handleCancel = () => {
-      // Show notification
-      this.setState({ visible: false, selectedFilter: "", dataStructure: structuredClone(this.props.dashboard.dataStructure) });
-      this.props.updateSelectedFilter("");
+      this.setState({
+        visible: false,
+        selectedFilter: '',
+        dataStructure: structuredClone(this.props.dashboard.dataStructure),
+      });
+      this.props.updateSelectedFilter('');
       this.props.submitEvent('dashboard');
-
     };
 
     const updateDataStructure = (dataStructure) => {
       this.setState({ dataStructure });
-    }
-
-
+    };
 
     return (
-      <Modal title="Set up filter data" visible={this.props.visible} onOk={handleOk} onCancel={handleCancel} closable={false} maskClosable={false} zIndex={2} okText={"submit"}>
-        <PopupFilterContent {...this.props}
-          handleStructureData={this.props.handleStructureData}
+      <Modal
+        title="Set up filter data"
+        visible={this.props.visible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        closable={false}
+        maskClosable={false}
+        zIndex={2}
+        okText={'submit'}
+      >
+        <PopupFilterContent
+          {...this.props}
           dataStructure={this.state.dataStructure}
           updateDataStructure={updateDataStructure}
-          handleOk={handleOk} />
+          handleOk={handleOk}
+        />
       </Modal>
     );
   }

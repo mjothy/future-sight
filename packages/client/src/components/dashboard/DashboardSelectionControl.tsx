@@ -34,7 +34,7 @@ export default class DashboardSelectionControl extends Component<
        */
       blockSelectedId: '',
       isDraft: false,
-      selectedFilter: ""
+      selectedFilter: '',
     };
   }
 
@@ -60,7 +60,7 @@ export default class DashboardSelectionControl extends Component<
       if (dashboardJson) {
         this.setState({
           dashboard: dashboardJson,
-          isDraft: true
+          isDraft: true,
         });
       } else {
         console.error('no draft found with id' + id);
@@ -72,10 +72,12 @@ export default class DashboardSelectionControl extends Component<
     const dashboardJson = this.state.dashboard;
     let lastId = 0;
     if (Object.keys(dashboardJson.blocks).length > 0) {
-      lastId = Math.max(...Object.keys(dashboardJson.blocks).map((key => parseInt(key))));
+      lastId = Math.max(
+        ...Object.keys(dashboardJson.blocks).map((key) => parseInt(key))
+      );
     }
     return lastId;
-  }
+  };
 
   updateLayout = (layout: LayoutModel[]) => {
     this.setState({
@@ -90,8 +92,8 @@ export default class DashboardSelectionControl extends Component<
     this.setState({ blockSelectedId });
   };
 
-  updateDashboardMetadata = (data, deletion?:any) => {
-    if(deletion) {
+  updateDashboardMetadata = (data, deletion?: any) => {
+    if (deletion) {
       //remove all blocks associated to deletion.model
       const blocks = {...this.state.dashboard.blocks};
       const layout = [...this.state.dashboard.layout];
@@ -99,7 +101,7 @@ export default class DashboardSelectionControl extends Component<
       for (const blockId in blocks) {
         const block = blocks[blockId];
         if (deletion.model in block.config.metaData.models) {
-          toRemove.push(blockId)
+          toRemove.push(blockId);
         }
       }
       for (const blockId of toRemove) {
@@ -112,9 +114,9 @@ export default class DashboardSelectionControl extends Component<
           ...this.state.dashboard,
           blocks: blocks,
           layout: layout,
-          ...data
-        }
-      })
+          ...data,
+        },
+      });
     } else {
       this.setState({ dashboard: { ...this.state.dashboard, ...data } });
     }
@@ -156,7 +158,7 @@ export default class DashboardSelectionControl extends Component<
   };
 
   addBlock = (blockType: string, masterBlockId?: string) => {
-    const layoutItem = new LayoutModel((this.getLastId()+1).toString());
+    const layoutItem = new LayoutModel((this.getLastId() + 1).toString());
     const dashboard = this.state.dashboard;
 
     dashboard.blocks[layoutItem.i] = new BlockModel(layoutItem.i, blockType);
@@ -172,7 +174,7 @@ export default class DashboardSelectionControl extends Component<
         blocks: dashboard.blocks,
         layout: dashboard.layout,
       },
-      blockSelectedId: layoutItem.i
+      blockSelectedId: layoutItem.i,
     };
     this.setState(state);
   };
@@ -189,9 +191,9 @@ export default class DashboardSelectionControl extends Component<
         blocks: blocks,
         layout: layout,
       },
-      blockSelectedId: ""
-    })
-  }
+      blockSelectedId: '',
+    });
+  };
 
   saveData = async (callback?: (idPermanent) => void, image?: string) => {
     const { id } = this.state.dashboard;
@@ -202,8 +204,8 @@ export default class DashboardSelectionControl extends Component<
   };
 
   updateSelectedFilter = (selectedFilter) => {
-    this.setState({ selectedFilter })
-  }
+    this.setState({ selectedFilter });
+  };
 
   render() {
     if (!this.state.dashboard) {
