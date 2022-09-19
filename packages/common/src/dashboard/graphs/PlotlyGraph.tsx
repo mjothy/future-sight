@@ -27,11 +27,19 @@ export default class PlotlyGraph extends Component<any, any> {
       height: this.props.height,
       legend: { orientation: 'h' },
       autosize: false,
-      margin: this.getMargins(),
+      margin: {
+        l: 40,
+        r: 10,
+        b: 35,
+        t: 35,
+        pad: 4,
+      },
       font: {
         size: 10,
       },
-      yaxis: this.props.layout.YAxis
+      yaxis: {
+        title: currentBlock.config.metaData.variables.toString(),
+      }
     };
     if (currentBlock.config.configStyle.title.isVisible) {
       layout = {
