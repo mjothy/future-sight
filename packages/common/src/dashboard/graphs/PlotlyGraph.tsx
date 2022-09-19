@@ -17,16 +17,18 @@ export default class PlotlyGraph extends Component<any, any> {
       legend: { orientation: 'h' },
       autosize: false,
       margin: {
-        l: 30,
-        r: 30,
-        b: 25,
-        t: 25,
+        l: 40,
+        r: 10,
+        b: 35,
+        t: 35,
         pad: 4,
       },
       font: {
         size: 10,
       },
-      hoverInfo: 'djjdjdjd',
+      yaxis: {
+        title: currentBlock.config.metaData.variables.toString(),
+      }
     };
     if (currentBlock.config.configStyle.title.isVisible) {
       layout = {
