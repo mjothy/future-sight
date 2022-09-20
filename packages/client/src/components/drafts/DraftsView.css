@@ -1,16 +1,21 @@
 .drafts-view-wrapper {
-  height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
 }
 
 .drafts-container {
   width: 90%;
-  margin: 2%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 0.5em;
 }
 
 .drafts-wrapper {
   flex: 1;
+}
+
+.draft-preview {
+  margin: 4px;
 }
