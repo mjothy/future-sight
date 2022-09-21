@@ -98,15 +98,15 @@ body {
 
 .sidebar-toggle {
   position: fixed;
-  top:15px;
-  right:15px;
+  top: 15px;
+  right: 15px;
   z-index: 2;
 }
 
 .back-to-setup {
   position: fixed;
-  top:15px;
-  right:55px;
+  top: 15px;
+  right: 55px;
   z-index: 2;
 }
 
@@ -157,6 +157,7 @@ body {
 /* Drawer */
 .drawer {
   margin-top: 60px;
+  max-height: calc(100% - 60px);
 }
 
 .selected-layout {

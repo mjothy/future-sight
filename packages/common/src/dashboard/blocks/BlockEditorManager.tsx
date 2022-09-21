@@ -106,7 +106,7 @@ export default class BlockEditorManager extends Component<any, any> {
           <Col>
             <Popconfirm
               title="Are you sure you want to delete this block ?"
-              onConfirm={this.props.deleteBlock}
+              onConfirm={() => this.props.deleteBlock(this.props.blockSelectedId)}
               okText="Yes"
               cancelText="No"
             >
