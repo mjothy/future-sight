@@ -4,6 +4,8 @@ import BlockViewManager from './blocks/BlockViewManager';
 import PropTypes from 'prop-types';
 import ComponentPropsWithDataManager from "../datamanager/ComponentPropsWithDataManager";
 import DataModel from "../models/DataModel";
+import { EditOutlined, EditTwoTone } from '@ant-design/icons';
+import { Button } from 'antd';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -105,9 +107,11 @@ class DashboardConfigView extends Component<any, any> {
     });
   };
 
-  onBlockClick = (e) => {
-    if (e.currentTarget.id) {
-      this.props.updateSelectedBlock(e.currentTarget.id);
+  onBlockClick = (e, id) => {
+    e.preventDefault();
+    console.log(id)
+    if (id) {
+      this.props.updateSelectedBlock(id);
     }
   };
 
@@ -152,8 +156,12 @@ class DashboardConfigView extends Component<any, any> {
               ref={(ref) => (this.ref[layout.i] = ref)}
               id={layout.i}
               className={'width-100 height-100 bg-white'}
-              onDoubleClick={this.onBlockClick}
             >
+              {!this.props.readonly && (
+                  <div className="block-edit" style={{position: "fixed", top: 2, right: 2, zIndex: 2}}>
+                    <Button icon={<EditTwoTone />} onClick={(e) => this.onBlockClick(e, layout.i)}/>
+                  </div>
+              )}
               <BlockViewManager
                 {...this.props}
                 currentBlock={...blocks[layout.i]}

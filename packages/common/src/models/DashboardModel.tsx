@@ -2,17 +2,17 @@ import BlockModel from './BlockModel';
 import LayoutModel from './LayoutModel';
 import UserDataModel from './UserDataModel';
 
+import defaultJson from './dashboardModel.json'
+
 export default class DashboardModel {
   constructor(id?: string) {
     this.id = id;
   }
 
-  static fromJson(json) : DashboardModel {
-    const ret = new DashboardModel(json.id)
-    ret.layout = json.layout
-    ret.dataStructure = json.dataStructure
-    ret.blocks = json.blocks
-    ret.userData = UserDataModel.fromJson(json.userData)
+  static fromDraft(id?: string) : DashboardModel {
+    const ret = new DashboardModel(id)
+    ret.layout = defaultJson.layout
+    ret.blocks = defaultJson.blocks
     return ret
   }
 

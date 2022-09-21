@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import UserDataForm from './UserDataForm';
 import DataStructureForm from './DataStructureForm';
-import { Button, Divider, Row, Typography } from 'antd';
+import {Alert, Button, Col, Divider, Row, Space, Typography } from 'antd';
 
 const { Title } = Typography;
 
@@ -28,6 +28,10 @@ export default class SetupView extends Component<any, any> {
     this.props.updateUserData(data);
   };
 
+  hasFilledStructure = () => {
+      return Object.keys(this.props.structureData).length !== 0
+  }
+
   render() {
     return (
       <div className="content">
@@ -49,9 +53,15 @@ export default class SetupView extends Component<any, any> {
 
         <Divider />
         <Row justify="end">
-          <Button type="primary" onClick={this.handleSubmit}>
-            Submit
-          </Button>
+            <Space>
+                {!this.hasFilledStructure() ? (
+                        <Alert message="You must select at least one Model and Scenario" type="warning" />
+                    ) : undefined
+                }
+                <Button type="primary" onClick={this.handleSubmit} disabled={!this.hasFilledStructure()}>
+                    Submit
+                </Button>
+            </Space>
         </Row>
       </div>
     );

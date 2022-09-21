@@ -20,7 +20,7 @@ const { TabPane } = Tabs;
 export default class BlockEditorManager extends Component<any, any> {
   blockType;
   readonly tabsTypes = [
-    { title: 'Data configuration', icon: <EditOutlined />, type: 'data' },
+    { title: 'Data', icon: <EditOutlined />, type: 'data' },
     { title: 'Visualization', icon: <EyeOutlined />, type: 'style' },
   ];
 
@@ -76,18 +76,8 @@ export default class BlockEditorManager extends Component<any, any> {
               : 'end'
           }
         >
-          <Col>
-            <Tooltip title="Back to blocks control">
-              <Button
-                type="primary"
-                onClick={() => this.props.updateSelectedBlock('')}
-                icon={<BackwardOutlined />}
-                size="large"
-              />
-            </Tooltip>
-          </Col>
           {this.hasTabs(this.props.blocks[this.props.blockSelectedId].blockType) && (
-            <Col>
+            <Col span={22}>
               <Tabs type="card" onChange={(activeKey) => this.tabsToggle(activeKey)}>
                 {this.tabsTypes.map((tab) => {
                   return (
@@ -103,7 +93,7 @@ export default class BlockEditorManager extends Component<any, any> {
               </Tabs>
             </Col>
           )}
-          <Col>
+          <Col span={2}>
             <Popconfirm
               title="Are you sure you want to delete this block ?"
               onConfirm={() => this.props.deleteBlock(this.props.blockSelectedId)}
@@ -111,7 +101,7 @@ export default class BlockEditorManager extends Component<any, any> {
               cancelText="No"
             >
               <Tooltip title="Delete block">
-                <Button type="default" icon={<DeleteOutlined />} size="large" />
+                <Button type="default" icon={<DeleteOutlined />} danger size="large" />
               </Tooltip>
             </Popconfirm>
           </Col>

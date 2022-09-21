@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import { Divider, Select } from 'antd';
+import { Divider, Select, Space } from 'antd';
 import DataBlockTableSelection from '../component/DataBlockTableSelection';
 import BlockModel from '../../../models/BlockModel';
 import ConfigurationModel from '../../../models/ConfigurationModel';
@@ -104,21 +104,24 @@ export default class DataBlockEditor extends Component<any, any> {
     const metaData = this.props.currentBlock.config.metaData;
 
     return (
-      <div>
-        {this.isBlockControlled &&
-        (this.controlBlock.config as ConfigurationModel).metaData.master[
-          'models'
-        ].isMaster ? (
-          <p>That block is controled by Model/scenario</p>
-        ) : (
-          <DataBlockTableSelection
-            {...this.props}
-            updateDropdownData={this.updateDropdownData}
-          />
-        )}
-        <Divider />
+      <Space direction="vertical" className="width-100">
+        <div>
+          <h4>Model & Scenario selection</h4>
+          {this.isBlockControlled &&
+          (this.controlBlock.config as ConfigurationModel).metaData.master[
+              'models'
+              ].isMaster ? (
+              <p>That block is controled by Model/scenario</p>
+          ) : (
+              <DataBlockTableSelection
+                  {...this.props}
+                  updateDropdownData={this.updateDropdownData}
+              />
+          )}
+        </div>
         {/* adding key, because react not updating the default value on state change */}
         <div>
+        <h4>Variables selection</h4>
           <Select
             key={this.defaultVariables.toString()}
             mode="multiple"
@@ -140,8 +143,8 @@ export default class DataBlockEditor extends Component<any, any> {
             ))}
           </Select>
         </div>
-        <Divider />
         <div>
+          <h4>Regions selection</h4>
           <Select
             key={this.defaultRegions.toString()}
             mode="multiple"
@@ -163,7 +166,7 @@ export default class DataBlockEditor extends Component<any, any> {
             ))}
           </Select>
         </div>
-      </div>
+      </Space>
     );
   }
 }
