@@ -1,0 +1,19 @@
+.browse-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.browse-container .form {
+  width: 75%;
+}
+
+.browse-container .search-result {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}

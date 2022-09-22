@@ -13,11 +13,11 @@ import { join } from 'path';
 // import regions from '../data/regions.json';
 
 // Useless ?
-import dashboard from '../data/dashboards.json';
+// import dashboard from '../data/dashboards.json';
 
 import * as fs from 'fs';
 import RedisClient from '../redis/RedisClient';
-import IDataProxy from "./IDataProxy";
+import IDataProxy from './IDataProxy';
 
 export default class ExpressServer {
   private app: any;
@@ -27,7 +27,14 @@ export default class ExpressServer {
   private readonly dbClient: RedisClient;
   private readonly dataProxy: IDataProxy;
 
-  constructor(port, cookieKey, auth, clientPath, dbClient, dataProxy: IDataProxy) {
+  constructor(
+    port,
+    cookieKey,
+    auth,
+    clientPath,
+    dbClient,
+    dataProxy: IDataProxy
+  ) {
     this.app = express();
     this.port = port;
     this.auth = auth;
@@ -86,9 +93,11 @@ export default class ExpressServer {
       const body = req.body;
       const response: any[] = [];
       for (const reqData of body) {
-        const element = this.dataProxy.getData().find(
-          (e) => e.model === reqData.model && e.scenario === reqData.scenario
-        );
+        const element = this.dataProxy
+          .getData()
+          .find(
+            (e) => e.model === reqData.model && e.scenario === reqData.scenario
+          );
         if (element) {
           response.push(element);
         }
@@ -144,9 +153,9 @@ export default class ExpressServer {
       });
     });
 
-    this.app.get(`/api/dashboard`, (req, res) => {
-      res.send(dashboard);
-    });
+    // this.app.get(`/api/dashboard`, (req, res) => {
+    //   res.send(dashboard);
+    // });
 
     this.app.get(`/api/dashboards/:id`, async (req, res, next) => {
       try {

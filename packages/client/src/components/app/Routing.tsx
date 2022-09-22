@@ -1,10 +1,10 @@
 import { Route, Routes } from 'react-router-dom';
-import Login from '../login/Login';
 import React from 'react';
 import HomeView from '../home/HomeView';
 import DashboardDataConfiguration from '../dashboard/DashboardDataConfiguration';
 import DraftsView from '../drafts/DraftsView';
 import DefaultLayout from './DefaultLayout';
+import BrowseView from '../browse/BrowseView';
 
 export interface RoutingProps {
   isEmbedded: boolean;
@@ -17,6 +17,7 @@ export default class Routing extends React.Component<RoutingProps> {
       <Routes>
         <Route element={<DefaultLayout />}>
           <Route path="drafts" element={<DraftsView />} />
+          <Route path="browse" element={<BrowseView />} />
           <Route index element={<HomeView />} />
         </Route>
 
