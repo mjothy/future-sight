@@ -3,19 +3,6 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import { join } from 'path';
 
-//Duplicate ?
-// import allData from '../data/test-data.json';
-// import data from '../data/data.json';
-//
-//
-// import models from '../data/models.json';
-// import variables from '../data/variables.json';
-// import regions from '../data/regions.json';
-
-// Useless ?
-import dashboard from '../data/dashboards.json';
-
-import * as fs from 'fs';
 import RedisClient from '../redis/RedisClient';
 import IDataProxy from "./IDataProxy";
 
@@ -138,16 +125,6 @@ export default class ExpressServer {
       }
     });
 
-    this.app.post(`/api/dashboard`, (req, res) => {
-      fs.writeFile('./dashboards.json', JSON.stringify(req.body), (err) => {
-        if (err) console.log('Error writing file:', err);
-      });
-    });
-
-    this.app.get(`/api/dashboard`, (req, res) => {
-      res.send(dashboard);
-    });
-
     this.app.get(`/api/dashboards/:id`, async (req, res, next) => {
       try {
         const id = req.params.id;
@@ -180,68 +157,6 @@ export default class ExpressServer {
         next(err);
       }
     });
-
-    /** START : To delete after Delete */
-
-    // Prepare model data from the CSV file
-    this.app.get(`/api/modelData`, (req, res) => {
-      // get the models with scenarios
-      const obj = {};
-      this.dataProxy.getTestData().map((data) => {
-        obj[data.Model] = {};
-        this.dataProxy.getTestData().map((data2) => {
-          if (data2.Model === data.Model) {
-            if (obj[data.Model][data2.Scenario] == null) {
-              obj[data.Model][data2.Scenario] = {
-                variables: [],
-                regions: [],
-              };
-            }
-            obj[data.Model][data2.Scenario].variables.push(data2.Variable);
-            obj[data.Model][data2.Scenario].regions.push(data2.Region);
-            // uniques values:
-            obj[data.Model][data2.Scenario].variables = [
-              ...new Set(obj[data.Model][data2.Scenario].variables),
-            ];
-            obj[data.Model][data2.Scenario].regions = [
-              ...new Set(obj[data.Model][data2.Scenario].regions),
-            ];
-          }
-        });
-      });
-      fs.writeFile('./models1.json', JSON.stringify(obj), (err) => {
-        console.log(err);
-      });
-    });
-
-    // Prepare the data with timeseries
-    this.app.get(`/api/allData`, (req, res) => {
-      const result: any = [];
-      this.dataProxy.getTestData().map((data) => {
-        const obj: any = {
-          model: data.Model,
-          scenario: data.Scenario,
-          region: data.Region,
-          variable: data.Variable,
-          unit: data.Unit,
-          data: [],
-        };
-        for (let i = 2005; i <= 2100; i = i + 5) {
-          const valStr = i.toString();
-          if (data[valStr] == null) data[valStr] = '';
-          const valObj = {
-            year: i,
-            value: data[valStr],
-          };
-          obj.data.push(valObj);
-        }
-        result.push(obj);
-      });
-      fs.writeFile('./result.json', JSON.stringify(result), (err) => {
-        console.log(err);
-      });
-    });
-    /** END : To delete after Delete */
 
     // Serve the HTML page
     this.app.get('*', (req: any, res: any) => {
