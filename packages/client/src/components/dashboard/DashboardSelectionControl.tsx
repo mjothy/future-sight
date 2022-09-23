@@ -1,7 +1,6 @@
 import {
   BlockModel,
   ComponentPropsWithDataManager,
-  DashboardModel,
   DataModel,
   LayoutModel,
 } from '@future-sight/common';
@@ -19,6 +18,7 @@ export interface DashboardSelectionControlProps
   getData: (data: DataModel[]) => any[];
   saveData: (id: string, image?: string) => Promise<any>;
   setDashboardModelScenario: (selection) => void;
+  updateDataToFetch: (data: any) => void;
 }
 
 export default class DashboardSelectionControl extends Component<
@@ -42,10 +42,11 @@ export default class DashboardSelectionControl extends Component<
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevState.dashboard != this.state.dashboard) {
       setDraft(this.state.dashboard.id, this.state.dashboard);
-      if (this.state.dashboard) {
-        this.props.setDashboardModelScenario(
-          this.state.dashboard.dataStructure
-        );
+      if (
+        prevState.dashboard?.dataStructure !=
+        this.state.dashboard?.dataStructure
+      ) {
+        this.props.updateDataToFetch(this.state.dashboard.dataStructure);
       }
     }
   }

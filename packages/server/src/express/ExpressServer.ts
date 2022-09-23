@@ -17,7 +17,7 @@ import dashboard from '../data/dashboards.json';
 
 import * as fs from 'fs';
 import RedisClient from '../redis/RedisClient';
-import IDataProxy from "./IDataProxy";
+import IDataProxy from './IDataProxy';
 
 export default class ExpressServer {
   private app: any;
@@ -27,7 +27,14 @@ export default class ExpressServer {
   private readonly dbClient: RedisClient;
   private readonly dataProxy: IDataProxy;
 
-  constructor(port, cookieKey, auth, clientPath, dbClient, dataProxy: IDataProxy) {
+  constructor(
+    port,
+    cookieKey,
+    auth,
+    clientPath,
+    dbClient,
+    dataProxy: IDataProxy
+  ) {
     this.app = express();
     this.port = port;
     this.auth = auth;
@@ -62,36 +69,22 @@ export default class ExpressServer {
     this.app.get('/api', (req, res) => {
       res.send(`Hello , From server`);
     });
-
-    /**
-     * @deprecated This is broken, should not be used as is
-     */
+    
     this.app.post('/api/data', (req, res) => {
       const body = req.body;
-      console.log('body: ', JSON.stringify(req.body));
-      this.dataProxy.getData().map((e) => {
-        if (
-          e.model === body.model &&
-          e.scenario === body.scenario &&
-          e.region === body.region &&
-          e.variable === body.variable
-        ) {
-          res.status(200).send(e);
-        }
-      });
-      res.status(404).send([]);
-    });
-
-    this.app.post('/api/plotData', (req, res) => {
-      const body = req.body;
       const response: any[] = [];
+      const globalData = this.dataProxy.getData();
       for (const reqData of body) {
-        const element = this.dataProxy.getData().find(
-          (e) => e.model === reqData.model && e.scenario === reqData.scenario
-        );
-        if (element) {
-          response.push(element);
-        }
+        globalData.forEach((e) => {
+          if (
+            e.model === reqData.model &&
+            e.scenario === reqData.scenario &&
+            e.region === reqData.region &&
+            e.variable === reqData.variable
+          ) {
+            response.push(e);
+          }
+        });
       }
       res.status(200).send(response);
     });

@@ -2,6 +2,7 @@ import {
   ComponentPropsWithDataManager,
   DataModel,
   ReadOnlyDashboard,
+  DataModelSet,
 } from '@future-sight/common';
 import { Component } from 'react';
 import withDataManager from '../../services/withDataManager';
@@ -33,41 +34,80 @@ class DashboardDataConfiguration extends Component<
     };
   }
 
+  // /**
+  //  * Compare each { model, scenario } in a and b
+  //  * @param a the first array of { model, scenario }
+  //  * @param b the second array of { model, scenario }
+  //  * @returns whether a and b contain the same objects
+  //  */
+  // modelScenarioIsEqual = (a: any[], b: any[]) => {
+  //   if (a.length != b.length) {
+  //     return false;
+  //   }
+  //   let i = 0; // a and b should keep the objects order
+  //   while (i < a.length) {
+  //     if (a[i].model !== b[i].model && a[i].scenario !== b[i].scenario) {
+  //       return false;
+  //     }
+  //     i++;
+  //   }
+  //   return true;
+  // };
+
+  // componentDidUpdate(
+  //   prevProps: Readonly<DashboardDataConfigurationProps>,
+  //   prevState: Readonly<any>,
+  //   snapshot?: any
+  // ): void {
+  //   const shouldUpdate = !this.modelScenarioIsEqual(
+  //     prevState.dashboardModelScenario,
+  //     this.state.dashboardModelScenario
+  //   ); // A child updated the models and scenarios selected
+  //   if (shouldUpdate) {
+  //     this.fetchData();
+  //   }
+  // }
+
   /**
-   * Compare each { model, scenario } in a and b
-   * @param a the first array of { model, scenario }
-   * @param b the second array of { model, scenario }
-   * @returns whether a and b contain the same objects
+   * Fetch the missing data from the state
+   * @param data
    */
-  modelScenarioIsEqual = (a: any[], b: any[]) => {
-    if (a.length != b.length) {
-      return false;
+  fetchData = async (data) => {
+    const { data: globalData } = this.state;
+    // Get the selected DataModel
+    const selectedData = new DataModelSet();
+    Object.entries(data).forEach(([model, value]) => {
+      Object.entries(value as any).forEach(([scenario, params]) => {
+        const regions = (params as any).regions;
+        const variables = (params as any).variables;
+        regions.forEach((region) => {
+          variables.forEach((variable) => {
+            selectedData.add({ model, scenario, region, variable });
+          });
+        });
+      });
+    });
+
+    // Find the missing DataModel from the data state and fetch the corresponding data
+    const missingData = [...selectedData].filter((data) => {
+      return !globalData.find(
+        (gData) =>
+          data.model === gData.model &&
+          data.scenario === gData.scenario &&
+          data.variable === gData.variable &&
+          data.region === gData.region
+      );
+    });
+    if (missingData.length > 0) {
+      const res = await this.props.dataManager.fetchData(missingData);
+      this.setState((prev) => {
+        return { data: prev.data.concat(res) };
+      });
     }
-    let i = 0; // a and b should keep the objects order
-    while (i < a.length) {
-      if (a[i].model !== b[i].model && a[i].scenario !== b[i].scenario) {
-        return false;
-      }
-      i++;
-    }
-    return true;
   };
 
-  componentDidUpdate(
-    prevProps: Readonly<DashboardDataConfigurationProps>,
-    prevState: Readonly<any>,
-    snapshot?: any
-  ): void {
-    const shouldUpdate = !this.modelScenarioIsEqual(
-      prevState.dashboardModelScenario,
-      this.state.dashboardModelScenario
-    ); // A child updated the models and scenarios selected
-    if (shouldUpdate) {
-      this.fetchData();
-    }
-  }
-
   /**
+   * @unused
    * Add the { model, scenario } selected by the user to the state
    * @param selection the dashboard dataStructure
    */
@@ -82,38 +122,38 @@ class DashboardDataConfiguration extends Component<
     this.setState({ dashboardModelScenario: modelScenarios });
   };
 
-  /**
-   * Fetch the data missing from the state
-   */
-  fetchData = async () => {
-    try {
-      /**
-       * Find modelScenario in the state.data
-       * @param modelScenario the { model, scenario } to find
-       * @returns the object wrapping the data related to the modelScenario, or null if the modelScenario was not found
-       */
-      const findModelScenario = (modelScenario) => {
-        const element = this.state.data.find(
-          (dataElement) =>
-            dataElement.model === modelScenario.model &&
-            dataElement.scenario === modelScenario.scenario
-        );
-        return element ? element : null;
-      };
+  // /**
+  //  * Fetch the data missing from the state
+  //  */
+  // fetchData = async () => {
+  //   try {
+  //     /**
+  //      * Find modelScenario in the state.data
+  //      * @param modelScenario the { model, scenario } to find
+  //      * @returns the object wrapping the data related to the modelScenario, or null if the modelScenario was not found
+  //      */
+  //     const findModelScenario = (modelScenario) => {
+  //       const element = this.state.data.find(
+  //         (dataElement) =>
+  //           dataElement.model === modelScenario.model &&
+  //           dataElement.scenario === modelScenario.scenario
+  //       );
+  //       return element ? element : null;
+  //     };
 
-      const missingData = this.state.dashboardModelScenario.filter(
-        (modelScenario) => {
-          return findModelScenario(modelScenario) === null;
-        }
-      );
-      const res = await this.props.dataManager.fetchPlotData(missingData);
-      this.setState((prev) => {
-        return { data: prev.data.concat(res) };
-      });
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  //     const missingData = this.state.dashboardModelScenario.filter(
+  //       (modelScenario) => {
+  //         return findModelScenario(modelScenario) === null;
+  //       }
+  //     );
+  //     const res = await this.props.dataManager.fetchPlotData(missingData);
+  //     this.setState((prev) => {
+  //       return { data: prev.data.concat(res) };
+  //     });
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // };
 
   /**
    *
@@ -139,8 +179,8 @@ class DashboardDataConfiguration extends Component<
   saveData = async (id: string, image?: string) => {
     const data = getDraft(id);
     if (data) {
-      if(image) {
-        data.preview = image
+      if (image) {
+        data.preview = image;
       }
       try {
         const res = await this.props.dataManager.saveDashboard(data);
@@ -194,6 +234,7 @@ class DashboardDataConfiguration extends Component<
         getData={this.getData}
         saveData={this.saveData}
         setDashboardModelScenario={this.setDashboardModelScenario}
+        updateDataToFetch={this.fetchData}
         {...this.props}
       />
     );
