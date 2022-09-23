@@ -12,7 +12,7 @@ interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
   getData: (data: DataModel[]) => any[];
   setEnableSwitchEmbeddedMode: (enable: boolean) => void;
   isEmbedded?: boolean;
-  updateDataToFetch: (data: any) => void;
+  fetchData: (dashboard: any) => void;
 }
 
 type LocationState = { dashboard: DashboardModel };
@@ -30,13 +30,13 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
     const locationState = location.state as LocationState;
     if (locationState?.dashboard) {
       setDashboard(locationState.dashboard);
-      props.updateDataToFetch(locationState.dashboard.dataStructure);
+      props.fetchData(locationState.dashboard);
     } else {
       const id = searchParams.get('id') as string;
       const fetchDashboard = async (id: string) => {
         await props.dataManager.getDashboard(id).then((dashboard) => {
           setDashboard(dashboard);
-          props.updateDataToFetch(dashboard.dataStructure);
+          props.fetchData(dashboard);
         });
       };
       fetchDashboard(id);

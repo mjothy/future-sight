@@ -35,27 +35,47 @@ class DashboardDataConfiguration extends Component<
   }
 
   /**
-   * Fetch the missing data from the state
-   * @param data
+   * Fetch the dataModels, if any
+   * @param dataModels the missing DataModels to fetch
    */
-  fetchData = async (data) => {
-    const { data: globalData } = this.state;
-    // Get the selected DataModel
-    const selectedData = new DataModelSet();
-    Object.entries(data).forEach(([model, value]) => {
-      Object.entries(value as any).forEach(([scenario, params]) => {
-        const regions = (params as any).regions;
-        const variables = (params as any).variables;
-        regions.forEach((region) => {
-          variables.forEach((variable) => {
-            selectedData.add({ model, scenario, region, variable });
+  fetchData = async (dataModels: DataModel[]) => {
+    if (dataModels.length > 0) {
+      const res = await this.props.dataManager.fetchData(dataModels);
+      this.setState((prev) => {
+        return { data: prev.data.concat(res) };
+      });
+    }
+  };
+
+  /**
+   * Get the DataModels from the dashboard
+   * @param dashboard the user's dashboard
+   */
+  getDataModels = (dashboard) => {
+    const dataModels = new DataModelSet();
+    Object.values(dashboard.blocks).forEach((block: any) => {
+      const metaData = block.config.metaData;
+      Object.entries(metaData.models).forEach(([model, scenarios]) => {
+        (scenarios as string[]).forEach((scenario) => {
+          metaData.regions.forEach((region) => {
+            metaData.variables.forEach((variable) => {
+              dataModels.add({ model, scenario, region, variable });
+            });
           });
         });
       });
     });
+    return [...dataModels];
+  };
 
-    // Find the missing DataModel from the data state and fetch the corresponding data
-    const missingData = [...selectedData].filter((data) => {
+  /**
+   * Find the DataModels that are not in the state
+   * @param dataModels the DataModels in the dashboard
+   * @returns the list of DataModels for which there's no data in the state
+   */
+  findMissingData = (dataModels: DataModel[]) => {
+    const { data: globalData } = this.state;
+    return dataModels.filter((data) => {
       return !globalData.find(
         (gData) =>
           data.model === gData.model &&
@@ -64,12 +84,16 @@ class DashboardDataConfiguration extends Component<
           data.region === gData.region
       );
     });
-    if (missingData.length > 0) {
-      const res = await this.props.dataManager.fetchData(missingData);
-      this.setState((prev) => {
-        return { data: prev.data.concat(res) };
-      });
-    }
+  };
+
+  /**
+   * Look for missing data in the state for the dashboard's DataModels
+   * @param dashboard
+   */
+  getDashboardData = (dashboard: any) => {
+    const dataModels = this.getDataModels(dashboard);
+    const missingData = this.findMissingData(dataModels);
+    this.fetchData(missingData);
   };
 
   saveData = async (id: string, image?: string) => {
@@ -126,14 +150,14 @@ class DashboardDataConfiguration extends Component<
     return readonly ? (
       <ReadOnlyDashboard
         getData={this.settingPlotData}
-        updateDataToFetch={this.fetchData}
+        fetchData={this.getDashboardData}
         {...this.props}
       />
     ) : (
       <DashboardSelectionControl
         getData={this.settingPlotData}
         saveData={this.saveData}
-        updateDataToFetch={this.fetchData}
+        dashboardUpdated={this.getDashboardData}
         {...this.props}
       />
     );
