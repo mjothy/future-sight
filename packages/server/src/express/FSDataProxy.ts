@@ -5,7 +5,7 @@ export default class FSDataProxy implements IDataProxy {
     private readonly data: any[];
     private readonly models: object;
 
-    constructor(dataPath: string, testDataPath: string, modelsPath: string, regionsPath: string, variablesPath: string) {
+    constructor(dataPath: string, modelsPath: string) {
         let raw = fs.readFileSync(dataPath);
         this.data = JSON.parse(raw.toString());
         raw = fs.readFileSync(modelsPath)
