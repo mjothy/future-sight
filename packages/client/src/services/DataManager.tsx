@@ -39,63 +39,8 @@ export default class DataManager implements IDataManager {
       .catch(console.error);
   };
 
-  fetchAllData = () => {
-    return fetch(`${this.getBaseUrl()}/data`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        return data;
-      })
-      .catch(console.error);
-  };
-
   fetchModels = () => {
     return fetch(`${this.getBaseUrl()}/models`)
-      .then((response) => response.json())
-      .then((data) => {
-        return data;
-      })
-      .catch(console.error);
-  };
-
-  fetchVariables = (data: ModelScenarioData) => {
-    return fetch(
-      `${this.getBaseUrl()}/variables?model=${data.model}&scenario=${
-        data.scenario
-      }`
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        return data;
-      })
-      .catch(console.error);
-  };
-
-  fetchRegions = (data: ModelScenarioData) => {
-    return fetch(
-      `${this.getBaseUrl()}/regions?model=${data.model}&scenario=${
-        data.scenario
-      }`
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        return data;
-      })
-      .catch(console.error);
-  };
-
-  addDashboard = (data) => {
-    return fetch(`${this.getBaseUrl()}/dashboard`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
       .then((response) => response.json())
       .then((data) => {
         return data;

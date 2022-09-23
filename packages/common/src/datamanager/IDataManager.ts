@@ -8,15 +8,7 @@ export default interface IDataManager {
 
   fetchPlotData: (data: DataModel) => Promise<any>;
 
-  fetchAllData: () => Promise<any>;
-
   fetchModels: () => Promise<any>;
-
-  fetchVariables: (data: ModelScenarioData) => Promise<any>;
-
-  fetchRegions: (data: ModelScenarioData) => Promise<any>;
-
-  addDashboard: (data: DataModel) => Promise<any>;
 
   getDashboard: (id: string) => Promise<any>;
 

@@ -40,10 +40,14 @@ class DashboardDataConfiguration extends Component<
    */
   fetchData = async (dataModels: DataModel[]) => {
     if (dataModels.length > 0) {
-      const res = await this.props.dataManager.fetchData(dataModels);
-      this.setState((prev) => {
-        return { data: prev.data.concat(res) };
-      });
+      try {
+        const res = await this.props.dataManager.fetchData(dataModels);
+        this.setState((prev) => {
+          return { data: prev.data.concat(res) };
+        });
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 
