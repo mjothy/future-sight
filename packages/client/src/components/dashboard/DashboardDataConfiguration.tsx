@@ -102,7 +102,7 @@ class DashboardDataConfiguration extends Component<
         const dataModels = this.getDataModels(dashboard);
         const missingData = this.findMissingData(dataModels);
         this.fetchData(missingData);
-      }, 3000),
+      }, 1000),
     });
   };
 
