@@ -69,11 +69,11 @@ export default class ExpressServer {
       const body = req.body;
       const response: any[] = [];
       for (const reqData of body) {
-        const element = this.dataProxy.getData().find(
+        const elements = this.dataProxy.getData().filter(
           (e) => e.model === reqData.model && e.scenario === reqData.scenario
         );
-        if (element) {
-          response.push(element);
+        if (elements) {
+          response.push(...elements);
         }
       }
       res.status(200).send(response);
