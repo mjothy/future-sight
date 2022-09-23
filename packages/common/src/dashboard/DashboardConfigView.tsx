@@ -2,8 +2,8 @@ import { Component } from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import BlockViewManager from './blocks/BlockViewManager';
 import PropTypes from 'prop-types';
-import ComponentPropsWithDataManager from "../datamanager/ComponentPropsWithDataManager";
-import DataModel from "../models/DataModel";
+import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
+import DataModel from '../models/DataModel';
 import { EditOutlined, EditTwoTone } from '@ant-design/icons';
 import { Button } from 'antd';
 
@@ -109,7 +109,6 @@ class DashboardConfigView extends Component<any, any> {
 
   onBlockClick = (e, id) => {
     e.preventDefault();
-    console.log(id)
     if (id) {
       this.props.updateSelectedBlock(id);
     }
