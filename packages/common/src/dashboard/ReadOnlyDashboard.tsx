@@ -1,6 +1,8 @@
-import {Spin} from 'antd';
-import React, {useEffect, useState} from 'react';
-import {useLocation, useSearchParams} from 'react-router-dom';
+/* eslint-disable @typescript-eslint/no-empty-function */
+
+import { Spin } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
 import DashboardModel from '../models/DashboardModel';
 import DataModel from '../models/DataModel';
@@ -10,7 +12,7 @@ interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
   getData: (data: DataModel[]) => any[];
   setEnableSwitchEmbeddedMode: (enable: boolean) => void;
   isEmbedded?: boolean;
-  setDashboardModelScenario: (selection) => void;
+  updateDataToFetch: (data: any) => void;
 }
 
 type LocationState = { dashboard: DashboardModel };
@@ -28,13 +30,13 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
     const locationState = location.state as LocationState;
     if (locationState?.dashboard) {
       setDashboard(locationState.dashboard);
-      props.setDashboardModelScenario(locationState.dashboard.dataStructure);
+      props.updateDataToFetch(locationState.dashboard.dataStructure);
     } else {
       const id = searchParams.get('id') as string;
       const fetchDashboard = async (id: string) => {
         await props.dataManager.getDashboard(id).then((dashboard) => {
           setDashboard(dashboard);
-          props.setDashboardModelScenario(dashboard.dataStructure);
+          props.updateDataToFetch(dashboard.dataStructure);
         });
       };
       fetchDashboard(id);

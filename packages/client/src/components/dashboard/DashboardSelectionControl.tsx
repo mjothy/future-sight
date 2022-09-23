@@ -17,7 +17,6 @@ export interface DashboardSelectionControlProps
     RoutingProps {
   getData: (data: DataModel[]) => any[];
   saveData: (id: string, image?: string) => Promise<any>;
-  setDashboardModelScenario: (selection) => void;
   updateDataToFetch: (data: any) => void;
 }
 
