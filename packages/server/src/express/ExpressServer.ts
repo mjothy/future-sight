@@ -50,12 +50,8 @@ export default class ExpressServer {
       res.send(`Hello , From server`);
     });
 
-    /**
-     * @deprecated This is broken, should not be used as is
-     */
     this.app.post('/api/data', (req, res) => {
       const body = req.body;
-      console.log('body: ', JSON.stringify(req.body));
       this.dataProxy.getData().map((e) => {
         if (
           e.model === body.model &&
@@ -85,30 +81,6 @@ export default class ExpressServer {
 
     this.app.get('/api/models', (req, res) => {
       res.send(this.dataProxy.getModels());
-    });
-
-    this.app.get(`/api/variables`, (req, res) => {
-      const model = req.query.model;
-      const scenario = req.query.scenario;
-
-      this.dataProxy.getVariables().forEach((variable) => {
-        if (variable.model === model && variable.scenario === scenario)
-          res.send({ ...variable });
-      });
-
-      res.status(404).send('No data found');
-    });
-
-    this.app.get(`/api/regions`, (req, res) => {
-      const model = req.query.model;
-      const scenario = req.query.scenario;
-
-      let allRegions: any[] = [];
-      this.dataProxy.getRegions().forEach((region) => {
-        if (region.model === model && region.scenario === scenario)
-          allRegions = [...allRegions, ...region.regions];
-      });
-      res.send(allRegions);
     });
 
     // Posts methods
