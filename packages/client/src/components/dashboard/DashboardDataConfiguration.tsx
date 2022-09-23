@@ -31,6 +31,7 @@ class DashboardDataConfiguration extends Component<
        */
       data: [],
       dashboardModelScenario: [],
+      timer: null,
     };
   }
 
@@ -95,9 +96,14 @@ class DashboardDataConfiguration extends Component<
    * @param dashboard
    */
   getDashboardData = (dashboard: any) => {
-    const dataModels = this.getDataModels(dashboard);
-    const missingData = this.findMissingData(dataModels);
-    this.fetchData(missingData);
+    clearTimeout(this.state.timer);
+    this.setState({
+      timer: setTimeout(() => {
+        const dataModels = this.getDataModels(dashboard);
+        const missingData = this.findMissingData(dataModels);
+        this.fetchData(missingData);
+      }, 3000),
+    });
   };
 
   saveData = async (id: string, image?: string) => {
