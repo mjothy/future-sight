@@ -9,7 +9,7 @@ export default class DataManager implements IDataManager {
     return '/api';
   }
 
-  fetchData = (data: DataModel) => {
+  fetchData = (data: DataModel[]) => {
     return fetch(`${this.getBaseUrl()}/data`, {
       method: 'POST',
       headers: {
@@ -129,8 +129,7 @@ export default class DataManager implements IDataManager {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
-      })
-          .then((response) => response.json())
+      }).then((response) => response.json());
     } catch (err) {
       console.error(err);
     }
