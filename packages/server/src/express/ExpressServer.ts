@@ -76,9 +76,11 @@ export default class ExpressServer {
       const body = req.body;
       const response: any[] = [];
       for (const reqData of body) {
-        const elements = this.dataProxy.getData().filter(
-          (e) => e.model === reqData.model && e.scenario === reqData.scenario
-        );
+        const elements = this.dataProxy
+          .getData()
+          .filter(
+            (e) => e.model === reqData.model && e.scenario === reqData.scenario
+          );
         if (elements) {
           response.push(...elements);
         }
@@ -131,6 +133,27 @@ export default class ExpressServer {
             return obj;
           }, {});
         res.send(result);
+      } catch (err) {
+        console.error(err);
+        next(err);
+      }
+    });
+
+    this.app.get('/api/browse/init', async (req, res, next) => {
+      try {
+        let authors, tags;
+        await Promise.allSettled([
+          this.dbClient
+            .getClient()
+            .json.get('authors')
+            .then((data) => (authors = Object.keys(data))),
+          this.dbClient
+            .getClient()
+            .json.get('tags')
+            .then((data) => (tags = Object.keys(data))),
+        ]);
+        const models = this.dataProxy.getModels();
+        res.send({ authors, tags, models });
       } catch (err) {
         console.error(err);
         next(err);

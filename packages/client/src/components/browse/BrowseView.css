@@ -25,6 +25,18 @@
   align-items: center;
 }
 
+.browse-container .submit-container .warning-container {
+  position: relative;
+  width: 100%;
+}
+
+.browse-container .submit-container .warning-container .warning {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 .browse-container .search-result {
   display: flex;
   flex-direction: column;

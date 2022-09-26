@@ -13,4 +13,6 @@ export default interface IDataManager {
   getDashboards: () => Promise<any>;
 
   saveDashboard: (data: any) => Promise<any>;
+
+  fetchBrowseInitData: () => Promise<any>;
 }
