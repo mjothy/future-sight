@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, Col, Row, Spin, Button, Alert, Select } from 'antd';
+import { Form, Input, Col, Row, Button, Alert, Select } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import './BrowseView.css';
 import withDataManager from '../../services/withDataManager';
@@ -12,7 +12,7 @@ class BrowseView extends React.Component<any, any> {
     super(props);
     this.state = {
       loading: false,
-      dashboards: [],
+      dashboards: {},
       submitDisabled: true,
       data: null,
       selectedModel: undefined,
@@ -42,7 +42,7 @@ class BrowseView extends React.Component<any, any> {
       .filter((key) => !!values[key])
       .reduce((obj, key) => Object.assign(obj, { [key]: values[key] }), {});
     if (inputs['model']) {
-      return inputs['scenario'] && inputs['scenario'].length > 0;
+      return inputs['scenarios'] && inputs['scenarios'].length > 0;
     }
     return Object.keys(inputs).length > 0;
   };
@@ -51,15 +51,39 @@ class BrowseView extends React.Component<any, any> {
     const state = {} as any;
     // reset scenario input if the model input has been cleared
     if (!values.model) {
-      this.props.form.setFieldsValue({ scenario: [] });
-      values.scenario = undefined;
+      this.props.form.setFieldsValue({ scenarios: [] });
+      values.scenarios = undefined;
     }
     state.submitDisabled = !this.checkValues(values);
     this.setState(state);
   };
 
   browseDashboards = (values) => {
-    console.log(values);
+    this.setState({ loading: true }, async () => {
+      const { authors, model, scenarios, tags, title } = values;
+      const { data } = this.state;
+      const dashboards = new Set();
+      authors.forEach((author) => {
+        // data.authors[author] contains the list of dashboards created by the "author"
+        data.authors[author].forEach((dashboard) => {
+          dashboards.add(dashboard);
+        });
+      });
+      tags.forEach((tag) => {
+        // data.tags[tag] contains the list of dashboards tagged with the "tag"
+        data.tags[tag].forEach((dashboard) => {
+          dashboards.add(dashboard);
+        });
+      });
+
+      const results = await this.props.dataManager.browseData({
+        dashboards: [...dashboards],
+        model,
+        scenarios,
+        title,
+      });
+      this.setState({ loading: false, dashboards: results });
+    });
   };
 
   render() {
@@ -75,14 +99,14 @@ class BrowseView extends React.Component<any, any> {
             onFinish={this.browseDashboards}
             form={this.props.form}
           >
-            <Row justify="space-around" align="middle">
+            <Row justify="space-around">
               <Col span={7}>
                 <Form.Item name="title" label="Title">
                   <Input />
                 </Form.Item>
               </Col>
               <Col span={7}>
-                <Form.Item name="author" label="Author">
+                <Form.Item name="authors" label="Authors">
                   <Select
                     mode="multiple"
                     showSearch
@@ -90,7 +114,7 @@ class BrowseView extends React.Component<any, any> {
                     allowClear
                   >
                     {data &&
-                      data.authors.map((author, i) => (
+                      Object.keys(data.authors).map((author, i) => (
                         <Option key={i} value={author}>
                           {author}
                         </Option>
@@ -107,7 +131,7 @@ class BrowseView extends React.Component<any, any> {
                     allowClear
                   >
                     {data &&
-                      data.tags.map((tag, i) => (
+                      Object.keys(data.tags).map((tag, i) => (
                         <Option key={i} value={tag}>
                           {tag}
                         </Option>
@@ -135,7 +159,7 @@ class BrowseView extends React.Component<any, any> {
                 </Form.Item>
               </Col>
               <Col span={11}>
-                <Form.Item name="scenario" label="Scenario">
+                <Form.Item name="scenarios" label="Scenarios">
                   <Select
                     mode="multiple"
                     showSearch
@@ -178,8 +202,8 @@ class BrowseView extends React.Component<any, any> {
             </div>
           </Form>
           <div className="search-result">
-            {dashboards.length > 0 &&
-              dashboards.map((e) => {
+            {Object.keys(dashboards).length > 0 &&
+              Object.keys(dashboards).map((e) => {
                 e;
               })}
           </div>

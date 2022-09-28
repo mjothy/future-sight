@@ -74,4 +74,18 @@ export default class DataManager implements IDataManager {
       console.error(err);
     }
   };
+
+  browseData = async (data) => {
+    try {
+      return await fetch(`${this.getBaseUrl()}/browse`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }).then((response) => response.json());
+    } catch (err) {
+      console.error(err);
+    }
+  };
 }
