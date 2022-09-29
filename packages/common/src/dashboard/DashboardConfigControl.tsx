@@ -2,7 +2,7 @@ import { Component } from 'react';
 import DashboardControl from './sidebar/DashboardControl';
 import PropTypes from 'prop-types';
 import { DashboardProps } from './Dashboard';
-import BlockEditorManager from './blocks/editors/BlockEditorManager';
+import BlockEditorManager from './blocks/BlockEditorManager';
 
 /**
  * Show {Edit selected block} OR {Add new block}

@@ -58,7 +58,7 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
 
   const newDraft = () => {
     const uuid = createUUID();
-    setDraft(uuid, new DashboardModel(uuid));
+    setDraft(uuid, DashboardModel.fromDraft(uuid));
     navigate('draft?id=' + uuid);
   };
 

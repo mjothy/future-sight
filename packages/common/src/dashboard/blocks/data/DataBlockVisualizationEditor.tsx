@@ -1,3 +1,4 @@
+import {AreaChartOutlined, BarChartOutlined, LineChartOutlined, TableOutlined } from '@ant-design/icons';
 import { Col, Input, Row, Select } from 'antd';
 import Checkbox from 'antd/es/checkbox';
 import { Component } from 'react';
@@ -5,7 +6,12 @@ import BlockStyleModel from '../../../models/BlockStyleModel';
 
 const { Option } = Select;
 
-const plotTypes = ['line', 'bar', 'area', 'table'];
+const plotTypes = [
+  {type: 'line', label: 'Line', icon: <LineChartOutlined/>},
+  {type: 'bar', label: 'Bar', icon: <BarChartOutlined />},
+  {type: 'area', label: 'Area', icon: <AreaChartOutlined />},
+  {type: 'table', label: 'Table', icon: <TableOutlined />},
+];
 
 export default class DataBlockVisualizationEditor extends Component<any, any> {
   configStyle: BlockStyleModel = new BlockStyleModel();
@@ -48,9 +54,9 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
               value={this.configStyle.graphType}
               onChange={this.onPlotTypeChange}
             >
-              {plotTypes.map((type) => (
-                <Option key={type} value={type}>
-                  {type}
+              {plotTypes.map((chart) => (
+                <Option key={chart.type} value={chart.type}>
+                  {chart.icon} {chart.label}
                 </Option>
               ))}
             </Select>

@@ -7,7 +7,7 @@ export default class UserDataModel {
     return ret;
   }
 
-  title = '';
-  author = '';
+  title = 'Title';
+  author = 'Anonymous';
   tags: string[] = [];
 }

@@ -5,6 +5,11 @@ import BlockStyleModel from '../../../models/BlockStyleModel';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
 
 export default class DataBlockView extends Component<any, any> {
+
+  constructor(props) {
+    super(props);
+  }
+
   /**
    * Getting the data to visualize on the graphf
    * @returns Data with timeseries
@@ -45,11 +50,10 @@ export default class DataBlockView extends Component<any, any> {
    * Preparing the fetched data to adapt plotly data OR antd table
    * @returns
    */
-  settingPlotData() {
+  settingPlotData = () => {
     const data: any[] = this.getPlotData();
     const showData: any[] = [];
-    const configStyle: BlockStyleModel =
-      this.props.currentBlock.config.configStyle;
+    const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
     if (configStyle.graphType === 'table') {
       return this.prepareTableData(data);
@@ -61,7 +65,7 @@ export default class DataBlockView extends Component<any, any> {
     }
   }
 
-  prepareTableData(data) {
+  prepareTableData = (data) => {
     const columns: ColumnsType<any> = [
       { title: 'model', dataIndex: 'model' },
       { title: 'scenario', dataIndex: 'scenario' },
@@ -92,8 +96,8 @@ export default class DataBlockView extends Component<any, any> {
     return { columns, values };
   }
 
-  preparePlotData(dataElement, configStyle) {
-    let obj = {};
+  preparePlotData = (dataElement, configStyle) => {
+    let obj;
     switch (configStyle.graphType) {
       case 'area':
         obj = {
@@ -148,8 +152,12 @@ export default class DataBlockView extends Component<any, any> {
    * @returns Axis x (array of values)
    */
   getX = (data) => {
-    const x: string[] = [];
-    data.data.map((d) => x.push(d.year));
+    const x: any[] = [];
+    data.data.map((d) => {
+      if (d.value !== "") {
+        x.push(d.year)
+      }
+    });
     return x;
   };
 
@@ -159,8 +167,12 @@ export default class DataBlockView extends Component<any, any> {
    * @returns Axis y (array of values)
    */
   getY = (data) => {
-    const y: string[] = [];
-    data.data.map((d) => y.push(d.value));
+    const y: any[] = [];
+    data.data.map((d) => {
+      if (d.value !== "") {
+        y.push(d.value)
+      }
+    });
     return y;
   };
 

@@ -1,7 +1,7 @@
 import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import type { Key } from 'antd/es/table/interface';
 import React, { Component } from 'react';
+
 interface DataType {
   key: React.Key;
   model: string;
@@ -19,29 +19,27 @@ const columns: ColumnsType<DataType> = [
   },
 ];
 
-/**
- * This component is called by the view (ControlBlockView)
- */
-export default class ControlBlockTableSelection extends Component<any, any> {
+export default class DataBlockTableSelection extends Component<any, any> {
   data: DataType[] = [];
   selectedData: { [id: string]: string[] } = {};
   constructor(props) {
     super(props);
-    this.state = {
-      data: [],
-    };
     this.selectedData =
-      this.props.currentBlock.config.metaData.master['models'].values;
-    this.prepareDataTable();
-  }
-
-  componentDidMount() {
+      this.props.dashboard.blocks[
+        this.props.blockSelectedId
+      ].config.metaData.models;
     this.prepareDataTable();
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps.models !== this.props.models) {
-      this.prepareDataTable();
+    if (
+      prevProps.blockSelectedId !== this.props.blockSelectedId &&
+      this.props.blockSelectedId != ''
+    ) {
+      this.selectedData =
+        this.props.dashboard.blocks[
+          this.props.blockSelectedId
+        ].config.metaData.models;
     }
   }
 
@@ -60,12 +58,11 @@ export default class ControlBlockTableSelection extends Component<any, any> {
    *The key table is: model/scenario
    */
   prepareDataTable() {
-    const models = this.props.models;
-    const data: any = [];
-    if (models != null) {
-      Object.keys(models).map((modelKey) => {
-        models[modelKey].map((scenarioKey) => {
-          data.push({
+    const { dataStructure } = this.props.dashboard;
+    if (dataStructure != null) {
+      Object.keys(dataStructure).map((modelKey) => {
+        Object.keys(dataStructure[modelKey]).map((scenarioKey) => {
+          this.data.push({
             key: modelKey + '/' + scenarioKey,
             model: modelKey,
             scenario: scenarioKey,
@@ -73,8 +70,6 @@ export default class ControlBlockTableSelection extends Component<any, any> {
         });
       });
     }
-
-    this.setState({ data });
   }
 
   onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -85,15 +80,18 @@ export default class ControlBlockTableSelection extends Component<any, any> {
 
       models[modelScenario[0]].push(modelScenario[1]);
     });
-    const metaData = this.props.currentBlock.config.metaData;
-    metaData.master['models'].values = models;
-    this.props.updateBlockMetaData(
-      { master: metaData.master },
-      this.props.currentBlock.id
-    );
+    this.props.updateBlockMetaData({ models });
     // Update the selected data variable
     this.selectedData =
-      this.props.currentBlock.config.metaData.master['models'].values;
+      this.props.dashboard.blocks[
+        this.props.blockSelectedId
+      ].config.metaData.models;
+
+    if (
+      this.props.dashboard.blocks[this.props.blockSelectedId].blockType ===
+      'data'
+    )
+      this.props.updateDropdownData();
   };
 
   render() {
@@ -109,7 +107,7 @@ export default class ControlBlockTableSelection extends Component<any, any> {
           ],
         }}
         columns={columns}
-        dataSource={this.state.data}
+        dataSource={this.data}
       />
     );
   }

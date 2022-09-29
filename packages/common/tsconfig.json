@@ -7,5 +7,6 @@
     "rootDir": "src",
     "outDir": "build"
   },
-  "include": ["src", "assets"]
+  "include": ["src", "assets"],
+  "files": ["src/models/dashboardModel.json"]
 }

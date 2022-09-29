@@ -1,7 +1,7 @@
 import { Button, Col, Row, Select } from 'antd';
 import Checkbox from 'antd/es/checkbox';
 import { Component } from 'react';
-import DataBlockTableSelection from './DataBlockTableSelection';
+import DataBlockTableSelection from '../component/DataBlockTableSelection';
 
 const { Option } = Select;
 

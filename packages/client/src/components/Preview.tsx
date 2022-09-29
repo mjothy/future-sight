@@ -8,7 +8,7 @@ const DEFAULT_PREVIEW = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDC
 
 export default class Preview extends React.Component<any, any> {
     copyToClipboard = () => {
-        const url = window.location.host + this.props.urlPrefix + this.props.id
+        const url = window.location.origin + this.props.urlPrefix + this.props.id
         navigator.clipboard.writeText(url)
             .then(() => {
                 notification.info({
@@ -32,8 +32,8 @@ export default class Preview extends React.Component<any, any> {
                       /*<Tooltip key="copy"  title="Copy this dashboard in draft">
                         <CopyOutlined />
                       </Tooltip>,*/
-                      <Space key="share">
-                          <LinkOutlined onClick={this.copyToClipboard} />
+                      <Space onClick={this.copyToClipboard} key="share">
+                          <LinkOutlined />
                           <div>Share</div>
                       </Space>,
                       <Link key="goto" to={this.props.urlPrefix + this.props.id}>

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import ControlBlockView from './ControlBlockView';
-import DataBlockView from './DataBlockView';
-import TextBlockView from './TextBlockView';
+import ControlBlockView from './control/ControlBlockView';
+import DataBlockView from './data/DataBlockView';
+import TextBlockView from './text/TextBlockView';
 
 
 

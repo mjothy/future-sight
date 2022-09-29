@@ -92,7 +92,7 @@ body {
 }
 
 .dashboard .dashboard-content {
-  background-color: azure;
+  background-color: #f3f3f3;
   width: 100%;
 }
 
@@ -121,6 +121,10 @@ body {
 
 .dashboard .dashboard-content .id-button:hover {
   opacity: 0.9;
+}
+
+.publishing .block-edit {
+  visibility: hidden;
 }
 
 .sidebar-toggle {
@@ -184,6 +188,7 @@ body {
 /* Drawer */
 .drawer {
   margin-top: 60px;
+  max-height: calc(100% - 60px);
 }
 
 .selected-layout {

@@ -1,0 +1,60 @@
+{
+  "userData": {
+    "title": "",
+    "author": "",
+    "tags": []
+  },
+  "dataStructure": {
+  },
+  "layout": [
+    {
+      "w": 4,
+      "h": 4,
+      "x": 0,
+      "y": 0,
+      "i": "1",
+      "moved": false,
+      "static": false
+    }
+  ],
+  "blocks": {
+    "1": {
+      "controlBlock": "",
+      "id": "1",
+      "blockType": "data",
+      "config": {
+        "configStyle": {
+          "graphType": "line",
+          "showLegend": false,
+          "title": {
+            "value": "Title",
+            "isVisible": true
+          }
+        },
+        "metaData": {
+          "models": {
+          },
+          "regions": [
+          ],
+          "variables": [
+          ],
+          "master": {
+            "models": {
+              "isMaster": false,
+              "values": []
+            },
+            "regions": {
+              "isMaster": false,
+              "values": []
+            },
+            "variables": {
+              "isMaster": false,
+              "values": []
+            }
+          }
+        }
+      }
+    }
+  },
+  "id": "default"
+}

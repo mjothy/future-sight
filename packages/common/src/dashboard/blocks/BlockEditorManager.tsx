@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
 import { Button, Col, Divider, Popconfirm, Row, Tooltip, Tabs } from 'antd';
-import DataBlockEditor from './DataBlockEditor';
-import TextBlockEditor from './TextBlockEditor';
-import ControlBlockEditor from './ControlBlockEditor';
-import DataBlockVisualizationEditor from './DataBlockVisualizationEditor';
+import DataBlockEditor from './data/DataBlockEditor';
+import DataBlockVisualizationEditor from './data/DataBlockVisualizationEditor';
+import TextBlockEditor from './text/TextBlockEditor';
+import ControlBlockEditor from './control/ControlBlockEditor';
 import {
   DeleteOutlined,
   BackwardOutlined,
   EditOutlined,
   EyeOutlined,
 } from '@ant-design/icons';
+import ControlBlockVisualizationEditor from "./control/ControlBlockVisualizationEditor";
 
 const { TabPane } = Tabs;
 
@@ -19,7 +20,7 @@ const { TabPane } = Tabs;
 export default class BlockEditorManager extends Component<any, any> {
   blockType;
   readonly tabsTypes = [
-    { title: 'Data configuration', icon: <EditOutlined />, type: 'data' },
+    { title: 'Data', icon: <EditOutlined />, type: 'data' },
     { title: 'Visualization', icon: <EyeOutlined />, type: 'style' },
   ];
 
@@ -30,27 +31,32 @@ export default class BlockEditorManager extends Component<any, any> {
     };
   }
 
+  hasTabs = (type) => {
+    return type === "data" || type === "control"
+  }
+
   blockByType = () => {
     const currentBlock = this.props.blocks[this.props.blockSelectedId];
     switch (currentBlock.blockType) {
       case 'data':
-        if (this.state.tab === 'data')
+        if (this.state.tab === 'data') {
+          return (<DataBlockEditor {...this.props} currentBlock={currentBlock}/>);
+        }
+        else {
           return (
-            <DataBlockEditor {...this.props} currentBlock={currentBlock} />
+              <DataBlockVisualizationEditor{...this.props} currentBlock={currentBlock}/>
           );
-        else
-          return (
-            <DataBlockVisualizationEditor
-              {...this.props}
-              currentBlock={currentBlock}
-            />
-          );
+        }
       case 'text':
         return <TextBlockEditor {...this.props} currentBlock={currentBlock} />;
       case 'control':
-        return (
-          <ControlBlockEditor {...this.props} currentBlock={currentBlock} />
-        );
+        if (this.state.tab === 'data') {
+          return (<ControlBlockEditor {...this.props} currentBlock={currentBlock}/>);
+        } else {
+          return (
+              <ControlBlockVisualizationEditor {...this.props} currentBlock={currentBlock}/>
+          )
+        }
       default:
         return <p>Error !</p>;
     }
@@ -65,23 +71,13 @@ export default class BlockEditorManager extends Component<any, any> {
       <>
         <Row
           justify={
-            this.props.blocks[this.props.blockSelectedId].blockType === 'data'
+            this.hasTabs(this.props.blocks[this.props.blockSelectedId].blockType)
               ? 'space-between'
               : 'end'
           }
         >
-          <Col>
-            <Tooltip title="Back to blocks control">
-              <Button
-                type="primary"
-                onClick={() => this.props.updateSelectedBlock('')}
-                icon={<BackwardOutlined />}
-                size="large"
-              />
-            </Tooltip>
-          </Col>
-          {this.props.blocks[this.props.blockSelectedId].blockType === 'data' && (
-            <Col>
+          {this.hasTabs(this.props.blocks[this.props.blockSelectedId].blockType) && (
+            <Col span={22}>
               <Tabs type="card" onChange={(activeKey) => this.tabsToggle(activeKey)}>
                 {this.tabsTypes.map((tab) => {
                   return (
@@ -97,15 +93,15 @@ export default class BlockEditorManager extends Component<any, any> {
               </Tabs>
             </Col>
           )}
-          <Col>
+          <Col span={2}>
             <Popconfirm
               title="Are you sure you want to delete this block ?"
-              onConfirm={this.props.deleteBlock}
+              onConfirm={() => this.props.deleteBlock(this.props.blockSelectedId)}
               okText="Yes"
               cancelText="No"
             >
               <Tooltip title="Delete block">
-                <Button type="default" icon={<DeleteOutlined />} size="large" />
+                <Button type="default" icon={<DeleteOutlined />} danger size="large" />
               </Tooltip>
             </Popconfirm>
           </Col>

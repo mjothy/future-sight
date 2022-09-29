@@ -3,15 +3,8 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import { join } from 'path';
 
-import data from '../data/data.json';
-import models from '../data/models.json';
-import variables from '../data/variables.json';
-import regions from '../data/regions.json';
-import dashboard from '../data/dashboards.json';
-import allData from '../data/test-data.json';
-
-import * as fs from 'fs';
 import RedisClient from '../redis/RedisClient';
+import IDataProxy from "./IDataProxy";
 
 export default class ExpressServer {
   private app: any;
@@ -19,13 +12,15 @@ export default class ExpressServer {
   private readonly auth: any;
   private readonly clientPath: any;
   private readonly dbClient: RedisClient;
+  private readonly dataProxy: IDataProxy;
 
-  constructor(port, cookieKey, auth, clientPath, dbClient) {
+  constructor(port, cookieKey, auth, clientPath, dbClient, dataProxy: IDataProxy) {
     this.app = express();
     this.port = port;
     this.auth = auth;
     this.clientPath = clientPath;
     this.dbClient = dbClient;
+    this.dataProxy = dataProxy;
     this.app.use(bodyParser.json());
     if (auth) {
       this.app.use(this.auth);
@@ -55,13 +50,9 @@ export default class ExpressServer {
       res.send(`Hello , From server`);
     });
 
-    /**
-     * @deprecated This is broken, should not be used as is
-     */
     this.app.post('/api/data', (req, res) => {
       const body = req.body;
-      console.log('body: ', JSON.stringify(req.body));
-      data.map((e) => {
+      this.dataProxy.getData().map((e) => {
         if (
           e.model === body.model &&
           e.scenario === body.scenario &&
@@ -78,42 +69,18 @@ export default class ExpressServer {
       const body = req.body;
       const response: any[] = [];
       for (const reqData of body) {
-        const element = data.find(
+        const elements = this.dataProxy.getData().filter(
           (e) => e.model === reqData.model && e.scenario === reqData.scenario
         );
-        if (element) {
-          response.push(element);
+        if (elements) {
+          response.push(...elements);
         }
       }
       res.status(200).send(response);
     });
 
     this.app.get('/api/models', (req, res) => {
-      res.send(models);
-    });
-
-    this.app.get(`/api/variables`, (req, res) => {
-      const model = req.query.model;
-      const scenario = req.query.scenario;
-
-      variables.forEach((variable) => {
-        if (variable.model === model && variable.scenario === scenario)
-          res.send({ ...variable });
-      });
-
-      res.status(404).send('No data found');
-    });
-
-    this.app.get(`/api/regions`, (req, res) => {
-      const model = req.query.model;
-      const scenario = req.query.scenario;
-
-      let allRegions: any[] = [];
-      regions.forEach((region) => {
-        if (region.model === model && region.scenario === scenario)
-          allRegions = [...allRegions, ...region.regions];
-      });
-      res.send(allRegions);
+      res.send(this.dataProxy.getModels());
     });
 
     // Posts methods
@@ -128,16 +95,6 @@ export default class ExpressServer {
         console.error(err);
         next(err);
       }
-    });
-
-    this.app.post(`/api/dashboard`, (req, res) => {
-      fs.writeFile('./dashboards.json', JSON.stringify(req.body), (err) => {
-        if (err) console.log('Error writing file:', err);
-      });
-    });
-
-    this.app.get(`/api/dashboard`, (req, res) => {
-      res.send(dashboard);
     });
 
     this.app.get(`/api/dashboards/:id`, async (req, res, next) => {
@@ -172,68 +129,6 @@ export default class ExpressServer {
         next(err);
       }
     });
-
-    /** START : To delete after Delete */
-
-    // Prepare model data from the CSV file
-    this.app.get(`/api/modelData`, (req, res) => {
-      // get the models with scenarios
-      const obj = {};
-      allData.map((data) => {
-        obj[data.Model] = {};
-        allData.map((data2) => {
-          if (data2.Model === data.Model) {
-            if (obj[data.Model][data2.Scenario] == null) {
-              obj[data.Model][data2.Scenario] = {
-                variables: [],
-                regions: [],
-              };
-            }
-            obj[data.Model][data2.Scenario].variables.push(data2.Variable);
-            obj[data.Model][data2.Scenario].regions.push(data2.Region);
-            // uniques values:
-            obj[data.Model][data2.Scenario].variables = [
-              ...new Set(obj[data.Model][data2.Scenario].variables),
-            ];
-            obj[data.Model][data2.Scenario].regions = [
-              ...new Set(obj[data.Model][data2.Scenario].regions),
-            ];
-          }
-        });
-      });
-      fs.writeFile('./models1.json', JSON.stringify(obj), (err) => {
-        console.log(err);
-      });
-    });
-
-    // Prepare the data with timeseries
-    this.app.get(`/api/allData`, (req, res) => {
-      const result: any = [];
-      allData.map((data) => {
-        const obj: any = {
-          model: data.Model,
-          scenario: data.Scenario,
-          region: data.Region,
-          variable: data.Variable,
-          unit: data.Unit,
-          data: [],
-        };
-        for (let i = 2005; i <= 2100; i = i + 5) {
-          const valStr = i.toString();
-          if (data[valStr] == null) data[valStr] = '';
-          const valObj = {
-            year: i,
-            value: data[valStr],
-          };
-          obj.data.push(valObj);
-        }
-        result.push(obj);
-      });
-      fs.writeFile('./result.json', JSON.stringify(result), (err) => {
-        console.log(err);
-      });
-    });
-    /** END : To delete after Delete */
 
     // Serve the HTML page
     this.app.get('*', (req: any, res: any) => {

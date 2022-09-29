@@ -100,6 +100,10 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
     this.setState({setupDashboardMode: view})
   }
 
+  hasFilledStructure = () => {
+    return Object.keys(this.props.dashboard.dataStructure).length !== 0
+  }
+
   render() {
     return (
       <>
@@ -109,7 +113,7 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
               onChange={(e) => this.switchSetupDashboardMode(e.target.value)}
               buttonStyle="solid">
             <Radio.Button value="setup">Setup</Radio.Button>
-            <Radio.Button value="dashboard">Dashboard</Radio.Button>
+            <Radio.Button value="dashboard" disabled={!this.hasFilledStructure()}>Dashboard</Radio.Button>
           </Radio.Group>
         </div>
         {this.state.isSubmited || this.state.setupDashboardMode === 'dashboard'
