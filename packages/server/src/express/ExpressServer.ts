@@ -3,6 +3,14 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import path, { join } from 'path';
 
+import data from '../data/data.json';
+import models from '../data/models.json';
+import filterData from '../data/filter.json'
+import regions from '../data/regions.json';
+import dashboard from '../data/dashboards.json';
+import allData from '../data/test-data.json';
+
+import * as fs from 'fs';
 import RedisClient from '../redis/RedisClient';
 import IDataProxy from './IDataProxy';
 
@@ -90,7 +98,112 @@ export default class ExpressServer {
     });
 
     this.app.get('/api/models', (req, res) => {
-      res.send(this.dataProxy.getModels());
+      let models: string[] = [];
+      filterData.forEach((data) => {
+        models.push(data.model);
+      });
+
+      models = [...new Set(models)];
+
+      res.send(models);
+    });
+
+    this.app.get('/api/scenarios', (req, res) => {
+      let scenarios: string[] = [];
+      filterData.forEach((data) => {
+        scenarios.push(data.scenario);
+      });
+
+      scenarios = [...new Set(scenarios)];
+
+      res.send(scenarios);
+    });
+
+    this.app.get(`/api/variables`, (req, res) => {
+
+      let variables: string[] = [];
+      filterData.forEach((data) => {
+        variables.push(data.variable);
+      });
+
+      variables = [...new Set(variables)];
+
+      res.send(variables);
+    });
+
+    this.app.get(`/api/regions`, (req, res) => {
+      let regions: string[] = [];
+      filterData.forEach((data) => {
+        regions.push(data.region);
+      });
+
+      regions = [...new Set(regions)];
+
+      res.send(regions);
+    });
+
+    this.app.post(`/api/filter`, (req, res) => {
+      const data = req.body;
+      const result: { [id: string]: string[] } = {
+        "regions": [],
+        "models": [],
+        "scenarios": [],
+        "variables": []
+      }
+      switch (data.type) {
+        case "regions":
+          data.data.map(region => {
+            const filtered: any[] = filterData.filter(dataElement => dataElement.region === region).map(e => e);
+            const models = filtered.map(data => data.model) as string[];
+            const scenarios = filtered.map(data => data.scenario) as string[];
+            const variables = filtered.map(data => data.variable) as string[];
+
+            result["models"] = [...new Set([...result["models"], ...models])];
+            result["scenarios"] = [...new Set([...result["scenarios"], ...scenarios])];
+            result["variables"] = [...new Set([...result["variables"], ...variables])];
+          });
+          break;
+
+        case "variables":
+          data.data.map(variable => {
+            const filtered: any[] = filterData.filter(dataElement => dataElement.variable === variable).map(e => e);
+            const models = filtered.map(data => data.model) as string[];
+            const scenarios = filtered.map(data => data.scenario) as string[];
+            const regions = filtered.map(data => data.region) as string[];
+
+            result["models"] = [...new Set([...result["models"], ...models])];
+            result["scenarios"] = [...new Set([...result["scenarios"], ...scenarios])];
+            result["regions"] = [...new Set([...result["regions"], ...regions])];
+          })
+          break;
+
+        case "scenarios":
+          data.data.map(scenario => {
+            const filtered: any[] = filterData.filter(dataElement => dataElement.scenario === scenario).map(e => e);
+            const models = filtered.map(data => data.model) as string[];
+            const variables = filtered.map(data => data.scenario) as string[];
+            const regions = filtered.map(data => data.region) as string[];
+
+            result["models"] = [...new Set([...result["models"], ...models])];
+            result["variables"] = [...new Set([...result["variables"], ...variables])];
+            result["regions"] = [...new Set([...result["regions"], ...regions])];
+          })
+          break;
+
+        case "models":
+          data.data.map(model => {
+            const filtered: any[] = filterData.filter(dataElement => dataElement.model === model).map(e => e);
+            const scenarios = filtered.map(data => data.scenario) as string[];
+            const variables = filtered.map(data => data.variable) as string[];
+            const regions = filtered.map(data => data.region) as string[];
+
+            result["scenarios"] = [...new Set([...result["scenarios"], ...scenarios])];
+            result["variables"] = [...new Set([...result["variables"], ...variables])];
+            result["regions"] = [...new Set([...result["regions"], ...regions])];
+          })
+          break;
+      }
+      res.send(result);
     });
 
     // Posts methods

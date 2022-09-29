@@ -123,6 +123,21 @@ class DashboardDataConfiguration extends Component<
    * @returns the fetched data from API with timeseries
    */
   getData = (data: DataModel[]) => {
+    data.map((dataElement) => {
+      const data = this.isDataExist(dataElement);
+      if (data === null) {
+        this.props.dataManager.fetchData(dataElement).then((resData) => {
+          // Check here if data exist or not (requested data)
+          if (resData.length !== 0) {
+            this.setState({data: [...this.state.data, resData]});
+          }
+          return resData;
+        });
+      } else {
+        return data;
+      }
+    });
+
     return this.settingPlotData(data);
   };
 
