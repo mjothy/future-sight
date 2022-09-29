@@ -1,6 +1,7 @@
 build/**/*
 node_modules
 build
+data
 
 .vscode
 *.iml

@@ -35,7 +35,6 @@ export default class DashboardSelectionControl extends Component<
        * The selected block id
        */
       blockSelectedId: '',
-      blockType: '',
       isDraft: false,
       selectedFilter: '',
     };

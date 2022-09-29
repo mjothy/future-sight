@@ -3,15 +3,8 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import { join } from 'path';
 
-import data from '../data/data.json';
-import models from '../data/models.json';
-import filterData from '../data/filter.json'
-import regions from '../data/regions.json';
-import dashboard from '../data/dashboards.json';
-import allData from '../data/test-data.json';
-
-import * as fs from 'fs';
 import RedisClient from '../redis/RedisClient';
+import IDataProxy from "./IDataProxy";
 
 export default class ExpressServer {
   private app: any;
@@ -19,13 +12,15 @@ export default class ExpressServer {
   private readonly auth: any;
   private readonly clientPath: any;
   private readonly dbClient: RedisClient;
+  private readonly dataProxy: IDataProxy;
 
-  constructor(port, cookieKey, auth, clientPath, dbClient) {
+  constructor(port, cookieKey, auth, clientPath, dbClient, dataProxy: IDataProxy) {
     this.app = express();
     this.port = port;
     this.auth = auth;
     this.clientPath = clientPath;
     this.dbClient = dbClient;
+    this.dataProxy = dataProxy;
     this.app.use(bodyParser.json());
     if (auth) {
       this.app.use(this.auth);
@@ -55,13 +50,9 @@ export default class ExpressServer {
       res.send(`Hello , From server`);
     });
 
-    /**
-     * @deprecated This is broken, should not be used as is
-     */
     this.app.post('/api/data', (req, res) => {
       const body = req.body;
-      console.log('body: ', JSON.stringify(req.body));
-      data.map((e) => {
+      this.dataProxy.getData().map((e) => {
         if (
           e.model === body.model &&
           e.scenario === body.scenario &&
@@ -78,37 +69,20 @@ export default class ExpressServer {
       const body = req.body;
       const response: any[] = [];
       for (const reqData of body) {
-        const element = data.find(
+        const elements = this.dataProxy.getData().filter(
           (e) => e.model === reqData.model && e.scenario === reqData.scenario
         );
-        if (element) {
-          response.push(element);
+        if (elements) {
+          response.push(...elements);
         }
       }
       res.status(200).send(response);
     });
 
     this.app.get('/api/models', (req, res) => {
-      let models: string[] = [];
-      filterData.forEach((data) => {
-        models.push(data.model);
-      });
-
-      models = [...new Set(models)];
-
-      res.send(models);
+      res.send(this.dataProxy.getModels());
     });
 
-    this.app.get('/api/scenarios', (req, res) => {
-      let scenarios: string[] = [];
-      filterData.forEach((data) => {
-        scenarios.push(data.scenario);
-      });
-
-      scenarios = [...new Set(scenarios)];
-
-      res.send(scenarios);
-    });
 
     this.app.get(`/api/variables`, (req, res) => {
 
@@ -213,16 +187,6 @@ export default class ExpressServer {
         console.error(err);
         next(err);
       }
-    });
-
-    this.app.post(`/api/dashboard`, (req, res) => {
-      fs.writeFile('./dashboards.json', JSON.stringify(req.body), (err) => {
-        if (err) console.log('Error writing file:', err);
-      });
-    });
-
-    this.app.get(`/api/dashboard`, (req, res) => {
-      res.send(dashboard);
     });
 
     this.app.get(`/api/dashboards/:id`, async (req, res, next) => {

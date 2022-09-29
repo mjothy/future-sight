@@ -4,6 +4,7 @@ import { Button, Col, Row, notification, Modal } from 'antd';
 import { DashboardProps } from '../Dashboard';
 import { useNavigate } from 'react-router-dom';
 import html2canvas from 'html2canvas'
+import {EditOutlined, EditTwoTone, QuestionCircleOutlined } from '@ant-design/icons';
 
 const DEFAULT_PREVIEW_WIDTH = 800;
 const DEFAULT_PREVIEW_HEIGHT = 450;
@@ -41,9 +42,16 @@ const DashboardControl: React.FC<DashboardProps> = ({
     setPublishing(true);
     const dashboard = document.querySelector(".dashboard") as HTMLElement
     if (dashboard) {
-      makeAndResizePreview(dashboard).then(function(dataURL) {
-        save(dataURL);
-      });
+      dashboard.classList.add('publishing');
+      let timer = setInterval(function() {
+        if (dashboard.classList.contains('publishing')) {
+          //run some other function
+          makeAndResizePreview(dashboard).then(function(dataURL) {
+            save(dataURL);
+          });
+          clearInterval(timer);
+        }
+      }, 200);
     } else {
       save()
     }
@@ -102,10 +110,10 @@ const DashboardControl: React.FC<DashboardProps> = ({
         display: 'flex',
         flexDirection: 'column',
         height: 'calc(100% - 64px)',
-        justifyContent: 'space-between',
+        flex: "1"
       }}
     >
-      <Row justify="space-between">
+      <Row >
         {actions.map((action) => (
           <Col key={action.type} span="8">
             <AddButton
@@ -117,6 +125,11 @@ const DashboardControl: React.FC<DashboardProps> = ({
         ))}
       </Row>
       <Row>
+        <Col span={24}>
+          <p className="p-10"><QuestionCircleOutlined /><em>Hint : Click on the <EditOutlined /> button to modify a block !</em></p>
+        </Col>
+      </Row>
+      <Row style={{marginTop: "auto"}}>
         <Col span={24}>
           <Button
             type="primary"

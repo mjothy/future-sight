@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import { Divider, Select } from 'antd';
+import { Divider, Select, Space } from 'antd';
 import BlockModel from '../../../models/BlockModel';
 import ConfigurationModel from '../../../models/ConfigurationModel';
 

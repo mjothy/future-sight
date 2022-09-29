@@ -9,21 +9,6 @@ export default class DataManager implements IDataManager {
     return '/api';
   }
 
-  fetchData = (data: DataModel) => {
-    return fetch(`${this.getBaseUrl()}/data`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        return data;
-      })
-      .catch(console.error);
-  };
-
   fetchPlotData = (data: DataModel) => {
     return fetch(`${this.getBaseUrl()}/plotData`, {
       method: 'POST',
@@ -31,20 +16,6 @@ export default class DataManager implements IDataManager {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        return data;
-      })
-      .catch(console.error);
-  };
-
-  fetchAllData = () => {
-    return fetch(`${this.getBaseUrl()}/data`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
     })
       .then((response) => response.json())
       .then((data) => {

@@ -92,8 +92,12 @@ body {
 }
 
 .dashboard .dashboard-content {
-  background-color: azure;
+  background-color: #f3f3f3;
   width: 100%;
+}
+
+.publishing .block-edit {
+  visibility: hidden;
 }
 
 .sidebar-toggle {
@@ -158,6 +162,7 @@ body {
 .drawer {
   margin-top: 60px;
   z-index: 0;
+  max-height: calc(100% - 60px);
 }
 
 .selected-layout {

@@ -31,6 +31,10 @@ export default class SetupView extends Component<any, any> {
     this.props.updateUserData(data);
   };
 
+  hasFilledStructure = () => {
+      return Object.keys(this.props.structureData).length !== 0
+  }
+
   render() {
     const handleOk = () => {
       this.setState({ visible: false });
