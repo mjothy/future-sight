@@ -29,8 +29,37 @@ class DashboardDataConfiguration extends Component<
        * Data (with timeseries from IASA API)
        */
       data: [],
+      allDataForFilter: {
+        regions: [],
+        variables: [],
+        scenarios: [],
+        models: [],
+      },
       dashboardModelScenario: [],
     };
+  }
+
+  componentDidMount(): void {
+    this.props.dataManager.fetchRegions().then((regions) =>
+      this.setState({
+        allDataForFilter: { ...this.state.allDataForFilter, regions },
+      })
+    );
+    this.props.dataManager.fetchVariables().then((variables) =>
+      this.setState({
+        allDataForFilter: { ...this.state.allDataForFilter, variables },
+      })
+    );
+    this.props.dataManager.fetchScenarios().then((scenarios) =>
+      this.setState({
+        allDataForFilter: { ...this.state.allDataForFilter, scenarios },
+      })
+    );
+    this.props.dataManager.fetchModels().then((models) =>
+      this.setState({
+        allDataForFilter: { ...this.state.allDataForFilter, models },
+      })
+    );
   }
 
   /**
@@ -182,6 +211,7 @@ class DashboardDataConfiguration extends Component<
         getData={this.getData}
         saveData={this.saveData}
         setDashboardModelScenario={this.setDashboardModelScenario}
+        allDataForFilter={this.state.allDataForFilter}
         {...this.props}
       />
     );

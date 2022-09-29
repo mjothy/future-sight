@@ -19,6 +19,7 @@ export interface DashboardSelectionControlProps
   getData: (data: DataModel[]) => any[];
   saveData: (id: string, image?: string) => Promise<any>;
   setDashboardModelScenario: (selection) => void;
+  allDataForFilter:any;
 }
 
 export default class DashboardSelectionControl extends Component<

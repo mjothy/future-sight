@@ -4,35 +4,13 @@ import {
   GlobalOutlined,
   LineChartOutlined,
 } from '@ant-design/icons';
-import { Alert, Radio, RadioChangeEvent, Select, Space } from 'antd';
+import { Radio, RadioChangeEvent, Select, Space } from 'antd';
 import { Option } from 'antd/lib/mentions';
-import React, { Component } from 'react';
+import { Component } from 'react';
 
 export default class PopupFilterContent extends Component<any, any> {
-  regions: string[] = [];
-  variables: string[] = [];
-  scenarios: string[] = [];
-  models: string[] = [];
-
   constructor(props) {
     super(props);
-  }
-
-  componentDidMount() {
-    // fetching data
-    this.props.dataManager
-      .fetchRegions()
-      .then((regions) => (this.regions = regions));
-
-    this.props.dataManager
-      .fetchVariables()
-      .then((variables) => (this.variables = variables));
-    this.props.dataManager
-      .fetchScenarios()
-      .then((scenarios) => (this.scenarios = scenarios));
-    this.props.dataManager
-      .fetchModels()
-      .then((models) => (this.models = models));
   }
 
   onRegionsChange = (regions: string[]) => {
@@ -71,19 +49,12 @@ export default class PopupFilterContent extends Component<any, any> {
   };
 
   render() {
-    let currentFilter: string | undefined = undefined;
-    for (const filter in this.props.dataStructure) {
-      if (this.props.dataStructure[filter].isFilter) {
-        currentFilter = filter;
-        break;
-      }
-    }
     return (
       <div>
         <Radio.Group
           onChange={this.onChange}
           className="width-100"
-          value={currentFilter}
+          value={this.props.selectedFilter}
         >
           <Space direction="vertical" className="width-100">
             <div className="mt-20">
@@ -91,7 +62,7 @@ export default class PopupFilterContent extends Component<any, any> {
                 <GlobalOutlined />
                 Regions
               </Radio>
-              {currentFilter === 'regions' && (
+              {this.props.selectedFilter === 'regions' && (
                 <Select
                   mode="multiple"
                   className="width-100 mt-20"
@@ -99,7 +70,7 @@ export default class PopupFilterContent extends Component<any, any> {
                   value={this.props.dataStructure.regions.selection}
                   onChange={this.onRegionsChange}
                 >
-                  {this.regions.map((option) => (
+                  {this.props.allDataForFilter.regions.map((option) => (
                     <Option key={option} value={option}>
                       {option}
                     </Option>
@@ -113,7 +84,7 @@ export default class PopupFilterContent extends Component<any, any> {
                 <LineChartOutlined />
                 Variables
               </Radio>
-              {currentFilter === 'variables' && (
+              {this.props.selectedFilter === 'variables' && (
                 <Select
                   mode="multiple"
                   className="width-100 mt-20"
@@ -121,7 +92,7 @@ export default class PopupFilterContent extends Component<any, any> {
                   value={this.props.dataStructure.variables.selection}
                   onChange={this.onVariablesChange}
                 >
-                  {this.variables.map((option) => (
+                  {this.props.allDataForFilter.variables.map((option) => (
                     <Option key={option} value={option}>
                       {option}
                     </Option>
@@ -134,7 +105,7 @@ export default class PopupFilterContent extends Component<any, any> {
                 <BranchesOutlined />
                 Scenarios
               </Radio>
-              {currentFilter === 'scenarios' && (
+              {this.props.selectedFilter === 'scenarios' && (
                 <Select
                   mode="multiple"
                   className="width-100 mt-20"
@@ -142,7 +113,7 @@ export default class PopupFilterContent extends Component<any, any> {
                   value={this.props.dataStructure.scenarios.selection}
                   onChange={this.onScenariosChange}
                 >
-                  {this.scenarios.map((option) => (
+                  {this.props.allDataForFilter.scenarios.map((option) => (
                     <Option key={option} value={option}>
                       {option}
                     </Option>
@@ -155,7 +126,7 @@ export default class PopupFilterContent extends Component<any, any> {
                 <ControlOutlined />
                 Models
               </Radio>
-              {currentFilter === 'models' && (
+              {this.props.selectedFilter === 'models' && (
                 <Select
                   mode="multiple"
                   className="width-100 mt-20"
@@ -163,7 +134,7 @@ export default class PopupFilterContent extends Component<any, any> {
                   value={this.props.dataStructure.models.selection}
                   onChange={this.onModelsChange}
                 >
-                  {this.models.map((option) => (
+                  {this.props.allDataForFilter.models.map((option) => (
                     <Option key={option} value={option}>
                       {option}
                     </Option>

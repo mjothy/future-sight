@@ -8,12 +8,12 @@ import {
 import React from 'react';
 import SetupView from './form/SetupView';
 import { RoutingProps } from '../app/Routing';
-import {Button, Radio } from 'antd';
+import { Button, Radio } from 'antd';
 import { FilterTwoTone } from '@ant-design/icons';
 
 interface DashboardViewProps
   extends ComponentPropsWithDataManager,
-    RoutingProps {
+  RoutingProps {
   dashboard: DashboardModel;
   addBlock: (blockType: string, masterBlockId?: string) => void;
   blockSelectedId: string;
@@ -110,16 +110,6 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
   render() {
     return (
       <>
-        <div className="back-to-setup">
-          <Radio.Group
-            value={this.state.setupDashboardMode}
-            onChange={(e) => this.switchSetupDashboardMode(e.target.value)}
-            buttonStyle="solid"
-          >
-            <Radio.Button value="setup">Filter data</Radio.Button>
-            <Radio.Button value="dashboard" disabled={!this.hasFilledStructure()}>Dashboard</Radio.Button>
-          </Radio.Group>
-        </div>
         <Dashboard {...this.props} />
         <SetupView
           {...this.props}
