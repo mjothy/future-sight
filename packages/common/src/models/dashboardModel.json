@@ -4,8 +4,7 @@
     "author": "",
     "tags": []
   },
-  "dataStructure": {
-  },
+  "dataStructure": {},
   "layout": [
     {
       "w": 4,
@@ -43,12 +42,10 @@
           }
         },
         "metaData": {
-          "models": {
-          },
-          "regions": [
-          ],
-          "variables": [
-          ],
+          "models": [],
+          "scenarios": [],
+          "regions": [],
+          "variables": [],
           "master": {
             "models": {
               "isMaster": false,

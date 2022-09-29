@@ -1,4 +1,9 @@
-import {BranchesOutlined, ControlOutlined, GlobalOutlined, LineChartOutlined } from '@ant-design/icons';
+import {
+  BranchesOutlined,
+  ControlOutlined,
+  GlobalOutlined,
+  LineChartOutlined,
+} from '@ant-design/icons';
 import { Alert, Radio, RadioChangeEvent, Select, Space } from 'antd';
 import { Option } from 'antd/lib/mentions';
 import React, { Component } from 'react';
@@ -18,6 +23,7 @@ export default class PopupFilterContent extends Component<any, any> {
     this.props.dataManager
       .fetchRegions()
       .then((regions) => (this.regions = regions));
+
     this.props.dataManager
       .fetchVariables()
       .then((variables) => (this.variables = variables));
@@ -65,9 +71,9 @@ export default class PopupFilterContent extends Component<any, any> {
   };
 
   render() {
-    let currentFilter:string|undefined = undefined
+    let currentFilter: string | undefined = undefined;
     for (const filter in this.props.dataStructure) {
-      if(this.props.dataStructure[filter].isFilter) {
+      if (this.props.dataStructure[filter].isFilter) {
         currentFilter = filter;
         break;
       }
@@ -81,7 +87,10 @@ export default class PopupFilterContent extends Component<any, any> {
         >
           <Space direction="vertical" className="width-100">
             <div className="mt-20">
-              <Radio value={'regions'}><GlobalOutlined />Regions</Radio>
+              <Radio value={'regions'}>
+                <GlobalOutlined />
+                Regions
+              </Radio>
               {currentFilter === 'regions' && (
                 <Select
                   mode="multiple"
@@ -100,7 +109,10 @@ export default class PopupFilterContent extends Component<any, any> {
             </div>
 
             <div className="mt-20">
-              <Radio value={'variables'}><LineChartOutlined />Variables</Radio>
+              <Radio value={'variables'}>
+                <LineChartOutlined />
+                Variables
+              </Radio>
               {currentFilter === 'variables' && (
                 <Select
                   mode="multiple"
@@ -118,7 +130,10 @@ export default class PopupFilterContent extends Component<any, any> {
               )}
             </div>
             <div className="mt-20">
-              <Radio value={'scenarios'}><BranchesOutlined />Scenarios</Radio>
+              <Radio value={'scenarios'}>
+                <BranchesOutlined />
+                Scenarios
+              </Radio>
               {currentFilter === 'scenarios' && (
                 <Select
                   mode="multiple"
@@ -136,7 +151,10 @@ export default class PopupFilterContent extends Component<any, any> {
               )}
             </div>
             <div className="mt-20">
-              <Radio value={'models'}><ControlOutlined />Models</Radio>
+              <Radio value={'models'}>
+                <ControlOutlined />
+                Models
+              </Radio>
               {currentFilter === 'models' && (
                 <Select
                   mode="multiple"

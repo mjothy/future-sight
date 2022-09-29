@@ -36,8 +36,8 @@ export default class ExpressServer {
     this.clientPath = clientPath;
     this.dbClient = dbClient;
     this.dataProxy = dataProxy;
-    this.app.use(bodyParser.json({limit: '50mb'}));
-    this.app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+    this.app.use(bodyParser.json({ limit: '50mb' }));
+    this.app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
     if (auth) {
       this.app.use(this.auth);
     }
@@ -119,27 +119,16 @@ export default class ExpressServer {
       res.send(scenarios);
     });
 
+    this.app.get('/api/scenarios', (req, res) => {
+      res.send(this.dataProxy.getScenarios());
+    });
+
     this.app.get(`/api/variables`, (req, res) => {
-
-      let variables: string[] = [];
-      filterData.forEach((data) => {
-        variables.push(data.variable);
-      });
-
-      variables = [...new Set(variables)];
-
-      res.send(variables);
+      res.send(this.dataProxy.getVariables());
     });
 
     this.app.get(`/api/regions`, (req, res) => {
-      let regions: string[] = [];
-      filterData.forEach((data) => {
-        regions.push(data.region);
-      });
-
-      regions = [...new Set(regions)];
-
-      res.send(regions);
+      res.send(this.dataProxy.getRegions());
     });
 
     this.app.post(`/api/filter`, (req, res) => {
@@ -153,7 +142,7 @@ export default class ExpressServer {
       switch (data.type) {
         case "regions":
           data.data.map(region => {
-            const filtered: any[] = filterData.filter(dataElement => dataElement.region === region).map(e => e);
+            const filtered: any[] = this.dataProxy.getData().filter(dataElement => dataElement.region === region).map(e => e);
             const models = filtered.map(data => data.model) as string[];
             const scenarios = filtered.map(data => data.scenario) as string[];
             const variables = filtered.map(data => data.variable) as string[];
@@ -166,7 +155,7 @@ export default class ExpressServer {
 
         case "variables":
           data.data.map(variable => {
-            const filtered: any[] = filterData.filter(dataElement => dataElement.variable === variable).map(e => e);
+            const filtered: any[] = this.dataProxy.getData().filter(dataElement => dataElement.variable === variable).map(e => e);
             const models = filtered.map(data => data.model) as string[];
             const scenarios = filtered.map(data => data.scenario) as string[];
             const regions = filtered.map(data => data.region) as string[];
@@ -179,7 +168,7 @@ export default class ExpressServer {
 
         case "scenarios":
           data.data.map(scenario => {
-            const filtered: any[] = filterData.filter(dataElement => dataElement.scenario === scenario).map(e => e);
+            const filtered: any[] = this.dataProxy.getData().filter(dataElement => dataElement.scenario === scenario).map(e => e);
             const models = filtered.map(data => data.model) as string[];
             const variables = filtered.map(data => data.scenario) as string[];
             const regions = filtered.map(data => data.region) as string[];
@@ -192,7 +181,7 @@ export default class ExpressServer {
 
         case "models":
           data.data.map(model => {
-            const filtered: any[] = filterData.filter(dataElement => dataElement.model === model).map(e => e);
+            const filtered: any[] = this.dataProxy.getData().filter(dataElement => dataElement.model === model).map(e => e);
             const scenarios = filtered.map(data => data.scenario) as string[];
             const variables = filtered.map(data => data.variable) as string[];
             const regions = filtered.map(data => data.region) as string[];
@@ -242,11 +231,11 @@ export default class ExpressServer {
           idsToFetch.push(latestId - i);
         }
         const dashboards: any[] = [];
-        for (let i = latestId; i > latestId - 5 ; i--) {
+        for (let i = latestId; i > latestId - 5; i--) {
           try {
             const dashboard = await this.dbClient
-                .getClient()
-                .json.get('dashboards', { path: i.toString() });
+              .getClient()
+              .json.get('dashboards', { path: i.toString() });
             dashboards.push(dashboard)
           } catch (e) {
             // no dashboard found for id
@@ -286,8 +275,8 @@ export default class ExpressServer {
           results[dashboards[0]] = data;
         } else {
           results = Object.entries(data).reduce(
-              (obj, [key, dashboard]) => Object.assign(obj, { [key]: dashboard }),
-              {}
+            (obj, [key, dashboard]) => Object.assign(obj, { [key]: dashboard }),
+            {}
           );
         }
 
