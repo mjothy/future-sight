@@ -83,28 +83,16 @@ export default class ExpressServer {
       res.send(this.dataProxy.getModels());
     });
 
-    //TODO : Changes these to use FS data proxy
+    this.app.get('/api/scenarios', (req, res) => {
+      res.send(this.dataProxy.getScenarios());
+    });
+
     this.app.get(`/api/variables`, (req, res) => {
-
-      let variables: string[] = [];
-      filterData.forEach((data) => {
-        variables.push(data.variable);
-      });
-
-      variables = [...new Set(variables)];
-
-      res.send(variables);
+      res.send(this.dataProxy.getVariables());
     });
 
     this.app.get(`/api/regions`, (req, res) => {
-      let regions: string[] = [];
-      filterData.forEach((data) => {
-        regions.push(data.region);
-      });
-
-      regions = [...new Set(regions)];
-
-      res.send(regions);
+      res.send(this.dataProxy.getRegions());
     });
 
     this.app.post(`/api/filter`, (req, res) => {
@@ -122,7 +110,7 @@ export default class ExpressServer {
       switch (data.type) {
         case "regions":
           data.data.map(region => {
-            const filtered: any[] = filterData.filter(dataElement => dataElement.region === region).map(e => e);
+            const filtered: any[] = this.dataProxy.getData().filter(dataElement => dataElement.region === region).map(e => e);
             const models = filtered.map(data => data.model) as string[];
             const scenarios = filtered.map(data => data.scenario) as string[];
             const variables = filtered.map(data => data.variable) as string[];
@@ -135,7 +123,7 @@ export default class ExpressServer {
 
         case "variables":
           data.data.map(variable => {
-            const filtered: any[] = filterData.filter(dataElement => dataElement.variable === variable).map(e => e);
+            const filtered: any[] = this.dataProxy.getData().filter(dataElement => dataElement.variable === variable).map(e => e);
             const models = filtered.map(data => data.model) as string[];
             const scenarios = filtered.map(data => data.scenario) as string[];
             const regions = filtered.map(data => data.region) as string[];
@@ -148,7 +136,7 @@ export default class ExpressServer {
 
         case "scenarios":
           data.data.map(scenario => {
-            const filtered: any[] = filterData.filter(dataElement => dataElement.scenario === scenario).map(e => e);
+            const filtered: any[] = this.dataProxy.getData().filter(dataElement => dataElement.scenario === scenario).map(e => e);
             const models = filtered.map(data => data.model) as string[];
             const variables = filtered.map(data => data.scenario) as string[];
             const regions = filtered.map(data => data.region) as string[];
@@ -161,7 +149,7 @@ export default class ExpressServer {
 
         case "models":
           data.data.map(model => {
-            const filtered: any[] = filterData.filter(dataElement => dataElement.model === model).map(e => e);
+            const filtered: any[] = this.dataProxy.getData().filter(dataElement => dataElement.model === model).map(e => e);
             const scenarios = filtered.map(data => data.scenario) as string[];
             const variables = filtered.map(data => data.variable) as string[];
             const regions = filtered.map(data => data.region) as string[];
