@@ -1,3 +1,4 @@
+import {BranchesOutlined, ControlOutlined, GlobalOutlined, LineChartOutlined } from '@ant-design/icons';
 import { Alert, Radio, RadioChangeEvent, Select, Space } from 'antd';
 import { Option } from 'antd/lib/mentions';
 import React, { Component } from 'react';
@@ -28,86 +29,66 @@ export default class PopupFilterContent extends Component<any, any> {
       .then((models) => (this.models = models));
   }
 
-  render() {
-    const dataStructure = this.props.dataStructure;
+  onRegionsChange = (regions: string[]) => {
+    this.props.dataStructure.regions.selection = regions;
+    this.props.updateDataStructure(this.props.dataStructure);
+  };
 
-    const onRegionsChange = (regions: string[]) => {
-      dataStructure.regions.selection = regions;
-      this.props.updateDataStructure(dataStructure);
-    };
+  onVariablesChange = (variables: string[]) => {
+    this.props.dataStructure.variables.selection = variables;
+    this.props.updateDataStructure(this.props.dataStructure);
+  };
 
-    const onVariablesChange = (variables: string[]) => {
-      dataStructure.variables.selection = variables;
-      this.props.updateDataStructure(dataStructure);
-    };
+  onScenariosChange = (scenarios: string[]) => {
+    this.props.dataStructure.scenarios.selection = scenarios;
+    this.props.updateDataStructure(this.props.dataStructure);
+  };
 
-    const onScenariosChange = (scenarios: string[]) => {
-      dataStructure.scenarios.selection = scenarios;
-      this.props.updateDataStructure(dataStructure);
-    };
+  onModelsChange = (models: string[]) => {
+    this.props.dataStructure.models.selection = models;
+    this.props.updateDataStructure(this.props.dataStructure);
+  };
 
-    const onModelsChange = (models: string[]) => {
-      dataStructure.models.selection = models;
-      this.props.updateDataStructure(dataStructure);
-    };
-
-    const onChange = (e: RadioChangeEvent) => {
-      const filter = e.target.value;
-      // tHE KEY can be: models/scenarios/regions/variables
-      Object.keys(dataStructure).map((key) => {
-        if (filter === key) {
-          dataStructure[key].isFilter = true;
-        } else {
-          dataStructure[key].isFilter = false;
-          dataStructure[key].selection = [];
-        }
-      });
-      this.props.updateDataStructure(dataStructure);
-      this.props.updateSelectedFilter(filter);
-    };
-
-    const isChange = () => {
-      const filter = Object.keys(this.props.dashboard.dataStructure)
-        .filter((e) => this.props.dashboard.dataStructure[e].isFilter)
-        .map((e) => this.props.dashboard.dataStructure[e])[0];
-      const newFilter = Object.keys(dataStructure)
-        .filter((e) => dataStructure[e].isFilter)
-        .map((e) => dataStructure[e])[0];
-
-      if (JSON.stringify(filter) === JSON.stringify(newFilter)) {
-        return false;
+  onChange = (e: RadioChangeEvent) => {
+    const filter = e.target.value;
+    // tHE KEY can be: models/scenarios/regions/variables
+    Object.keys(this.props.dataStructure).map((key) => {
+      if (filter === key) {
+        this.props.dataStructure[key].isFilter = true;
       } else {
-        return true;
+        this.props.dataStructure[key].isFilter = false;
+        this.props.dataStructure[key].selection = [];
       }
-    };
+    });
+    this.props.updateDataStructure(this.props.dataStructure);
+    this.props.updateSelectedFilter(filter);
+  };
 
+  render() {
+    let currentFilter:string|undefined = undefined
+    for (const filter in this.props.dataStructure) {
+      if(this.props.dataStructure[filter].isFilter) {
+        currentFilter = filter;
+        break;
+      }
+    }
     return (
       <div>
-        {isChange() && (
-          <Alert
-            message="Warning"
-            description="Changes have been done."
-            type="warning"
-            className="width-100"
-            showIcon
-            closable
-          />
-        )}
         <Radio.Group
-          onChange={onChange}
+          onChange={this.onChange}
           className="width-100"
-          value={this.props.selectedFilter}
+          value={currentFilter}
         >
           <Space direction="vertical" className="width-100">
             <div className="mt-20">
-              <Radio value={'regions'}>Regions</Radio>
-              {this.props.selectedFilter === 'regions' && (
+              <Radio value={'regions'}><GlobalOutlined />Regions</Radio>
+              {currentFilter === 'regions' && (
                 <Select
                   mode="multiple"
                   className="width-100 mt-20"
                   placeholder="Regions"
-                  value={dataStructure.regions.selection}
-                  onChange={onRegionsChange}
+                  value={this.props.dataStructure.regions.selection}
+                  onChange={this.onRegionsChange}
                 >
                   {this.regions.map((option) => (
                     <Option key={option} value={option}>
@@ -119,14 +100,14 @@ export default class PopupFilterContent extends Component<any, any> {
             </div>
 
             <div className="mt-20">
-              <Radio value={'variables'}>Variables</Radio>
-              {this.props.selectedFilter === 'variables' && (
+              <Radio value={'variables'}><LineChartOutlined />Variables</Radio>
+              {currentFilter === 'variables' && (
                 <Select
                   mode="multiple"
                   className="width-100 mt-20"
                   placeholder="Variables"
-                  value={dataStructure.variables.selection}
-                  onChange={onVariablesChange}
+                  value={this.props.dataStructure.variables.selection}
+                  onChange={this.onVariablesChange}
                 >
                   {this.variables.map((option) => (
                     <Option key={option} value={option}>
@@ -137,14 +118,14 @@ export default class PopupFilterContent extends Component<any, any> {
               )}
             </div>
             <div className="mt-20">
-              <Radio value={'scenarios'}>Scenarios</Radio>
-              {this.props.selectedFilter === 'scenarios' && (
+              <Radio value={'scenarios'}><BranchesOutlined />Scenarios</Radio>
+              {currentFilter === 'scenarios' && (
                 <Select
                   mode="multiple"
                   className="width-100 mt-20"
                   placeholder="Scenarios"
-                  value={dataStructure.scenarios.selection}
-                  onChange={onScenariosChange}
+                  value={this.props.dataStructure.scenarios.selection}
+                  onChange={this.onScenariosChange}
                 >
                   {this.scenarios.map((option) => (
                     <Option key={option} value={option}>
@@ -155,14 +136,14 @@ export default class PopupFilterContent extends Component<any, any> {
               )}
             </div>
             <div className="mt-20">
-              <Radio value={'models'}>Models</Radio>
-              {this.props.selectedFilter === 'models' && (
+              <Radio value={'models'}><ControlOutlined />Models</Radio>
+              {currentFilter === 'models' && (
                 <Select
                   mode="multiple"
                   className="width-100 mt-20"
                   placeholder="Models"
-                  value={dataStructure.models.selection}
-                  onChange={onModelsChange}
+                  value={this.props.dataStructure.models.selection}
+                  onChange={this.onModelsChange}
                 >
                   {this.models.map((option) => (
                     <Option key={option} value={option}>

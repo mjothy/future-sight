@@ -1,6 +1,8 @@
 import { Component } from 'react';
 import Modal from 'antd/lib/modal/Modal';
 import PopupFilterContent from './PopupFilterContent';
+import { Button } from 'antd';
+import { FilterTwoTone } from '@ant-design/icons';
 
 /**
  * The view for setting dashboard mataData
@@ -11,6 +13,7 @@ export default class SetupView extends Component<any, any> {
     this.state = {
       dataStructure: structuredClone(this.props.dashboard.dataStructure),
       selectedFilter: '',
+      visible: this.hasFilters() === undefined
     };
   }
 
@@ -23,59 +26,67 @@ export default class SetupView extends Component<any, any> {
       });
     }
   }
-  /**
-   * Receive the user data from UserDataForm and send it to DashboardView to update the parent state
-   * @param data contains the information of the dashboard {title, author and tags}
-   */
-  handleUserData = (data) => {
-    this.props.updateUserData(data);
-  };
+
+  hasFilters = () => {
+    let has : string|undefined = undefined;
+    for (const filter in this.props.dashboard.dataStructure) {
+      if (this.props.dashboard.dataStructure[filter].isFilter) {
+        has = filter
+        break;
+      }
+    }
+    return has;
+  }
+
+  show = () => {
+    this.setState({visible: true})
+  }
+
+  handleCancel = () => {
+    this.setState({visible: false})
+  }
 
   hasFilledStructure = () => {
       return Object.keys(this.props.structureData).length !== 0
   }
 
+  updateDataStructure = (dataStructure) => {
+    this.setState({ dataStructure });
+  }
+
+  handleOk = () => {
+    this.setState({ visible: false });
+    this.props.updateDashboardMetadata({
+      dataStructure: this.state.dataStructure,
+    });
+  }
+
   render() {
-    const handleOk = () => {
-      this.setState({ visible: false });
-      this.props.updateDashboardMetadata({
-        dataStructure: this.state.dataStructure,
-      });
-      this.props.submitEvent('dashboard');
-    };
-
-    const handleCancel = () => {
-      this.setState({
-        visible: false,
-        selectedFilter: '',
-        dataStructure: structuredClone(this.props.dashboard.dataStructure),
-      });
-      this.props.updateSelectedFilter('');
-      this.props.submitEvent('dashboard');
-    };
-
-    const updateDataStructure = (dataStructure) => {
-      this.setState({ dataStructure });
-    };
-
     return (
-      <Modal
-        title="Set up filter data"
-        visible={this.props.visible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        closable={false}
-        maskClosable={false}
-        zIndex={2}
-        okText={'submit'}
-      >
-        <PopupFilterContent
-          {...this.props}
-          dataStructure={this.state.dataStructure}
-          updateDataStructure={updateDataStructure}
-          handleOk={handleOk}
-        />
-      </Modal>
+        <>
+          <div className="back-to-setup">
+            <Button value="setup" onClick={this.show}>
+              <FilterTwoTone />Data focus {this.hasFilters() ? ": " + this.hasFilters() : ""}
+            </Button>
+          </div>
+          <Modal
+              title="Choose the data to focus on:"
+              visible={this.state.visible}
+              onOk={this.handleOk}
+              onCancel={this.handleCancel}
+              closable={false}
+              maskClosable={false}
+              zIndex={2}
+              okText={'submit'}
+          >
+            <PopupFilterContent
+                {...this.props}
+                dataStructure={this.state.dataStructure}
+                updateDataStructure={this.updateDataStructure}
+                handleOk={this.handleOk}
+            />
+          </Modal>
+        </>
     );
   }
 }

@@ -8,7 +8,8 @@ import {
 import React from 'react';
 import SetupView from './form/SetupView';
 import { RoutingProps } from '../app/Routing';
-import { Radio } from 'antd';
+import {Button, Radio } from 'antd';
+import { FilterTwoTone } from '@ant-design/icons';
 
 interface DashboardViewProps
   extends ComponentPropsWithDataManager,
@@ -44,8 +45,7 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
       /**
        * Selected data to work with in dashboard {model: {scenario: { variables: [], regions: []}}}
        */
-      data: [],
-      setupDashboardMode: 'dashboard',
+      data: []
     };
   }
 
@@ -124,10 +124,8 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
         <SetupView
           {...this.props}
           userData={this.props.dashboard.userData}
-          submitEvent={this.switchSetupDashboardMode}
           updateUserData={this.handleUserData}
           handleStructureData={this.handleStructureData}
-          visible={this.state.setupDashboardMode === 'setup'}
         />
       </>
     );

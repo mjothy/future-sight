@@ -83,7 +83,7 @@ export default class ExpressServer {
       res.send(this.dataProxy.getModels());
     });
 
-
+    //TODO : Changes these to use FS data proxy
     this.app.get(`/api/variables`, (req, res) => {
 
       let variables: string[] = [];
