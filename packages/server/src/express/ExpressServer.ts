@@ -145,8 +145,7 @@ export default class ExpressServer {
         // data is returned as: [ { author1: [], author2: [], ... }, { tag1: [], tag2: [], ... } ]
         const authors = data[0];
         const tags = data[1];
-        const models = this.dataProxy.getModels();
-        res.send({ authors, tags, models });
+        res.send({ authors, tags });
       } catch (err) {
         console.error(err);
         next(err);
@@ -154,52 +153,15 @@ export default class ExpressServer {
     });
 
     this.app.post('/api/browse', async (req, res, next) => {
-      // Find the requested DataModel (i.e. Model&Scenario) in the dashboard
-      const findDataModel = (model, scenarios, dashboard) => {
-        // Loop in dashboard blocks
-        for (const block of Object.values((dashboard as any).blocks)) {
-          const models = (block as any).config.metaData.models;
-          // Find the model and scenarios in the dashboard
-          for (const [_model, _scenarios] of Object.entries(models)) {
-            if (model === _model) {
-              const found = scenarios.some((scenario) => {
-                return (_scenarios as Array<string>).indexOf(scenario) > -1;
-              });
-              if (found) {
-                return true;
-              }
-            }
-          }
-        }
-        return false;
-      };
-
       try {
-        const { dashboards, model, scenarios, title } = req.body;
+        const { dashboards } = req.body;
         const data = await this.dbClient
           .getClient()
           .json.get('dashboards', { path: dashboards.map(String) });
-        const results = Object.entries(data)
-          // Filter the data with info from req.body
-          .filter(([_, dashboard]) => {
-            let toKeep = true;
-            // Find provided title in dashboard's data
-            if (title) {
-              const dbTitle = (dashboard as any).userData.title.toLowerCase();
-              const usTitle = title.toLowerCase();
-              toKeep = dbTitle.indexOf(usTitle) > -1;
-            }
-            // Compare model&scenario
-            if (model && scenarios) {
-              toKeep = findDataModel(model, scenarios, dashboard);
-            }
-            return toKeep;
-          })
-          // Reduce as an object
-          .reduce(
-            (obj, [key, dashboard]) => Object.assign(obj, { [key]: dashboard }),
-            {}
-          );
+        const results = Object.entries(data).reduce(
+          (obj, [key, dashboard]) => Object.assign(obj, { [key]: dashboard }),
+          {}
+        );
         res.send(results);
       } catch (err) {
         console.error(err);

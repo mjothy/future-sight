@@ -3,7 +3,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 100%;
+  min-height: 33%;
 }
 
 .browse-container .form-container {
@@ -37,7 +37,7 @@
   transform: translateX(-50%);
 }
 
-.browse-container .search-result {
+.search-result {
   display: flex;
   flex-direction: column;
   justify-content: center;
