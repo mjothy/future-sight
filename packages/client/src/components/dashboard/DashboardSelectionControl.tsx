@@ -1,12 +1,10 @@
 import {
   BlockModel,
   ComponentPropsWithDataManager,
-  DashboardModel,
   DataModel,
   LayoutModel,
 } from '@future-sight/common';
 import { Component } from 'react';
-import { v1 as uuidv1 } from 'uuid';
 import { RoutingProps } from '../app/Routing';
 
 import DashboardView from './DashboardView';
@@ -65,10 +63,21 @@ export default class DashboardSelectionControl extends Component<
           dashboard: dashboardJson,
           isDraft: true,
         });
+
+        // Get the selected filter(s)
+        const filterOptions = Object.keys(dashboardJson.dataStructure)
+          .filter((key) => dashboardJson.dataStructure[key].isFilter)
+          .map((key) => key);
+        if (filterOptions.length > 0) {
+          this.updateSelectedFilter(filterOptions[0]);
+        }
+
       } else {
         console.error('no draft found with id' + id);
       }
     }
+
+
   }
 
   getLastId = () => {

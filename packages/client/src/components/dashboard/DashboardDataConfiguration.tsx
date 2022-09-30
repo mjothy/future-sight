@@ -41,7 +41,6 @@ class DashboardDataConfiguration extends Component<
 
   componentDidMount(): void {
     this.props.dataManager.fetchRegions().then((regions) => {
-      console.log("fetched regions: ", regions);
       this.setState({
         filters: { ...this.state.filters, regions }
       })
