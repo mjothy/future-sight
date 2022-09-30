@@ -2,7 +2,6 @@ import { Component } from 'react';
 import { Divider, Select, Space } from 'antd';
 import DataBlockTableSelection from '../component/DataBlockTableSelection';
 import BlockModel from '../../../models/BlockModel';
-import ConfigurationModel from '../../../models/ConfigurationModel';
 
 const { Option } = Select;
 
@@ -19,8 +18,9 @@ export default class DataBlockEditor extends Component<any, any> {
   constructor(props) {
     super(props);
     this.state = {
+      isFirstSelected: false,
       /**
-       * Data options in dropDown boxes
+       * Data options in dropDown boxs
        */
       data: {
         regions: [],
@@ -28,6 +28,20 @@ export default class DataBlockEditor extends Component<any, any> {
         scenarios: [],
         models: [],
       },
+      /**
+       * Selected data to save in dashboard config (metaData)
+       */
+      selectedData: {
+        regions: [],
+        variables: [],
+        scenarios: [],
+        models: [],
+      },
+      /**
+       * Order of selection data
+       */
+      selectOrder: [],
+      selectOptions: ["regions", "variables", "scenarios", "models"]
     };
     this.updateDropdownData();
     this.checkIfBlockControlled();
@@ -43,8 +57,22 @@ export default class DataBlockEditor extends Component<any, any> {
     if (filterOptions.length > 0) {
       this.filterOption = filterOptions[0];
       const data = this.state.data;
+
+      // Set the filter selection 
       data[this.filterOption] =
         this.props.dashboard.dataStructure[this.filterOption].selection;
+
+      // Set other data based on filter option
+      this.state.selectOptions.map(option => {
+        if (option !== this.filterOption) {
+          // Example: if filter is "regions" = ["Word", "France"], we get all possible other data (models, ...) of {Word, France}
+          data[this.filterOption].map(filterValue => {
+            // Example: this.props.filters["regions"]["Word"]["models"] ==> all possible models of word
+            data[option] = [...data[option], ...this.props.filters[this.filterOption][filterValue][option]]
+          })
+        }
+      })
+
       this.setState({ data });
     }
   }
@@ -75,79 +103,93 @@ export default class DataBlockEditor extends Component<any, any> {
   };
 
   updateDropdownData = () => {
-    switch (this.filterOption) {
-      case 'regions':
-        // Search other data
-        this.props.dataManager
-          .filter('regions', this.props.currentBlock.config.metaData.regions)
-          .then((data) => {
-            this.setState({
-              data: { ...data, regions: this.state.data.regions },
-            });
-          });
-        break;
-      case 'variables':
-        this.props.dataManager
-          .filter(
-            'variables',
-            this.props.currentBlock.config.metaData.variables
-          )
-          .then((data) => {
-            this.setState({
-              data: { ...data, variables: this.state.data.variables },
-            });
-          });
-        break;
-      case 'scenarios':
-        this.props.dataManager
-          .filter(
-            'scenarios',
-            this.props.currentBlock.config.metaData.scenarios
-          )
-          .then((data) => {
-            this.setState({
-              data: { ...data, scenarios: this.state.data.scenarios },
-            });
-          });
-        break;
-      case 'models':
-        this.props.dataManager
-          .filter('models', this.props.currentBlock.config.metaData.models)
-          .then((data) => {
-            this.setState({
-              data: { ...data, models: this.state.data.models },
-            });
-          });
-        break;
-    }
+
+    const filter = {};
+    this.state.selectOrder.map(e => filter[e] = this.state.selectedData[e]);
+
+    this.state.selectOptions.map(option => {
+      const data = this.state.data;
+      data[option] = this.updateDropDown(filter, option);
+      this.setState({ data })
+    });
+
   };
 
+  // Variables
   onVariablesChange = (selectedVariables: string[]) => {
-    this.props.updateBlockMetaData({ variables: selectedVariables });
-    this.updateDropdownData();
+    this.setState({ selectedData: { ...this.state.selectedData, variables: selectedVariables } })
   };
 
+  onDropdownVariablesVisibleChange = (e) => {
+    this.onDropdownVisibleChange(e, "variables")
+  }
+
+  // Regions
   onRegionsChange = (selectedRegions: string[]) => {
-    this.props.updateBlockMetaData({ regions: selectedRegions });
-    this.updateDropdownData();
+    this.setState({ selectedData: { ...this.state.selectedData, regions: selectedRegions } })
   };
 
+  onDropdownRegionsVisibleChange = (e) => {
+    this.onDropdownVisibleChange(e, "regions")
+  }
+
+  // Models
   onModelsChange = (selectedModels: string[]) => {
-    this.props.updateBlockMetaData({ models: selectedModels });
-    this.updateDropdownData();
+    this.setState({ selectedData: { ...this.state.selectedData, models: selectedModels } })
   };
 
+  onDropdownModelsVisibleChange = (e) => {
+    this.onDropdownVisibleChange(e, "models")
+  }
+
+  // scenarios
   onScenariosChange = (selectedScenarios: string[]) => {
-    this.props.updateBlockMetaData({ scenarios: selectedScenarios });
-    this.updateDropdownData();
+    this.setState({ selectedData: { ...this.state.selectedData, scenarios: selectedScenarios } })
   };
+
+  onDropdownScenariosVisibleChange = (e) => {
+    this.onDropdownVisibleChange(e, "scenarios")
+  }
+
+  onDropdownVisibleChange = (e, option) => {
+    if (!e && this.state.selectedData[option].length > 0) {
+      this.props.updateBlockMetaData({ models: this.state.selectedData[option] });
+      this.setState({ selectOrder: [...this.state.selectOrder, option], selectOptions: this.state.selectOptions.filter(e => e != option) }, () => this.updateDropdownData())
+    }
+
+    // Check if the first option (filtre) selected
+    if (this.filterOption === option ) {
+      this.setState({ isFirstSelected: (this.state.selectedData[option].length > 0) ? true : false });
+    }
+  }
+
+  /**
+   * Update drop down lists
+   * @param filter selected drop down lists with selected data values
+   * @param option can be {regions, variables, scenarios, models} (drop down lists that still unselected)
+   * @returns new data in drop down list 
+   */
+  updateDropDown = (filter, option) => {
+    const optionData: string[] = [];
+    // Select other data (the unselected drop down lists) based on the filters (selected drop down data)
+    // Data union
+    Object.keys(this.props.filters[option]).map(optionKey => {
+      let isExist = true;
+      Object.keys(filter).map(filterKey => {
+        //check if an array contains at least one element from another array
+        if (!this.props.filters[option][optionKey][filterKey].some(Set.prototype.has, new Set(filter[filterKey]))) {
+          isExist = false
+        }
+      })
+      if (isExist) optionData.push(optionKey);
+    });
+
+    return optionData;
+  }
 
   render() {
-    const metaData = this.props.currentBlock.config.metaData;
-
     return (
       <>
-        {' '}
         <Divider />
         <div className={'block-flex'}>
           {/* adding key, because react not updating the default value on state change */}
@@ -160,22 +202,13 @@ export default class DataBlockEditor extends Component<any, any> {
               mode="multiple"
               className="width-100"
               placeholder="Regions"
-              value={metaData.regions}
+              defaultValue={this.state.selectedData.regions}
+              // Update selection on state
+
               onChange={this.onRegionsChange}
-              disabled={
-                (this.isBlockControlled &&
-                  (this.controlBlock.config as ConfigurationModel).metaData
-                    .master['regions'].isMaster) ||
-                (this.filterOption !== '' &&
-                  this.filterOption !== 'regions' &&
-                  metaData[this.filterOption].length <= 0)
-              }
-              // status={
-              //   this.filterOption !== "" && this.filterOption !== 'regions' &&
-              //     metaData[this.filterOption].length <= 0
-              //     ? 'warning'
-              //     : ''
-              // }
+              // on close: save data
+              onDropdownVisibleChange={this.onDropdownRegionsVisibleChange}
+              disabled={this.state.selectOrder.includes("regions") || (this.filterOption !== "regions" && !this.state.isFirstSelected)}
             >
               {this.state.data['regions'].map((region) => (
                 <Option key={region} value={region}>
@@ -194,16 +227,10 @@ export default class DataBlockEditor extends Component<any, any> {
               mode="multiple"
               className="width-100"
               placeholder="Variables"
-              value={metaData.variables}
+              value={this.state.selectedData.variables}
               onChange={this.onVariablesChange}
-              disabled={
-                (this.isBlockControlled &&
-                  (this.controlBlock.config as ConfigurationModel).metaData
-                    .master['variables'].isMaster) ||
-                (this.filterOption !== '' &&
-                  this.filterOption !== 'variables' &&
-                  metaData[this.filterOption].length <= 0)
-              }
+              onDropdownVisibleChange={this.onDropdownVariablesVisibleChange}
+              disabled={this.state.selectOrder.includes("variables") || (this.filterOption !== "variables" && !this.state.isFirstSelected)}
             >
               {this.state.data['variables'].map((variable) => (
                 <Option key={variable} value={variable}>
@@ -223,16 +250,10 @@ export default class DataBlockEditor extends Component<any, any> {
               mode="multiple"
               className="width-100"
               placeholder="Scenarios"
-              value={metaData.scenarios}
+              value={this.state.selectedData.scenarios}
               onChange={this.onScenariosChange}
-              disabled={
-                (this.isBlockControlled &&
-                  (this.controlBlock.config as ConfigurationModel).metaData
-                    .master['scenarios'].isMaster) ||
-                (this.filterOption !== '' &&
-                  this.filterOption !== 'scenarios' &&
-                  metaData[this.filterOption].length <= 0)
-              }
+              onDropdownVisibleChange={this.onDropdownScenariosVisibleChange}
+              disabled={this.state.selectOrder.includes("scenarios") || (this.filterOption !== "scenarios" && !this.state.isFirstSelected)}
             >
               {this.state.data['scenarios'].map((scenario) => (
                 <Option key={scenario} value={scenario}>
@@ -251,16 +272,10 @@ export default class DataBlockEditor extends Component<any, any> {
               mode="multiple"
               className="width-100"
               placeholder="Models"
-              value={metaData.models}
+              value={this.state.selectedData.models}
               onChange={this.onModelsChange}
-              disabled={
-                (this.isBlockControlled &&
-                  (this.controlBlock.config as ConfigurationModel).metaData
-                    .master['models'].isMaster) ||
-                (this.filterOption !== '' &&
-                  this.filterOption !== 'models' &&
-                  metaData[this.filterOption].length <= 0)
-              }
+              onDropdownVisibleChange={this.onDropdownModelsVisibleChange}
+              disabled={this.state.selectOrder.includes("models") || (this.filterOption !== "models" && !this.state.isFirstSelected)}
             >
               {this.state.data['models'].map((model) => (
                 <Option key={model} value={model}>

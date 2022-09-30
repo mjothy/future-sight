@@ -12,7 +12,6 @@ export default class SetupView extends Component<any, any> {
     super(props);
     this.state = {
       dataStructure: structuredClone(this.props.dashboard.dataStructure),
-      selectedFilter: '',
       visible: this.hasFilters() === undefined
     };
   }
@@ -39,15 +38,15 @@ export default class SetupView extends Component<any, any> {
   }
 
   show = () => {
-    this.setState({visible: true})
+    this.setState({ visible: true })
   }
 
   handleCancel = () => {
-    this.setState({visible: false})
+    this.setState({ visible: false })
   }
 
   hasFilledStructure = () => {
-      return Object.keys(this.props.structureData).length !== 0
+    return Object.keys(this.props.structureData).length !== 0
   }
 
   updateDataStructure = (dataStructure) => {
@@ -63,30 +62,30 @@ export default class SetupView extends Component<any, any> {
 
   render() {
     return (
-        <>
-          <div className="back-to-setup">
-            <Button value="setup" onClick={this.show}>
-              <FilterTwoTone />Data focus {this.hasFilters() ? ": " + this.hasFilters() : ""}
-            </Button>
-          </div>
-          <Modal
-              title="Choose the data to focus on:"
-              visible={this.state.visible}
-              onOk={this.handleOk}
-              onCancel={this.handleCancel}
-              closable={false}
-              maskClosable={false}
-              zIndex={2}
-              okText={'submit'}
-          >
-            <PopupFilterContent
-                {...this.props}
-                dataStructure={this.state.dataStructure}
-                updateDataStructure={this.updateDataStructure}
-                handleOk={this.handleOk}
-            />
-          </Modal>
-        </>
+      <>
+        <div className="back-to-setup">
+          <Button value="setup" onClick={this.show}>
+            <FilterTwoTone />Data focus {this.hasFilters() ? ": " + this.hasFilters() : ""}
+          </Button>
+        </div>
+        <Modal
+          title="Choose the data to focus on:"
+          visible={this.state.visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          closable={false}
+          maskClosable={false}
+          zIndex={2}
+          okText={'submit'}
+        >
+          <PopupFilterContent
+            {...this.props}
+            dataStructure={this.state.dataStructure}
+            updateDataStructure={this.updateDataStructure}
+            handleOk={this.handleOk}
+          />
+        </Modal>
+      </>
     );
   }
 }

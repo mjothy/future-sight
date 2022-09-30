@@ -135,21 +135,4 @@ export default class DataManager implements IDataManager {
     }
   };
 
-  filter = (type, data) => {
-    return fetch(`${this.getBaseUrl()}/filter`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type, data
-        }),
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        return data;
-      })
-      .catch(console.error);
-  }
 }

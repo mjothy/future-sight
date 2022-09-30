@@ -12,7 +12,7 @@ import Utils from '../../services/Utils';
 
 export interface DashboardDataConfigurationProps
   extends ComponentPropsWithDataManager,
-    RoutingProps {
+  RoutingProps {
   readonly?: boolean;
 }
 
@@ -30,35 +30,38 @@ class DashboardDataConfiguration extends Component<
        * Data (with timeseries from IASA API)
        */
       data: [],
-      allDataForFilter: {
-        regions: [],
-        variables: [],
-        scenarios: [],
-        models: [],
+      filters: {
+        regions: {},
+        variables: {},
+        scenarios: {},
+        models: {},
       },
       dashboardModelScenario: [],
     };
   }
 
   componentDidMount(): void {
-    this.props.dataManager.fetchRegions().then((regions) =>
+    this.props.dataManager.fetchRegions().then((regions) => {
+      console.log("fetched regions: ", regions);
       this.setState({
-        allDataForFilter: { ...this.state.allDataForFilter, regions },
+        filters: { ...this.state.filters, regions }
       })
+    }
     );
     this.props.dataManager.fetchVariables().then((variables) =>
       this.setState({
-        allDataForFilter: { ...this.state.allDataForFilter, variables },
+        filters: { ...this.state.filters, variables }
+
       })
     );
     this.props.dataManager.fetchScenarios().then((scenarios) =>
       this.setState({
-        allDataForFilter: { ...this.state.allDataForFilter, scenarios },
+        filters: { ...this.state.filters, scenarios }
       })
     );
     this.props.dataManager.fetchModels().then((models) =>
       this.setState({
-        allDataForFilter: { ...this.state.allDataForFilter, models },
+        filters: { ...this.state.filters, models }
       })
     );
   }
@@ -88,6 +91,7 @@ class DashboardDataConfiguration extends Component<
     prevState: Readonly<any>,
     snapshot?: any
   ): void {
+    console.log("update: ");
     const shouldUpdate = !this.modelScenarioIsEqual(
       prevState.dashboardModelScenario,
       this.state.dashboardModelScenario
@@ -124,6 +128,7 @@ class DashboardDataConfiguration extends Component<
        * @returns the object wrapping the data related to the modelScenario, or null if the modelScenario was not found
        */
       const findModelScenario = (modelScenario) => {
+        console.log("modelScenario: ", modelScenario);
         const element = this.state.data.find(
           (dataElement) =>
             dataElement.model === modelScenario.model &&
@@ -213,7 +218,7 @@ class DashboardDataConfiguration extends Component<
         getData={this.getData}
         saveData={this.saveData}
         setDashboardModelScenario={this.setDashboardModelScenario}
-        allDataForFilter={this.state.allDataForFilter}
+        filters={this.state.filters}
         {...this.props}
       />
     );

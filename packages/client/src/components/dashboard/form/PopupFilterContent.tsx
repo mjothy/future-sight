@@ -49,6 +49,7 @@ export default class PopupFilterContent extends Component<any, any> {
   };
 
   render() {
+    console.log("this.props.selectedFilter: ", this.props.selectedFilter);
     return (
       <div>
         <Radio.Group
@@ -70,7 +71,7 @@ export default class PopupFilterContent extends Component<any, any> {
                   value={this.props.dataStructure.regions.selection}
                   onChange={this.onRegionsChange}
                 >
-                  {this.props.allDataForFilter.regions.map((option) => (
+                  {Object.keys(this.props.filters.regions).map((option) => (
                     <Option key={option} value={option}>
                       {option}
                     </Option>
@@ -92,7 +93,7 @@ export default class PopupFilterContent extends Component<any, any> {
                   value={this.props.dataStructure.variables.selection}
                   onChange={this.onVariablesChange}
                 >
-                  {this.props.allDataForFilter.variables.map((option) => (
+                  {Object.keys(this.props.filters.variables).map((option) => (
                     <Option key={option} value={option}>
                       {option}
                     </Option>
@@ -113,7 +114,7 @@ export default class PopupFilterContent extends Component<any, any> {
                   value={this.props.dataStructure.scenarios.selection}
                   onChange={this.onScenariosChange}
                 >
-                  {this.props.allDataForFilter.scenarios.map((option) => (
+                  {Object.keys(this.props.filters.scenarios).map((option) => (
                     <Option key={option} value={option}>
                       {option}
                     </Option>
@@ -134,7 +135,7 @@ export default class PopupFilterContent extends Component<any, any> {
                   value={this.props.dataStructure.models.selection}
                   onChange={this.onModelsChange}
                 >
-                  {this.props.allDataForFilter.models.map((option) => (
+                  {Object.keys(this.props.filters.models).map((option) => (
                     <Option key={option} value={option}>
                       {option}
                     </Option>
