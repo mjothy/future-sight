@@ -32,5 +32,6 @@ jobs:
         uses: borales/actions-yarn@v3.0.0
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
+          CI: "false"
         with:
           cmd: build-all # will run `yarn build-all` command
