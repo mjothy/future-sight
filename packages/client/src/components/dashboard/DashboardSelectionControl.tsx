@@ -15,11 +15,11 @@ import { Spin } from 'antd';
 
 export interface DashboardSelectionControlProps
   extends ComponentPropsWithDataManager,
-    RoutingProps {
+  RoutingProps {
   getData: (data: DataModel[]) => any[];
   saveData: (id: string, image?: string) => Promise<any>;
   setDashboardModelScenario: (selection) => void;
-  allDataForFilter:any;
+  filters: any;
 }
 
 export default class DashboardSelectionControl extends Component<

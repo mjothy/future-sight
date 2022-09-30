@@ -3,21 +3,25 @@ import * as fs from "fs";
 
 export default class FSDataProxy implements IDataProxy {
     private readonly data: any[];
-    private readonly models = new Set<string>();
-    private readonly scenarios = new Set<string>();
-    private readonly variables = new Set<string>();
-    private readonly regions = new Set<string>();
+    private readonly models: any;
+    private readonly scenarios: any;
+    private readonly variables: any;
+    private readonly regions: any;
 
 
-    constructor(dataPath: string) {
-        const raw = fs.readFileSync(dataPath);
-        this.data = JSON.parse(raw.toString());
-        this.data.forEach((data) => {
-            this.models.add(data.model);
-            this.scenarios.add(data.scenario);
-            this.variables.add(data.variable);
-            this.regions.add(data.region);
-        });
+    constructor(dataPath: string, modelsPath: string, scenariosPath: string, variablesPath: string, regionsPath: string) {
+        const dataRaw = fs.readFileSync(dataPath);
+        const modelsRaw = fs.readFileSync(modelsPath);
+        const scenariosRaw = fs.readFileSync(scenariosPath);
+        const variablesRaw = fs.readFileSync(variablesPath);
+        const regionsRaw = fs.readFileSync(regionsPath);
+
+        this.data = JSON.parse(dataRaw.toString());
+        this.models = JSON.parse(modelsRaw.toString());
+        this.scenarios = JSON.parse(scenariosRaw.toString());
+        this.variables = JSON.parse(variablesRaw.toString());
+        this.regions = JSON.parse(regionsRaw.toString());
+
 
     }
 
@@ -25,19 +29,19 @@ export default class FSDataProxy implements IDataProxy {
         return this.data;
     }
 
-    getModels(): string[] {
-        return Array.from(this.models);
+    getModels() {
+        return this.models;
     }
 
-    getScenarios(): string[] {
-        return Array.from(this.scenarios);
+    getScenarios() {
+        return this.scenarios;
     }
 
-    getVariables(): string[] {
-        return Array.from(this.variables);
+    getVariables() {
+        return this.variables;
     }
 
-    getRegions(): string[] {
-        return Array.from(this.regions);
+    getRegions() {
+        return this.regions;
     }
 }
