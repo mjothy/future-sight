@@ -9,7 +9,7 @@ import {
 import './HomeView.css';
 import { createUUID, getDrafts, setDraft } from '../drafts/DraftUtils';
 import Footer from '../footer/Footer';
-import PreviewGroup from "../PreviewGroup";
+import PreviewGroup from '../PreviewGroup';
 
 const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
   const [draftFromURL, setDraftFromURL] = useState('');
@@ -17,15 +17,7 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Remove the last char, which is the dot added by the backend
-    // (see the GET /api/dashboards response)
-    dataManager.getDashboards().then((dashboards) => {
-      const parsedDashboards = {}
-      for(const old_key of Object.keys(dashboards)) {
-        parsedDashboards[old_key.slice(0,-1)] = dashboards[old_key]
-      }
-      setPublishedDashboards(parsedDashboards)
-    });
+    dataManager.getDashboards().then(setPublishedDashboards);
   }, []);
 
   const getDraftsElement = () => {
@@ -93,7 +85,10 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
             <Divider />
             <h3>Latest submissions</h3>
             <div className="previews-container">
-              <PreviewGroup dashboards={publishedDashboards} urlPrefix={'/view?id='} />
+              <PreviewGroup
+                dashboards={publishedDashboards}
+                urlPrefix={'/view?id='}
+              />
             </div>
           </>
         )}
