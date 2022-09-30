@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Menu, Tooltip, Switch, Space, Button } from 'antd';
+import { Menu, Button } from 'antd';
 import {
   FullscreenOutlined,
-  HomeOutlined, ShareAltOutlined
+  HomeOutlined
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 

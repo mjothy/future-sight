@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Input, Divider, Image, notification } from 'antd';
+import { Button, Input, Divider, notification } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import withDataManager from '../../services/withDataManager';
 import {

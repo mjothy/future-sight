@@ -1,7 +1,5 @@
 import React from 'react';
-import {Card, Col, Image, Row, Space} from 'antd';
-import {Link} from 'react-router-dom';
-import {getDrafts} from "./drafts/DraftUtils";
+import {Col, Row, Space} from 'antd';
 import Preview from "./Preview";
 
 import "./PreviewGroup.css"

@@ -1,5 +1,5 @@
-import { ColumnsType } from 'antd/lib/table';
-import React, { Component } from 'react';
+import {ColumnsType} from 'antd/lib/table';
+import React, {Component} from 'react';
 import BlockDataModel from '../../../models/BlockDataModel';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
@@ -41,8 +41,7 @@ export default class DataBlockView extends Component<any, any> {
         });
       });
 
-      const returnData = this.props.getData(data);
-      return returnData;
+      return this.props.getData(data);
     }
   };
 

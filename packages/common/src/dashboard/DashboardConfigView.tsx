@@ -1,11 +1,9 @@
-import { Component } from 'react';
-import { Responsive, WidthProvider } from 'react-grid-layout';
+import {Component} from 'react';
+import {Responsive, WidthProvider} from 'react-grid-layout';
 import BlockViewManager from './blocks/BlockViewManager';
 import PropTypes from 'prop-types';
-import ComponentPropsWithDataManager from "../datamanager/ComponentPropsWithDataManager";
-import DataModel from "../models/DataModel";
-import { EditOutlined, EditTwoTone } from '@ant-design/icons';
-import { Button } from 'antd';
+import {EditTwoTone} from '@ant-design/icons';
+import {Button} from 'antd';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -27,7 +25,7 @@ class DashboardConfigView extends Component<any, any> {
   /**
    * Array of references of all blocks on LayoutGrid
    */
-  private ref: any[];
+  private readonly ref: any[];
 
   private width = 300;
   private height = 200;
@@ -64,7 +62,7 @@ class DashboardConfigView extends Component<any, any> {
 
   /**
    * Callback with new layouts
-   * @param layouts the update layouts
+   * @param layout the update layouts
    */
   onLayoutChange = (layout) => {
     if(!this.props.readonly) {
@@ -89,11 +87,10 @@ class DashboardConfigView extends Component<any, any> {
   updateLayoutView = (layout) => {
     const key = layout.i;
     const graphsSize = this.state.graphsSize;
-    const obj = {
+    graphsSize[layout.i] = {
       width: this.ref[key].clientWidth,
       height: this.ref[key].clientHeight,
     };
-    graphsSize[layout.i] = obj;
     this.setState({ graphsSize });
   };
 

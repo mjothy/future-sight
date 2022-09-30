@@ -1,12 +1,10 @@
 import {
   BlockModel,
   ComponentPropsWithDataManager,
-  DashboardModel,
   DataModel,
   LayoutModel,
 } from '@future-sight/common';
 import { Component } from 'react';
-import { v1 as uuidv1 } from 'uuid';
 import { RoutingProps } from '../app/Routing';
 
 import DashboardView from './DashboardView';
@@ -129,7 +127,7 @@ export default class DashboardSelectionControl extends Component<
   updateBlockMetaData = (data, idBlock = '') => {
     const dashboard = this.state.dashboard;
     // store the selected data
-    let blockSelectedId = '';
+    let blockSelectedId: string;
     if (this.state.blockSelectedId === '') {
       blockSelectedId = idBlock;
     } else {

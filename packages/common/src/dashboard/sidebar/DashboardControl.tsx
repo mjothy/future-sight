@@ -4,7 +4,7 @@ import { Button, Col, Row, notification, Modal } from 'antd';
 import { DashboardProps } from '../Dashboard';
 import { useNavigate } from 'react-router-dom';
 import html2canvas from 'html2canvas'
-import {EditOutlined, EditTwoTone, QuestionCircleOutlined } from '@ant-design/icons';
+import {EditOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 
 const DEFAULT_PREVIEW_WIDTH = 800;
 const DEFAULT_PREVIEW_HEIGHT = 450;
