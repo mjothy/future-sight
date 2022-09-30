@@ -22,10 +22,15 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v2
-      - uses: borales/actions-yarn@v3.0.0
+      - name: "checkout"
+        uses: actions/checkout@v2
+      - name: "install"
+        uses: borales/actions-yarn@v3.0.0
         with:
-          cmd: install # will run `yarn install` command
-      - uses: borales/actions-yarn@v3.0.0
+            cmd: install # will run `yarn install` command
+      - name: "build"
+        uses: borales/actions-yarn@v3.0.0
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
         with:
           cmd: build-all # will run `yarn build-all` command
