@@ -8,6 +8,6 @@ interface TextBlockViewProps {
 
 export default class TextBlockView extends React.Component<any, any> {
   render() {
-    return <MDEditor.Markdown source={this.props.currentBlock.config.value} />;
+    return <MDEditor.Markdown style={{height : "100%", overflowY: "auto"}} source={this.props.currentBlock.config.value} />;
   }
 }

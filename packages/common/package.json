@@ -20,7 +20,10 @@
     "plotly.js": "^2.12.1",
     "react-grid-layout": "^1.3.4",
     "react-plotly.js": "^2.5.1",
-    "rehype-sanitize": "^5.0.1"
+    "rehype-parse": "^8.0.4",
+    "rehype-sanitize": "^5.0.1",
+    "rehype-stringify": "^9.0.3",
+    "unified": "^10.1.2"
   },
   "scripts": {
     "watch": "tsc -w",

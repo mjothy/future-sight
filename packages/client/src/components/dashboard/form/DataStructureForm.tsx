@@ -9,7 +9,6 @@ const { Option } = Select;
  */
 class DataStructureForm extends Component<any, any> {
   data = {};
-  scenarioSelectRef = React.createRef();
 
   constructor(props) {
     super(props);
@@ -46,7 +45,7 @@ class DataStructureForm extends Component<any, any> {
     const data = {};
     data[modelSelected] = {};
     // Change scenarios on dropdown list
-    let scenarios = Object.keys(this.state.models[modelSelected]);
+    const scenarios = Object.keys(this.state.models[modelSelected]);
     this.setState({
       scenarios,
       selectedModel: modelSelected,

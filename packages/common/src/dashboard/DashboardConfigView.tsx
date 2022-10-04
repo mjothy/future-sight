@@ -106,7 +106,6 @@ class DashboardConfigView extends Component<any, any> {
 
   onBlockClick = (e, id) => {
     e.preventDefault();
-    console.log(id)
     if (id) {
       this.props.updateSelectedBlock(id);
     }
@@ -118,13 +117,11 @@ class DashboardConfigView extends Component<any, any> {
       <ResponsiveGridLayout
         className="layout"
         layouts={{ lg: layout }}
-        autoSize={true}
         isDraggable={!this.props.readonly}
         isResizable={!this.props.readonly}
-        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+        breakpoints={{ lg: 1, md: 0, sm: 0, xs: 0, xxs: 0 }}
         cols={{ lg: 12, md: 12, sm: 12, xs: 12, xxs: 12 }}
         rowHeight={50}
-        maxRows={12}
         onLayoutChange={this.onLayoutChange}
         onBreakpointChange={this.onBreakpointChange}
         onResizeStop={this.resizeStop}
