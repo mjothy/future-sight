@@ -29,6 +29,17 @@
           "title": {
             "value": "Title",
             "isVisible": true
+          },
+          "YAxis" : {
+            "label": false,
+            "unit": false,
+            "force0": false
+          },
+          "legend" : {
+            "Model": false,
+            "Scenario": false,
+            "Region": false,
+            "Variable": false
           }
         },
         "metaData": {

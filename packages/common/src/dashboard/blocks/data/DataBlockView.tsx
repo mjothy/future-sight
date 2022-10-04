@@ -54,14 +54,16 @@ export default class DataBlockView extends Component<any, any> {
     const showData: any[] = [];
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
+    let plotData;
     if (configStyle.graphType === 'table') {
-      return this.prepareTableData(data);
+      plotData =  this.prepareTableData(data);
     } else {
       data.map((dataElement) => {
         showData.push(this.preparePlotData(dataElement, configStyle));
       });
-      return showData;
+      plotData = showData;
     }
+    return {data: plotData, layout: this.prepareLayout(data)}
   }
 
   prepareTableData = (data) => {
@@ -95,7 +97,31 @@ export default class DataBlockView extends Component<any, any> {
     return { columns, values };
   }
 
-  preparePlotData = (dataElement, configStyle) => {
+  getLegend = (dataElement, legend) => {
+    if (!legend) {
+      return dataElement.region
+          + " - " + dataElement.variable
+          + " - " + dataElement.scenario
+          + " - " + dataElement.model
+    } else {
+      let label: any[] = [];
+      if (legend.Region && dataElement.region) {
+        label.push(dataElement.region)
+      }
+      if (legend.Variable && dataElement.variable) {
+        label.push(dataElement.variable)
+      }
+      if (legend.Scenario && dataElement.scenario) {
+        label.push(dataElement.scenario)
+      }
+      if (legend.Model && dataElement.model) {
+        label.push(dataElement.model)
+      }
+      return label.join(' - ')
+    }
+  }
+
+  preparePlotData = (dataElement, configStyle: BlockStyleModel) => {
     let obj;
     switch (configStyle.graphType) {
       case 'area':
@@ -105,7 +131,7 @@ export default class DataBlockView extends Component<any, any> {
           x: this.getX(dataElement),
           y: this.getY(dataElement),
           mode: 'none',
-          name: dataElement.model + '/' + dataElement.scenario,
+          name: this.getLegend(dataElement, configStyle.legend),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
         };
@@ -115,7 +141,7 @@ export default class DataBlockView extends Component<any, any> {
           type: configStyle.graphType,
           x: this.getX(dataElement),
           y: this.getY(dataElement),
-          name: dataElement.model + '/' + dataElement.scenario,
+          name: this.getLegend(dataElement, configStyle.legend),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
         };
@@ -175,7 +201,48 @@ export default class DataBlockView extends Component<any, any> {
     return y;
   };
 
+  prepareLayout = (data) => {
+    const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
+    return {
+      YAxis: {
+        title: {
+          text: this.getYAxisLabel(data)
+        },
+        rangemode: configStyle.YAxis.force0 ? "tozero" : "normal"
+      }
+    }
+  }
+
+  getYAxisLabel = (data) => {
+    const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
+
+    let labels = {}
+    for (let dataElement of data) {
+      labels[dataElement.variable] = dataElement.unit
+    }
+    let label: any[] = []
+    for (let key of Object.keys(labels)) {
+      let text;
+      if (configStyle.YAxis.unit && configStyle.YAxis.label) {
+        text = key + " (" + labels[key] + ") "
+      } else if (configStyle.YAxis.unit) {
+        text = labels[key]
+      } else if (configStyle.YAxis.label) {
+        text = key
+      }
+      if(text) {
+        label.push(text)
+      }
+    }
+    if (label.length > 0) {
+      return label.join(" - ")
+    } else {
+      return undefined;
+    }
+  }
+
   render() {
-    return <PlotlyGraph {...this.props} data={this.settingPlotData()} />;
+    const {data, layout} = this.settingPlotData();
+    return <PlotlyGraph {...this.props} data={data} layout={layout} />;
   }
 }
