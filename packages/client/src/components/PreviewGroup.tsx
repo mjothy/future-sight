@@ -16,7 +16,7 @@ export default class PreviewGroup extends React.Component<any, any> {
                 </Col>
             )
             if(i % 6 === 0) {
-                ret.push(<Row key={i}><Space>{bucket}</Space></Row>)
+                ret.push(<Row key={i} style={{marginBottom: 8}}><Space>{bucket}</Space></Row>)
                 bucket = []
             }
             i++
