@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Menu, Button } from 'antd';
 import {
   FullscreenOutlined,
-  HomeOutlined
+  HomeOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
