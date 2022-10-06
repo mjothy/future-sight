@@ -42,6 +42,7 @@ class BrowseView extends React.Component<any, any> {
     const inputs = Object.keys(values)
       .filter((key) => !!values[key])
       .reduce((obj, key) => Object.assign(obj, { [key]: values[key] }), {});
+    console.log(inputs);
     return Object.keys(inputs).length > 0;
   };
 
@@ -51,29 +52,47 @@ class BrowseView extends React.Component<any, any> {
     this.setState(state);
   };
 
+  /**
+   * Update the "globalSet" with the list of dashboards linked to the "value" selected by the user
+   * @param globalSet the global list to update
+   * @param value the input value (e.g. authors, tags, ...)
+   * @param key the key to find the dashboards in the state.data
+   */
+  updateGlobalSet = (globalSet, value, key) => {
+    if (value && value.length > 0) {
+      const selected = new Set<number>();
+      value.forEach((e) => {
+        /**
+         * globalData[key][e] contains the list of dashboards linked with "e"
+         * e (may be the author, the tag, etc. according to the "key")
+         */
+        this.state.data[key][e].forEach((dashboard) => {
+          selected.add(dashboard);
+        });
+      });
+      globalSet.push([...selected]);
+    }
+  };
+
   browseDashboards = (values) => {
     this.setState({ loading: true }, async () => {
       const { authors, tags } = values;
-      const { data, memo } = this.state;
-      const dashboards = new Set<number>();
+      const { memo } = this.state;
 
-      if (authors) {
-        authors.forEach((author) => {
-          // data.authors[author] contains the list of dashboards created by the "author"
-          data.authors[author].forEach((dashboard) => {
-            dashboards.add(dashboard);
-          });
-        });
-      }
+      console.log(values);
+      /**
+       * A list of non empty lists of dashboard ids.
+       * It contains all the dashboards selected by each filter.
+       */
+      const globalSet: Array<Array<number>> = [];
+      // For each filters, update globalSet with the selected dashboards
+      this.updateGlobalSet(globalSet, authors, 'authors');
+      this.updateGlobalSet(globalSet, tags, 'tags');
 
-      if (tags) {
-        tags.forEach((tag) => {
-          // data.tags[tag] contains the list of dashboards tagged with the "tag"
-          data.tags[tag].forEach((dashboard) => {
-            dashboards.add(dashboard);
-          });
-        });
-      }
+      // Intersection of all the filters
+      const dashboards = globalSet.reduce((a, b) =>
+        a.filter((c) => b.includes(c))
+      );
 
       // Fetch missing dashboard from the memo
       const dashboardsToFetch = [...dashboards].filter((id) => !memo.has(id));
