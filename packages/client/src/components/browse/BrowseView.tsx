@@ -40,9 +40,8 @@ class BrowseView extends React.Component<any, any> {
    */
   checkValues = (values) => {
     const inputs = Object.keys(values)
-      .filter((key) => !!values[key])
+      .filter((key) => values[key] && values[key].length > 0)
       .reduce((obj, key) => Object.assign(obj, { [key]: values[key] }), {});
-    console.log(inputs);
     return Object.keys(inputs).length > 0;
   };
 
@@ -79,7 +78,6 @@ class BrowseView extends React.Component<any, any> {
       const { authors, tags } = values;
       const { memo } = this.state;
 
-      console.log(values);
       /**
        * A list of non empty lists of dashboard ids.
        * It contains all the dashboards selected by each filter.
