@@ -16,6 +16,7 @@ class BrowseView extends React.Component<any, any> {
       dashboards: {},
       submitDisabled: true,
       data: null,
+      memo: new Map<number, any>(), // cache to avoid re-fetching already fetched dashboards
     };
   }
 
@@ -53,8 +54,8 @@ class BrowseView extends React.Component<any, any> {
   browseDashboards = (values) => {
     this.setState({ loading: true }, async () => {
       const { authors, tags } = values;
-      const { data } = this.state;
-      const dashboards = new Set();
+      const { data, memo } = this.state;
+      const dashboards = new Set<number>();
 
       if (authors) {
         authors.forEach((author) => {
@@ -74,8 +75,22 @@ class BrowseView extends React.Component<any, any> {
         });
       }
 
-      const results = await this.props.dataManager.browseData({
-        dashboards: [...dashboards],
+      // Fetch missing dashboard from the memo
+      const dashboardsToFetch = [...dashboards].filter((id) => !memo.has(id));
+      if (dashboardsToFetch.length > 0) {
+        const results = await this.props.dataManager.browseData({
+          dashboards: dashboardsToFetch,
+        });
+        Object.entries(results).forEach(([key, val]) => {
+          const id = typeof key === 'string' ? parseInt(key) : key;
+          memo.set(id, val);
+        });
+      }
+
+      // Get the dashboards to display from the memo
+      const results = {};
+      [...dashboards].forEach((id) => {
+        results[id] = memo.get(id);
       });
       this.setState({ loading: false, dashboards: results });
     });
