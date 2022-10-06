@@ -105,10 +105,24 @@ body {
   position: relative;
 }
 
+.dashboard .dashboard-content .id-card-logo-container {
+  background-color: #d2d6db;
+  padding: 5px;
+}
+
+.dashboard .dashboard-content .id-card-logo {
+  background-image: url('assets/images/ECEMF_logo.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+  height: 80px;
+}
+
 .dashboard .dashboard-content .id-card .id-card-close {
   position: absolute;
   top: 10px;
   right: 10px;
+  color: white;
 }
 
 .dashboard .dashboard-content .id-button {

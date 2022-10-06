@@ -6,6 +6,7 @@ import {
   InfoCircleOutlined,
   CloseOutlined,
   DownloadOutlined,
+  LinkOutlined,
 } from '@ant-design/icons';
 import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
 import DashboardModel from '../models/DashboardModel';
@@ -76,7 +77,15 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
         {dashboard && idCardVisible && (
           <Card
             className="id-card"
+            cover={
+              <div className="id-card-logo-container">
+                <div className="id-card-logo"></div>
+              </div>
+            }
             actions={[
+              <Tooltip key="share" placement="bottom" title="Share">
+                <LinkOutlined />
+              </Tooltip>,
               <Tooltip
                 key="download"
                 placement="bottom"
