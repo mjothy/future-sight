@@ -1,5 +1,5 @@
 import { build } from "esbuild";
-import copyfiles = require("copyfiles");
+
 import rimraf = require("rimraf");
 const cssModulesPlugin = require("esbuild-css-modules-plugin");
 

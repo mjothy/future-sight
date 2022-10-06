@@ -83,7 +83,6 @@ body {
   display: flex;
   height: calc(100% - 60px);
   width: 100%;
-  overflow-y: auto;
 }
 
 .dashboard .sidebar {
@@ -92,8 +91,10 @@ body {
 }
 
 .dashboard .dashboard-content {
-  background-color: azure;
+  background-color: #f3f3f3;
   width: 100%;
+  height: fit-content;
+  min-height: 100%;
 }
 
 .publishing .block-edit {

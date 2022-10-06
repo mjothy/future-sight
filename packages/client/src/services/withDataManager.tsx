@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
-import DataManager from './DataManager';
 import { DataManagerContext } from './DataManagerContextProvider';
 
 export default function withDataManager(Component) {

@@ -1,4 +1,4 @@
-import { Col, Input, Row, Select } from 'antd';
+import { Col, Input, Row} from 'antd';
 import Checkbox from 'antd/es/checkbox';
 import { Component } from 'react';
 import BlockStyleModel from '../../../models/BlockStyleModel';

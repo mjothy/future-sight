@@ -1,4 +1,3 @@
-import ModelScenarioData from './ModelScenarioData';
 import DataModel from '../models/DataModel';
 
 export default interface IDataManager {

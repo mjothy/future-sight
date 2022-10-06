@@ -1,11 +1,9 @@
-import { Component } from 'react';
-import { Responsive, WidthProvider } from 'react-grid-layout';
+import {Component} from 'react';
+import {Responsive, WidthProvider} from 'react-grid-layout';
 import BlockViewManager from './blocks/BlockViewManager';
 import PropTypes from 'prop-types';
-import ComponentPropsWithDataManager from "../datamanager/ComponentPropsWithDataManager";
-import DataModel from "../models/DataModel";
-import { EditOutlined, EditTwoTone } from '@ant-design/icons';
-import { Button } from 'antd';
+import {EditTwoTone} from '@ant-design/icons';
+import {Button} from 'antd';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -27,7 +25,7 @@ class DashboardConfigView extends Component<any, any> {
   /**
    * Array of references of all blocks on LayoutGrid
    */
-  private ref: any[];
+  private readonly ref: any[];
 
   private width = 300;
   private height = 200;
@@ -64,7 +62,7 @@ class DashboardConfigView extends Component<any, any> {
 
   /**
    * Callback with new layouts
-   * @param layouts the update layouts
+   * @param layout the update layouts
    */
   onLayoutChange = (layout) => {
     if(!this.props.readonly) {
@@ -89,11 +87,10 @@ class DashboardConfigView extends Component<any, any> {
   updateLayoutView = (layout) => {
     const key = layout.i;
     const graphsSize = this.state.graphsSize;
-    const obj = {
+    graphsSize[layout.i] = {
       width: this.ref[key].clientWidth,
       height: this.ref[key].clientHeight,
     };
-    graphsSize[layout.i] = obj;
     this.setState({ graphsSize });
   };
 
@@ -109,7 +106,6 @@ class DashboardConfigView extends Component<any, any> {
 
   onBlockClick = (e, id) => {
     e.preventDefault();
-    console.log(id)
     if (id) {
       this.props.updateSelectedBlock(id);
     }
@@ -121,13 +117,11 @@ class DashboardConfigView extends Component<any, any> {
       <ResponsiveGridLayout
         className="layout"
         layouts={{ lg: layout }}
-        autoSize={true}
         isDraggable={!this.props.readonly}
         isResizable={!this.props.readonly}
-        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+        breakpoints={{ lg: 1, md: 0, sm: 0, xs: 0, xxs: 0 }}
         cols={{ lg: 12, md: 12, sm: 12, xs: 12, xxs: 12 }}
         rowHeight={50}
-        maxRows={12}
         onLayoutChange={this.onLayoutChange}
         onBreakpointChange={this.onBreakpointChange}
         onResizeStop={this.resizeStop}

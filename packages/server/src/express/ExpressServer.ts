@@ -28,7 +28,8 @@ export default class ExpressServer {
     this.clientPath = clientPath;
     this.dbClient = dbClient;
     this.dataProxy = dataProxy;
-    this.app.use(bodyParser.json());
+    this.app.use(bodyParser.json({limit: '50mb'}));
+    this.app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
     if (auth) {
       this.app.use(this.auth);
     }

@@ -1,7 +1,7 @@
 import { createClient } from 'redis';
 
 export default class RedisClient {
-  private client: any;
+  private readonly client: any;
 
   constructor(url) {
     this.client = createClient({

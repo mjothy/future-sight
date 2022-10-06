@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import UserDataForm from './UserDataForm';
 import DataStructureForm from './DataStructureForm';
-import {Alert, Button, Col, Divider, Row, Space, Typography } from 'antd';
+import {Alert, Button, Divider, Row, Space, Typography } from 'antd';
 
 const { Title } = Typography;
 

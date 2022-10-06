@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import { Button, Col, Divider, Popconfirm, Row, Tooltip, Tabs } from 'antd';
+import { Button, Col, Popconfirm, Row, Tooltip, Tabs } from 'antd';
 import DataBlockEditor from './data/DataBlockEditor';
 import DataBlockVisualizationEditor from './data/DataBlockVisualizationEditor';
 import TextBlockEditor from './text/TextBlockEditor';
 import ControlBlockEditor from './control/ControlBlockEditor';
 import {
   DeleteOutlined,
-  BackwardOutlined,
   EditOutlined,
   EyeOutlined,
 } from '@ant-design/icons';

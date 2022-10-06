@@ -1,6 +1,5 @@
 import {
   IDataManager,
-  ModelScenarioData,
   DataModel,
 } from '@future-sight/common';
 
