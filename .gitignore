@@ -45,3 +45,6 @@ build/Release
 # Typescript v1 declaration files
 typings/
 dist
+
+# Typescript build info
+*.tsbuildinfo

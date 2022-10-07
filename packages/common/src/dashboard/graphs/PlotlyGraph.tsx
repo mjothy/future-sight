@@ -8,7 +8,7 @@ export default class PlotlyGraph extends Component<any, any> {
     return {
       l: this.props.layout.YAxis.title ? 60 : 40,
       r: 10,
-      b: 0,
+      b: 30,
       t: hasTitle ? 25 : 5,
       pad: 4,
     }

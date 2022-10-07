@@ -235,7 +235,8 @@ export default class DataBlockView extends Component<any, any> {
       }
     }
     if (label.length > 0) {
-      return label.join(" - ")
+      let uniqueItems = [...new Set(label)]
+      return uniqueItems.join(" - ")
     } else {
       return undefined;
     }
