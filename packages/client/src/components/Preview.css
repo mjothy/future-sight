@@ -1,3 +1,7 @@
 .preview-img {
-    object-fit: cover;
+  object-fit: cover;
+}
+
+.preview-container {
+  height: 22px;
 }

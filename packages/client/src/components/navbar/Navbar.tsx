@@ -3,7 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import { Menu, Button } from 'antd';
 import {
   FullscreenOutlined,
-  HomeOutlined
+  HomeOutlined,
+  SearchOutlined,
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 
@@ -38,11 +39,24 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
 
         {props.enableSwitchEmbeddedMode && (
           <Menu.Item key="embedded" style={{ backgroundColor: '#001529' }}>
-            <Button type="primary" icon={<FullscreenOutlined />} onClick={switchEmbeddedMode} style={{ backgroundColor: '#001529' }}>
+            <Button
+              type="primary"
+              icon={<FullscreenOutlined />}
+              onClick={switchEmbeddedMode}
+              style={{ backgroundColor: '#001529' }}
+            >
               Full Screen Mode
             </Button>
           </Menu.Item>
         )}
+
+        <Menu.Item
+          key="browse"
+          icon={<SearchOutlined />}
+          style={{ backgroundColor: '#001529' }}
+        >
+          <Link to={'browse'}>Browse</Link>
+        </Menu.Item>
       </Menu>
     </div>
   );

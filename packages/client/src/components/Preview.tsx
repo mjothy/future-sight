@@ -1,5 +1,5 @@
 import React from 'react';
-import {Card, Image, notification, Space} from 'antd';
+import {Card, Image, notification, Space, Tag} from 'antd';
 import {Link} from 'react-router-dom';
 import {LinkOutlined, RightCircleTwoTone} from '@ant-design/icons';
 import './Preview.css';
@@ -16,6 +16,23 @@ export default class Preview extends React.Component<any, any> {
                 });
             });
     }
+
+    getCardDescription = () => {
+        return (
+            <div>
+                <p>Author: {this.props.conf.userData.author}</p>
+                <div className="preview-container">{this.getTags()}</div>
+            </div>
+        );
+    };
+
+    getTags = () => {
+        const content: JSX.Element[] = [];
+        this.props.conf.userData.tags.forEach((tag) => {
+            content.push(<Tag>{tag}</Tag>);
+        });
+        return content;
+    };
 
     render() {
         return (
@@ -46,7 +63,7 @@ export default class Preview extends React.Component<any, any> {
                 >
                     <Card.Meta
                         title={this.props.conf.userData.title}
-                        description={"Author: " + this.props.conf.userData.author}
+                        description={this.getCardDescription()}
                     />
                 </Card>
         );

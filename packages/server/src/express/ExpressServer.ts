@@ -1,10 +1,10 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import { join } from 'path';
+import path, { join } from 'path';
 
 import RedisClient from '../redis/RedisClient';
-import IDataProxy from "./IDataProxy";
+import IDataProxy from './IDataProxy';
 
 export default class ExpressServer {
   private app: any;
@@ -14,7 +14,14 @@ export default class ExpressServer {
   private readonly dbClient: RedisClient;
   private readonly dataProxy: IDataProxy;
 
-  constructor(port, cookieKey, auth, clientPath, dbClient, dataProxy: IDataProxy) {
+  constructor(
+    port,
+    cookieKey,
+    auth,
+    clientPath,
+    dbClient,
+    dataProxy: IDataProxy
+  ) {
     this.app = express();
     this.port = port;
     this.auth = auth;
@@ -70,9 +77,11 @@ export default class ExpressServer {
       const body = req.body;
       const response: any[] = [];
       for (const reqData of body) {
-        const elements = this.dataProxy.getData().filter(
-          (e) => e.model === reqData.model && e.scenario === reqData.scenario
-        );
+        const elements = this.dataProxy
+          .getData()
+          .filter(
+            (e) => e.model === reqData.model && e.scenario === reqData.scenario
+          );
         if (elements) {
           response.push(...elements);
         }
@@ -113,18 +122,48 @@ export default class ExpressServer {
 
     this.app.get(`/api/dashboards`, async (req, res, next) => {
       try {
+        const latestId = await this.dbClient.getClient().get('dashboards:id');
+        const idsToFetch = [latestId];
+        // Get the 5 last published dashboards
+        for (let i = 1; i < 5; i++) {
+          idsToFetch.push(latestId - i);
+        }
         const dashboards = await this.dbClient
           .getClient()
-          .json.get('dashboards');
-        const result = Object.keys(dashboards)
-          .reverse() // Reverse the order as the lastest publications have the greatest ids
-          .slice(0, 5) // Limit to 5 elements
-          .reduce((obj, id) => {
-            // As the id is a number, we add a dot to keep the insertion order
-            obj[`${id}.`] = dashboards[id];
-            return obj;
-          }, {});
-        res.send(result);
+          .json.get('dashboards', { path: idsToFetch.map(String) });
+        res.send(dashboards);
+      } catch (err) {
+        console.error(err);
+        next(err);
+      }
+    });
+
+    this.app.get('/api/browse/init', async (req, res, next) => {
+      try {
+        const data = await this.dbClient
+          .getClient()
+          .json.mGet(['authors', 'tags'], '.');
+        // data is returned as: [ { author1: [], author2: [], ... }, { tag1: [], tag2: [], ... } ]
+        const authors = data[0];
+        const tags = data[1];
+        res.send({ authors, tags });
+      } catch (err) {
+        console.error(err);
+        next(err);
+      }
+    });
+
+    this.app.post('/api/browse', async (req, res, next) => {
+      try {
+        const { dashboards } = req.body;
+        const data = await this.dbClient
+          .getClient()
+          .json.get('dashboards', { path: dashboards.map(String) });
+        const results = Object.entries(data).reduce(
+          (obj, [key, dashboard]) => Object.assign(obj, { [key]: dashboard }),
+          {}
+        );
+        res.send(results);
       } catch (err) {
         console.error(err);
         next(err);
