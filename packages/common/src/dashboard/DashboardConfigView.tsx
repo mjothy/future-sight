@@ -121,7 +121,7 @@ class DashboardConfigView extends Component<any, any> {
         isResizable={!this.props.readonly}
         breakpoints={{ lg: 1, md: 0, sm: 0, xs: 0, xxs: 0 }}
         cols={{ lg: 12, md: 12, sm: 12, xs: 12, xxs: 12 }}
-        rowHeight={50}
+        rowHeight={42}
         onLayoutChange={this.onLayoutChange}
         onBreakpointChange={this.onBreakpointChange}
         onResizeStop={this.resizeStop}
