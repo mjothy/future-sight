@@ -128,9 +128,18 @@ export default class ExpressServer {
         for (let i = 1; i < 5; i++) {
           idsToFetch.push(latestId - i);
         }
-        const dashboards = await this.dbClient
-          .getClient()
-          .json.get('dashboards', { path: idsToFetch.map(String) });
+        const dashboards: any[] = [];
+        for (let i = latestId; i > latestId - 5 ; i--) {
+          try {
+            const dashboard = await this.dbClient
+                .getClient()
+                .json.get('dashboards', { path: i.toString() });
+            dashboards.push(dashboard)
+          } catch (e) {
+            // no dashboard found for id
+          }
+        }
+
         res.send(dashboards);
       } catch (err) {
         console.error(err);
@@ -159,10 +168,16 @@ export default class ExpressServer {
         const data = await this.dbClient
           .getClient()
           .json.get('dashboards', { path: dashboards.map(String) });
-        const results = Object.entries(data).reduce(
-          (obj, [key, dashboard]) => Object.assign(obj, { [key]: dashboard }),
-          {}
-        );
+        let results = {}
+        if (dashboards.length === 1) {
+          results[dashboards[0]] = data;
+        } else {
+          results = Object.entries(data).reduce(
+              (obj, [key, dashboard]) => Object.assign(obj, { [key]: dashboard }),
+              {}
+          );
+        }
+
         res.send(results);
       } catch (err) {
         console.error(err);

@@ -174,7 +174,7 @@ class BrowseView extends React.Component<any, any> {
               {submitDisabled && (
                 <div className="warning-container">
                   <Alert
-                    message="You need to fill in at least one input to browse a dashboard"
+                    message="You need to fill in at least one input to search for dashboards"
                     type="warning"
                     className="warning"
                   />
