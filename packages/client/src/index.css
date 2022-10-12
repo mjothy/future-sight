@@ -101,6 +101,10 @@ body {
   visibility: hidden;
 }
 
+.publishing .react-resizable-handle {
+  visibility: hidden;
+}
+
 .sidebar-toggle {
   position: fixed;
   top: 15px;
