@@ -232,7 +232,8 @@ export default class DashboardSelectionControl extends Component<
     const data: any[] = [];
     Object.values(this.state.dashboard.blocks).map((block: any) => {
       const metaData: BlockDataModel = block.config.metaData;
-      if (metaData.models && metaData.scenarios && metaData.variables && metaData.regions) {
+      // Check if the block type != text
+      if (metaData !== undefined && metaData.models && metaData.scenarios && metaData.variables && metaData.regions) {
         metaData.models.map((model) => {
           metaData.scenarios.map((scenario) => {
             metaData.variables.map((variable) => {

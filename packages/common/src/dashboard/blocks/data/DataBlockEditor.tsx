@@ -56,14 +56,15 @@ export default class DataBlockEditor extends Component<any, any> {
 
       this.setState({ data });
     }
+
+    this.updateDropdownData();
+
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     // the second condition to not update the dropdown list of ControlData
-    // this.props.currentBlock.blockType === 'data' to delete after (find alternative)
     if (
-      prevProps.blockSelectedId !== this.props.blockSelectedId &&
-      this.props.currentBlock.blockType === 'data'
+      prevProps.blockSelectedId !== this.props.blockSelectedId
     ) {
       this.initialize();
       this.updateDropdownData();
