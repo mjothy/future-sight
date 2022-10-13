@@ -30,6 +30,7 @@ interface DashboardViewProps
   readonly?: boolean;
   updateSelectedFilter: (filter: string) => void;
   selectedFilter: string;
+  blockData: (id: string) => void;
 }
 
 /**

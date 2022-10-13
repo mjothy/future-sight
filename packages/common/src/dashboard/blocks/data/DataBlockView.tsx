@@ -9,66 +9,41 @@ export default class DataBlockView extends Component<any, any> {
 
   constructor(props) {
     super(props);
+    this.state = {
+      visualizeData: [],
+      layout: []
+    }
   }
 
-  /**
-   * Getting the data to visualize on the graphf
-   * @returns Data with timeseries
-   */
-  getPlotData = () => {
-    // 2 options: if the block controlled or not
-    // if the models is control, it will take the data from his master
-    const { currentBlock } = this.props;
-    const metaData: BlockDataModel = currentBlock.config.metaData;
-    if (currentBlock.controlBlock !== '') {
-      const controlBlock =
-        this.props.blocks[currentBlock.controlBlock].config.metaData;
-      if (controlBlock.master['models'].isMaster)
-        metaData.models = controlBlock.master['models'].values;
-      if (controlBlock.master['variables'].isMaster)
-        metaData.variables = controlBlock.master['variables'].values;
-      if (controlBlock.master['regions'].isMaster)
-        metaData.regions = controlBlock.master['regions'].values;
+  componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): void {
+    if (this.props.dashboard !== prevProps.dashboard || this.props.plotData !== prevProps.plotData) {
+      // this will be run infinitely if no data exist of {model, scenario, variable, region }
+      this.settingPlotData();
     }
-    const data: any[] = [];
-    if (metaData.models && metaData.variables && metaData.variables && metaData.regions) {
-      metaData.models.map((model) => {
-        metaData.scenarios.map((scenario) => {
-          metaData.variables.map((variable) => {
-            metaData.regions.map((region) => {
-              data.push({ model, scenario, variable, region });
-            });
-          });
-        });
-      });
-
-      console.log("data: ", data)
-
-      const returnData = this.props.getData(data);
-      console.log("returnData: ", returnData);
-      return returnData;
-    }
-  };
+  }
 
   /**
    * Preparing the fetched data to adapt plotly data OR antd table
    * @returns
    */
   settingPlotData = () => {
-    const data: any[] = this.getPlotData();
+    const { currentBlock } = this.props;
+    const data: any[] = this.props.blockData(currentBlock.id);
+    console.log("Run settingPlotData");
     const showData: any[] = [];
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
-    let plotData;
+    let visualizeData: any = [];
     if (configStyle.graphType === 'table') {
-      plotData =  this.prepareTableData(data);
+      visualizeData = this.prepareTableData(data);
     } else {
       data.map((dataElement) => {
         showData.push(this.preparePlotData(dataElement, configStyle));
       });
-      plotData = showData;
+      visualizeData = showData;
     }
-    return {data: plotData, layout: this.prepareLayout(data)}
+
+    this.setState({ visualizeData, layout: this.prepareLayout(data) })
   }
 
   prepareTableData = (data) => {
@@ -248,7 +223,6 @@ export default class DataBlockView extends Component<any, any> {
   }
 
   render() {
-    const {data, layout} = this.settingPlotData();
-    return <PlotlyGraph {...this.props} data={data} layout={layout} />;
+    return <PlotlyGraph {...this.props} data={this.state.visualizeData} layout={this.state.layout} />;
   }
 }

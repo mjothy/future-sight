@@ -3,14 +3,6 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import path, { join } from 'path';
 
-import data from '../data/data.json';
-import models from '../data/models.json';
-import filterData from '../data/filter.json'
-import regions from '../data/regions.json';
-import dashboard from '../data/dashboards.json';
-import allData from '../data/test-data.json';
-
-import * as fs from 'fs';
 import RedisClient from '../redis/RedisClient';
 import IDataProxy from './IDataProxy';
 
@@ -85,11 +77,9 @@ export default class ExpressServer {
       const body = req.body;
       const response: any[] = [];
       for (const reqData of body) {
-        const elements = this.dataProxy
-          .getData()
-          .filter(
-            (e) => e.model === reqData.model && e.scenario === reqData.scenario
-          );
+        const elements = this.dataProxy.getData().filter(
+          (e) => e.model === reqData.model && e.scenario === reqData.scenario && e.variable === reqData.variable && e.region === reqData.region
+        );
         if (elements) {
           response.push(...elements);
         }
@@ -98,25 +88,7 @@ export default class ExpressServer {
     });
 
     this.app.get('/api/models', (req, res) => {
-      let models: string[] = [];
-      filterData.forEach((data) => {
-        models.push(data.model);
-      });
-
-      models = [...new Set(models)];
-
-      res.send(models);
-    });
-
-    this.app.get('/api/scenarios', (req, res) => {
-      let scenarios: string[] = [];
-      filterData.forEach((data) => {
-        scenarios.push(data.scenario);
-      });
-
-      scenarios = [...new Set(scenarios)];
-
-      res.send(scenarios);
+      res.send(this.dataProxy.getModels());
     });
 
     this.app.get('/api/scenarios', (req, res) => {

@@ -8,10 +8,19 @@ export default class BlockDataModel {
   variables: string[] = [];
 
   /**
+   * Selection order
+   */
+  selectOrder: string[] = [];
+
+  /**
    * If type of block is control
    */
   master = {
     models: {
+      isMaster: false,
+      values: [],
+    },
+    scenarios: {
       isMaster: false,
       values: [],
     },
@@ -24,4 +33,5 @@ export default class BlockDataModel {
       values: [],
     },
   };
+
 }

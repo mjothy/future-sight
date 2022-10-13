@@ -48,7 +48,7 @@ export default class PlotlyGraph extends Component<any, any> {
       };
     }
 
-    return currentBlock.config.configStyle.graphType === 'table' ? (
+    return currentBlock.config.configStyle.graphType === 'table' && this.props.data.values.length > 0 ? (
       <Table
         // Make the height 100% of the div (not working)
         style={{ minHeight: '100%' }}
