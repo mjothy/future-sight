@@ -1,16 +1,13 @@
-import {Spin} from 'antd';
-import React, {useEffect, useState} from 'react';
-import {useLocation, useSearchParams} from 'react-router-dom';
+import { Spin } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
 import DashboardModel from '../models/DashboardModel';
-import DataModel from '../models/DataModel';
 import DashboardConfigView from './DashboardConfigView';
 
 interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
-  getData: (data: DataModel[]) => any[];
   setEnableSwitchEmbeddedMode: (enable: boolean) => void;
   isEmbedded?: boolean;
-  setDashboardModelScenario: (selection) => void;
 }
 
 type LocationState = { dashboard: DashboardModel };
@@ -28,13 +25,13 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
     const locationState = location.state as LocationState;
     if (locationState?.dashboard) {
       setDashboard(locationState.dashboard);
-      props.setDashboardModelScenario(locationState.dashboard.dataStructure);
+      // props.setDashboardModelScenario(locationState.dashboard.dataStructure);
     } else {
       const id = searchParams.get('id') as string;
       const fetchDashboard = async (id: string) => {
         await props.dataManager.getDashboard(id).then((dashboard) => {
           setDashboard(dashboard);
-          props.setDashboardModelScenario(dashboard.dataStructure);
+          // props.setDashboardModelScenario(dashboard.dataStructure);
         });
       };
       fetchDashboard(id);
@@ -58,12 +55,11 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
             dashboard={dashboard}
             layout={dashboard.layout}
             blocks={dashboard.blocks}
-            getData={props.getData}
-            updateSelectedBlock={(blockSelectedId: string) => {}}
+            updateSelectedBlock={(blockSelectedId: string) => { }}
             blockSelectedId={undefined}
-            updateBlockMetaData={(data, idBlock) => {}}
-            updateBlockStyleConfig={(data) => {}}
-            updateDashboardMetadata={(data) => {}}
+            updateBlockMetaData={(data, idBlock) => { }}
+            updateBlockStyleConfig={(data) => { }}
+            updateDashboardMetadata={(data) => { }}
             readonly
           />
         )}

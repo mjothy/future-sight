@@ -10,7 +10,7 @@ export default class DashboardModel {
     this.id = id;
   }
 
-  static fromDraft(id?: string) : DashboardModel {
+  static fromDraft(id?: string): DashboardModel {
     const ret = new DashboardModel(id)
     ret.layout = defaultJson.layout
     ret.blocks = defaultJson.blocks

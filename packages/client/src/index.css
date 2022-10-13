@@ -58,6 +58,14 @@ body {
   margin-top: 20px;
 }
 
+.mt-16 {
+  margin-top: 16px;
+}
+
+.ml-20 {
+  margin-left: 20px;
+}
+
 /* navbar */
 .ant-menu.ant-menu-dark {
   position: fixed;
@@ -209,3 +217,11 @@ body {
   order: 1;
   -webkit-order: 1;
 }
+
+.transition {
+  /* animation: cssAnimation 0s 2s forwards; */
+}
+
+/* @keyframes cssAnimation {
+  to   {  }
+} */

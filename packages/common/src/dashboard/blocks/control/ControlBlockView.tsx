@@ -2,6 +2,7 @@ import { Col, Row, Select } from 'antd';
 import { Component } from 'react';
 import ControlBlockTableSelection from '../component/ControlBlockTableSelection';
 import BlockStyleModel from "../../../models/BlockStyleModel";
+import { CheckCircleOutlined, ClearOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 
@@ -19,6 +20,24 @@ export default class ControlBlockView extends Component<any, any> {
       );
     };
 
+    const modelsSelectionChange = (selectedModels: string[]) => {
+      // Update the controlBlock data
+      metaData.master['models'].values = selectedModels;
+      this.props.updateBlockMetaData(
+        { master: metaData.master },
+        this.props.currentBlock.id
+      );
+    };
+
+    const scenariosSelectionChange = (selectedScenarios: string[]) => {
+      // Update the controlBlock data
+      metaData.master['scenarios'].values = selectedScenarios;
+      this.props.updateBlockMetaData(
+        { master: metaData.master },
+        this.props.currentBlock.id
+      );
+    };
+
     const regionsSelectionChange = (selectedRegions: string[]) => {
       metaData.master['regions'].values = selectedRegions;
       this.props.updateBlockMetaData(
@@ -30,20 +49,50 @@ export default class ControlBlockView extends Component<any, any> {
     return (
       <div style={{ maxHeight: this.props.height - 30, overflowY: "auto", paddingRight: "10px", paddingLeft: "10px" }}>
         {configStyle.title.isVisible ? (
-            <Row>
-              <Col span={24}>
-                <h3>{configStyle.title.value}</h3>
-              </Col>
-            </Row>
-          ) : undefined
-        }
-        {metaData.master['models'].isMaster && (
           <Row>
             <Col span={24}>
-              <ControlBlockTableSelection
-                {...this.props}
-                models={metaData.models}
-              />
+              <h3>{configStyle.title.value}</h3>
+            </Col>
+          </Row>
+        ) : undefined
+        }
+
+        {metaData.master['models'].isMaster && (
+          <Row className="mb-10">
+            <Col span={24}>
+              <Select
+                mode="multiple"
+                className="width-100"
+                placeholder="Models"
+                defaultValue={metaData.master['models'].values}
+                onChange={modelsSelectionChange}
+              >
+                {metaData.models.map((model) => (
+                  <Option key={model} value={model}>
+                    {model}
+                  </Option>
+                ))}
+              </Select>
+            </Col>
+          </Row>
+        )}
+
+        {metaData.master['scenarios'].isMaster && (
+          <Row className="mb-10">
+            <Col span={24}>
+              <Select
+                mode="multiple"
+                className="width-100"
+                placeholder="Scenarios"
+                defaultValue={metaData.master['scenarios'].values}
+                onChange={scenariosSelectionChange}
+              >
+                {metaData.scenarios.map((scenario) => (
+                  <Option key={scenario} value={scenario}>
+                    {scenario}
+                  </Option>
+                ))}
+              </Select>
             </Col>
           </Row>
         )}

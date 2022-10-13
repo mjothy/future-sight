@@ -10,14 +10,15 @@ import { RoutingProps } from '../app/Routing';
 import DashboardView from './DashboardView';
 import { getDraft, setDraft } from '../drafts/DraftUtils';
 import { Spin } from 'antd';
+import BlockDataModel from '@future-sight/common/src/models/BlockDataModel';
 
 export interface DashboardSelectionControlProps
   extends ComponentPropsWithDataManager,
   RoutingProps {
-  getData: (data: DataModel[]) => any[];
   saveData: (id: string, image?: string) => Promise<any>;
-  setDashboardModelScenario: (selection) => void;
   filters: any;
+  setPlotData: (data: any[]) => void
+  plotData: any[];
 }
 
 export default class DashboardSelectionControl extends Component<
@@ -36,6 +37,7 @@ export default class DashboardSelectionControl extends Component<
       blockSelectedId: '',
       isDraft: false,
       selectedFilter: '',
+      plotData: []
     };
   }
 
@@ -43,9 +45,9 @@ export default class DashboardSelectionControl extends Component<
     if (prevState.dashboard != this.state.dashboard) {
       setDraft(this.state.dashboard.id, this.state.dashboard);
       if (this.state.dashboard) {
-        this.props.setDashboardModelScenario(
-          this.state.dashboard.dataStructure
-        );
+        // this.props.setDashboardModelScenario(
+        //   this.state.dashboard.dataStructure
+        // );
       }
     }
   }
@@ -62,6 +64,9 @@ export default class DashboardSelectionControl extends Component<
         this.setState({
           dashboard: dashboardJson,
           isDraft: true,
+        }, () => {
+          // Get the data for graphs
+          this.getPlotData();
         });
 
         // Get the selected filter(s)
@@ -219,6 +224,82 @@ export default class DashboardSelectionControl extends Component<
     this.setState({ selectedFilter });
   };
 
+  /**
+   * If dashboard is draft, get first all the possible data to visualize
+   */
+  //Change this function position (dashboard view ???)
+  getPlotData = () => {
+    const data: any[] = [];
+    Object.values(this.state.dashboard.blocks).map((block: any) => {
+      const metaData: BlockDataModel = block.config.metaData;
+      if (metaData.models && metaData.scenarios && metaData.variables && metaData.regions) {
+        metaData.models.map((model) => {
+          metaData.scenarios.map((scenario) => {
+            metaData.variables.map((variable) => {
+              metaData.regions.map((region) => {
+                data.push({ model, scenario, variable, region });
+              });
+            });
+          });
+        });
+      }
+    });
+    console.log("first block metaData: ", data)
+    this.props.setPlotData(data)
+  }
+
+  /**
+   * to dispatch data for diffrenet plots (based on block id)
+   * @param blockId the block id
+   * @returns the fetched data from API with timeseries
+   */
+  blockData = (blockId: string) => {
+    const block = this.state.dashboard.blocks[blockId];
+
+    const metaData: BlockDataModel = block.config.metaData;
+    // if the models is control, it will take the data from his master
+    if (block.controlBlock !== '') {
+      const controlBlock =
+        this.state.dashboard.blocks[block.controlBlock].config.metaData;
+      if (controlBlock.master['models'].isMaster)
+        metaData.models = controlBlock.master['models'].values;
+      if (controlBlock.master['scenarios'].isMaster)
+        metaData.scenarios = controlBlock.master['scenarios'].values;
+      if (controlBlock.master['variables'].isMaster)
+        metaData.variables = controlBlock.master['variables'].values;
+      if (controlBlock.master['regions'].isMaster)
+        metaData.regions = controlBlock.master['regions'].values;
+    }
+
+    const data: any[] = [];
+    const missingData: any[] = [];
+
+    if (metaData.models && metaData.scenarios && metaData.variables && metaData.regions) {
+      metaData.models.map((model) => {
+        metaData.scenarios.map((scenario) => {
+          metaData.variables.map((variable) => {
+            metaData.regions.map((region) => {
+              const d = this.props.plotData.find(
+                (e) => e.model === model && e.scenario === scenario && e.variable === variable && e.region === region
+              );
+              if (d) {
+                data.push(d);
+              } else {
+                missingData.push({ model, scenario, variable, region });
+              }
+            });
+          });
+        });
+      });
+    }
+
+    if (missingData.length > 0) {
+      this.props.setPlotData(missingData);
+    }
+    return data;
+  }
+
+
   render() {
     if (!this.state.dashboard) {
       return (
@@ -244,6 +325,7 @@ export default class DashboardSelectionControl extends Component<
         isDraft={this.state.isDraft}
         updateSelectedFilter={this.updateSelectedFilter}
         selectedFilter={this.state.selectedFilter}
+        blockData={this.blockData}
         {...this.props}
       />
     );

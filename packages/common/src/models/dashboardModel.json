@@ -35,8 +35,13 @@
           "scenarios": [],
           "regions": [],
           "variables": [],
+          "selectOrder": [],
           "master": {
             "models": {
+              "isMaster": false,
+              "values": []
+            },
+            "scenarios": {
               "isMaster": false,
               "values": []
             },
