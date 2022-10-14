@@ -1,5 +1,6 @@
 import { Col, Row, Select } from 'antd';
 import { Component } from 'react';
+import BlockModel from '../../../models/BlockModel';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 
 const { Option } = Select;
@@ -21,6 +22,23 @@ export default class ControlBlockView extends Component<any, any> {
     );
 
     // Update also children
+    const childrens = Object.values(this.props.dashboard.blocks).filter((block: BlockModel | any) => block.controlBlock === this.props.currentBlock.id);
+
+    if (childrens.length > 0) {
+      childrens.map((child: BlockModel | any) => {
+        Object.keys(metaData.master).map((option) => {
+          if (metaData.master[option].isMaster) {
+            // Use setState instate of mutate it directly
+            const data = {};
+            data[option] = metaData.master[option].values;
+            this.props.updateBlockMetaData(data,
+              child.id
+            );
+          }
+        });
+      });
+    }
+
   };
 
   selectDropDown = (option) => {

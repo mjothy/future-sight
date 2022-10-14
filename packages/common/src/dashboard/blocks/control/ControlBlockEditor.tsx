@@ -1,6 +1,7 @@
 import { Button, Col, Row, Select } from 'antd';
 import Checkbox from 'antd/es/checkbox';
 import { Component } from 'react';
+import BlockModel from '../../../models/BlockModel';
 
 const { Option } = Select;
 
@@ -28,25 +29,23 @@ export default class ControlBlockEditor extends Component<any, any> {
   }
 
   initialize = (data) => {
-    // Get all the data selected in setUp view (models, regions, variables)
-    const dataStructure = this.props.dashboard.dataStructure;
-    const filter = this.props.selectedFilter;
 
-    // filters contains all files.json (exp: filters["regions"] = regions.json)
-    const dataOfSelectedFilter = this.props.filters[filter];
+    if (this.props.selectedFilter !== '') {
+      const selectedFilter = this.props.selectedFilter;
 
-    // Get the selected values on the filter
-    const selectedValuesOnFilter = dataStructure[filter].selection;
-
-    // For all values selected on filter, get other data 
-    selectedValuesOnFilter.map(value => {
-      Object.keys(dataOfSelectedFilter[value]).map(e => {
-        // exp: dataOfSelectedFilter["France"]["models"] -> map on models of France and add them to this.state.data.models (dataState["models"].add("model1"))
-        dataOfSelectedFilter[value][e].map(variable => data[e].add(variable));
-      })
-      data[filter].add(value);
-
-    });
+      // Set the filter selection
+      data[selectedFilter] = this.props.dashboard.dataStructure[selectedFilter].selection;
+      this.state.options.forEach((option) => {
+        if (option !== selectedFilter) {
+          data[selectedFilter].forEach((filterValue) => {
+            data[option] = data[option] = Array.from(new Set([
+              ...data[option],
+              ...this.props.filters[selectedFilter][filterValue][option],
+            ]));
+          });
+        }
+      });
+    }
   };
 
   onAddControlledBlock = () => {
@@ -57,6 +56,23 @@ export default class ControlBlockEditor extends Component<any, any> {
     const metaData = this.props.currentBlock.config.metaData;
     metaData.master[option].isMaster = e.target.checked;
     this.props.updateBlockMetaData({ master: metaData.master });
+    // Update also children
+    const childrens = Object.values(this.props.dashboard.blocks).filter((block: BlockModel | any) => block.controlBlock === this.props.currentBlock.id);
+
+    if (childrens.length > 0 && e) {
+      childrens.map((child: BlockModel | any) => {
+        Object.keys(metaData.master).map((option) => {
+          if (metaData.master[option].isMaster) {
+            // Use setState instate of mutate it directly
+            const selectOrder = Array.from(new Set([...child.config.metaData.selectOrder, option]))
+            console.log("data selectOrder: ", selectOrder, ", id: ", child.id);
+            this.props.updateBlockMetaData({ selectOrder },
+              child.id
+            );
+          }
+        });
+      });
+    }
   }
 
   onSelectionChange = (option, selectedData) => {
