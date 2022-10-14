@@ -2,6 +2,7 @@ import { Component } from 'react';
 import { Button, Col, Divider, Row, Select, Tooltip } from 'antd';
 import BlockModel from '../../../models/BlockModel';
 import { ClearOutlined } from '@ant-design/icons';
+import ConfigurationModel from '../../../models/ConfigurationModel';
 
 const { Option } = Select;
 
@@ -46,14 +47,13 @@ export default class DataBlockEditor extends Component<any, any> {
       this.state.selectOptions.forEach((option) => {
         if (option !== selectedFilter) {
           data[selectedFilter].forEach((filterValue) => {
-            data[option] = [
+            data[option] = Array.from(new Set([
               ...data[option],
               ...this.props.filters[selectedFilter][filterValue][option],
-            ];
+            ]));
           });
         }
       });
-
       this.setState({ data });
     }
 
@@ -70,10 +70,6 @@ export default class DataBlockEditor extends Component<any, any> {
       this.updateDropdownData();
       this.checkIfBlockControlled();
     }
-
-    if (prevProps.currentBlock.metaData !== this.props.currentBlock.metaData) {
-      console.log("update !! ");
-    }
   }
 
   /**
@@ -84,12 +80,19 @@ export default class DataBlockEditor extends Component<any, any> {
     const selectOptions = Object.keys(this.props.filters);
 
     if (currentBlock.selectOrder.length > 0) {
-      currentBlock.selectOrder.forEach(e => {
-        selectOptions.splice(e, 1);
-      })
+      const newOptions: string[] = [];
+      selectOptions.forEach(option => {
+        if (!currentBlock.selectOrder.includes(option)) {
+          newOptions.push(option);
+        }
+      });
+
+      this.setState({ selectOptions: newOptions });
+
+    } else {
+      this.setState({ selectOptions });
     }
 
-    this.setState({ selectOptions });
   };
 
   /**
@@ -118,7 +121,22 @@ export default class DataBlockEditor extends Component<any, any> {
     const filter = {};
     // To set the filter options (what is already selected, so fetch the data based on what in selections )
     const metaData = this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
-    metaData.selectOrder.forEach((option) => (filter[option] = metaData[option]));
+
+    metaData.selectOrder.forEach((option) => {
+      if (!this.isBlockControlled) {
+        filter[option] = metaData[option]
+      } else {
+        const controlConfig = this.controlBlock.config as ConfigurationModel;
+        if (controlConfig.metaData.master[option].isMaster) {
+          filter[option] = controlConfig.metaData.master[option].values;
+        } else {
+          filter[option] = metaData[option]
+        }
+      }
+    });
+
+    console.log("filter: ", filter);
+
     //Update all options
     this.filtreOptions(filter);
   };

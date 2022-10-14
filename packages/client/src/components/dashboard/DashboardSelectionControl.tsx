@@ -147,12 +147,13 @@ export default class DashboardSelectionControl extends Component<
   updateBlockMetaData = (data, idBlock = '') => {
     const dashboard = this.state.dashboard;
     // store the selected data
-    let blockSelectedId: string;
-    if (this.state.blockSelectedId === '') {
+    let blockSelectedId = '';
+    if (this.state.blockSelectedId === '' || idBlock !== '') {
       blockSelectedId = idBlock;
     } else {
       blockSelectedId = this.state.blockSelectedId;
     }
+
     const selectedBlock = dashboard.blocks[blockSelectedId];
     if (selectedBlock.blockType === 'text') {
       selectedBlock.config = { value: data };
@@ -183,6 +184,14 @@ export default class DashboardSelectionControl extends Component<
 
     if (masterBlockId) {
       dashboard.blocks[layoutItem.i].controlBlock = masterBlockId;
+      const master = dashboard.blocks[masterBlockId].config.metaData.master;
+      Object.keys(master).map((option) => {
+        if (master[option].isMaster) {
+          dashboard.blocks[layoutItem.i].config.metaData.selectOrder = Array.from(new Set([...dashboard.blocks[layoutItem.i].config.metaData.selectOrder, option]));
+          dashboard.blocks[layoutItem.i].config.metaData[option] = master[option].values;
+        }
+      });
+
     }
 
     const state = {
@@ -260,18 +269,18 @@ export default class DashboardSelectionControl extends Component<
     // if the models is control, it will take the data from his master
 
     // Do it in control block
-    if (block.controlBlock !== '') {
-      const controlBlock =
-        this.state.dashboard.blocks[block.controlBlock].config.metaData;
-      if (controlBlock.master['models'].isMaster)
-        metaData.models = controlBlock.master['models'].values;
-      if (controlBlock.master['scenarios'].isMaster)
-        metaData.scenarios = controlBlock.master['scenarios'].values;
-      if (controlBlock.master['variables'].isMaster)
-        metaData.variables = controlBlock.master['variables'].values;
-      if (controlBlock.master['regions'].isMaster)
-        metaData.regions = controlBlock.master['regions'].values;
-    }
+    // if (block.controlBlock !== '') {
+    //   const controlBlock =
+    //     this.state.dashboard.blocks[block.controlBlock].config.metaData;
+    //   if (controlBlock.master['models'].isMaster)
+    //     metaData.models = controlBlock.master['models'].values;
+    //   if (controlBlock.master['scenarios'].isMaster)
+    //     metaData.scenarios = controlBlock.master['scenarios'].values;
+    //   if (controlBlock.master['variables'].isMaster)
+    //     metaData.variables = controlBlock.master['variables'].values;
+    //   if (controlBlock.master['regions'].isMaster)
+    //     metaData.regions = controlBlock.master['regions'].values;
+    // }
 
     const data: any[] = [];
     const missingData: any[] = [];
