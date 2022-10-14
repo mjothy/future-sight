@@ -20,7 +20,9 @@ export default class ControlBlockEditor extends Component<any, any> {
         variables: new Set<string>(),
         scenarios: new Set<string>(),
         models: new Set<string>(),
-      }
+      },
+
+      options: Object.keys(this.props.filters)
     }
     this.initialize(this.state.data);
   }
@@ -51,157 +53,55 @@ export default class ControlBlockEditor extends Component<any, any> {
     this.props.addBlock('data', this.props.blockSelectedId);
   };
 
-  onShowTable = (e) => {
+  onCheckChange = (option, e) => {
     const metaData = this.props.currentBlock.config.metaData;
-    this.setState({ showTable: e.target.checked });
-    metaData.master['models'].isMaster = e.target.checked;
-    this.props.updateBlockMetaData({ master: metaData.master });
-  };
-
-  onModelsChange = (e) => {
-    const metaData = this.props.currentBlock.config.metaData;
-    metaData.master['models'].isMaster = e.target.checked;
+    metaData.master[option].isMaster = e.target.checked;
     this.props.updateBlockMetaData({ master: metaData.master });
   }
 
-  onScenarioChange = (e) => {
-    const metaData = this.props.currentBlock.config.metaData;
-    metaData.master['scenarios'].isMaster = e.target.checked;
-    this.props.updateBlockMetaData({ master: metaData.master });
+  onSelectionChange = (option, selectedData) => {
+    const data = {};
+    data[option] = selectedData;
+    this.props.updateBlockMetaData({ ...data })
   }
 
-  onVariablesChange = (e) => {
+  selectDropDown = (option) => {
     const metaData = this.props.currentBlock.config.metaData;
-    metaData.master['variables'].isMaster = e.target.checked;
-    this.props.updateBlockMetaData({ master: metaData.master });
-  };
 
-  onRegionsChange = (e) => {
-    const metaData = this.props.currentBlock.config.metaData;
-    metaData.master['regions'].isMaster = e.target.checked;
-    this.props.updateBlockMetaData({ master: metaData.master });
-  };
-
-  modelsSelectionChange = (selectedModels: string[]) => {
-    this.props.updateBlockMetaData({ models: selectedModels });
-  };
-
-  scenariosSelectionChange = (selectedScenarios: string[]) => {
-    this.props.updateBlockMetaData({ scenarios: selectedScenarios });
-  };
-
-  variablesSelectionChange = (selectedVariables: string[]) => {
-    this.props.updateBlockMetaData({ variables: selectedVariables });
-  };
-
-  regionsSelectionChange = (selectedRegions: string[]) => {
-    this.props.updateBlockMetaData({ regions: selectedRegions });
-  };
+    return <Row className="mb-10">
+      <Col span={2} className={'checkbox-col'}>
+        <Checkbox
+          onChange={(e) => this.onCheckChange(option, e)}
+          checked={metaData.master[option].isMaster}
+        />
+      </Col>
+      <Col span={16}>
+        <Select
+          mode="multiple"
+          className="width-100"
+          placeholder={option}
+          value={metaData[option]}
+          onChange={(selectedData) => this.onSelectionChange(option, selectedData)}
+        >
+          {Array.from(this.state.data[option]).map((element: any) => (
+            <Option key={element} value={element}>
+              {element}
+            </Option>
+          ))}
+        </Select>
+      </Col>
+    </Row>
+  }
 
   render() {
-    const metaData = this.props.currentBlock.config.metaData;
     return (
       <>
         <div>
 
-          <Row className="mb-10">
-            <Col span={2} className={'checkbox-col'}>
-              <Checkbox
-                onChange={this.onModelsChange}
-                checked={metaData.master['models'].isMaster}
-              />
-            </Col>
-            <Col span={16}>
-              <Select
-                key={metaData.models.toString()}
-                mode="multiple"
-                className="width-100"
-                placeholder="Models"
-                value={metaData.models}
-                onChange={this.modelsSelectionChange}
-              >
-                {Array.from(this.state.data.models).map((model: any) => (
-                  <Option key={model} value={model}>
-                    {model}
-                  </Option>
-                ))}
-              </Select>
-            </Col>
-          </Row>
+          {this.state.options.map((option) =>
+            this.selectDropDown(option)
+          )}
 
-          <Row className="mb-10">
-            <Col span={2} className={'checkbox-col'}>
-              <Checkbox
-                onChange={this.onScenarioChange}
-                checked={metaData.master['scenarios'].isMaster}
-              />
-            </Col>
-            <Col span={16}>
-              <Select
-                key={metaData.models.toString()}
-                mode="multiple"
-                className="width-100"
-                placeholder="Scenarios"
-                value={metaData.scenarios}
-                onChange={this.scenariosSelectionChange}
-              >
-                {Array.from(this.state.data.scenarios).map((scenario: any) => (
-                  <Option key={scenario} value={scenario}>
-                    {scenario}
-                  </Option>
-                ))}
-              </Select>
-            </Col>
-          </Row>
-
-          <Row className="mb-10">
-            <Col span={2} className={'checkbox-col'}>
-              <Checkbox
-                onChange={this.onVariablesChange}
-                checked={metaData.master['variables'].isMaster}
-              />
-            </Col>
-            <Col span={16}>
-              <Select
-                key={metaData.variables.toString()}
-                mode="multiple"
-                className="width-100"
-                placeholder="Variables"
-                value={metaData.variables}
-                onChange={this.variablesSelectionChange}
-              >
-                {Array.from(this.state.data.variables).map((variable: any) => (
-                  <Option key={variable} value={variable}>
-                    {variable}
-                  </Option>
-                ))}
-              </Select>
-            </Col>
-          </Row>
-          <Row className="mb-10">
-            <Col span={2} className={'checkbox-col'}>
-              <Checkbox
-                onChange={this.onRegionsChange}
-                checked={metaData.master['regions'].isMaster}
-              />
-            </Col>
-            <Col span={16} className={'checkbox-col-label'}>
-              <Select
-                key={metaData.regions.toString()}
-                mode="multiple"
-                className="width-100"
-                placeholder="Regions"
-                value={metaData.regions}
-                onChange={this.regionsSelectionChange}
-              >
-                {Array.from(this.state.data.regions).map((region: any) => (
-                  <Option key={region} value={region}>
-                    {region}
-                  </Option>
-                ))}
-              </Select>
-            </Col>
-          </Row>
         </div>
         <div>
           <Button onClick={this.onAddControlledBlock}>Add data block</Button>

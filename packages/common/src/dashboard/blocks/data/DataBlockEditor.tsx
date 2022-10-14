@@ -70,6 +70,10 @@ export default class DataBlockEditor extends Component<any, any> {
       this.updateDropdownData();
       this.checkIfBlockControlled();
     }
+
+    if (prevProps.currentBlock.metaData !== this.props.currentBlock.metaData) {
+      console.log("update !! ");
+    }
   }
 
   /**
@@ -102,9 +106,9 @@ export default class DataBlockEditor extends Component<any, any> {
     }
   };
 
-  onChange = (option, selectedScenarios: string[]) => {
+  onChange = (option, selectedData: string[]) => {
     const data = {};
-    data[option] = selectedScenarios;
+    data[option] = selectedData;
     this.props.updateBlockMetaData({ ...data })
     this.updateDropdownData();
   }
