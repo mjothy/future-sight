@@ -116,7 +116,7 @@ const regions: any = {}
 const jsonFilePath = path.join(__dirname, "../data/out/data1.json");
 const modelsFilePath = path.join(__dirname, "../data/out/models.json");
 const scenariosFilePath = path.join(__dirname, "../data/out/scenarios.json");
-const variablesFilePath = path.join(__dirname, "../data/out/varibales.json");
+const variablesFilePath = path.join(__dirname, "../data/out/variables.json");
 const regionsFilePath = path.join(__dirname, "../data/out/regions.json");
 
 const csvFilePath = "D:/tmp/data/";

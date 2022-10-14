@@ -245,7 +245,6 @@ export default class DashboardSelectionControl extends Component<
         });
       }
     });
-    console.log("first block metaData: ", data)
     this.props.setPlotData(data)
   }
 
@@ -259,6 +258,8 @@ export default class DashboardSelectionControl extends Component<
 
     const metaData: BlockDataModel = block.config.metaData;
     // if the models is control, it will take the data from his master
+
+    // Do it in control block
     if (block.controlBlock !== '') {
       const controlBlock =
         this.state.dashboard.blocks[block.controlBlock].config.metaData;
