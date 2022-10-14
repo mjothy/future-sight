@@ -1,9 +1,9 @@
-import {Component} from 'react';
-import {Responsive, WidthProvider} from 'react-grid-layout';
+import { Component } from 'react';
+import { Responsive, WidthProvider } from 'react-grid-layout';
 import BlockViewManager from './blocks/BlockViewManager';
 import PropTypes from 'prop-types';
-import {EditTwoTone} from '@ant-design/icons';
-import {Button} from 'antd';
+import { EditTwoTone, DragOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -65,7 +65,7 @@ class DashboardConfigView extends Component<any, any> {
    * @param layout the update layouts
    */
   onLayoutChange = (layout) => {
-    if(!this.props.readonly) {
+    if (!this.props.readonly) {
       this.props.updateLayout(layout);
       this.updateAllLayoutsView();
     }
@@ -125,6 +125,7 @@ class DashboardConfigView extends Component<any, any> {
         onLayoutChange={this.onLayoutChange}
         onBreakpointChange={this.onBreakpointChange}
         onResizeStop={this.resizeStop}
+        draggableHandle={".block-grab"}
       >
         {layout.map((layout) => (
           <div
@@ -135,15 +136,15 @@ class DashboardConfigView extends Component<any, any> {
                   ? 'selected-layout'
                   : blocks[this.props.blockSelectedId]?.controlBlock ===
                     layout.i
-                  ? 'selected-layout-master'
-                  : ''
+                    ? 'selected-layout-master'
+                    : ''
                 : this.props.blockSelectedId === layout.i
-                ? 'selected-layout'
-                : blocks[layout.i]?.controlBlock ===
+                  ? 'selected-layout'
+                  : blocks[layout.i]?.controlBlock ===
                     this.props.blockSelectedId &&
-                  blocks[layout.i]?.controlBlock !== ''
-                ? 'selected-layout-master'
-                : ''
+                    blocks[layout.i]?.controlBlock !== ''
+                    ? 'selected-layout-master'
+                    : ''
             }
           >
             <div
@@ -152,9 +153,21 @@ class DashboardConfigView extends Component<any, any> {
               className={'width-100 height-100 bg-white'}
             >
               {!this.props.readonly && (
-                  <div className="block-edit" style={{position: "fixed", top: 2, right: 2, zIndex: 2}}>
-                    <Button icon={<EditTwoTone />} onClick={(e) => this.onBlockClick(e, layout.i)}/>
-                  </div>
+                <div className="block-edit" style={{ position: "fixed", top: 2, right: 2, zIndex: 2 }}>
+                  <Button icon={<EditTwoTone />} onClick={(e) => this.onBlockClick(e, layout.i)} />
+                </div>
+              )}
+              {!this.props.readonly && (
+                <div 
+                  className="block-grab"
+                  style={{
+                    position: "fixed",
+                    top: 2,
+                    left: 2,
+                    zIndex: 2
+                  }}>
+                  <Button size="small" icon={<DragOutlined />} />
+                </div>
               )}
               <BlockViewManager
                 {...this.props}
