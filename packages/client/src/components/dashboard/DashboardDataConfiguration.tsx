@@ -8,6 +8,7 @@ import withDataManager from '../../services/withDataManager';
 import { RoutingProps } from '../app/Routing';
 import DashboardSelectionControl from './DashboardSelectionControl';
 import { getDraft, removeDraft } from '../drafts/DraftUtils';
+import Utils from '../../services/Utils';
 
 export interface DashboardDataConfigurationProps
   extends ComponentPropsWithDataManager,
@@ -127,8 +128,8 @@ class DashboardDataConfiguration extends Component<
   saveData = async (id: string, image?: string) => {
     const data = getDraft(id);
     if (data) {
-      if(image) {
-        data.preview = image
+      if (image) {
+        data.preview = image;
       }
       try {
         const res = await this.props.dataManager.saveDashboard(data);
@@ -175,6 +176,7 @@ class DashboardDataConfiguration extends Component<
       <ReadOnlyDashboard
         getData={this.getData}
         setDashboardModelScenario={this.setDashboardModelScenario}
+        shareButtonOnClickHandler={() => Utils.copyToClipboard()}
         {...this.props}
       />
     ) : (

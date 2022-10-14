@@ -1,9 +1,9 @@
-import { Spin } from 'antd';
-import { cp } from 'fs/promises';
+/* eslint-disable @typescript-eslint/no-empty-function */
+import { DownloadOutlined, LinkOutlined } from '@ant-design/icons';
+import { Spin, Button, PageHeader } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
-import BlockModel from '../models/BlockModel';
 import ConfigurationModel from '../models/ConfigurationModel';
 import DashboardModel from '../models/DashboardModel';
 import DataModel from '../models/DataModel';
@@ -14,6 +14,7 @@ interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
   setEnableSwitchEmbeddedMode: (enable: boolean) => void;
   isEmbedded?: boolean;
   setDashboardModelScenario: (selection) => void;
+  shareButtonOnClickHandler?: () => void;
 }
 
 type LocationState = { dashboard: DashboardModel };
@@ -82,9 +83,37 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
 
   return (
     <div
-      className="dashboard"
+      className="dashboard readonly"
       style={{ height: props.isEmbedded ? '100%' : undefined }}
     >
+      {dashboard && (
+        <PageHeader
+          className="info-container"
+          backIcon={false}
+          title={dashboard.userData.title}
+          subTitle={`by ${dashboard.userData.author}`}
+          extra={[
+            <Button
+              key="share"
+              type="default"
+              size="small"
+              icon={<LinkOutlined />}
+              onClick={props.shareButtonOnClickHandler}
+            >
+              Share
+            </Button>,
+            // <Button
+            //   key="download"
+            //   type="default"
+            //   size="small"
+            //   icon={<DownloadOutlined />}
+            // >
+            //   Download the data
+            // </Button>,
+          ]}
+          avatar={{ alt: 'logo-short', shape: 'square', size: 'large' }}
+        />
+      )}
       <div className="dashboard-content">
         {(isLoading || !dashboard) && <Spin />}
         {dashboard && (

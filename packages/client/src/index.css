@@ -97,6 +97,26 @@ body {
   min-height: 100%;
 }
 
+.dashboard.readonly {
+  flex-direction: column;
+}
+
+.dashboard.readonly .info-container {
+  padding: 0 15%;
+}
+
+.dashboard.readonly .info-container .ant-avatar {
+  background-image: url('assets/images/ECEMF_logo_short.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: unset;
+}
+
+.dashboard.readonly .info-container .ant-page-header-heading-extra {
+  display: flex;
+}
+
 .publishing .block-edit {
   visibility: hidden;
 }
