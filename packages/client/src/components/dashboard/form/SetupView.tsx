@@ -34,7 +34,7 @@ export default class SetupView extends Component<any, any> {
 
   render() {
     return (
-      <div className="content">
+      <div className="setupView-content">
         <UserDataForm
           {...this.props}
           handleUserData={this.handleUserData}
