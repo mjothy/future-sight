@@ -194,7 +194,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         <Row>
           <Col span={2}/>
           <Col>
-            <Checkbox.Group options={this.legendOptions()} defaultValue={defaultLegendOptions} onChange={this.onLegendContentChange} />
+            <Checkbox.Group options={this.legendOptions()} value={defaultLegendOptions} onChange={this.onLegendContentChange} />
           </Col>
         </Row>
       </div>

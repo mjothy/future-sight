@@ -92,7 +92,7 @@ export default class DashboardSelectionControl extends Component<
   updateDashboardMetadata = (data, deletion?:any) => {
     if(deletion) {
       //remove all blocks associated to deletion.model
-      const blocks = this.state.dashboard.blocks;
+      const blocks = {...this.state.dashboard.blocks};
       const layout = [...this.state.dashboard.layout];
       const toRemove:string[] = []
       for (const blockId in blocks) {
@@ -177,7 +177,7 @@ export default class DashboardSelectionControl extends Component<
   };
 
   deleteBlock = (blockId: string) => {
-    const blocks = this.state.dashboard.blocks;
+    const blocks = {...this.state.dashboard.blocks};
     delete blocks[blockId]
     const layout = [...this.state.dashboard.layout];
     const index = layout.findIndex((element) => element.i === blockId);
