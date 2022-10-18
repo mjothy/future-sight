@@ -121,22 +121,18 @@ export default class DataBlockEditor extends Component<any, any> {
     const filter = {};
     // To set the filter options (what is already selected, so fetch the data based on what in selections )
     const metaData = this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
-
-    metaData.selectOrder.forEach((option) => {
+    Object.keys(this.props.filters).forEach((option) => {
       if (!this.isBlockControlled) {
         filter[option] = metaData[option]
       } else {
         const controlConfig = this.controlBlock.config as ConfigurationModel;
         if (controlConfig.metaData.master[option].isMaster) {
-          filter[option] = controlConfig.metaData.master[option].values;
+          filter[option] = controlConfig.metaData[option];
         } else {
           filter[option] = metaData[option]
         }
       }
     });
-
-    console.log("filter: ", filter);
-
     //Update all options
     this.filtreOptions(filter);
   };
@@ -247,7 +243,7 @@ export default class DataBlockEditor extends Component<any, any> {
     const metaData = this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
 
     return (!isControlled &&
-      <div className="transition">
+      <div className={selected ? "transition" : ""}>
         <Row className="width-100 mt-16">
           <Col span={selected ? 20 : 24}>
             <Select
@@ -278,7 +274,7 @@ export default class DataBlockEditor extends Component<any, any> {
             </Col>
           )}
         </Row>
-      </div>
+      </div >
     );
   };
 
