@@ -218,10 +218,10 @@ body {
   -webkit-order: 1;
 }
 
-.transition {
-  /* animation: cssAnimation 0s 2s forwards; */
+/* .transition {
+ transition: translateY(100%) 1s ease-in-out;
 }
 
-/* @keyframes cssAnimation {
-  to   {  }
+.transition:hover {
+  transform: translateY(100%)
 } */
