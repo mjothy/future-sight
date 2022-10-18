@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
 import { Button, Col, Popconfirm, Row, Tooltip, Tabs } from 'antd';
-import DataBlockEditor from './data/DataBlockEditor';
 import DataBlockVisualizationEditor from './data/DataBlockVisualizationEditor';
 import TextBlockEditor from './text/TextBlockEditor';
-import ControlBlockEditor from './control/ControlBlockEditor';
 import {
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
 } from '@ant-design/icons';
-import ControlBlockVisualizationEditor from "./control/ControlBlockVisualizationEditor";
+import ControlBlockVisualizationEditor from './control/ControlBlockVisualizationEditor';
+import BlockFilterManager from './BlockFilterManager';
 
 const { TabPane } = Tabs;
 
@@ -31,30 +30,47 @@ export default class BlockEditorManager extends Component<any, any> {
   }
 
   hasTabs = (type) => {
-    return type === "data" || type === "control"
-  }
+    return type === 'data' || type === 'control';
+  };
 
   blockByType = () => {
     const currentBlock = this.props.blocks[this.props.blockSelectedId];
     switch (currentBlock.blockType) {
       case 'data':
         if (this.state.tab === 'data') {
-          return (<DataBlockEditor {...this.props} currentBlock={currentBlock}/>);
-        }
-        else {
           return (
-              <DataBlockVisualizationEditor{...this.props} currentBlock={currentBlock}/>
+            <BlockFilterManager
+              blockType="data"
+              {...this.props}
+              currentBlock={currentBlock}
+            />
+          );
+        } else {
+          return (
+            <DataBlockVisualizationEditor
+              {...this.props}
+              currentBlock={currentBlock}
+            />
           );
         }
       case 'text':
         return <TextBlockEditor {...this.props} currentBlock={currentBlock} />;
       case 'control':
         if (this.state.tab === 'data') {
-          return (<ControlBlockEditor {...this.props} currentBlock={currentBlock}/>);
+          return (
+            <BlockFilterManager
+              blockType="control"
+              {...this.props}
+              currentBlock={currentBlock}
+            />
+          );
         } else {
           return (
-              <ControlBlockVisualizationEditor {...this.props} currentBlock={currentBlock}/>
-          )
+            <ControlBlockVisualizationEditor
+              {...this.props}
+              currentBlock={currentBlock}
+            />
+          );
         }
       default:
         return <p>Error !</p>;

@@ -29,7 +29,7 @@ export default class DataBlockView extends Component<any, any> {
   settingPlotData = () => {
     const { currentBlock } = this.props;
     const data: any[] = this.props.blockData(currentBlock.id);
-    console.log("Run settingPlotData");
+    console.log("Run settingPlotData", data);
     const showData: any[] = [];
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
