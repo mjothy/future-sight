@@ -51,6 +51,7 @@ export default class DataManager implements IDataManager {
   };
 
   saveDashboard = async (data) => {
+    data.date = new Date()
     try {
       return await fetch(`${this.getBaseUrl()}/dashboard/save`, {
         method: 'POST',

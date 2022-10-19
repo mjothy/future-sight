@@ -13,6 +13,7 @@ export default class DashboardModel {
     const ret = new DashboardModel(id)
     ret.layout = defaultJson.layout
     ret.blocks = defaultJson.blocks
+    ret.date = new Date()
     return ret
   }
 
@@ -22,4 +23,5 @@ export default class DashboardModel {
   dataStructure: object = {};
   layout: LayoutModel[] = [];
   blocks: { [id: string]: BlockModel } = {};
+  date?: Date |string;
 }

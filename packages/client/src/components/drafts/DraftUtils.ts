@@ -27,6 +27,7 @@ export function getDraft(draftId) : Record<string, any> | undefined {
 
 export function setDraft(id, conf) {
     const drafts = getDrafts();
+    conf.date = new Date();
     drafts[id] = conf;
     setDrafts(drafts)
 }

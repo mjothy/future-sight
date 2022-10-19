@@ -37,7 +37,7 @@ export default class DraftsView extends React.Component<any, any> {
         <div className="drafts-container">
           {Object.entries(this.state.drafts).map(([key, value]) => {
             return (
-              <div key={key} className="draft-preview">
+              <div key={key} className="draft-preview-group">
                 <DraftPreview id={key} conf={value} urlPrefix={'/draft?id='} refreshDrafts={this.refreshDrafts}/>
               </div>
             );

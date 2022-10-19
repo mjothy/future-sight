@@ -13,7 +13,19 @@ class DraftPreview extends React.Component<any, any> {
     getCardDescription = () => {
         return (
             <div>
-                <p>Author: {this.props.conf.userData.author}</p>
+                <p>
+                    Author: {this.props.conf.userData.author}
+                    {
+                        !!this.props.conf.date &&
+                        <span>
+                            <br/>
+                            {new Date(this.props.conf.date).toLocaleString(
+                                [],
+                                {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'})
+                            }
+                        </span>
+                    }
+                </p>
                 <div className="preview-container">{this.getTags()}</div>
             </div>
         );

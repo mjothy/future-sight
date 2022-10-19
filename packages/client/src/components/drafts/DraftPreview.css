@@ -1,16 +1,15 @@
-.preview-img {
-  object-fit: cover;
-}
-
 .preview-container {
   height: 22px;
 }
 
-.other_actions{
-  display: flex;
-  flex-direction: row;
-}
-
 .draft-preview > .ant-card-actions > li > span:hover {
   color: #ff4d4f;
+}
+
+.draft-preview .ant-card-body{
+  padding: 10px;
+}
+
+.draft-preview .ant-card-meta-detail {
+  overflow: unset;
 }
