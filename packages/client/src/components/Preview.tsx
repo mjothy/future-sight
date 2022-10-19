@@ -1,7 +1,7 @@
 import React from 'react';
 import {Card, Image, Space, Tag} from 'antd';
 import {Link} from 'react-router-dom';
-import {DeleteOutlined, RightCircleTwoTone, ShareAltOutlined} from '@ant-design/icons';
+import {RightCircleTwoTone, ShareAltOutlined} from '@ant-design/icons';
 import Utils from '../services/Utils';
 import './Preview.css';
 import {removeDraft} from "./drafts/DraftUtils";
@@ -51,13 +51,6 @@ class Preview extends React.Component<any, any> {
                 <ShareAltOutlined/>
             </Space>
         ]
-
-        if (this.props.isDraft) {
-            actions.push(
-                <Space onClick={this.onDeleteDraft} key="delete">
-                    <DeleteOutlined/>
-                </Space>)
-        }
 
         return (
             <Card

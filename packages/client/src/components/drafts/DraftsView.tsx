@@ -1,7 +1,7 @@
 import React from 'react';
 import './DraftsView.css';
-import Preview from '../Preview';
 import { getDrafts } from './DraftUtils';
+import DraftPreview from "./DraftPreview";
 
 export default class DraftsView extends React.Component<any, any> {
 
@@ -38,7 +38,7 @@ export default class DraftsView extends React.Component<any, any> {
           {Object.entries(this.state.drafts).map(([key, value]) => {
             return (
               <div key={key} className="draft-preview">
-                <Preview id={key} conf={value} urlPrefix={'/draft?id='} refreshDrafts={this.refreshDrafts} isDraft ={true}/>
+                <DraftPreview id={key} conf={value} urlPrefix={'/draft?id='} refreshDrafts={this.refreshDrafts}/>
               </div>
             );
           })}
