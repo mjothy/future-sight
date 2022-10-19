@@ -5,3 +5,8 @@
 .preview-container {
   height: 22px;
 }
+
+.other_actions{
+  display: flex;
+  flex-direction: row;
+}
