@@ -14,7 +14,7 @@ import BlockDataModel from '@future-sight/common/src/models/BlockDataModel';
 
 export interface DashboardSelectionControlProps
   extends ComponentPropsWithDataManager,
-    RoutingProps {
+  RoutingProps {
   saveData: (id: string, image?: string) => Promise<any>;
   filters: any;
   setPlotData: (data: any[]) => void;
@@ -135,6 +135,19 @@ export default class DashboardSelectionControl extends Component<
         },
       });
     } else {
+      // Check if dataStructure changed, if True delete all blocks that used the ancien data
+      const newDataStructure = data.dataStructure;
+      const toDeleteBlocks = new Set<string>();
+      Object.values(this.state.dashboard.blocks).forEach((block: BlockModel | any) => {
+        block.config.metaData[this.state.selectedFilter].forEach(value => {
+          if (!newDataStructure[this.state.selectedFilter].selection.includes(value)) {
+            toDeleteBlocks.add(block.id);
+          }
+        })
+      })
+
+      console.log("toDelete: ", toDeleteBlocks);
+      Array.from(toDeleteBlocks).forEach(blockId => this.deleteBlock(blockId))
       this.setState({ dashboard: { ...this.state.dashboard, ...data } });
     }
   };

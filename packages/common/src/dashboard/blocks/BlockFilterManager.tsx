@@ -140,6 +140,7 @@ export default class BlockFilterManager extends Component<any, any> {
      */
     checkFoundContent = () => {
         console.log("Update selection for all blocks")
+        
     }
 
     /**
