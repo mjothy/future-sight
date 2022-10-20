@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { Button, Col, Divider, Row, Select, Tooltip } from 'antd';
-import { ClearOutlined } from '@ant-design/icons';
+import { ClearOutlined, ExclamationCircleOutlined, FrownOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 
@@ -86,6 +86,13 @@ export default class DataBlockEditor extends Component<any, any> {
                 disabled={
                   this.props.isBlockControlled && control[option].isMaster
                 }
+                dropdownMatchSelectWidth={true}
+                notFoundContent={(
+                  <div>
+                    <ExclamationCircleOutlined />
+                    <p>This item does not exists for your filter selections.</p>
+                  </div>
+                )}
               >
                 {this.props.data[option].map((value) => (
                   <Option key={value} value={value}>
