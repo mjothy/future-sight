@@ -86,7 +86,7 @@ export default class DataBlockEditor extends Component<any, any> {
                 disabled={
                   this.props.isBlockControlled && control[option].isMaster
                 }
-                dropdownMatchSelectWidth={true}
+                dropdownMatchSelectWidth={false}
                 notFoundContent={(
                   <div>
                     <ExclamationCircleOutlined />
