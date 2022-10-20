@@ -13,3 +13,11 @@
 .right-navbar {
   justify-content: flex-end;
 }
+
+.ant-menu.ant-menu-dark {
+  box-shadow: 0 3px 5px rgb(0 0 0 / 50%)
+}
+
+.ant-menu.ant-menu-dark, .ant-menu-dark .ant-menu-sub, .ant-menu.ant-menu-dark .ant-menu-sub {
+  background: #212121;
+}

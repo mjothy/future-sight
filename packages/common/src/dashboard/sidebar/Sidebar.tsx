@@ -59,7 +59,7 @@ export default class Sidebar extends Component<any, any> {
   }
 
   getExtra = () => {
-    let opposite = this.state.placement === "right" ? "left" : "right";
+    const opposite = this.state.placement === "right" ? "left" : "right";
     let placement;
     if (this.state.placement === "right") {
       placement = <Button onClick={() => this.setPlacement(opposite)} icon={<PicLeftOutlined />}/>
@@ -73,7 +73,14 @@ export default class Sidebar extends Component<any, any> {
           {placement}
         </Tooltip>
         <Tooltip title="Close menu" placement={"left"}>
-          <Button onClick={this.toggleVisible} icon={<CloseOutlined />}/>
+          <Button
+              onClick={()=> {
+                  this.toggleVisible();
+                  !!this.props.onCloseMenu && this.props.onCloseMenu();
+              }
+          }
+              icon={<CloseOutlined />}
+          />
         </Tooltip>
       </Space>
     )
@@ -85,7 +92,10 @@ export default class Sidebar extends Component<any, any> {
         <Button
             className={'sidebar-toggle'}
             icon={this.state.visible ? <MenuUnfoldOutlined /> : <MenuFoldOutlined style={{color: "888888"}}/>}
-            onClick={this.toggleVisible}
+            onClick={()=>{
+                this.toggleVisible();
+                this.props.onCloseMenu();
+            }}
         />
         <Drawer
             placement={this.state.placement}
