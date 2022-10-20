@@ -1,8 +1,11 @@
 import { Component } from 'react';
-import Modal from 'antd/lib/modal/Modal';
 import PopupFilterContent from './PopupFilterContent';
-import { Button } from 'antd';
+import { Modal, Button } from 'antd';
 import { FilterTwoTone } from '@ant-design/icons';
+import FilterModel from '@future-sight/common/src/models/FilterModel';
+import { DataStructureModel } from '@future-sight/common';
+
+const { confirm } = Modal;
 
 /**
  * The view for setting dashboard mataData
@@ -12,13 +15,15 @@ export default class SetupView extends Component<any, any> {
     super(props);
     this.state = {
       dataStructure: structuredClone(this.props.dashboard.dataStructure),
-      visible: this.hasFilters() === undefined
+      visible: this.hasFilters() === undefined,
+      isSubmit: false
     };
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     // Update the filter state after modal open/close
-    if (this.props.visible !== prevProps.visible) {
+    if (this.state.visible !== prevState.visible) {
+      this.setState({ dataStructure: structuredClone(this.props.dashboard.dataStructure) })
       Object.keys(this.props.dashboard.dataStructure).map((key) => {
         if (this.props.dashboard.dataStructure[key].isFilter)
           this.props.updateSelectedFilter(key);
@@ -27,7 +32,7 @@ export default class SetupView extends Component<any, any> {
   }
 
   hasFilters = () => {
-    let has : string|undefined = undefined;
+    let has: string | undefined = undefined;
     for (const filter in this.props.dashboard.dataStructure) {
       if (this.props.dashboard.dataStructure[filter].isFilter) {
         has = filter
@@ -54,9 +59,40 @@ export default class SetupView extends Component<any, any> {
   }
 
   handleOk = () => {
-    this.setState({ visible: false });
+    // Check if there is an already selected filter
+    if (this.hasFilters() !== undefined) {
+      this.setState({ isSubmit: true }, () => {
+        this.showConfirm()
+      })
+    } else {
+      this.setState({ visible: false });
+      this.updateDashboardDataStructure();
+    }
+
+  }
+
+  updateDashboardDataStructure = () => {
+    const newDataStructure = new DataStructureModel();
+    newDataStructure[this.props.selectedFilter] = this.state.dataStructure[this.props.selectedFilter];
     this.props.updateDashboardMetadata({
-      dataStructure: this.state.dataStructure,
+      dataStructure: newDataStructure,
+    });
+  }
+
+  showConfirm = () => {
+    confirm({
+      title: 'Do you Want to update the current filter?',
+      content: 'If you are removing data from your filter, that will remove all blocks using them.',
+      onOk: () => {
+        console.log('OK');
+        this.setState({ visible: false });
+        this.updateDashboardDataStructure();
+      },
+      onCancel: () => {
+        console.log('Cancel');
+        this.setState({ isSubmit: false });
+        this.handleCancel();
+      }
     });
   }
 
@@ -77,6 +113,7 @@ export default class SetupView extends Component<any, any> {
           maskClosable={false}
           zIndex={2}
           okText={'submit'}
+          destroyOnClose={true}
         >
           <PopupFilterContent
             {...this.props}

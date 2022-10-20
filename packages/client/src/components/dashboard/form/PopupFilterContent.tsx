@@ -11,6 +11,13 @@ import { Component } from 'react';
 export default class PopupFilterContent extends Component<any, any> {
   constructor(props) {
     super(props);
+    this.state = {
+      options: Object.keys(this.props.filters)
+    }
+  }
+
+  componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): void {
+    console.log("Update selection for all blocks")
   }
 
   onRegionsChange = (regions: string[]) => {
@@ -41,7 +48,7 @@ export default class PopupFilterContent extends Component<any, any> {
         this.props.dataStructure[key].isFilter = true;
       } else {
         this.props.dataStructure[key].isFilter = false;
-        this.props.dataStructure[key].selection = [];
+        // this.props.dataStructure[key].selection = [];
       }
     });
     this.props.updateDataStructure(this.props.dataStructure);
@@ -49,7 +56,6 @@ export default class PopupFilterContent extends Component<any, any> {
   };
 
   render() {
-    console.log("this.props.selectedFilter: ", this.props.selectedFilter);
     return (
       <div>
         <Radio.Group

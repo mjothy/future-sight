@@ -69,6 +69,11 @@ export default class BlockFilterManager extends Component<any, any> {
             this.initialize();
             this.updateDropdownData();
         }
+
+        if (this.props.selectedFilter !== prevProps.selectedFilter || this.props.dashboard.dataStructure !== prevProps.dashboard.dataStructure) {
+            this.checkFoundContent();
+        }
+
     }
 
     /**
@@ -129,6 +134,13 @@ export default class BlockFilterManager extends Component<any, any> {
         console.log("filter: ", filter);
         this.filtreOptions(filter);
     };
+
+    /**
+     * 
+     */
+    checkFoundContent = () => {
+        console.log("Update selection for all blocks")
+    }
 
     /**
      * Update options of drop down lists
