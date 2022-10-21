@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Component, createRef } from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import BlockViewManager from './blocks/BlockViewManager';
 import PropTypes from 'prop-types';
@@ -6,7 +6,8 @@ import { EditTwoTone, DragOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
-
+const GRID_RATIO = 16/9
+const COLS = 12
 /**
  * Manage react grid layout
  */
@@ -36,8 +37,11 @@ class DashboardConfigView extends Component<any, any> {
 
     this.state = {
       graphsSize: [],
+      rowHeight: 30
     };
   }
+
+  gridRef = createRef();
 
   componentDidMount() {
     // Adjust the width and height of the graph in case the blocks already exist
@@ -45,6 +49,13 @@ class DashboardConfigView extends Component<any, any> {
 
     // Update graph dim after every resize
     window.addEventListener('resize', this.updateAllLayoutsView);
+
+    // Define initial height
+    const node : WidthProvider = this.gridRef.current;
+    if (node.constructor.name ==  "WidthProvider") {
+      this.setState({ rowHeight: node.state.width/COLS/GRID_RATIO});
+    }
+
   }
 
   componentWillUnmount() {
@@ -111,21 +122,29 @@ class DashboardConfigView extends Component<any, any> {
     }
   };
 
+  onWidthChange = (width, margin, cols, containerPadding) => {
+  //  Update height to keep grid ratio to 16/9
+    this.setState({rowHeight: width/cols/GRID_RATIO});
+  }
+
   render() {
     const { blocks, layout } = this.props;
     return (
       <ResponsiveGridLayout
         className="layout"
+        ref={this.gridRef}
+        id="ResponsiveGridLayout"
         layouts={{ lg: layout }}
         isDraggable={!this.props.readonly}
         isResizable={!this.props.readonly}
         breakpoints={{ lg: 1, md: 0, sm: 0, xs: 0, xxs: 0 }}
-        cols={{ lg: 12, md: 12, sm: 12, xs: 12, xxs: 12 }}
-        rowHeight={42}
+        cols={{ lg: COLS, md: COLS, sm: COLS, xs: COLS, xxs: COLS }}
+        rowHeight={this.state.rowHeight}
         onLayoutChange={this.onLayoutChange}
         onBreakpointChange={this.onBreakpointChange}
         onResizeStop={this.resizeStop}
         draggableHandle={".block-grab"}
+        onWidthChange={this.onWidthChange}
       >
         {layout.map((layout) => (
           <div
