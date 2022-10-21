@@ -2,7 +2,6 @@ import { Component } from 'react';
 import PopupFilterContent from './PopupFilterContent';
 import { Modal, Button } from 'antd';
 import { FilterTwoTone } from '@ant-design/icons';
-import FilterModel from '@future-sight/common/src/models/FilterModel';
 import { DataStructureModel } from '@future-sight/common';
 
 const { confirm } = Modal;

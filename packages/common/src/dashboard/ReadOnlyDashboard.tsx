@@ -26,28 +26,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
     const [blockSelectedId, setBlockSelectedId] = useState('');
     const location = useLocation();
     const [searchParams] = useSearchParams();
-
-    useEffect(() => {
-        const locationState = location.state as LocationState;
-        if (locationState?.dashboard) {
-            setDashboard(locationState.dashboard);
-            // props.setDashboardModelScenario(locationState.dashboard.dataStructure);
-        } else {
-            const id = searchParams.get('id') as string;
-            const fetchDashboard = async (id: string) => {
-                await props.dataManager.getDashboard(id).then((dashboard) => {
-                    setDashboard(dashboard);
-                    // props.setDashboardModelScenario(dashboard.dataStructure);
-                });
-            };
-            fetchDashboard(id);
-        }
-        setIsLoading(false);
-        props.setEnableSwitchEmbeddedMode(true);
-        return () => {
-            props.setEnableSwitchEmbeddedMode(false);
-        };
-    }, []);
+    
     /**
      * Update configuration metaData (selected models and scenarios)
      * @param data Block config metaData
@@ -79,6 +58,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
     };
 
 
+    
     useEffect(() => {
         const locationState = location.state as LocationState;
         if (locationState?.dashboard) {

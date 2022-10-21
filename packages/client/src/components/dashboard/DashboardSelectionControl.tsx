@@ -112,9 +112,9 @@ export default class DashboardSelectionControl extends Component<
   updateDashboardMetadata = (data, deletion?: any) => {
     if (deletion) {
       //remove all blocks associated to deletion.model
-      const blocks = {...this.state.dashboard.blocks};
+      const blocks = { ...this.state.dashboard.blocks };
       const layout = [...this.state.dashboard.layout];
-      const toRemove:string[] = []
+      const toRemove: string[] = []
       for (const blockId in blocks) {
         const block = blocks[blockId];
         if (deletion.model in block.config.metaData.models) {
@@ -147,8 +147,9 @@ export default class DashboardSelectionControl extends Component<
       })
 
       console.log("toDelete: ", toDeleteBlocks);
-      Array.from(toDeleteBlocks).forEach(blockId => this.deleteBlock(blockId))
-      this.setState({ dashboard: { ...this.state.dashboard, ...data } });
+      this.setState({ dashboard: { ...this.state.dashboard, ...data } }, () => {
+        Array.from(toDeleteBlocks).forEach(blockId => this.deleteBlock(blockId))
+      });
     }
   };
 
@@ -225,11 +226,23 @@ export default class DashboardSelectionControl extends Component<
   };
 
   deleteBlock = (blockId: string) => {
-    const blocks = {...this.state.dashboard.blocks};
-    delete blocks[blockId]
+    const blocks = { ...this.state.dashboard.blocks };
     const layout = [...this.state.dashboard.layout];
     const index = layout.findIndex((element) => element.i === blockId);
     layout.splice(index, 1);
+
+    // delete childs
+    if (blocks[blockId].blockType === "control") {
+      const blockChilds = Object.values(blocks).filter((block: BlockModel | any) => block.controlBlock === blocks[blockId].id).map((block: BlockModel | any) => block.id);
+      blockChilds.forEach(id => {
+        delete blocks[id];
+        const index = layout.findIndex((element) => element.i === id);
+        layout.splice(index, 1);
+      });
+    }
+
+    delete blocks[blockId]
+
     this.setState({
       dashboard: {
         ...this.state.dashboard,
@@ -238,6 +251,7 @@ export default class DashboardSelectionControl extends Component<
       },
       blockSelectedId: '',
     });
+
   };
 
   saveData = async (callback?: (idPermanent) => void, image?: string) => {
