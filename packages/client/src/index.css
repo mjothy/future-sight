@@ -200,7 +200,19 @@ body {
 /* Drawer */
 .drawer {
   margin-top: 60px;
-  max-height: calc(100% - 60px);
+  height: calc((100% - 60px)*0.88);
+}
+
+.ant-drawer-content-wrapper {
+  margin-top: 6%;
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+}
+
+.ant-drawer-content {
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+  /*border: solid #001529 1px;*/
 }
 
 .selected-layout {
