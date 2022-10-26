@@ -39,10 +39,16 @@ export default class Dashboard extends Component<DashboardProps, any> {
         className="dashboard"
         style={{ height: this.props.isEmbedded ? '100%' : undefined }}
       >
-        <Content className="dashboard-content">
-          <DashboardConfigView {...this.props} />
-        </Content>
-        <Sidebar
+        {/*<Content className="dashboard-content">*/}
+        {/*  <DashboardConfigView {...this.props} />*/}
+        {/*</Content>*/}
+          <Content className={"dashboard-content-wrapper"}>
+              <div className="dashboard-content">
+                  <DashboardConfigView {...this.props} />
+              </div>
+          </Content>
+
+          <Sidebar
             onClose={() => this.props.updateSelectedBlock('')}
             {...this.props}
         >

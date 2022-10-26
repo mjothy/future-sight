@@ -116,7 +116,7 @@ class DashboardConfigView extends Component<any, any> {
     const { blocks, layout } = this.props;
     return (
       <ResponsiveGridLayout
-        className="layout"
+        className="dashboard-grid"
         layouts={{ lg: layout }}
         isDraggable={!this.props.readonly}
         isResizable={!this.props.readonly}

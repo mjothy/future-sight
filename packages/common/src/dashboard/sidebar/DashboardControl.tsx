@@ -51,7 +51,7 @@ const DashboardControl: React.FC<DashboardProps> = ({
           });
           clearInterval(timer);
         }
-      }, 200);
+      }, 200); // 200ms is the transition duration of closing the sider
     } else {
       save()
     }

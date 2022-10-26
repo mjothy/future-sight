@@ -85,25 +85,45 @@ body {
   width: 100%;
 }
 
+.dashboard .dashboard-grid{
+  background-color: #f3f3f3;
+}
+
 .dashboard .sidebar {
   background-color: #001529;
   min-height: 100%;
 }
 
+.dashboard .dashboard-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+}
+
 .dashboard .dashboard-content {
-  background-color: #f3f3f3;
-  width: 100%;
+  background-color: white;
+  width: calc(100vw - 500px);
   height: fit-content;
   min-height: 100%;
+  padding: 0 10px;
 }
 
 .dashboard.readonly {
   flex-direction: column;
 }
 
+
+.dashboard.readonly .dashboard-content {
+  width: 100%;
+  background-color: #f3f3f3;
+  padding: 0;
+}
+
 .dashboard.readonly .info-container {
   padding: 0 15%;
 }
+
 
 .dashboard.readonly .info-container .ant-avatar {
   background-image: url('assets/images/ECEMF_logo_short.png');
