@@ -8,7 +8,7 @@ import {
     PicLeftOutlined,
     PicRightOutlined,
 } from '@ant-design/icons';
-import {Button, Drawer, Space, Tooltip} from 'antd';
+import {Button, Space, Tooltip} from 'antd';
 import Sider from "antd/es/layout/Sider";
 
 export default class Sidebar extends Component<any, any> {
@@ -107,14 +107,14 @@ export default class Sidebar extends Component<any, any> {
                     collapsedWidth="0"
                     trigger={null}
                     className={"dashboard-sider"}
-                    width={500}
+                    width={"30%"}
                     theme={"light"}
                 >
-                    <div className={"ant-drawer-header"}>
+                    <div className={"sider-header"}>
                         {this.getTitle()}
                     </div>
                     {/*{this.getExtra()}*/}
-                    <div className={"ant-drawer-body"}>
+                    <div className={"sider-body"}>
                         {this.props.children}
                     </div>
                 </Sider>,

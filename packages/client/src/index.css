@@ -85,45 +85,86 @@ body {
   width: 100%;
 }
 
-.dashboard .dashboard-grid{
-  background-color: #f3f3f3;
-}
 
 .dashboard .sidebar {
   background-color: #001529;
   min-height: 100%;
 }
 
+/*Dashboard content*/
 .dashboard .dashboard-content-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   background-color: white;
+  padding: 10px;
 }
 
 .dashboard .dashboard-content {
-  background-color: white;
-  width: calc(100vw - 500px);
+  background-color: #f3f3f3;
+  width: 100%;
+  /*If I want white columns when closing my sidebar. However, pb when overflow-y appear on the right,
+  doesn't update width, so the sidebar and content overlap*/
+  /*width: calc(100vw - 30vw);*/
   height: fit-content;
-  min-height: 100%;
-  padding: 0 10px;
+  border-radius: 10px;
 }
 
+.dashboard .dashboard-grid{
+  background-color: #f3f3f3;
+  border-radius: 10px;
+}
+
+/*Dashboard sider*/
+.dashboard .dashboard-sider{
+  background-color: white;
+}
+
+.dashboard .ant-layout-sider-children{
+  top: 60px;
+  position: fixed;
+  width: inherit;
+  border-left: #f0f0f0 1px solid;
+}
+
+.dashboard .sider-header{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  color: rgba(0, 0, 0, 0.85);
+  border-bottom: 1px solid #f0f0f0;
+  border-radius: 2px 2px 0 0;
+  height: 65px;
+}
+
+.dashboard .sider-body{
+  flex-grow: 1;
+  padding: 24px;
+  font-size: 14px;
+  line-height: 1.5715;
+  word-wrap: break-word;
+  height: calc(100vh - 65px - 60px);
+  overflow-y: auto;
+}
+
+
+
+/* Dashboard readonly */
 .dashboard.readonly {
   flex-direction: column;
 }
 
-
 .dashboard.readonly .dashboard-content {
   width: 100%;
-  background-color: #f3f3f3;
-  padding: 0;
+  border-radius: 0;
+  /*background-color: #f3f3f3;*/
 }
 
 .dashboard.readonly .info-container {
   padding: 0 15%;
 }
-
 
 .dashboard.readonly .info-container .ant-avatar {
   background-image: url('assets/images/ECEMF_logo_short.png');
@@ -221,11 +262,6 @@ body {
 .drawer {
   margin-top: 60px;
   max-height: calc(100% - 60px);
-}
-
-.dashboard-sider {
-  /*position: sticky;*/
-  /*height: calc(100vh - 64px);*/
 }
 
 .selected-layout {

@@ -40,7 +40,7 @@ const DashboardControl: React.FC<DashboardProps> = ({
 
   const onClickHandler = () => {
     setPublishing(true);
-    const dashboard = document.querySelector(".dashboard-content") as HTMLElement
+    const dashboard = document.querySelector(".dashboard-grid") as HTMLElement
     if (dashboard) {
       dashboard.classList.add('publishing');
       let timer = setInterval(function() {
