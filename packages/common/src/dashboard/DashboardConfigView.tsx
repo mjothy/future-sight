@@ -47,6 +47,7 @@ class DashboardConfigView extends Component<any, any> {
     window.addEventListener('resize', this.updateAllLayoutsView);
   }
 
+
   componentWillUnmount() {
     window.removeEventListener('resize', this.updateAllLayoutsView);
   }

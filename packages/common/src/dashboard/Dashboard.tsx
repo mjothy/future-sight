@@ -7,6 +7,8 @@ import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithData
 import DashboardModel from '../models/DashboardModel';
 import LayoutModel from '../models/LayoutModel';
 import BlockModel from '../models/BlockModel';
+import {Layout} from "antd";
+import {Content} from "antd/es/layout/layout";
 
 export interface DashboardProps extends ComponentPropsWithDataManager {
   dashboard: DashboardModel;
@@ -33,20 +35,20 @@ export default class Dashboard extends Component<DashboardProps, any> {
 
   render() {
     return (
-      <div
+      <Layout
         className="dashboard"
         style={{ height: this.props.isEmbedded ? '100%' : undefined }}
       >
+        <Content className="dashboard-content">
+          <DashboardConfigView {...this.props} />
+        </Content>
         <Sidebar
-          onClose={() => this.props.updateSelectedBlock('')}
-          {...this.props}
+            onClose={() => this.props.updateSelectedBlock('')}
+            {...this.props}
         >
           <DashboardConfigControl {...this.props} />
         </Sidebar>
-        <div className="dashboard-content">
-          <DashboardConfigView {...this.props} />
-        </div>
-      </div>
+      </Layout>
     );
   }
 }
