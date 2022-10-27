@@ -72,13 +72,13 @@ export default class DataBlockTableSelection extends Component<any, any> {
     }
   }
 
-  onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+  onSelectChange = (newSelectedRowKeys: React.Key[], selectedRows: DataType[]) => {
     const models: { [id: string]: string[] } = {};
-    newSelectedRowKeys.map((row) => {
-      const modelScenario = row.toString().split('/');
-      if (models[modelScenario[0]] == null) models[modelScenario[0]] = [];
-
-      models[modelScenario[0]].push(modelScenario[1]);
+    selectedRows.map((row) => {
+      const model = row.model
+      const scenario = row.scenario
+      if (models[model] == null) models[model] = [];
+      models[model].push(scenario);
     });
     this.props.updateBlockMetaData({ models });
     // Update the selected data variable
