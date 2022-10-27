@@ -37,20 +37,32 @@ class DataStructureForm extends Component<any, any> {
     this.setState({ data: { ...this.props.dashboard.dataStructure } });
   }
 
+  /*
+  * Return false if key already selected in datastructure
+  * */
+  filterAlreadySelectedScenarios = (key: string, modelSelected: string) => {
+    if (modelSelected in this.state.data){
+      if (key in this.state.data[modelSelected]){
+        return false
+      }
+    }
+    return true
+  }
+
   /**
    * Triggered when the list of selection models changed
    * to update the list of scenarios
    */
   modelSelectionChange = (modelSelected: string) => {
-    const data = {};
-    data[modelSelected] = {};
     // Change scenarios on dropdown list
-    const scenarios = Object.keys(this.state.models[modelSelected]);
+    const scenarios = Object.keys(this.state.models[modelSelected])
+    const selectedScenarios = modelSelected in this.state.data
+        ? Object.keys(this.state.data[modelSelected])
+        : []
     this.setState({
       scenarios,
+      selectedScenarios,
       selectedModel: modelSelected,
-      selectedScenarios: [],
-      data: { ...this.state.data, ...data },
     });
   };
 
@@ -66,13 +78,14 @@ class DataStructureForm extends Component<any, any> {
       this.state.selectedModel != '' &&
       this.state.selectedScenarios.length > 0
     ) {
-      const data = this.state.data;
       const model = this.state.selectedModel;
+      const temp_data = {...this.state.data, [model]:{}};
       this.state.selectedScenarios.map((scenario) => {
         // to set variables and regions
-        data[model][scenario] = this.state.models[model][scenario];
+        temp_data[model][scenario] = this.state.models[model][scenario];
       });
-      this.props.handleStructureData(data);
+      this.setState({data: temp_data})
+      this.props.handleStructureData(temp_data);
       this.resetForm();
     }
   };

@@ -107,6 +107,8 @@ export default class ExpressServer {
     this.app.post(`/api/dashboard/save`, async (req, res, next) => {
       try {
         const id = await this.dbClient.getClient().incr('dashboards:id');
+        // change id
+        req.body.id = id;
         await this.dbClient
           .getClient()
           .json.set('dashboards', `.${id}`, req.body);

@@ -109,7 +109,7 @@ const DashboardControl: React.FC<DashboardProps> = ({
       style={{
         display: 'flex',
         flexDirection: 'column',
-        height: 'calc(100% - 64px)',
+        height: '100%',
         flex: "1"
       }}
     >
