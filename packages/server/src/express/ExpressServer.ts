@@ -28,8 +28,8 @@ export default class ExpressServer {
     this.clientPath = clientPath;
     this.dbClient = dbClient;
     this.dataProxy = dataProxy;
-    this.app.use(bodyParser.json({limit: '50mb'}));
-    this.app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+    this.app.use(bodyParser.json({ limit: '50mb' }));
+    this.app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
     if (auth) {
       this.app.use(this.auth);
     }
@@ -97,6 +97,8 @@ export default class ExpressServer {
     this.app.post(`/api/dashboard/save`, async (req, res, next) => {
       try {
         const id = await this.dbClient.getClient().incr('dashboards:id');
+        // change id
+        req.body.id = id;
         await this.dbClient
           .getClient()
           .json.set('dashboards', `.${id}`, req.body);
@@ -129,11 +131,11 @@ export default class ExpressServer {
           idsToFetch.push(latestId - i);
         }
         const dashboards: any[] = [];
-        for (let i = latestId; i > latestId - 5 ; i--) {
+        for (let i = latestId; i > latestId - 5; i--) {
           try {
             const dashboard = await this.dbClient
-                .getClient()
-                .json.get('dashboards', { path: i.toString() });
+              .getClient()
+              .json.get('dashboards', { path: i.toString() });
             dashboards.push(dashboard)
           } catch (e) {
             // no dashboard found for id
@@ -173,8 +175,8 @@ export default class ExpressServer {
           results[dashboards[0]] = data;
         } else {
           results = Object.entries(data).reduce(
-              (obj, [key, dashboard]) => Object.assign(obj, { [key]: dashboard }),
-              {}
+            (obj, [key, dashboard]) => Object.assign(obj, { [key]: dashboard }),
+            {}
           );
         }
 
