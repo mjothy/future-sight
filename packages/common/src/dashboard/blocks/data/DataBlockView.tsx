@@ -1,6 +1,6 @@
 /* eslint-disable prefer-const */
-import {ColumnsType} from 'antd/lib/table';
-import React, {Component} from 'react';
+import { ColumnsType } from 'antd/lib/table';
+import React, { Component } from 'react';
 import BlockDataModel from '../../../models/BlockDataModel';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
@@ -11,7 +11,7 @@ export default class DataBlockView extends Component<any, any> {
     super(props);
     this.state = {
       visualizeData: [],
-      layout: []
+      layout: this.prepareLayout([])
     }
   }
 
@@ -42,8 +42,7 @@ export default class DataBlockView extends Component<any, any> {
       });
       visualizeData = showData;
     }
-
-    this.setState({ visualizeData, layout: this.prepareLayout(data) })
+    return { data: visualizeData, layout: this.prepareLayout(data) }
   }
 
   prepareTableData = (data) => {
@@ -80,9 +79,9 @@ export default class DataBlockView extends Component<any, any> {
   getLegend = (dataElement, legend) => {
     if (!legend) {
       return dataElement.region
-          + " - " + dataElement.variable
-          + " - " + dataElement.scenario
-          + " - " + dataElement.model
+        + " - " + dataElement.variable
+        + " - " + dataElement.scenario
+        + " - " + dataElement.model
     } else {
       let label: any[] = [];
       if (legend.Region && dataElement.region) {
@@ -210,7 +209,7 @@ export default class DataBlockView extends Component<any, any> {
       } else if (configStyle.YAxis.label) {
         text = key
       }
-      if(text) {
+      if (text) {
         label.push(text)
       }
     }
@@ -223,6 +222,7 @@ export default class DataBlockView extends Component<any, any> {
   }
 
   render() {
-    return <PlotlyGraph {...this.props} data={this.state.visualizeData} layout={this.state.layout} />;
+    const { data, layout } = this.settingPlotData();
+    return <PlotlyGraph {...this.props} data={data} layout={layout} />;
   }
 }

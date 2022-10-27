@@ -4,7 +4,12 @@ import Plot from 'react-plotly.js';
 
 export default class PlotlyGraph extends Component<any, any> {
   getMargins = () => {
-    const hasTitle = this.props.currentBlock.config.configStyle.title.isVisible
+    console.log("this.props: ", this.props);
+    console.log("this.props.layout: ", this.props.layout)
+    let hasTitle = false;
+    if (this.props.currentBlock !== undefined) {
+      hasTitle = this.props.currentBlock.config.configStyle.title.isVisible
+    }
     return {
       l: this.props.layout.YAxis.title ? 60 : 40,
       r: 10,
@@ -27,19 +32,11 @@ export default class PlotlyGraph extends Component<any, any> {
       height: this.props.height,
       legend: { orientation: 'h' },
       autosize: false,
-      margin: {
-        l: 40,
-        r: 10,
-        b: 35,
-        t: 35,
-        pad: 4,
-      },
+      margin: this.getMargins(),
       font: {
         size: 10,
       },
-      yaxis: {
-        title: currentBlock.config.metaData.variables.toString(),
-      }
+      yaxis: this.props.layout.YAxis
     };
     if (currentBlock.config.configStyle.title.isVisible) {
       layout = {
