@@ -56,8 +56,8 @@ class DraftPreview extends React.Component<any, any> {
                     <div>Open</div>
                 </Space>
             </Link>,
-            <Space onClick={this.onDeleteDraft} key="delete">
-                <DeleteOutlined/>
+            <Space className='delete-btn' onClick={this.onDeleteDraft} key="delete">
+                <DeleteOutlined />
             </Space>
         ]
 
