@@ -93,15 +93,33 @@ export default class ExpressServer {
       res.send(this.dataProxy.getModels());
     });
 
+    const appendDashboardIdToIndexList = async (id: string, indexListKey: string, value: string) => {
+      // Initialize the key if it does not exist
+      await this.dbClient.getClient().json.set(indexListKey, `.${value}`, [], {
+        NX: true, // only set the key if it does not already exist
+      });
+      // Append the dashboard id to the list
+      await this.dbClient
+        .getClient()
+        .json.arrAppend(indexListKey, `.${value}`, id);
+    };
+
     // Posts methods
     this.app.post(`/api/dashboard/save`, async (req, res, next) => {
       try {
         const id = await this.dbClient.getClient().incr('dashboards:id');
-        // change id
-        req.body.id = id;
+        // Save the dashboard
+        req.body.id = id; // change id
         await this.dbClient
           .getClient()
           .json.set('dashboards', `.${id}`, req.body);
+
+        // Update the indexes
+        for (const tag of req.body.userData.tags) {
+          await appendDashboardIdToIndexList(id, 'tags', tag) // Set the tags indexes
+        }
+        // Set the authors indexes
+        await appendDashboardIdToIndexList(id, 'authors', req.body.userData.author);
         res.send(JSON.stringify({ id: id }));
       } catch (err) {
         console.error(err);
