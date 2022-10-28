@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import { Button, Col, Divider, Row, Select, Tooltip } from 'antd';
+import { Button, Col, Divider, Input, Row, Select, Tooltip } from 'antd';
 import { ClearOutlined, ExclamationCircleOutlined, FrownOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
@@ -69,10 +69,11 @@ export default class DataBlockEditor extends Component<any, any> {
       !isControlled && (
         <div className={selected ? 'transition' : ''}>
           <Row className="width-100 mt-16">
-            <Col span={selected ? 20 : 24}>
+            <h4>{option}</h4>
+            <Input.Group compact>
               <Select
                 mode="multiple"
-                className="width-100"
+                className={selected ? "width-80" : "width-100"}
                 placeholder={option}
                 value={metaData[option]}
                 // Update selection on state
@@ -100,19 +101,15 @@ export default class DataBlockEditor extends Component<any, any> {
                   </Option>
                 ))}
               </Select>
-            </Col>
-            {selected && (
-              <Col span={4}>
-                <Tooltip title="That will reset all other selections">
-                  <Button
-                    type="default"
-                    onClick={(e) => this.clearClick(option, e)}
-                    danger
-                    icon={<ClearOutlined />}
-                  />
-                </Tooltip>
-              </Col>
-            )}
+              {selected && <Tooltip title="That will reset all other selections">
+                <Button
+                  type="default"
+                  onClick={(e) => this.clearClick(option, e)}
+
+                  icon={<ClearOutlined />}
+                />
+              </Tooltip>}
+            </Input.Group>
           </Row>
         </div>
       )

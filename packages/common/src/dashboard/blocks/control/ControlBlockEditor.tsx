@@ -1,6 +1,7 @@
-import { Button, Col, Row, Select } from 'antd';
+import { ClearOutlined } from '@ant-design/icons';
+import { Button, Col, Input, Row, Select, Tooltip } from 'antd';
 import Checkbox from 'antd/es/checkbox';
-import { Component } from 'react';
+import { Component, MouseEvent } from 'react';
 import BlockModel from '../../../models/BlockModel';
 
 const { Option } = Select;
@@ -9,6 +10,9 @@ const { Option } = Select;
  * The form in sidebar to add/edit control block
  */
 export default class ControlBlockEditor extends Component<any, any> {
+  clearClick(option: any, e: MouseEvent<HTMLElement, MouseEvent>): void {
+    throw new Error('Method not implemented.');
+  }
   onAddControlledBlock = () => {
     this.props.addBlock('data', this.props.blockSelectedId);
   };
@@ -42,17 +46,17 @@ export default class ControlBlockEditor extends Component<any, any> {
     const metaData = this.props.currentBlock.config.metaData;
 
     return (
-      <Row className="mb-10">
-        <Col span={2} className={'checkbox-col'}>
-          <Checkbox
-            onChange={(e) => this.onCheckChange(option, e)}
-            checked={metaData.master[option].isMaster}
-          />
-        </Col>
-        <Col span={16}>
+      <div className='mb-20'>
+        <Checkbox
+          onChange={(e) => this.onCheckChange(option, e)}
+          checked={metaData.master[option].isMaster}
+        >
+          <h4>{option}</h4>
+        </Checkbox>
+        <Input.Group compact>
           <Select
             mode="multiple"
-            className="width-100"
+            className="width-80"
             placeholder={option}
             value={metaData[option]}
             onChange={(selectedData) =>
@@ -65,8 +69,9 @@ export default class ControlBlockEditor extends Component<any, any> {
               </Option>
             ))}
           </Select>
-        </Col>
-      </Row>
+        </Input.Group>
+
+      </div>
     );
   };
 
