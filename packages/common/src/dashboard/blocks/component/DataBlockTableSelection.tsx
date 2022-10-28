@@ -43,11 +43,7 @@ export default class DataBlockTableSelection extends Component<any, any> {
       if (models[model] == null) models[model] = [];
       models[model].push(scenario);
     });
-    this.props.updateBlockMetaData({ models });
-
-    if (this.getSelectedBlock().blockType === 'data') {
-      this.props.updateDropdownData();
-    }
+    this.props.onSelectChange(models);
   };
 
   getSelectedBlock = () => {

@@ -23,11 +23,7 @@ export default class DataBlockEditor extends Component<any, any> {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        // the second condition to not update the dropdown list of ControlData
-        if (
-            prevProps.blockSelectedId !== this.props.blockSelectedId &&
-            this.props.currentBlock.blockType === 'data'
-        ) {
+        if (prevProps.blockSelectedId !== this.props.blockSelectedId) {
             this.updateDropdownData();
         }
     }
@@ -38,23 +34,22 @@ export default class DataBlockEditor extends Component<any, any> {
      */
     updateDropdownData = () => {
         const dataStructure = this.props.dashboard.dataStructure;
-        let variables: string[] = [];
-        let regions: string[] = [];
         const metaData = this.props.currentBlock.config.metaData;
 
-        // Not controlled block allow selection of only selected model
-        if (!this.props.currentBlock.controlBlock) {
-            Object.keys(metaData.models).map((modelKey) => {
-                metaData.models[modelKey].map((scenarioKey) => {
+        let variables: string[] = [];
+        let regions: string[] = [];
+        if (this.isControlled() && this.getControlBlock().config.metaData.master.models.isMaster) {
+            const controlBlock = this.getControlBlock();
+            const controlBlockMetaData = controlBlock.config.metaData
+            Object.keys(controlBlockMetaData.models).forEach((modelKey) => {
+                controlBlockMetaData.models[modelKey].forEach((scenarioKey) => {
                     variables.push(...dataStructure[modelKey][scenarioKey].variables);
                     regions.push(...dataStructure[modelKey][scenarioKey].regions);
                 });
             });
-        //  Controlled block allow selection of regions and variables of all model from control block
         } else {
-            const controlBlockMetaData = this.props.blocks[this.props.currentBlock.controlBlock].config.metaData
-            Object.keys(controlBlockMetaData.models).map((modelKey) => {
-                controlBlockMetaData.models[modelKey].map((scenarioKey) => {
+            Object.keys(metaData.models).forEach((modelKey) => {
+                metaData.models[modelKey].forEach((scenarioKey) => {
                     variables.push(...dataStructure[modelKey][scenarioKey].variables);
                     regions.push(...dataStructure[modelKey][scenarioKey].regions);
                 });
@@ -70,52 +65,56 @@ export default class DataBlockEditor extends Component<any, any> {
         })
 
         // Show selected/default values (check if the selected values exist in the dropdown list options)
-        const defaultVariables = metaData.variables
-            .filter((variable: string) => variables.indexOf(variable) >= 0);
-        const defaultRegions = metaData.regions
-            .filter((region: string) => regions.indexOf(region) >= 0);
+        const defaultVariables = metaData.variables.filter((variable: string) => variables.indexOf(variable) >= 0);
+        const defaultRegions = metaData.regions.filter((region: string) => regions.indexOf(region) >= 0);
 
-        this.props.updateBlockMetaData({
-            variables: defaultVariables,
-            regions: defaultRegions,
-        });
+        this.props.updateBlockMetaData({variables: defaultVariables, regions: defaultRegions,}, this.props.currentBlock.id);
 
     };
 
     variablesSelectionChange = (selectedVariables: string[]) => {
-        this.props.updateBlockMetaData({variables: selectedVariables});
+        this.props.updateBlockMetaData({variables: selectedVariables}, this.props.currentBlock.id);
         this.updateDropdownData();
     };
 
     regionsSelectionChange = (selectedRegions: string[]) => {
-        this.props.updateBlockMetaData({regions: selectedRegions});
+        this.props.updateBlockMetaData({regions: selectedRegions}, this.props.currentBlock.id);
         this.updateDropdownData();
     };
 
+    modelsSelectionChange = (models) => {
+        this.props.updateBlockMetaData({models: models}, this.props.currentBlock.id);
+        this.updateDropdownData();
+    }
+
+    isControlled = () => {
+        return this.props.currentBlock.controlBlock != ''
+    }
+
+    getControlBlock = () => {
+        return this.props.blocks[this.props.currentBlock.controlBlock];
+    }
+
     inputIsMaster = (input) => {
         const controlBlockId = this.props.currentBlock.controlBlock
-        console.log(controlBlockId)
-        console.log(!!controlBlockId)
         return (
-            !!controlBlockId &&
+            this.isControlled() &&
             this.props.blocks[controlBlockId].config.metaData.master[input].isMaster
         )
     }
 
     render() {
-
-
+        //TODO: If controlled, but no control selection, show info message instead
         return (
             <Space direction="vertical" className="width-100">
                 <div>
                     <h4>Model & Scenario selection</h4>
                     {
-                        this.inputIsMaster("models")
-                        ? (<p>That block is controlled by Model/scenario</p>)
+                        this.inputIsMaster("models") ? (<p>That block is controlled by Model/scenario</p>)
                         : (
                             <DataBlockTableSelection
                                 {...this.props}
-                                updateDropdownData={this.updateDropdownData}
+                                onSelectChange={this.modelsSelectionChange}
                             />
                         )
                     }

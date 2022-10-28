@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "sourceMap": true,
     "composite": true,
     "module": "commonjs",
     "jsx": "react-jsx",

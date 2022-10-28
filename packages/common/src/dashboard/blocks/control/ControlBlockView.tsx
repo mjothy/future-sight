@@ -11,19 +11,13 @@ export default class ControlBlockView extends Component<any, any> {
     const metaData = this.props.currentBlock.config.metaData;
     // Update the controlBlock data
     metaData.master['variables'].values = selectedVariables;
-    this.props.updateBlockMetaData(
-        { master: metaData.master },
-        this.props.currentBlock.id
-    );
+    this.props.updateBlockMetaData({ master: metaData.master }, this.props.currentBlock.id);
   };
 
   regionsSelectionChange = (selectedRegions: string[]) => {
     const metaData = this.props.currentBlock.config.metaData;
     metaData.master['regions'].values = selectedRegions;
-    this.props.updateBlockMetaData(
-        { master: metaData.master },
-        this.props.currentBlock.id
-    );
+    this.props.updateBlockMetaData({ master: metaData.master }, this.props.currentBlock.id);
   };
 
   render() {
