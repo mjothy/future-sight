@@ -50,7 +50,7 @@ export default class DataBlockEditor extends Component<any, any> {
                     regions.push(...dataStructure[modelKey][scenarioKey].regions);
                 });
             });
-        //  Controlled block allow selection of regions and variables of all model from control block        } else {
+        //  Controlled block allow selection of regions and variables of all model from control block
         } else {
             const controlBlockMetaData = this.props.blocks[this.props.currentBlock.controlBlock].config.metaData
             Object.keys(controlBlockMetaData.models).map((modelKey) => {
