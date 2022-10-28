@@ -49,6 +49,7 @@ export default class ControlBlockView extends Component<any, any> {
             placeholder={option}
             defaultValue={metaData.master[option].values}
             onChange={(e) => this.onChange(option, e)}
+            dropdownMatchSelectWidth={false}
           >
             {metaData[option].map((element) => (
               <Option key={element} value={element}>
