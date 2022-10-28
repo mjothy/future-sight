@@ -5,6 +5,7 @@ import { Button, PageHeader, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
+import BlockModel from '../models/BlockModel';
 import ConfigurationModel from '../models/ConfigurationModel';
 import DashboardModel from '../models/DashboardModel';
 import DashboardConfigView from './DashboardConfigView';
@@ -13,7 +14,7 @@ interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
     setEnableSwitchEmbeddedMode: (enable: boolean) => void;
     isEmbedded?: boolean;
     shareButtonOnClickHandler: () => void;
-
+    blockData: (block: BlockModel) => any[];
 }
 
 type LocationState = { dashboard: DashboardModel };
@@ -26,7 +27,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
     const [blockSelectedId, setBlockSelectedId] = useState('');
     const location = useLocation();
     const [searchParams] = useSearchParams();
-    
+
     /**
      * Update configuration metaData (selected models and scenarios)
      * @param data Block config metaData
@@ -58,7 +59,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
     };
 
 
-    
+
     useEffect(() => {
         const locationState = location.state as LocationState;
         if (locationState?.dashboard) {
@@ -140,6 +141,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                         updateDashboardMetadata={(data) => {
                         }}
                         readonly
+                        blockData={props.blockData}
                     />
                 )}
             </div>

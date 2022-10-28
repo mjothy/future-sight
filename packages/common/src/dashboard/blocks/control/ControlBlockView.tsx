@@ -6,12 +6,6 @@ import BlockStyleModel from '../../../models/BlockStyleModel';
 const { Option } = Select;
 
 export default class ControlBlockView extends Component<any, any> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      options: Object.keys(this.props.filters),
-    };
-  }
 
   onChange = (option, selectedData: string[]) => {
     const metaData = this.props.currentBlock.config.metaData;

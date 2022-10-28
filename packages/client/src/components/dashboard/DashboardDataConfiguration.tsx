@@ -1,5 +1,8 @@
 import {
+  BlockDataModel,
+  BlockModel,
   ComponentPropsWithDataManager,
+  ConfigurationModel,
   ReadOnlyDashboard,
 } from '@future-sight/common';
 import { Component } from 'react';
@@ -64,22 +67,6 @@ class DashboardDataConfiguration extends Component<
     );
   }
 
-  /**
-   * Add the { model, scenario } selected by the user to the state
-   * @param selection the dashboard dataStructure
-   */
-  // setDashboardModelScenario = (selection) => {
-  //   const modelScenarios: any[] = [];
-  //   console.log('selection: ', selection);
-  //   Object.keys(selection).forEach((model) => {
-  //     Object.keys(selection[model]).forEach((scenario) => {
-  //       modelScenarios.push({ model, scenario });
-  //     });
-  //   });
-
-  //   this.setState({ dashboardModelScenario: modelScenarios });
-  // };
-
   saveData = async (id: string, image?: string) => {
     const data = getDraft(id);
     if (data) {
@@ -96,6 +83,85 @@ class DashboardDataConfiguration extends Component<
     }
   };
 
+  /**
+   * to dispatch data for diffrenet plots (based on block id)
+   * @param block the block
+   * @returns the fetched data from API with timeseries
+   */
+  blockData = (block: BlockModel) => {
+
+    if (block.blockType !== "text") {
+      const config: ConfigurationModel | any = block.config;
+      const metaData: BlockDataModel = config.metaData;
+      const data: any[] = [];
+      const missingData: any[] = [];
+
+      if (
+        metaData.models &&
+        metaData.scenarios &&
+        metaData.variables &&
+        metaData.regions
+      ) {
+        metaData.models.map((model) => {
+          metaData.scenarios.map((scenario) => {
+            metaData.variables.map((variable) => {
+              metaData.regions.map((region) => {
+                const d = this.state.plotData.find(
+                  (e) =>
+                    e.model === model &&
+                    e.scenario === scenario &&
+                    e.variable === variable &&
+                    e.region === region
+                );
+                if (d) {
+                  data.push(d);
+                } else {
+                  missingData.push({ model, scenario, variable, region });
+                }
+              });
+            });
+          });
+        });
+      }
+
+      if (missingData.length > 0) {
+        this.setPlotData(missingData);
+      }
+      return data;
+    }
+
+    return [];
+  };
+
+  /**
+   * If dashboard is draft, get first all the possible data to visualize
+   */
+  getPlotData = (blocks: BlockModel[]) => {
+    const data: any[] = [];
+    Object.values(blocks).map((block: any) => {
+      const metaData: BlockDataModel = block.config.metaData;
+      // Check if the block type != text
+      if (
+        metaData !== undefined &&
+        metaData.models &&
+        metaData.scenarios &&
+        metaData.variables &&
+        metaData.regions
+      ) {
+        metaData.models.map((model) => {
+          metaData.scenarios.map((scenario) => {
+            metaData.variables.map((variable) => {
+              metaData.regions.map((region) => {
+                data.push({ model, scenario, variable, region });
+              });
+            });
+          });
+        });
+      }
+    });
+    this.setPlotData(data);
+  };
+
   setPlotData = (data) => {
     this.props.dataManager.fetchPlotData(data)
       .then(res => {
@@ -109,7 +175,8 @@ class DashboardDataConfiguration extends Component<
 
     return readonly ? (
       <ReadOnlyDashboard
-      shareButtonOnClickHandler={() => Utils.copyToClipboard()}
+        shareButtonOnClickHandler={() => Utils.copyToClipboard()}
+        blockData={this.blockData}
         {...this.props}
       />
     ) : (
@@ -118,6 +185,8 @@ class DashboardDataConfiguration extends Component<
         filters={this.state.filters}
         setPlotData={this.setPlotData}
         plotData={this.state.plotData}
+        blockData={this.blockData}
+        getPlotData={this.getPlotData}
         {...this.props}
       />
     );
