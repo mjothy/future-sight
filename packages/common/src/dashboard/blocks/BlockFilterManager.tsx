@@ -35,9 +35,41 @@ export default class BlockFilterManager extends Component<any, any> {
 
     componentDidMount(): void {
         this.initialize();
+    }
 
-        // The setup filter (in case the dashboard in draft)
-        // const selectOrder = this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData.selectOrder;
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        // the second condition to not update the dropdown list of ControlData
+        if (prevProps.blockSelectedId !== this.props.blockSelectedId || this.props.selectedFilter !== prevProps.selectedFilter || this.props.dashboard != prevProps.dashboard) {
+            this.initialize();
+            this.updateDropdownData();
+        }
+    }
+
+    /**
+     * Initialise the state of component
+     */
+    initialize = () => {
+        const currentBlock =
+            this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
+        const selectOptions = Object.keys(this.props.filters);
+
+        // Set inputs that still emplty
+        if (currentBlock.selectOrder.length > 0) {
+            const newOptions: string[] = [];
+            selectOptions.forEach((option) => {
+                if (!currentBlock.selectOrder.includes(option)) {
+                    newOptions.push(option);
+                }
+            });
+
+            this.setState({ selectOptions: newOptions });
+        } else {
+            this.setState({ selectOptions });
+        }
+
+        this.checkIfBlockControlled();
+
+        // Set options based on the initial filter, and after that updateDropdownData to filter by already selected data
         if (this.props.selectedFilter !== '') {
             const selectedFilter = this.props.selectedFilter;
             const data = this.state.data;
@@ -61,39 +93,6 @@ export default class BlockFilterManager extends Component<any, any> {
                 this.updateDropdownData()
             );
         }
-    }
-
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        // the second condition to not update the dropdown list of ControlData
-        if (prevProps.blockSelectedId !== this.props.blockSelectedId || this.props.selectedFilter !== prevProps.selectedFilter || this.props.dashboard != prevProps.dashboard) {
-            this.initialize();
-            this.updateDropdownData();
-        }
-    }
-
-    /**
-     * Initialise the state of component
-     */
-    initialize = () => {
-        const currentBlock =
-            this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
-        const selectOptions = Object.keys(this.props.filters);
-
-        // if dataType == data
-        if (currentBlock.selectOrder.length > 0) {
-            const newOptions: string[] = [];
-            selectOptions.forEach((option) => {
-                if (!currentBlock.selectOrder.includes(option)) {
-                    newOptions.push(option);
-                }
-            });
-
-            this.setState({ selectOptions: newOptions });
-        } else {
-            this.setState({ selectOptions });
-        }
-
-        this.checkIfBlockControlled();
     };
 
     checkIfBlockControlled = () => {
@@ -102,7 +101,7 @@ export default class BlockFilterManager extends Component<any, any> {
         if (controlBlockId !== '') {
             controlBlock = this.props.blocks[controlBlockId];
         }
-        this.setState({ controlBlock }, () => this.updateDropdownData());
+        this.setState({ controlBlock });
     };
 
     updateDropdownData = () => {

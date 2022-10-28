@@ -16,10 +16,6 @@ export default class PopupFilterContent extends Component<any, any> {
     }
   }
 
-  componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): void {
-    console.log("Update selection for all blocks")
-  }
-
   onRegionsChange = (regions: string[]) => {
     this.props.dataStructure.regions.selection = regions;
     this.props.updateDataStructure(this.props.dataStructure);
