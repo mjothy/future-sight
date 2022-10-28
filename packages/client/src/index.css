@@ -211,6 +211,10 @@ body {
   height: calc((100% - 60px)*0.88);
 }
 
+.ant-drawer {
+z-index: 3;
+}
+
 .ant-drawer-content-wrapper {
   margin-top: 6%;
   border-bottom-left-radius: 10px;
@@ -255,4 +259,8 @@ body {
   display: flex;
   justify-content: center;
   width: 100%;
+}
+
+.ant-modal-mask, .ant-modal-wrap{
+  z-index: 4 !important;
 }
