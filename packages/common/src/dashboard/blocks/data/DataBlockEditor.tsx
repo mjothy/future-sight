@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import { Button, Col, Divider, Input, Row, Select, Tooltip } from 'antd';
+import { Alert, Button, Col, Divider, Input, Row, Select, Tag, Tooltip } from 'antd';
 import { ClearOutlined, ExclamationCircleOutlined, FrownOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
@@ -73,7 +73,7 @@ export default class DataBlockEditor extends Component<any, any> {
             <Input.Group compact>
               <Select
                 mode="multiple"
-                className={selected ? "width-80" : "width-100"}
+                className={selected ? "width-90" : "width-100"}
                 placeholder={option}
                 value={metaData[option]}
                 // Update selection on state
@@ -83,9 +83,6 @@ export default class DataBlockEditor extends Component<any, any> {
                 // on close: save data
                 onDropdownVisibleChange={(e) =>
                   this.onDropdownVisibleChange(option, e)
-                }
-                disabled={
-                  this.props.isBlockControlled && control[option].isMaster
                 }
                 dropdownMatchSelectWidth={false}
                 notFoundContent={(
@@ -122,9 +119,15 @@ export default class DataBlockEditor extends Component<any, any> {
     return Object.keys(controlBlock.master).map((key) => {
       if (controlBlock.master[key].isMaster) {
         return (
-          <div>
-            <strong>{key}: </strong>{' '}
-            {controlBlock.master[key].values.toString()}
+          <div className='mt-20'>
+            <strong>{key}: </strong> <br />
+            {controlBlock[key].map(element => {
+              let color = "default";
+              if (controlBlock.master[key].values.includes(element)) {
+                color = "blue";
+              }
+              return <Tag key={element} color={color}>{element}</Tag>
+            })}
           </div>
         );
       }

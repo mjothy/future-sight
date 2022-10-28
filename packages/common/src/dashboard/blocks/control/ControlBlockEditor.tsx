@@ -1,5 +1,5 @@
-import { ClearOutlined } from '@ant-design/icons';
-import { Button, Col, Input, Row, Select, Tooltip } from 'antd';
+import { ClearOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Col, Divider, Input, Row, Select, Tooltip } from 'antd';
 import Checkbox from 'antd/es/checkbox';
 import { Component, MouseEvent } from 'react';
 import BlockModel from '../../../models/BlockModel';
@@ -67,7 +67,7 @@ export default class ControlBlockEditor extends Component<any, any> {
         <Input.Group compact>
           <Select
             mode="multiple"
-            className="width-80"
+            className="width-90"
             placeholder={option}
             value={metaData[option]}
             onChange={(selectedData) =>
@@ -99,9 +99,19 @@ export default class ControlBlockEditor extends Component<any, any> {
     return (
       <>
         <div>{options.map((option) => this.selectDropDown(option))}</div>
-        <div>
-          <Button onClick={this.onAddControlledBlock}>Add data block</Button>
-        </div>
+        <Divider />
+        <Row style={{ marginTop: "auto" }}>
+          <Col span={24}>
+            <Button
+              type="primary"
+
+              className="width-100"
+              onClick={this.onAddControlledBlock}
+            >
+              <PlusOutlined />Add linked data block
+            </Button>
+          </Col>
+        </Row>
       </>
     );
   }
