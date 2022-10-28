@@ -21,53 +21,18 @@ export default class RedisClient {
     });
   };
 
+  /**
+   * Initialize Redis keys
+   * NB: dashboards:id is initialized in the /api/dashboard/save endpoint by the incr() call, no need to initialize this key here
+   */
   initialize = async () => {
     try {
       // init dashboards
-      const dashboards = await this.client.json.get('dashboards');
-      if (!dashboards) {
-        await this.client.json.set('dashboards', '$', {});
-      }
-
-      // init authors
-      const authors = await this.client.json.get('authors', '$');
-      if (!authors) {
-        const data = {};
-        if (dashboards) {
-          for (const [key, val] of Object.entries(dashboards)) {
-            const value = val as any;
-            const id = parseInt(key);
-            if (data[value.userData.author]) {
-              data[value.userData.author].add(id);
-            } else {
-              data[value.userData.author] = new Set([id]);
-            }
-          }
-        }
-        this.convertValue(data);
-        await this.client.json.set('authors', '$', data);
-      }
-
-      // init tags
-      const tags = await this.client.json.get('tags', '$');
-      if (!tags) {
-        const data = {};
-        if (dashboards) {
-          for (const [key, val] of Object.entries(dashboards)) {
-            const value = val as any;
-            const id = parseInt(key);
-            value.userData.tags.forEach((tag) => {
-              if (data[tag]) {
-                data[tag].add(id);
-              } else {
-                data[tag] = new Set([id]);
-              }
-            });
-          }
-        }
-        this.convertValue(data);
-        await this.client.json.set('tags', '$', data);
-      }
+      await this.client.json.set('dashboards', '$', {}, {
+        NX: true, // only set the key if it does not already exist
+      });
+      await this.client.json.set('authors', '$', {}, { NX: true }); // init the authors key
+      await this.client.json.set('tags', '$', {}, { NX: true }); // init the tags key
     } catch (err) {
       console.error(err);
     }
