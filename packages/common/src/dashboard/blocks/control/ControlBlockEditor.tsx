@@ -10,9 +10,7 @@ const { Option } = Select;
  * The form in sidebar to add/edit control block
  */
 export default class ControlBlockEditor extends Component<any, any> {
-  clearClick(option: any, e: MouseEvent<HTMLElement, MouseEvent>): void {
-    throw new Error('Method not implemented.');
-  }
+
   onAddControlledBlock = () => {
     this.props.addBlock('data', this.props.blockSelectedId);
   };
@@ -42,6 +40,19 @@ export default class ControlBlockEditor extends Component<any, any> {
     }
   };
 
+  clearClick = (option, e) => {
+    const metaData =
+      this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
+
+    metaData[option] = [];
+
+    this.props.updateBlockMetaData({
+      ...metaData
+    });
+
+    this.props.updateDropdownData();
+  };
+
   selectDropDown = (option) => {
     const metaData = this.props.currentBlock.config.metaData;
 
@@ -69,6 +80,14 @@ export default class ControlBlockEditor extends Component<any, any> {
               </Option>
             ))}
           </Select>
+          <Tooltip title="That will reset all other selections">
+            <Button
+              type="default"
+              onClick={(e) => this.clearClick(option, e)}
+
+              icon={<ClearOutlined />}
+            />
+          </Tooltip>
         </Input.Group>
 
       </div>
