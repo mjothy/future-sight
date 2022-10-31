@@ -92,6 +92,7 @@ export default class DashboardGlobalInfo extends Component<any, any> {
           prefix={<EditFilled className="site-form-item-icon" />}
           placeholder="Title"
           onChange={(e) => this.onTitleChange(e)}
+          allowClear={true}
         />
 
         <Input
@@ -101,6 +102,7 @@ export default class DashboardGlobalInfo extends Component<any, any> {
           prefix={<UserOutlined className="site-form-item-icon" />}
           placeholder="Author"
           onChange={(e) => this.onAuthorChange(e)}
+          allowClear={true}
         />
 
         <div className=" mt-20 tag-input-content">
