@@ -21,7 +21,7 @@ interface DashboardViewProps
   updateLayout: (layout: LayoutModel[]) => void;
   blocks: { [id: string]: BlockModel };
   updateSelectedBlock: (blockSelectedId: string) => void;
-  updateBlockMetaData: (data: any) => void;
+  updateBlockMetaData: (data: any, blockId: any) => void;
   updateBlockStyleConfig: (data: any) => void;
   saveDashboard: (callback: (idPermanent) => void, image?: string) => void;
   updateDashboardMetadata: (data: any, deletion?: any) => void;

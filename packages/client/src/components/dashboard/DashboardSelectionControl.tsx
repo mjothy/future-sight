@@ -159,17 +159,10 @@ export default class DashboardSelectionControl extends Component<
    * @param data Block config metaData
    * @param idBlock In case of controling dataBlocks by controlBlock (so the control block is not necessarily selected, we need mandatory the id of controlBlock)
    */
-  updateBlockMetaData = (data, idBlock = '') => {
+  updateBlockMetaData = (data, idBlock) => {
     const dashboard = this.state.dashboard;
     // store the selected data
-    let blockSelectedId = '';
-    if (this.state.blockSelectedId === '' || idBlock !== '') {
-      blockSelectedId = idBlock;
-    } else {
-      blockSelectedId = this.state.blockSelectedId;
-    }
-
-    const selectedBlock = dashboard.blocks[blockSelectedId];
+    const selectedBlock = dashboard.blocks[idBlock];
     if (selectedBlock.blockType === 'text') {
       selectedBlock.config = { value: data };
     } else {

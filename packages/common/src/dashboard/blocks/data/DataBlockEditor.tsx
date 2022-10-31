@@ -11,14 +11,14 @@ export default class DataBlockEditor extends Component<any, any> {
 
   onDropdownVisibleChange = (option, e) => {
     const metaData =
-      this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
+      this.props.dashboard.blocks[this.props.currentBlock.id].config.metaData;
     if (!e && metaData[option].length > 0) {
       // Update the order of selection
       this.props.updateBlockMetaData({
         selectOrder: Array.from(
           new Set<string>([...metaData.selectOrder, option])
         ),
-      });
+      }, this.props.currentBlock.id);
       const selectOptions = this.props.selectOptions.filter((e) => e != option);
       this.props.updateSelectOptions(selectOptions);
     }
@@ -28,7 +28,7 @@ export default class DataBlockEditor extends Component<any, any> {
     const data = {};
 
     const metaData =
-      this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
+      this.props.dashboard.blocks[this.props.currentBlock.id].config.metaData;
     const index = metaData.selectOrder.indexOf(option);
     if (index >= 0) {
       const selectOrder = [...metaData.selectOrder];
@@ -43,7 +43,7 @@ export default class DataBlockEditor extends Component<any, any> {
       this.props.updateBlockMetaData({
         ...data,
         selectOrder: Array.from(new Set<string>([...selectOrder])),
-      });
+      }, this.props.currentBlock.id);
     }
 
     this.props.updateDropdownData();
@@ -63,7 +63,7 @@ export default class DataBlockEditor extends Component<any, any> {
 
     const control = this.props.currentBlock.config.metaData;
     const metaData =
-      this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
+      this.props.dashboard.blocks[this.props.currentBlock.id].config.metaData;
 
     return (
       !isControlled && (
@@ -136,7 +136,7 @@ export default class DataBlockEditor extends Component<any, any> {
 
   render() {
     const metaData =
-      this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
+      this.props.dashboard.blocks[this.props.currentBlock.id].config.metaData;
 
     return (
       <div>

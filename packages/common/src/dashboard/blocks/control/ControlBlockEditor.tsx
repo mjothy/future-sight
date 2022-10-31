@@ -18,7 +18,7 @@ export default class ControlBlockEditor extends Component<any, any> {
   onCheckChange = (option, e) => {
     const metaData = this.props.currentBlock.config.metaData;
     metaData.master[option].isMaster = e.target.checked;
-    this.props.updateBlockMetaData({ master: metaData.master });
+    this.props.updateBlockMetaData({ master: metaData.master }, this.props.currentBlock.id);
     // Update also children
     const childrens = Object.values(this.props.dashboard.blocks).filter(
       (block: BlockModel | any) =>
@@ -48,7 +48,7 @@ export default class ControlBlockEditor extends Component<any, any> {
 
     this.props.updateBlockMetaData({
       ...metaData
-    });
+    }, this.props.currentBlock.id);
 
     this.props.updateDropdownData();
   };

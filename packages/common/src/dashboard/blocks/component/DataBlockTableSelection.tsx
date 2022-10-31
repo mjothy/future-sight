@@ -20,30 +20,12 @@ const columns: ColumnsType<DataType> = [
 ];
 
 export default class DataBlockTableSelection extends Component<any, any> {
-  data: DataType[] = [];
-  selectedData: { [id: string]: string[] } = {};
   constructor(props) {
     super(props);
-    this.selectedData =
-      this.props.dashboard.blocks[
-        this.props.blockSelectedId
-      ].config.metaData.models;
-    this.prepareDataTable();
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (
-      prevProps.blockSelectedId !== this.props.blockSelectedId &&
-      this.props.blockSelectedId != ''
-    ) {
-      this.selectedData =
-        this.props.dashboard.blocks[
-          this.props.blockSelectedId
-        ].config.metaData.models;
-    }
-  }
-
-  extractSelectedRowKeys(data) {
+  extractSelectedRowKeys() {
+    const data = this.getSelectedData()
     const selectedRowKeys: React.Key[] = [];
     Object.keys(data).map((modelKey) => {
       data[modelKey].map((scenario) =>
@@ -51,25 +33,6 @@ export default class DataBlockTableSelection extends Component<any, any> {
       );
     });
     return selectedRowKeys;
-  }
-
-  /**
-   *Prepare the table source data
-   *The key table is: model/scenario
-   */
-  prepareDataTable() {
-    const { dataStructure } = this.props.dashboard;
-    if (dataStructure != null) {
-      Object.keys(dataStructure).map((modelKey) => {
-        Object.keys(dataStructure[modelKey]).map((scenarioKey) => {
-          this.data.push({
-            key: modelKey + '/' + scenarioKey,
-            model: modelKey,
-            scenario: scenarioKey,
-          });
-        });
-      });
-    }
   }
 
   onSelectChange = (newSelectedRowKeys: React.Key[], selectedRows: DataType[]) => {
@@ -80,25 +43,39 @@ export default class DataBlockTableSelection extends Component<any, any> {
       if (models[model] == null) models[model] = [];
       models[model].push(scenario);
     });
-    this.props.updateBlockMetaData({ models });
-    // Update the selected data variable
-    this.selectedData =
-      this.props.dashboard.blocks[
-        this.props.blockSelectedId
-      ].config.metaData.models;
-
-    if (
-      this.props.dashboard.blocks[this.props.blockSelectedId].blockType ===
-      'data'
-    )
-      this.props.updateDropdownData();
+    this.props.onSelectChange(models);
   };
+
+  getSelectedBlock = () => {
+    return this.props.dashboard.blocks[this.props.blockSelectedId]
+  }
+
+  getSelectedData = () => {
+    return this.getSelectedBlock().config.metaData.models;
+  }
+
+  getTableData = () => {
+    const data: DataType[] = [];
+    const { dataStructure } = this.props.dashboard;
+    if (dataStructure != null) {
+      Object.keys(dataStructure).map((modelKey) => {
+        Object.keys(dataStructure[modelKey]).map((scenarioKey) => {
+          data.push({
+            key: modelKey + '/' + scenarioKey,
+            model: modelKey,
+            scenario: scenarioKey,
+          });
+        });
+      });
+    }
+    return data;
+  }
 
   render() {
     return (
       <Table
         rowSelection={{
-          selectedRowKeys: this.extractSelectedRowKeys(this.selectedData),
+          selectedRowKeys: this.extractSelectedRowKeys(),
           onChange: this.onSelectChange,
           selections: [
             Table.SELECTION_ALL,
@@ -107,7 +84,7 @@ export default class DataBlockTableSelection extends Component<any, any> {
           ],
         }}
         columns={columns}
-        dataSource={this.data}
+        dataSource={this.getTableData()}
       />
     );
   }

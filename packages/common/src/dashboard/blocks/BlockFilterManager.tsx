@@ -188,7 +188,7 @@ export default class BlockFilterManager extends Component<any, any> {
     onChange = (option, selectedData: string[]) => {
         const data = {};
         data[option] = selectedData;
-        this.props.updateBlockMetaData({ ...data });
+        this.props.updateBlockMetaData({ ...data }, this.props.currentBlock.id);
         this.updateDropdownData();
     };
 

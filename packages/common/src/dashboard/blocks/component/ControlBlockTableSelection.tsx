@@ -86,10 +86,7 @@ export default class ControlBlockTableSelection extends Component<any, any> {
     });
     const metaData = this.props.currentBlock.config.metaData;
     metaData.master['models'].values = models;
-    this.props.updateBlockMetaData(
-      { master: metaData.master },
-      this.props.currentBlock.id
-    );
+    this.props.updateBlockMetaData({ master: metaData.master }, this.props.currentBlock.id);
     // Update the selected data variable
     this.selectedData =
       this.props.currentBlock.config.metaData.master['models'].values;
