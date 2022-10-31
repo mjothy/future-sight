@@ -131,20 +131,25 @@ export default class DashboardSelectionControl extends Component<
       });
     } else {
       // Check if dataStructure changed, if True delete all blocks that used the ancien data
-      const newDataStructure = data.dataStructure;
-      const toDeleteBlocks = new Set<string>();
-      Object.values(this.state.dashboard.blocks).forEach((block: BlockModel | any) => {
-        block.config.metaData[this.state.selectedFilter].forEach(value => {
-          if (!newDataStructure[this.state.selectedFilter].selection.includes(value)) {
-            toDeleteBlocks.add(block.id);
-          }
-        })
-      })
+      if (data.dataStructure === undefined) {
+        this.setState({ dashboard: { ...this.state.dashboard, ...data } });
+      } else {
 
-      console.log("toDelete: ", toDeleteBlocks);
-      this.setState({ dashboard: { ...this.state.dashboard, ...data } }, () => {
-        Array.from(toDeleteBlocks).forEach(blockId => this.deleteBlock(blockId))
-      });
+        const newDataStructure = data.dataStructure;
+        const toDeleteBlocks = new Set<string>();
+        Object.values(this.state.dashboard.blocks).forEach((block: BlockModel | any) => {
+          block.config.metaData[this.state.selectedFilter].forEach(value => {
+            if (!newDataStructure[this.state.selectedFilter].selection.includes(value)) {
+              toDeleteBlocks.add(block.id);
+            }
+          })
+        })
+
+        console.log("toDelete: ", toDeleteBlocks);
+        this.setState({ dashboard: { ...this.state.dashboard, ...data } }, () => {
+          Array.from(toDeleteBlocks).forEach(blockId => this.deleteBlock(blockId))
+        });
+      }
     }
   };
 

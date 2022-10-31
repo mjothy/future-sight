@@ -3,12 +3,14 @@ import PropTypes from 'prop-types';
 import {
   ArrowLeftOutlined,
   CloseOutlined,
+  EditOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   PicLeftOutlined,
   PicRightOutlined,
 } from '@ant-design/icons';
 import { Button, Drawer, Space, Tooltip } from 'antd';
+import DashboardGlobalInfo from './DashboardGlobalInfo';
 
 export default class Sidebar extends Component<any, any> {
   static propTypes = {
@@ -20,6 +22,7 @@ export default class Sidebar extends Component<any, any> {
     this.state = {
       visible: true,
       placement: 'right',
+      isShowGlobalInfo: false
     };
   }
 
@@ -54,8 +57,25 @@ export default class Sidebar extends Component<any, any> {
       return (<Space>
         <strong>{this.props.dashboard.userData.title}</strong>
         <em>- by {this.props.dashboard.userData.author}</em>
+
+        {<Tooltip title="Edit dashboard global information (title, author, tags)">
+          <Button
+            type="default"
+            onClick={this.openGlobalInfoModal}
+            icon={<EditOutlined />}
+          />
+        </Tooltip>
+        }
       </Space>)
     }
+  }
+
+  openGlobalInfoModal = () => {
+    this.setState({ isShowGlobalInfo: true })
+  }
+
+  closeGlobalInfoModal = () => {
+    this.setState({ isShowGlobalInfo: false })
   }
 
   getExtra = () => {
@@ -103,6 +123,8 @@ export default class Sidebar extends Component<any, any> {
         >
           {this.props.children}
         </Drawer>
+
+        {this.state.isShowGlobalInfo && <DashboardGlobalInfo openGlobalInfoModal={this.openGlobalInfoModal} closeGlobalInfoModal={this.closeGlobalInfoModal} isShowGlobalInfo={this.state.isShowGlobalInfo}  {...this.props} />}
       </div>
     );
   }

@@ -56,27 +56,6 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
     }
   }
 
-  /**
-   * Geting and update the value the user data
-   * @param data contains the information of the dashboard {title, author and tags}
-   */
-  handleUserData = (data) => {
-    const userData = this.props.dashboard.userData;
-
-    switch (data.name) {
-      case 'title':
-        userData.title = data.value;
-        break;
-      case 'author':
-        userData.author = data.value;
-        break;
-      case 'tags':
-        userData.tags = data.value;
-        break;
-    }
-    this.props.updateDashboardMetadata({ userData });
-  };
-
   handleStructureData = (data, deletion = undefined) => {
     this.props.updateDashboardMetadata({ dataStructure: data }, deletion);
   };
@@ -86,26 +65,11 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
       <SetupView
         {...this.props}
         userData={this.props.dashboard.userData}
-        submitEvent={this.switchSetupDashboardMode}
-        updateUserData={this.handleUserData}
         handleStructureData={this.handleStructureData}
         visible={this.state.setupDashboardMode === 'setup'}
       />
     );
   };
-
-  dashboardManager = () => {
-    return <Dashboard {...this.props} />;
-  };
-
-  switchSetupDashboardMode = (view) => {
-    console.log('called: ', view);
-    this.setState({ setupDashboardMode: view });
-  };
-
-  hasFilledStructure = () => {
-    return Object.keys(this.props.dashboard.dataStructure).length !== 0
-  }
 
   render() {
     return (
@@ -114,7 +78,6 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
         <SetupView
           {...this.props}
           userData={this.props.dashboard.userData}
-          updateUserData={this.handleUserData}
           handleStructureData={this.handleStructureData}
         />
       </>
