@@ -9,7 +9,6 @@ import { RoutingProps } from '../app/Routing';
 import DashboardView from './DashboardView';
 import { getDraft, setDraft } from '../drafts/DraftUtils';
 import { Spin } from 'antd';
-import BlockDataModel from '@future-sight/common/src/models/BlockDataModel';
 
 export interface DashboardSelectionControlProps
   extends ComponentPropsWithDataManager,
@@ -45,11 +44,6 @@ export default class DashboardSelectionControl extends Component<
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevState.dashboard != this.state.dashboard) {
       setDraft(this.state.dashboard.id, this.state.dashboard);
-      if (this.state.dashboard) {
-        // this.props.setDashboardModelScenario(
-        //   this.state.dashboard.dataStructure
-        // );
-      }
     }
   }
 
@@ -193,7 +187,7 @@ export default class DashboardSelectionControl extends Component<
     if (masterBlockId) {
       dashboard.blocks[layoutItem.i].controlBlock = masterBlockId;
       const master = dashboard.blocks[masterBlockId].config.metaData.master;
-      Object.keys(master).map((option) => {
+      Object.keys(master).forEach((option) => {
         if (master[option].isMaster) {
           dashboard.blocks[layoutItem.i].config.metaData.selectOrder =
             Array.from(

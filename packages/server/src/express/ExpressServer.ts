@@ -58,21 +58,6 @@ export default class ExpressServer {
       res.send(`Hello , From server`);
     });
 
-    this.app.post('/api/data', (req, res) => {
-      const body = req.body;
-      this.dataProxy.getData().map((e) => {
-        if (
-          e.model === body.model &&
-          e.scenario === body.scenario &&
-          e.region === body.region &&
-          e.variable === body.variable
-        ) {
-          res.status(200).send(e);
-        }
-      });
-      res.status(404).send([]);
-    });
-
     this.app.post('/api/plotData', (req, res) => {
       const body = req.body;
       const response: any[] = [];

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import AddButton from './actions/AddButton';
-import { Button, Col, Row, notification, Modal } from 'antd';
+import { Button, Col, Row, notification, Modal, Divider } from 'antd';
 import { DashboardProps } from '../Dashboard';
 import { useNavigate } from 'react-router-dom';
 import html2canvas from 'html2canvas'
-import {DragOutlined, EditOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { DragOutlined, EditOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 
 const DEFAULT_PREVIEW_WIDTH = 800;
 const DEFAULT_PREVIEW_HEIGHT = 450;
@@ -43,10 +43,10 @@ const DashboardControl: React.FC<DashboardProps> = ({
     const dashboard = document.querySelector(".dashboard-content") as HTMLElement
     if (dashboard) {
       dashboard.classList.add('publishing');
-      let timer = setInterval(function() {
+      const timer = setInterval(function () {
         if (dashboard.classList.contains('publishing')) {
           //run some other function
-          makeAndResizePreview(dashboard).then(function(dataURL) {
+          makeAndResizePreview(dashboard).then(function (dataURL) {
             save(dataURL);
           });
           clearInterval(timer);
@@ -58,20 +58,19 @@ const DashboardControl: React.FC<DashboardProps> = ({
   };
 
   const makeAndResizePreview = (dashboard) => {
-    return html2canvas(dashboard).then((function(canvas) {
+    return html2canvas(dashboard).then((function (canvas) {
       const dataURL = canvas.toDataURL();
       return resizeDataURL(dataURL, DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT)
     }));
   }
 
   function resizeDataURL(datas, wantedWidth, wantedHeight) {
-    return new Promise<any>(async function (resolve, reject){
+    return new Promise<any>(async function (resolve, reject) {
       // We create an image to receive the Data URI
       const img = document.createElement('img');
 
       // When the event "onload" is triggered we can resize the image.
-      img.onload = function()
-      {
+      img.onload = function () {
         // We create a canvas and get its context.
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
@@ -91,7 +90,7 @@ const DashboardControl: React.FC<DashboardProps> = ({
     })
   }
 
-  const save = (image ?: string) => {
+  const save = (image?: string) => {
     saveDashboard((idPermanent) => {
       setPublishing(false);
       notification.success({
@@ -124,13 +123,14 @@ const DashboardControl: React.FC<DashboardProps> = ({
           </Col>
         ))}
       </Row>
+      <Divider />
       <Row>
         <Col span={24}>
           <p><QuestionCircleOutlined /> <em>Click on the <EditOutlined /> button to modify a block !</em></p>
           <p><QuestionCircleOutlined /> <em>Drag and drop the <DragOutlined /> button to move a block !</em></p>
         </Col>
       </Row>
-      <Row style={{marginTop: "auto"}}>
+      <Row style={{ marginTop: "auto" }}>
         <Col span={24}>
           <Button
             type="primary"

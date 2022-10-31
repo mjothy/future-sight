@@ -1,7 +1,7 @@
-import { ClearOutlined, PlusOutlined } from '@ant-design/icons';
+import {  CloseCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Col, Divider, Input, Row, Select, Tooltip } from 'antd';
 import Checkbox from 'antd/es/checkbox';
-import { Component, MouseEvent } from 'react';
+import { Component } from 'react';
 import BlockModel from '../../../models/BlockModel';
 
 const { Option } = Select;
@@ -85,7 +85,7 @@ export default class ControlBlockEditor extends Component<any, any> {
               type="default"
               onClick={(e) => this.clearClick(option, e)}
 
-              icon={<ClearOutlined />}
+              icon={<CloseCircleOutlined />}
             />
           </Tooltip>
         </Input.Group>

@@ -102,10 +102,10 @@ class DashboardDataConfiguration extends Component<
         metaData.variables &&
         metaData.regions
       ) {
-        metaData.models.map((model) => {
-          metaData.scenarios.map((scenario) => {
-            metaData.variables.map((variable) => {
-              metaData.regions.map((region) => {
+        metaData.models.forEach((model) => {
+          metaData.scenarios.forEach((scenario) => {
+            metaData.variables.forEach((variable) => {
+              metaData.regions.forEach((region) => {
                 const d = this.state.plotData.find(
                   (e) =>
                     e.model === model &&
@@ -135,10 +135,11 @@ class DashboardDataConfiguration extends Component<
 
   /**
    * If dashboard is draft, get first all the possible data to visualize
+   * This function called one time on draft dashboard rendered
    */
   getPlotData = (blocks: BlockModel[]) => {
     const data: any[] = [];
-    Object.values(blocks).map((block: any) => {
+    Object.values(blocks).forEach((block: any) => {
       const metaData: BlockDataModel = block.config.metaData;
       // Check if the block type != text
       if (
@@ -148,10 +149,10 @@ class DashboardDataConfiguration extends Component<
         metaData.variables &&
         metaData.regions
       ) {
-        metaData.models.map((model) => {
-          metaData.scenarios.map((scenario) => {
-            metaData.variables.map((variable) => {
-              metaData.regions.map((region) => {
+        metaData.models.forEach((model) => {
+          metaData.scenarios.forEach((scenario) => {
+            metaData.variables.forEach((variable) => {
+              metaData.regions.forEach((region) => {
                 data.push({ model, scenario, variable, region });
               });
             });

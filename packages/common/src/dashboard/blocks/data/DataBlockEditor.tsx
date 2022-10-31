@@ -1,6 +1,6 @@
 import { Component } from 'react';
-import { Alert, Button, Col, Divider, Input, Row, Select, Tag, Tooltip } from 'antd';
-import { ClearOutlined, ExclamationCircleOutlined, FrownOutlined } from '@ant-design/icons';
+import { Button, Divider, Input, Row, Select, Tag, Tooltip } from 'antd';
+import { CloseCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 
@@ -61,7 +61,6 @@ export default class DataBlockEditor extends Component<any, any> {
       }
     }
 
-    const control = this.props.currentBlock.config.metaData;
     const metaData =
       this.props.dashboard.blocks[this.props.currentBlock.id].config.metaData;
 
@@ -103,7 +102,7 @@ export default class DataBlockEditor extends Component<any, any> {
                   type="default"
                   onClick={(e) => this.clearClick(option, e)}
 
-                  icon={<ClearOutlined />}
+                  icon={<CloseCircleOutlined />}
                 />
               </Tooltip>}
             </Input.Group>
