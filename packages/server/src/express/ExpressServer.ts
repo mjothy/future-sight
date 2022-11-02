@@ -88,14 +88,15 @@ export default class ExpressServer {
       res.send(this.dataProxy.getRegions());
     });
     const appendDashboardIdToIndexList = async (id: string, indexListKey: string, value: string) => {
-      // Initialize the key if it does not exist
-      await this.dbClient.getClient().json.set(indexListKey, `.${value}`, [], {
+      // Initialize the key if it does not exist      
+      const objJsonB64 = Buffer.from(value).toString('base64');
+      await this.dbClient.getClient().json.set(indexListKey, `.${objJsonB64}`, [], {
         NX: true, // only set the key if it does not already exist
       });
       // Append the dashboard id to the list
       await this.dbClient
         .getClient()
-        .json.arrAppend(indexListKey, `.${value}`, id);
+        .json.arrAppend(indexListKey, `.${objJsonB64}`, id);
     };
 
     // Posts methods
@@ -169,7 +170,12 @@ export default class ExpressServer {
         // data is returned as: [ { author1: [], author2: [], ... }, { tag1: [], tag2: [], ... } ]
         const authors = data[0];
         const tags = data[1];
-        res.send({ authors, tags });
+        const authorsTransform = {};
+        const tagsTransform = {};
+        Object.keys(authors).forEach(key => authorsTransform[Buffer.from(key, 'base64').toString()] = authors[key])
+        Object.keys(tags).forEach(key => tagsTransform[Buffer.from(key, 'base64').toString()] = tags[key])
+
+        res.send({ authors: authorsTransform, tags: tagsTransform });
       } catch (err) {
         console.error(err);
         next(err);
