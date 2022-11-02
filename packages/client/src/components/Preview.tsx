@@ -1,7 +1,7 @@
 import React from 'react';
-import {Card, Image, Space, Tag} from 'antd';
-import {Link} from 'react-router-dom';
-import {RightCircleTwoTone, ShareAltOutlined} from '@ant-design/icons';
+import { Card, Image, Space, Tag } from 'antd';
+import { Link } from 'react-router-dom';
+import { RightCircleTwoTone, ShareAltOutlined } from '@ant-design/icons';
 import Utils from '../services/Utils';
 import './Preview.css';
 
@@ -20,10 +20,10 @@ class Preview extends React.Component<any, any> {
                     {
                         !!this.props.conf.date &&
                         <span>
-                            <br/>
+                            <br />
                             {new Date(this.props.conf.date).toLocaleString(
                                 [],
-                                {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'})
+                                { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
                             }
                         </span>
                     }
@@ -50,12 +50,12 @@ class Preview extends React.Component<any, any> {
             </Tooltip>,*/
             <Link key="goto" to={this.props.urlPrefix + this.props.id}>
                 <Space>
-                    <RightCircleTwoTone key="share"/>
+                    <RightCircleTwoTone key="share" />
                     <div>Open</div>
                 </Space>
             </Link>,
-            <Space onClick={() => Utils.copyToClipboard(this.props.urlPrefix + this.props.id)} key="share">
-                <ShareAltOutlined/>
+            <Space className='delete-btn' onClick={() => Utils.copyToClipboard(this.props.urlPrefix + this.props.id)} key="share">
+                <ShareAltOutlined />
             </Space>
         ]
 
