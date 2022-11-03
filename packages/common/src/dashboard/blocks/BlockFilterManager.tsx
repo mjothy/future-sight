@@ -1,3 +1,4 @@
+import { notification } from 'antd';
 import React, { Component } from 'react';
 import BlockModel from '../../models/BlockModel';
 import ConfigurationModel from '../../models/ConfigurationModel';
@@ -33,14 +34,16 @@ export default class BlockFilterManager extends Component<any, any> {
         };
     }
 
-    componentDidMount(): void {
-        this.initialize();
+    async componentDidMount(): Promise<void> {
+        await this.initialize();
+        await this.checkIfSelectedInOptions();
+        this.updateDropdownData();
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
+    async componentDidUpdate(prevProps, prevState, snapshot) {
         // the second condition to not update the dropdown list of ControlData
         if (prevProps.blockSelectedId !== this.props.blockSelectedId || this.props.selectedFilter !== prevProps.selectedFilter || this.props.dashboard != prevProps.dashboard) {
-            this.initialize();
+            await this.initialize();
             this.updateDropdownData();
         }
     }
@@ -89,11 +92,30 @@ export default class BlockFilterManager extends Component<any, any> {
                     });
                 }
             });
-            this.setState({ data, initializedData: data }, () =>
-                this.updateDropdownData()
-            );
+            this.setState({ data, initializedData: data });
         }
     };
+
+    checkIfSelectedInOptions = () => {
+        const options = this.state.data;
+        const selected = this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
+
+        const blockUpdatedData = { ...this.props.currentBlock.config.metaData };
+
+        Object.keys(options).forEach(option => {
+            const existData = selected[option].filter(data => options[option].includes(data));
+            blockUpdatedData[option] = existData;
+
+            if (existData.length < selected[option].length) {
+                notification.warning({
+                    message: 'Data missing',
+                    description: 'Some selected data are not available  in existing options (due to your latest modifications), block will be updated automatically ',
+                    placement: 'top',
+                });
+            }
+        });
+        this.props.updateBlockMetaData({ ...blockUpdatedData }, this.props.currentBlock.id);
+    }
 
     checkIfBlockControlled = () => {
         const controlBlockId = this.props.currentBlock.controlBlock;
