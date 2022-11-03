@@ -93,6 +93,7 @@ body {
 
 /*Dashboard content*/
 .dashboard .dashboard-content-wrapper {
+  flex: 1 0 70%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -100,12 +101,14 @@ body {
   padding: 10px;
 }
 
+.dashboard .no-sidebar-margin{
+  flex: 0 1 15%;
+  background-color: white;
+}
+
 .dashboard .dashboard-content {
   background-color: #f3f3f3;
   width: 100%;
-  /*If I want white columns when closing my sidebar. However, pb when overflow-y appear on the right,
-  doesn't update width, so the sidebar and content overlap*/
-  /*width: calc(100vw - 30vw);*/
   height: fit-content;
   border-radius: 10px;
 }
@@ -121,9 +124,9 @@ body {
 }
 
 .dashboard .ant-layout-sider-children{
+  width: inherit;
   top: 60px;
   position: fixed;
-  width: inherit;
   border-left: #f0f0f0 1px solid;
 }
 
