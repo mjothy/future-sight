@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { Button, Col, Input, Modal, Row, Tag, Tooltip } from 'antd';
+import { Button, Input, Modal, notification, Tag, Tooltip } from 'antd';
 import { UserOutlined, TagOutlined, EditFilled } from '@ant-design/icons';
 import UserDataModel from '../../models/UserDataModel';
+
+type NotificationType = 'success' | 'info' | 'warning' | 'error';
 
 /**
  * To set dashboard global information (title, author and tags)
@@ -73,13 +75,26 @@ export default class DashboardGlobalInfo extends Component<any, any> {
   };
 
   handleOk = () => {
-    this.props.updateDashboardMetadata({ userData: this.state.userData });
-    this.props.closeGlobalInfoModal();
+    try {
+      this.props.updateDashboardMetadata({ userData: this.state.userData });
+      this.props.closeGlobalInfoModal();
+      this.openNotificationWithIcon('success', 'Update dashboard', 'Dashboard information updated successfully')
+    } catch (e) {
+      this.openNotificationWithIcon('error', 'Update dashboard', 'Error occured')
+    }
+
   };
 
   handleCancel = () => {
     this.setState({ userData: { ...this.props.dashboard.userData } }, () => this.props.closeGlobalInfoModal());
+    this.openNotificationWithIcon('warning', 'Update canceled', '')
+  };
 
+  openNotificationWithIcon = (type: NotificationType, title: string, msg: string) => {
+    notification[type]({
+      message: title,
+      description: msg
+    });
   };
 
   render() {
