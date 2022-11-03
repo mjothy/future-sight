@@ -147,7 +147,7 @@ export default class DashboardSelectionControl extends Component<
 
         console.log("toDelete: ", toDeleteBlocks);
         this.setState({ dashboard: { ...this.state.dashboard, ...data } }, () => {
-          Array.from(toDeleteBlocks).forEach(blockId => this.deleteBlock(blockId))
+          this.deleteBlocks(Array.from(toDeleteBlocks));
         });
       }
     }
@@ -235,6 +235,39 @@ export default class DashboardSelectionControl extends Component<
     }
 
     delete blocks[blockId]
+
+    this.setState({
+      dashboard: {
+        ...this.state.dashboard,
+        blocks: blocks,
+        layout: layout,
+      },
+      blockSelectedId: '',
+    });
+
+  };
+
+  deleteBlocks = (blocksId: string[]) => {
+    const blocks = { ...this.state.dashboard.blocks };
+    const layout = [...this.state.dashboard.layout];
+    blocksId.forEach(blockId => {
+
+      const index = layout.findIndex((element) => element.i === blockId);
+      layout.splice(index, 1);
+
+      // delete childs
+      if (blocks[blockId].blockType === "control") {
+        const blockChilds = Object.values(blocks).filter((block: BlockModel | any) => block.controlBlock === blocks[blockId].id).map((block: BlockModel | any) => block.id);
+        blockChilds.forEach(id => {
+          delete blocks[id];
+          const index = layout.findIndex((element) => element.i === id);
+          layout.splice(index, 1);
+        });
+      }
+
+      delete blocks[blockId]
+
+    })
 
     this.setState({
       dashboard: {

@@ -42,7 +42,13 @@ export default class BlockFilterManager extends Component<any, any> {
 
     async componentDidUpdate(prevProps, prevState, snapshot) {
         // the second condition to not update the dropdown list of ControlData
-        if (prevProps.blockSelectedId !== this.props.blockSelectedId || this.props.selectedFilter !== prevProps.selectedFilter || this.props.dashboard != prevProps.dashboard) {
+        if (prevProps.blockSelectedId !== this.props.blockSelectedId || this.props.selectedFilter !== prevProps.selectedFilter) {
+            await this.initialize();
+            await this.checkIfSelectedInOptions();
+            this.updateDropdownData();
+        }
+
+        if (this.props.dashboard != prevProps.dashboard) {
             await this.initialize();
             this.updateDropdownData();
         }
