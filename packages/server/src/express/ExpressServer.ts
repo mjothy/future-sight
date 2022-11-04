@@ -88,15 +88,15 @@ export default class ExpressServer {
       res.send(this.dataProxy.getRegions());
     });
     const appendDashboardIdToIndexList = async (id: string, indexListKey: string, value: string) => {
-      // Initialize the key if it does not exist      
-      const objJsonB64 = Buffer.from(value).toString('base64');
-      await this.dbClient.getClient().json.set(indexListKey, `.${objJsonB64}`, [], {
+      // Initialize the key if it does not exist
+      const valueTransform = value.replaceAll(" ", "%");
+      await this.dbClient.getClient().json.set(indexListKey, `.${valueTransform}`, [], {
         NX: true, // only set the key if it does not already exist
       });
       // Append the dashboard id to the list
       await this.dbClient
         .getClient()
-        .json.arrAppend(indexListKey, `.${objJsonB64}`, id);
+        .json.arrAppend(indexListKey, `.${valueTransform}`, id);
     };
 
     // Posts methods
@@ -172,9 +172,8 @@ export default class ExpressServer {
         const tags = data[1];
         const authorsTransform = {};
         const tagsTransform = {};
-        Object.keys(authors).forEach(key => authorsTransform[Buffer.from(key, 'base64').toString()] = authors[key])
-        Object.keys(tags).forEach(key => tagsTransform[Buffer.from(key, 'base64').toString()] = tags[key])
-
+        Object.keys(authors).forEach(key => authorsTransform[key.replaceAll("%", " ")] = authors[key])
+        Object.keys(tags).forEach(key => tagsTransform[key.replaceAll("%", " ")] = tags[key])
         res.send({ authors: authorsTransform, tags: tagsTransform });
       } catch (err) {
         console.error(err);

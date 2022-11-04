@@ -223,7 +223,6 @@ export default class DashboardSelectionControl extends Component<
     const layout = [...this.state.dashboard.layout];
     const index = layout.findIndex((element) => element.i === blockId);
     layout.splice(index, 1);
-
     // delete childs
     if (blocks[blockId].blockType === "control") {
       const blockChilds = Object.values(blocks).filter((block: BlockModel | any) => block.controlBlock === blocks[blockId].id).map((block: BlockModel | any) => block.id);

@@ -93,7 +93,14 @@ export default class Sidebar extends Component<any, any> {
           {placement}
         </Tooltip>
         <Tooltip title="Close menu" placement={"left"}>
-          <Button onClick={this.toggleVisible} icon={<CloseOutlined />} />
+          <Button
+              onClick={()=> {
+                  this.toggleVisible();
+                  !!this.props.onCloseMenu && this.props.onCloseMenu();
+              }
+          }
+              icon={<CloseOutlined />}
+          />
         </Tooltip>
       </Space>
     )
@@ -103,9 +110,12 @@ export default class Sidebar extends Component<any, any> {
     return (
       <div>
         <Button
-          className={'sidebar-toggle'}
-          icon={this.state.visible ? <MenuUnfoldOutlined /> : <MenuFoldOutlined style={{ color: "888888" }} />}
-          onClick={this.toggleVisible}
+            className={'sidebar-toggle'}
+            icon={this.state.visible ? <MenuUnfoldOutlined /> : <MenuFoldOutlined style={{color: "888888"}}/>}
+            onClick={()=>{
+                this.toggleVisible();
+                this.props.onCloseMenu();
+            }}
         />
         <Drawer
           placement={this.state.placement}

@@ -39,6 +39,7 @@ export default class Dashboard extends Component<DashboardProps, any> {
       >
         <Sidebar
           onClose={() => this.props.updateSelectedBlock('')}
+          onCloseMenu={() => this.props.updateSelectedBlock('')}
           {...this.props}
         >
           <DashboardConfigControl {...this.props} />
