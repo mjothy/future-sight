@@ -161,11 +161,7 @@ body {
 }
 
 .dashboard.readonly .dashboard-content {
-  width: 100%;
   border-radius: 0;
-  /*background-color: #f3f3f3;*/
-  /*flex: 1;*/
-  /*min-height: auto;*/
 }
 
 .dashboard.readonly .info-container {
