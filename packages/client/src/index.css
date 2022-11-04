@@ -85,7 +85,6 @@ body {
   width: 100%;
 }
 
-
 .dashboard .sidebar {
   background-color: #001529;
   min-height: 100%;
@@ -156,17 +155,22 @@ body {
 
 /* Dashboard readonly */
 .dashboard.readonly {
+  display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .dashboard.readonly .dashboard-content {
   width: 100%;
   border-radius: 0;
   /*background-color: #f3f3f3;*/
+  /*flex: 1;*/
+  /*min-height: auto;*/
 }
 
 .dashboard.readonly .info-container {
   padding: 0 15%;
+  width: 100%;
 }
 
 .dashboard.readonly .info-container .ant-avatar {

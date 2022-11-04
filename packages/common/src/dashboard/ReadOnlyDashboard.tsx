@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import {DownloadOutlined, LinkOutlined} from '@ant-design/icons';
+import {LinkOutlined} from '@ant-design/icons';
 import {Spin, Button, PageHeader} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {useLocation, useSearchParams} from 'react-router-dom';
@@ -8,6 +8,15 @@ import ConfigurationModel from '../models/ConfigurationModel';
 import DashboardModel from '../models/DashboardModel';
 import DataModel from '../models/DataModel';
 import DashboardConfigView from './DashboardConfigView';
+
+// TODO add ratio when publishing dashboard
+// TODO debug why when loading first, the graphs are not properly sized in comparison to its container
+/*TODO Check that embedded and published view have the same purpose and always look ok,
+* For instance, do we want full width with scrolling when in published view
+* or do we want to see full dashboard (might be a problem for big height dashboard)
+* */
+
+const TEST_RATIO = 16/9
 
 interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
     getData: (data: DataModel[]) => any[];
@@ -45,9 +54,9 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                 f_blockSelectedId = blockSelectedId;
             }
 
-            let selectedBlock = f_dashboard.blocks[f_blockSelectedId];
+            const selectedBlock = f_dashboard.blocks[f_blockSelectedId];
             if (selectedBlock.blockType !== 'text') {
-                let config = selectedBlock.config as ConfigurationModel
+                const config = selectedBlock.config as ConfigurationModel
                 let metaData = config.metaData;
                 metaData = {...metaData, ...data};
                 config.metaData = metaData;
@@ -123,7 +132,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                     avatar={{alt: 'logo-short', shape: 'square', size: 'large'}}
                 />
             )}
-            <div className="dashboard-content">
+            <div className="dashboard-content" style={{width: `${TEST_RATIO*100}vh`}}>
                 {(isLoading || !dashboard) && <Spin/>}
                 {dashboard && (
                     <DashboardConfigView
