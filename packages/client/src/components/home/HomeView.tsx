@@ -39,6 +39,7 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
       const dashboard = dashboards.find((d: any) => d.id == parse);
       if (dashboard) {
         const uuid = createUUID();
+        dashboard.id = uuid;
         setDraft(uuid, dashboard);
         navigate('draft?id=' + uuid);
       }
