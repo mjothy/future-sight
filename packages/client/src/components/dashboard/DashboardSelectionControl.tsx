@@ -13,7 +13,7 @@ import { Spin } from 'antd';
 
 export interface DashboardSelectionControlProps
   extends ComponentPropsWithDataManager,
-    RoutingProps {
+  RoutingProps {
   getData: (data: DataModel[]) => any[];
   saveData: (id: string, image?: string) => Promise<any>;
   setDashboardModelScenario: (selection) => void;
@@ -89,12 +89,12 @@ export default class DashboardSelectionControl extends Component<
     this.setState({ blockSelectedId });
   };
 
-  updateDashboardMetadata = (data, deletion?:any) => {
-    if(deletion) {
+  updateDashboardMetadata = (data, deletion?: any) => {
+    if (deletion) {
       //remove all blocks associated to deletion.model
-      const blocks = {...this.state.dashboard.blocks};
+      const blocks = { ...this.state.dashboard.blocks };
       const layout = [...this.state.dashboard.layout];
-      const toRemove:string[] = []
+      const toRemove: string[] = []
       for (const blockId in blocks) {
         const block = blocks[blockId];
         if (deletion.model in block.config.metaData.models) {
@@ -124,16 +124,10 @@ export default class DashboardSelectionControl extends Component<
    * @param data Block config metaData
    * @param idBlock In case of controling dataBlocks by controlBlock (so the control block is not necessarily selected, we need mandatory the id of controlBlock)
    */
-  updateBlockMetaData = (data, idBlock = '') => {
+  updateBlockMetaData = (data, idBlock) => {
     const dashboard = this.state.dashboard;
     // store the selected data
-    let blockSelectedId: string;
-    if (this.state.blockSelectedId === '') {
-      blockSelectedId = idBlock;
-    } else {
-      blockSelectedId = this.state.blockSelectedId;
-    }
-    const selectedBlock = dashboard.blocks[blockSelectedId];
+    const selectedBlock = dashboard.blocks[idBlock];
     if (selectedBlock.blockType === 'text') {
       selectedBlock.config = { value: data };
     } else {
@@ -155,7 +149,7 @@ export default class DashboardSelectionControl extends Component<
   };
 
   addBlock = (blockType: string, masterBlockId?: string) => {
-    const layoutItem = new LayoutModel((this.getLastId()+1).toString());
+    const layoutItem = new LayoutModel((this.getLastId() + 1).toString());
     const dashboard = this.state.dashboard;
 
     dashboard.blocks[layoutItem.i] = new BlockModel(layoutItem.i, blockType);
@@ -177,11 +171,20 @@ export default class DashboardSelectionControl extends Component<
   };
 
   deleteBlock = (blockId: string) => {
-    const blocks = {...this.state.dashboard.blocks};
-    delete blocks[blockId]
+    const blocks = { ...this.state.dashboard.blocks };
     const layout = [...this.state.dashboard.layout];
     const index = layout.findIndex((element) => element.i === blockId);
     layout.splice(index, 1);
+    // delete childs
+    if (blocks[blockId].blockType === "control") {
+      const blockChilds = Object.values(blocks).filter((block: BlockModel | any) => block.controlBlock === blocks[blockId].id).map((block: BlockModel | any) => block.id);
+      blockChilds.forEach(id => {
+        delete blocks[id];
+        const index = layout.findIndex((element) => element.i === id);
+        layout.splice(index, 1);
+      });
+    }
+    delete blocks[blockId]
     this.setState({
       dashboard: {
         ...this.state.dashboard,

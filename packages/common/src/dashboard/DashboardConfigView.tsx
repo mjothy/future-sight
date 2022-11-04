@@ -1,9 +1,9 @@
-import {Component, createRef} from 'react';
+import {Component} from 'react';
 import {Responsive, WidthProvider} from 'react-grid-layout';
 import BlockViewManager from './blocks/BlockViewManager';
 import PropTypes from 'prop-types';
 import {EditTwoTone, DragOutlined} from '@ant-design/icons';
-import {Button} from 'antd';
+import {Button, Space} from 'antd';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 const GRID_RATIO = 16 / 9
@@ -41,8 +41,6 @@ class DashboardConfigView extends Component<any, any> {
             rowHeight: 0,
         };
     }
-
-    gridRef = createRef();
 
     componentDidMount() {
         // Adjust the width and height of the graph in case the blocks already exist
@@ -111,7 +109,6 @@ class DashboardConfigView extends Component<any, any> {
      */
     updateAllLayoutsView = () => {
         const layout = [...this.props.layout];
-        console.log("updateAllLayoutsView", layout, this.state.rowHeight)
         layout.map((layout) => {
             this.updateLayoutView(layout);
         });
@@ -136,7 +133,6 @@ class DashboardConfigView extends Component<any, any> {
         return (
             <ResponsiveGridLayout
                 className="dashboard-grid"
-                ref={this.gridRef}
                 id="ResponsiveGridLayout"
                 layouts={{lg: layout}}
                 isDraggable={!this.props.readonly}
@@ -176,21 +172,14 @@ class DashboardConfigView extends Component<any, any> {
                             className={'width-100 height-100 bg-white'}
                         >
                             {!this.props.readonly && (
-                                <div className="block-edit" style={{position: "fixed", top: 2, right: 2, zIndex: 2}}>
-                                    <Button icon={<EditTwoTone/>} onClick={(e) => this.onBlockClick(e, layout.i)}/>
-                                </div>
-                            )}
-                            {!this.props.readonly && (
-                                <div
-                                    className="block-grab"
-                                    style={{
-                                        position: "fixed",
-                                        top: 2,
-                                        left: 2,
-                                        zIndex: 2
-                                    }}>
-                                    <Button size="small" icon={<DragOutlined/>}/>
-                                </div>
+                                <Space style={{ position: "fixed", top: 1, right: 1, zIndex: 2 }}>
+                                  <div className="block-edit">
+                                    <Button size="small" icon={<EditTwoTone />} onClick={(e) => this.onBlockClick(e, layout.i)} />
+                                  </div>
+                                  <div className="block-grab">
+                                    <Button size="small" icon={<DragOutlined />} />
+                                  </div>
+                                </Space>
                             )}
                             <BlockViewManager
                                 {...this.props}

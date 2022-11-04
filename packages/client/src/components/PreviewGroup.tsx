@@ -3,13 +3,16 @@ import { Col, Row, Space } from 'antd';
 import Preview from "./Preview";
 
 import "./PreviewGroup.css"
+import { DashboardModel } from '@future-sight/common';
 
 export default class PreviewGroup extends React.Component<any, any> {
     render() {
+        console.log("this.props.dashboards: ", this.props.dashboards);
+
         const ret: JSX.Element[] = []
         let i = 1
         let bucket: JSX.Element[] = []
-        this.props.dashboards.forEach(dashboard => {
+        Object.values(this.props.dashboards).forEach((dashboard: DashboardModel | any) => {
             bucket.push(
                 <Col key={i}>
                     <Preview key={dashboard.id} id={dashboard.id} conf={dashboard} urlPrefix={this.props.urlPrefix} />

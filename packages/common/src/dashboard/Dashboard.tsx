@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import DashboardConfigView from './DashboardConfigView';
 import DashboardConfigControl from './DashboardConfigControl';
 import Sidebar from './sidebar/Sidebar';
@@ -18,7 +18,7 @@ export interface DashboardProps extends ComponentPropsWithDataManager {
     updateLayout: (layout: LayoutModel[]) => void;
     blocks: { [id: string]: BlockModel };
     updateSelectedBlock: (blockSelectedId: string) => void;
-    updateBlockMetaData: (data: any) => void;
+    updateBlockMetaData: (data: any, blockId: any) => void;
     updateBlockStyleConfig: (data: any) => void;
     saveDashboard: (callback: (idPermanent) => void, image?: string) => void;
     isEmbedded?: boolean;
@@ -51,6 +51,7 @@ export default class Dashboard extends Component<DashboardProps, any> {
                 <div className="no-sidebar-margin"/>
                 <Sidebar
                     onClose={() => this.props.updateSelectedBlock('')}
+                    onCloseMenu={() => this.props.updateSelectedBlock('')}
                     {...this.props}
                 >
                     <DashboardConfigControl {...this.props} />

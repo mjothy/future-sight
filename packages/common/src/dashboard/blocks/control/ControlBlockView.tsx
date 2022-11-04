@@ -11,19 +11,13 @@ export default class ControlBlockView extends Component<any, any> {
     const metaData = this.props.currentBlock.config.metaData;
     // Update the controlBlock data
     metaData.master['variables'].values = selectedVariables;
-    this.props.updateBlockMetaData(
-        { master: metaData.master },
-        this.props.currentBlock.id
-    );
+    this.props.updateBlockMetaData({ master: metaData.master }, this.props.currentBlock.id);
   };
 
   regionsSelectionChange = (selectedRegions: string[]) => {
     const metaData = this.props.currentBlock.config.metaData;
     metaData.master['regions'].values = selectedRegions;
-    this.props.updateBlockMetaData(
-        { master: metaData.master },
-        this.props.currentBlock.id
-    );
+    this.props.updateBlockMetaData({ master: metaData.master }, this.props.currentBlock.id);
   };
 
   render() {
@@ -31,14 +25,14 @@ export default class ControlBlockView extends Component<any, any> {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
     return (
       <div className={'width-100 height-100'}
-          style={{overflowY: "auto", paddingRight: "10px", paddingLeft: "10px",paddingTop:"6px" }}>
+        style={{ overflowY: "auto", paddingRight: "10px", paddingLeft: "10px", paddingTop: "6px" }}>
         {configStyle.title.isVisible ? (
-            <Row>
-              <Col span={24}>
-                <h3>{configStyle.title.value}</h3>
-              </Col>
-            </Row>
-          ) : undefined
+          <Row>
+            <Col span={24}>
+              <h3>{configStyle.title.value}</h3>
+            </Col>
+          </Row>
+        ) : undefined
         }
         {metaData.master['models'].isMaster && (
           <Row>
@@ -66,6 +60,7 @@ export default class ControlBlockView extends Component<any, any> {
                 placeholder="Variables"
                 defaultValue={metaData.master['variables'].values}
                 onChange={this.variablesSelectionChange}
+                dropdownMatchSelectWidth={false}
               >
                 {metaData.variables.map((variable) => (
                   <Option key={variable} value={variable}>
@@ -89,6 +84,7 @@ export default class ControlBlockView extends Component<any, any> {
                 placeholder="Regions"
                 defaultValue={metaData.master['regions'].values}
                 onChange={this.regionsSelectionChange}
+                dropdownMatchSelectWidth={false}
               >
                 {metaData.regions.map((region) => (
                   <Option key={region} value={region}>

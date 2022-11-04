@@ -4,7 +4,7 @@ import { Button, Col, Row, notification, Modal } from 'antd';
 import { DashboardProps } from '../Dashboard';
 import { useNavigate } from 'react-router-dom';
 import html2canvas from 'html2canvas'
-import {EditOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import {DragOutlined, EditOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 
 const DEFAULT_PREVIEW_WIDTH = 800;
 const DEFAULT_PREVIEW_HEIGHT = 450;
@@ -28,9 +28,9 @@ const actions = [
  * Dashboard control: to set the block type and send a notification to parent (Dashboard) to add/edit block
  */
 const DashboardControl: React.FC<DashboardProps> = ({
-                                                      addBlock,
-                                                      saveDashboard,
-                                                    }) => {
+  addBlock,
+  saveDashboard,
+}) => {
   const [publishing, setPublishing] = useState(false);
   const navigate = useNavigate();
 
@@ -126,7 +126,8 @@ const DashboardControl: React.FC<DashboardProps> = ({
         </Row>
         <Row>
           <Col span={24}>
-            <p className="p-10"><QuestionCircleOutlined /><em>Hint : Click on the <EditOutlined /> button to modify a block !</em></p>
+            <p><QuestionCircleOutlined /> <em>Click on the <EditOutlined /> button to modify a block !</em></p>
+            <p><QuestionCircleOutlined /> <em>Drag and drop the <DragOutlined /> button to move a block !</em></p>
           </Col>
         </Row>
         <Row style={{marginTop: "auto"}}>
