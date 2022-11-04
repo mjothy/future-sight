@@ -37,7 +37,7 @@ class DashboardConfigView extends Component<any, any> {
         this.ref = [];
 
         this.state = {
-            graphsSize: [],
+            graphsSize: {},
             rowHeight: 0,
         };
     }
@@ -87,31 +87,35 @@ class DashboardConfigView extends Component<any, any> {
      * @param layout current updated layout
      */
     resizeStop = (e, layout) => {
-        this.updateLayoutView(layout);
+        this.updateLayoutView(layout.i);
     };
 
     /**
      * Update {width,height} of layout item content
-     * @param layout
+     * @param key
      */
-    updateLayoutView = (layout) => {
-        const key = layout.i;
-        const graphsSize = [...this.state.graphsSize];
-        graphsSize[layout.i] = {
+    updateLayoutView = (key) => {
+        const graphsSize = {...this.state.graphsSize};
+        graphsSize[key] = {
             width: this.ref[key].clientWidth,
             height: this.ref[key].clientHeight,
         };
-        this.setState({graphsSize});
+        this.setState({graphsSize: graphsSize});
     };
 
     /**
      * Update {width,height} of all blocks content on every block dimentions change
      */
     updateAllLayoutsView = () => {
-        const layout = [...this.props.layout];
-        layout.map((layout) => {
-            this.updateLayoutView(layout);
-        });
+        const graphsSize = {...this.state.graphsSize};
+        for (const layout of this.props.layout) {
+            const key = layout.i
+            graphsSize[key] = {
+                width: this.ref[key].clientWidth,
+                height: this.ref[key].clientHeight,
+            };
+        }
+        this.setState({graphsSize});
     };
 
     onBlockClick = (e, id) => {
@@ -124,8 +128,6 @@ class DashboardConfigView extends Component<any, any> {
     onWidthChange = (width, margin, cols, containerPadding) => {
         //  Update height to keep grid ratio to 16/9
         this.setState({rowHeight: width / cols / GRID_RATIO});
-        console.log(this.state.rowHeight)
-        this.updateAllLayoutsView();
     }
 
     render() {

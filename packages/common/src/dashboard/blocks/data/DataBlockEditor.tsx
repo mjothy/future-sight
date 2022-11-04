@@ -2,7 +2,6 @@ import {Component} from 'react';
 import {Select, Space} from 'antd';
 import DataBlockTableSelection from '../component/DataBlockTableSelection';
 
-//TODO variable selection do not change because currentBlock doesn't change
 const {Option} = Select;
 
 /**

@@ -43,7 +43,7 @@ const DashboardControl: React.FC<DashboardProps> = ({
     const dashboard = document.querySelector(".dashboard-grid") as HTMLElement
     if (dashboard) {
       dashboard.classList.add('publishing');
-      let timer = setInterval(function() {
+      const timer = setInterval(function() {
         if (dashboard.classList.contains('publishing')) {
           //run some other function
           makeAndResizePreview(dashboard).then(function(dataURL) {
@@ -51,7 +51,7 @@ const DashboardControl: React.FC<DashboardProps> = ({
           });
           clearInterval(timer);
         }
-      }, 200); // 200ms is the transition duration of closing the sider
+      }, 200);
     } else {
       save()
     }

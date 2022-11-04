@@ -14,6 +14,7 @@ import DashboardConfigView from './DashboardConfigView';
 * or do we want to see full dashboard (might be a problem for big height dashboard)
 * */
 
+// TODO Change published URL to youtube embedded standard embed/... instead of view?.../embedded
 
 interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
     getData: (data: DataModel[]) => any[];
@@ -43,7 +44,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
 
         if (!!dashboard) {
             // store the selected data
-            let f_dashboard: DashboardModel = dashboard
+            const f_dashboard: DashboardModel = dashboard
             let f_blockSelectedId: string;
             if (blockSelectedId === '') {
                 f_blockSelectedId = idBlock;

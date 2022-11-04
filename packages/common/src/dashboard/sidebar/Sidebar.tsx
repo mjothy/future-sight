@@ -35,7 +35,7 @@ export default class Sidebar extends Component<any, any> {
             () => {
                 window.dispatchEvent(new Event('resize'));
             },
-            200 //TODO check if it's still useful
+            200 // 200ms is the transition duration of closing the sider
         );
     }
 
