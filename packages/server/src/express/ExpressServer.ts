@@ -28,8 +28,8 @@ export default class ExpressServer {
     this.clientPath = clientPath;
     this.dbClient = dbClient;
     this.dataProxy = dataProxy;
-    this.app.use(bodyParser.json({limit: '50mb'}));
-    this.app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+    this.app.use(bodyParser.json({ limit: '50mb' }));
+    this.app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
     if (auth) {
       this.app.use(this.auth);
     }
@@ -93,13 +93,33 @@ export default class ExpressServer {
       res.send(this.dataProxy.getModels());
     });
 
+    const appendDashboardIdToIndexList = async (id: string, indexListKey: string, value: string) => {
+      // Initialize the key if it does not exist
+      await this.dbClient.getClient().json.set(indexListKey, `.${value}`, [], {
+        NX: true, // only set the key if it does not already exist
+      });
+      // Append the dashboard id to the list
+      await this.dbClient
+        .getClient()
+        .json.arrAppend(indexListKey, `.${value}`, id);
+    };
+
     // Posts methods
     this.app.post(`/api/dashboard/save`, async (req, res, next) => {
       try {
         const id = await this.dbClient.getClient().incr('dashboards:id');
+        // Save the dashboard
+        req.body.id = id; // change id
         await this.dbClient
           .getClient()
           .json.set('dashboards', `.${id}`, req.body);
+
+        // Update the indexes
+        for (const tag of req.body.userData.tags) {
+          await appendDashboardIdToIndexList(id, 'tags', tag) // Set the tags indexes
+        }
+        // Set the authors indexes
+        await appendDashboardIdToIndexList(id, 'authors', req.body.userData.author);
         res.send(JSON.stringify({ id: id }));
       } catch (err) {
         console.error(err);
@@ -129,11 +149,11 @@ export default class ExpressServer {
           idsToFetch.push(latestId - i);
         }
         const dashboards: any[] = [];
-        for (let i = latestId; i > latestId - 5 ; i--) {
+        for (let i = latestId; i > latestId - 5; i--) {
           try {
             const dashboard = await this.dbClient
-                .getClient()
-                .json.get('dashboards', { path: i.toString() });
+              .getClient()
+              .json.get('dashboards', { path: i.toString() });
             dashboards.push(dashboard)
           } catch (e) {
             // no dashboard found for id
@@ -173,8 +193,8 @@ export default class ExpressServer {
           results[dashboards[0]] = data;
         } else {
           results = Object.entries(data).reduce(
-              (obj, [key, dashboard]) => Object.assign(obj, { [key]: dashboard }),
-              {}
+            (obj, [key, dashboard]) => Object.assign(obj, { [key]: dashboard }),
+            {}
           );
         }
 

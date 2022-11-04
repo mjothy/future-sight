@@ -100,7 +100,6 @@ export default class ControlBlockEditor extends Component<any, any> {
             </Col>
             <Col span={16}>
               <Select
-                key={metaData.variables.toString()}
                 mode="multiple"
                 className="width-100"
                 placeholder="Variables"
@@ -124,7 +123,6 @@ export default class ControlBlockEditor extends Component<any, any> {
             </Col>
             <Col span={16} className={'checkbox-col-label'}>
               <Select
-                key={metaData.regions.toString()}
                 mode="multiple"
                 className="width-100"
                 placeholder="Regions"

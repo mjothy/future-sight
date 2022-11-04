@@ -35,9 +35,11 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
   const draftFromURLOnClick = () => {
     const parse = new URL(draftFromURL).searchParams.get('id');
     if (parse) {
-      if (parse in publishedDashboards) {
+      const dashboards = publishedDashboards as Array<DashboardModel | undefined>;
+      const dashboard = dashboards.find((d: any) => d.id == parse);
+      if (dashboard) {
         const uuid = createUUID();
-        setDraft(uuid, publishedDashboards[parse]);
+        setDraft(uuid, dashboard);
         navigate('draft?id=' + uuid);
       }
     } else {
