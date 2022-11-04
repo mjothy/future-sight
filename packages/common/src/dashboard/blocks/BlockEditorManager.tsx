@@ -99,7 +99,7 @@ export default class BlockEditorManager extends Component<any, any> {
               okText="Yes"
               cancelText="No"
             >
-              <Tooltip title="Delete block">
+              <Tooltip placement="left" title="Delete block">
                 <Button type="default" icon={<DeleteOutlined />} danger size="large" />
               </Tooltip>
             </Popconfirm>

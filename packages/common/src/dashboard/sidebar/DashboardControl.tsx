@@ -40,10 +40,10 @@ const DashboardControl: React.FC<DashboardProps> = ({
 
   const onClickHandler = () => {
     setPublishing(true);
-    const dashboard = document.querySelector(".dashboard-content") as HTMLElement
+    const dashboard = document.querySelector(".dashboard-grid") as HTMLElement
     if (dashboard) {
       dashboard.classList.add('publishing');
-      let timer = setInterval(function() {
+      const timer = setInterval(function() {
         if (dashboard.classList.contains('publishing')) {
           //run some other function
           makeAndResizePreview(dashboard).then(function(dataURL) {
@@ -105,53 +105,53 @@ const DashboardControl: React.FC<DashboardProps> = ({
   }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        flex: "1"
-      }}
-    >
-      <Row >
-        {actions.map((action) => (
-          <Col key={action.type} span="8">
-            <AddButton
-              label={action.label}
-              type={action.type}
-              clicked={() => clicked(action.type)}
-            />
+      <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: 'calc(100% - 64px)',
+            flex: "1"
+          }}
+      >
+        <Row >
+          {actions.map((action) => (
+              <Col key={action.type} span="8">
+                <AddButton
+                    label={action.label}
+                    type={action.type}
+                    clicked={() => clicked(action.type)}
+                />
+              </Col>
+          ))}
+        </Row>
+        <Row>
+          <Col span={24}>
+            <p><QuestionCircleOutlined /> <em>Click on the <EditOutlined /> button to modify a block !</em></p>
+            <p><QuestionCircleOutlined /> <em>Drag and drop the <DragOutlined /> button to move a block !</em></p>
           </Col>
-        ))}
-      </Row>
-      <Row>
-        <Col span={24}>
-          <p><QuestionCircleOutlined /> <em>Click on the <EditOutlined /> button to modify a block !</em></p>
-          <p><QuestionCircleOutlined /> <em>Drag and drop the <DragOutlined /> button to move a block !</em></p>
-        </Col>
-      </Row>
-      <Row style={{marginTop: "auto"}}>
-        <Col span={24}>
-          <Button
-            type="primary"
-            danger
-            className="width-100"
-            onClick={() =>
-              Modal.confirm({
-                title: 'Do you want to publish the dashboard?',
-                content: "The dashboard won't be editable anymore.",
-                onOk() {
-                  onClickHandler();
-                },
-              })
-            }
-            loading={publishing}
-          >
-            Publish
-          </Button>
-        </Col>
-      </Row>
-    </div>
+        </Row>
+        <Row style={{marginTop: "auto"}}>
+          <Col span={24}>
+            <Button
+                type="primary"
+                danger
+                className="width-100"
+                onClick={() =>
+                    Modal.confirm({
+                      title: 'Do you want to publish the dashboard?',
+                      content: "The dashboard won't be editable anymore.",
+                      onOk() {
+                        onClickHandler();
+                      },
+                    })
+                }
+                loading={publishing}
+            >
+              Publish
+            </Button>
+          </Col>
+        </Row>
+      </div>
   );
 };
 
