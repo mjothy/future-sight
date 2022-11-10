@@ -191,17 +191,11 @@ body {
 
 .block-grab button{
   cursor: grab;
-  opacity: 50%;
 }
 
 .block-grab button:active{
   cursor: grabbing;
 }
-
-.block-grab button:hover{
-  opacity: 100%;
-}
-
 
 .sidebar-toggle {
   position: fixed;
