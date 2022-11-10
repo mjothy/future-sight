@@ -138,11 +138,13 @@ export default class DashboardSelectionControl extends Component<
         const newDataStructure = data.dataStructure;
         const toDeleteBlocks = new Set<string>();
         Object.values(this.state.dashboard.blocks).forEach((block: BlockModel | any) => {
-          block.config.metaData[this.state.selectedFilter].forEach(value => {
-            if (!newDataStructure[this.state.selectedFilter].selection.includes(value)) {
-              toDeleteBlocks.add(block.id);
-            }
-          })
+          if (block.blockType !== "text") {
+            block.config.metaData[this.state.selectedFilter].forEach(value => {
+              if (!newDataStructure[this.state.selectedFilter].selection.includes(value)) {
+                toDeleteBlocks.add(block.id);
+              }
+            })
+          }
         })
 
         console.log("toDelete: ", toDeleteBlocks);
@@ -255,7 +257,7 @@ export default class DashboardSelectionControl extends Component<
       layout.splice(index, 1);
 
       // delete childs
-      if (blocks[blockId].blockType === "control") {
+      if (blocks[blockId] !== undefined && blocks[blockId].blockType === "control") {
         const blockChilds = Object.values(blocks).filter((block: BlockModel | any) => block.controlBlock === blocks[blockId].id).map((block: BlockModel | any) => block.id);
         blockChilds.forEach(id => {
           delete blocks[id];
