@@ -89,7 +89,7 @@ export default class ExpressServer {
     });
     const appendDashboardIdToIndexList = async (id: string, indexListKey: string, value: string) => {
       // Initialize the key if it does not exist
-      const valueTransform = value.replaceAll(" ", "%");
+      const valueTransform = value.replace(/ /g, '%');
       await this.dbClient.getClient().json.set(indexListKey, `.${valueTransform}`, [], {
         NX: true, // only set the key if it does not already exist
       });
@@ -172,8 +172,8 @@ export default class ExpressServer {
         const tags = data[1];
         const authorsTransform = {};
         const tagsTransform = {};
-        Object.keys(authors).forEach(key => authorsTransform[key.replaceAll("%", " ")] = authors[key])
-        Object.keys(tags).forEach(key => tagsTransform[key.replaceAll("%", " ")] = tags[key])
+        Object.keys(authors).forEach(key => authorsTransform[key.replace(/%/g, ' ')] = authors[key])
+        Object.keys(tags).forEach(key => tagsTransform[key.replace(/%/g, ' ')] = tags[key])
         res.send({ authors: authorsTransform, tags: tagsTransform });
       } catch (err) {
         console.error(err);
