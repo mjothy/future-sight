@@ -97,8 +97,10 @@ export default class DashboardSelectionControl extends Component<
       const toRemove: string[] = []
       for (const blockId in blocks) {
         const block = blocks[blockId];
-        if (deletion.model in block.config.metaData.models) {
-          toRemove.push(blockId)
+        if (block.blockType !== 'text') {
+          if (deletion.model in block.config.metaData.models) {
+            toRemove.push(blockId)
+          }
         }
       }
       for (const blockId of toRemove) {

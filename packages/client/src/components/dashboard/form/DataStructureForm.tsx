@@ -95,6 +95,7 @@ class DataStructureForm extends Component<any, any> {
     delete data[record.model]
     this.props.handleStructureData(data, record);
     this.resetForm();
+    this.props.updateSelectedBlock("")
     //add block suppression popup
   }
 
