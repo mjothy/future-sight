@@ -1,5 +1,6 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-extra-boolean-cast */
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { LinkOutlined } from '@ant-design/icons';
 import { Button, PageHeader, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -9,6 +10,13 @@ import BlockModel from '../models/BlockModel';
 import ConfigurationModel from '../models/ConfigurationModel';
 import DashboardModel from '../models/DashboardModel';
 import DashboardConfigView from './DashboardConfigView';
+
+/*TODO Check that embedded and published view have the same purpose and always look ok,
+* For instance, do we want full width with scrolling when in published view
+* or do we want to see full dashboard (might be a problem for big height dashboard)
+* */
+
+// TODO Change published URL to youtube embedded standard embed/... instead of view?.../embedded
 
 interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
     setEnableSwitchEmbeddedMode: (enable: boolean) => void;
@@ -37,7 +45,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
 
         if (!!dashboard) {
             // store the selected data
-            let f_dashboard: DashboardModel = dashboard
+            const f_dashboard: DashboardModel = dashboard
             let f_blockSelectedId: string;
             if (blockSelectedId === '') {
                 f_blockSelectedId = idBlock;
@@ -45,9 +53,9 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                 f_blockSelectedId = blockSelectedId;
             }
 
-            let selectedBlock = f_dashboard.blocks[f_blockSelectedId];
+            const selectedBlock = f_dashboard.blocks[f_blockSelectedId];
             if (selectedBlock.blockType !== 'text') {
-                let config = selectedBlock.config as ConfigurationModel
+                const config = selectedBlock.config as ConfigurationModel
                 let metaData = config.metaData;
                 metaData = { ...metaData, ...data };
                 config.metaData = metaData;
@@ -57,7 +65,6 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
             setDashboard({ ...dashboard, blocks: f_dashboard.blocks });
         }
     };
-
 
 
     useEffect(() => {
@@ -126,6 +133,8 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
             )}
             <div className="dashboard-content">
                 {(isLoading || !dashboard) && <Spin />}
+            {/*<div className="dashboard-content" style={{width: `${TEST_RATIO*100}vh`}}>*/}
+                {(isLoading || !dashboard) && <Spin/>}
                 {dashboard && (
                     <DashboardConfigView
                         dashboard={dashboard}

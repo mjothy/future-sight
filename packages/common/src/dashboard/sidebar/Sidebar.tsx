@@ -11,6 +11,7 @@ import {
 } from '@ant-design/icons';
 import { Button, Drawer, Space, Tooltip } from 'antd';
 import DashboardGlobalInfo from './DashboardGlobalInfo';
+import Sider from "antd/es/layout/Sider";
 
 export default class Sidebar extends Component<any, any> {
   static propTypes = {
@@ -33,6 +34,12 @@ export default class Sidebar extends Component<any, any> {
         visible: true,
       });
     }
+    setTimeout(
+      () => {
+        window.dispatchEvent(new Event('resize'));
+      },
+      200 // 200ms is the transition duration of closing the sider
+    );
   }
 
   toggleVisible = () => {
@@ -94,12 +101,11 @@ export default class Sidebar extends Component<any, any> {
         </Tooltip>
         <Tooltip title="Close menu" placement={"left"}>
           <Button
-              onClick={()=> {
-                  this.toggleVisible();
-                  !!this.props.onCloseMenu && this.props.onCloseMenu();
-              }
-          }
-              icon={<CloseOutlined />}
+            onClick={() => {
+              this.toggleVisible();
+              !!this.props.onCloseMenu && this.props.onCloseMenu();
+            }}
+            icon={<CloseOutlined />}
           />
         </Tooltip>
       </Space>
@@ -107,35 +113,37 @@ export default class Sidebar extends Component<any, any> {
   }
 
   render() {
-    return (
-      <div>
-        <Button
-            className={'sidebar-toggle'}
-            icon={this.state.visible ? <MenuUnfoldOutlined /> : <MenuFoldOutlined style={{color: "888888"}}/>}
-            onClick={()=>{
-                this.toggleVisible();
-                this.props.onCloseMenu();
-            }}
-        />
-        <Drawer
-          placement={this.state.placement}
-          width={500}
-          visible={this.state.visible}
-          closable={false}
-          mask={false}
-          className={'drawer'}
-          title={
-            this.getTitle()
-          }
-          extra={
-            this.getExtra()
-          }
-        >
+    return ([
+      <Sider
+        key={"dashboard-sider"}
+        collapsible
+        collapsed={!this.state.visible}
+        collapsedWidth="0"
+        trigger={null}
+        className={"dashboard-sider"}
+        width={"30%"}
+        theme={"light"}
+      >
+        <div className={"sider-header"}>
+          {this.getTitle()}
+        </div>
+        <div className={"sider-body"}>
           {this.props.children}
-        </Drawer>
+        </div>
+      </Sider>,
+      <Button
+        key={"open-sider"}
+        className={'sidebar-toggle'}
+        icon={this.state.visible ? <MenuUnfoldOutlined /> : <MenuFoldOutlined style={{ color: "888888" }} />}
+        onClick={() => {
+          this.toggleVisible();
+          this.props.onCloseMenu();
+        }}
+      />,
+      <>                {this.state.isShowGlobalInfo && <DashboardGlobalInfo openGlobalInfoModal={this.openGlobalInfoModal} closeGlobalInfoModal={this.closeGlobalInfoModal} isShowGlobalInfo={this.state.isShowGlobalInfo}  {...this.props} />}
+      </>
+    ]
 
-        {this.state.isShowGlobalInfo && <DashboardGlobalInfo openGlobalInfoModal={this.openGlobalInfoModal} closeGlobalInfoModal={this.closeGlobalInfoModal} isShowGlobalInfo={this.state.isShowGlobalInfo}  {...this.props} />}
-      </div>
-    );
+    )
   }
 }
