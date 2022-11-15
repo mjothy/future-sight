@@ -1,10 +1,9 @@
-import { CloseCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Col, Divider, Input, Row, Select, Tooltip } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { Button, Col, Divider, Row } from 'antd';
 import Checkbox from 'antd/es/checkbox';
 import { Component } from 'react';
 import BlockModel from '../../../models/BlockModel';
-
-const { Option } = Select;
+import SelectInput from '../utils/SelectInput';
 
 /**
  * The form in sidebar to add/edit control block
@@ -88,33 +87,16 @@ export default class ControlBlockEditor extends Component<any, any> {
         >
           <h4>{option}</h4>
         </Checkbox>
-        <Input.Group compact>
-          <Select
-            mode="multiple"
-            className="width-90"
-            placeholder={option}
-            value={metaData[option]}
-            onChange={(selectedData) =>
-              this.props.onChange(option, selectedData)
-            }
-            onDeselect={(selectedData) => this.updateControlView(option, selectedData)}
-          >
-            {Array.from(this.props.data[option]).map((element: any) => (
-              <Option key={element} value={element}>
-                {element}
-              </Option>
-            ))}
-          </Select>
-          <Tooltip title="That will reset all other selections">
-            <Button
-              type="default"
-              onClick={(e) => this.clearClick(option, e)}
 
-              icon={<CloseCircleOutlined />}
-            />
-          </Tooltip>
-        </Input.Group>
-
+        <SelectInput
+          type={option}
+          value={metaData[option]}
+          options={this.props.data[option]}
+          onChange={this.props.onChange}
+          isClear={true}
+          onClear={this.clearClick}
+          onDeselect={this.updateControlView}
+        />
       </div>
     );
   };

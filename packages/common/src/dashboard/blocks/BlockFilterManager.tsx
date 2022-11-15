@@ -36,16 +36,17 @@ export default class BlockFilterManager extends Component<any, any> {
 
     async componentDidMount(): Promise<void> {
         await this.initialize();
+        await this.updateDropdownData();
         await this.checkIfSelectedInOptions();
-        this.updateDropdownData();
+
     }
 
     async componentDidUpdate(prevProps, prevState, snapshot) {
         // the second condition to not update the dropdown list of ControlData
-        if (prevProps.blockSelectedId !== this.props.blockSelectedId || this.props.selectedFilter !== prevProps.selectedFilter) {
+        if (prevProps.blockSelectedId !== this.props.blockSelectedId) {
             await this.initialize();
+            await this.updateDropdownData();
             await this.checkIfSelectedInOptions();
-            this.updateDropdownData();
         }
 
         if (this.props.dashboard != prevProps.dashboard) {
@@ -58,8 +59,7 @@ export default class BlockFilterManager extends Component<any, any> {
      * Initialise the state of component
      */
     initialize = () => {
-        const currentBlock =
-            this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
+        const currentBlock = this.props.currentBlock.config.metaData;
         const selectOptions = Object.keys(this.props.filters);
 
         // Set inputs that still emplty
@@ -104,7 +104,7 @@ export default class BlockFilterManager extends Component<any, any> {
 
     checkIfSelectedInOptions = () => {
         const options = this.state.data;
-        const selected = this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
+        const selected = this.props.currentBlock.config.metaData;
 
         const blockUpdatedData = { ...this.props.currentBlock.config.metaData };
 
@@ -136,8 +136,7 @@ export default class BlockFilterManager extends Component<any, any> {
         // The selected data
         const filter = {};
         // To set the filter options (what is already selected, so fetch the data based on what in selections )
-        const metaData =
-            this.props.dashboard.blocks[this.props.blockSelectedId].config.metaData;
+        const metaData = this.props.currentBlock.config.metaData;
         Object.keys(this.props.filters).forEach((option) => {
             if (this.state.controlBlock.id === undefined) {
                 filter[option] = metaData[option];

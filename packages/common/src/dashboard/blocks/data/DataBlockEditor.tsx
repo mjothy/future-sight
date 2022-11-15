@@ -1,8 +1,6 @@
 import { Component } from 'react';
-import { Button, Divider, Input, Row, Select, Tag, Tooltip } from 'antd';
-import { CloseCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-
-const { Option } = Select;
+import { Divider, Row, Tag } from 'antd';
+import SelectInput from '../utils/SelectInput';
 
 /**
  * The form in sidebar to add/edit dara block
@@ -10,8 +8,7 @@ const { Option } = Select;
 export default class DataBlockEditor extends Component<any, any> {
 
   onDropdownVisibleChange = (option, e) => {
-    const metaData =
-      this.props.dashboard.blocks[this.props.currentBlock.id].config.metaData;
+    const metaData = this.props.currentBlock.config.metaData;
     if (!e && metaData[option].length > 0) {
       // Update the order of selection
       this.props.updateBlockMetaData({
@@ -27,8 +24,7 @@ export default class DataBlockEditor extends Component<any, any> {
   clearClick = (option, e) => {
     const data = {};
 
-    const metaData =
-      this.props.dashboard.blocks[this.props.currentBlock.id].config.metaData;
+    const metaData = this.props.currentBlock.config.metaData;
     const index = metaData.selectOrder.indexOf(option);
     if (index >= 0) {
       const selectOrder = [...metaData.selectOrder];
@@ -61,51 +57,22 @@ export default class DataBlockEditor extends Component<any, any> {
       }
     }
 
-    const metaData =
-      this.props.dashboard.blocks[this.props.currentBlock.id].config.metaData;
+    const metaData = this.props.currentBlock.config.metaData;
 
     return (
       !isControlled && (
         <div className={selected ? 'transition' : ''}>
           <Row className="width-100 mt-16">
             <h4>{option}</h4>
-            <Input.Group compact>
-              <Select
-                mode="multiple"
-                className={selected ? "width-90" : "width-100"}
-                placeholder={option}
-                value={metaData[option]}
-                // Update selection on state
-                onChange={(selectedData) =>
-                  this.props.onChange(option, selectedData)
-                }
-                // on close: save data
-                onDropdownVisibleChange={(e) =>
-                  this.onDropdownVisibleChange(option, e)
-                }
-                dropdownMatchSelectWidth={false}
-                notFoundContent={(
-                  <div>
-                    <ExclamationCircleOutlined />
-                    <p>This item does not exists for your filter selections.</p>
-                  </div>
-                )}
-              >
-                {this.props.data[option].map((value) => (
-                  <Option key={value} value={value}>
-                    {value}
-                  </Option>
-                ))}
-              </Select>
-              {selected && <Tooltip title="That will reset all other selections">
-                <Button
-                  type="default"
-                  onClick={(e) => this.clearClick(option, e)}
-
-                  icon={<CloseCircleOutlined />}
-                />
-              </Tooltip>}
-            </Input.Group>
+            <SelectInput
+              type={option}
+              value={metaData[option]}
+              options={this.props.data[option]}
+              onChange={this.props.onChange}
+              isClear={selected}
+              onClear={this.clearClick}
+              onDropdownVisibleChange={this.onDropdownVisibleChange}
+            />
           </Row>
         </div>
       )
@@ -134,8 +101,7 @@ export default class DataBlockEditor extends Component<any, any> {
   };
 
   render() {
-    const metaData =
-      this.props.dashboard.blocks[this.props.currentBlock.id].config.metaData;
+    const metaData = this.props.currentBlock.config.metaData;
 
     return (
       <div>
