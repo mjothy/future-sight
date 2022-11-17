@@ -44,36 +44,44 @@ export default class ControlBlockEditor extends Component<any, any> {
     const metaData = block.config.metaData;
 
     metaData[option] = [];
+    // Update the control view
     metaData.master[option].values = [];
 
-    // TODO update children data blocks
     this.props.updateBlockMetaData({
       ...metaData
     }, this.props.currentBlock.id);
 
     this.props.updateDropdownData();
+
+    // update children data blocks
+    const childBlocks = Object.values(this.props.dashboard.blocks).filter((block: BlockModel | any) => block.controlBlock === this.props.currentBlock.id)
+    childBlocks.forEach(async (block: BlockModel | any) => {
+      const blockMetaData = { ...block.config.metaData };
+      blockMetaData[option] = [];
+      await this.props.updateBlockMetaData({ ...blockMetaData }, block.id);
+    })
   };
 
+  /**
+   * Called on deselect a value from Select input
+   * @param option input type (models, scenarios, ...)
+   * @param selectedData deselected data
+   */
   updateControlView = async (option, selectedData) => {
     // Check if the unselected value is selected in the view, if its the case update ControlBlockView
     const metaData = { ...this.props.dashboard.blocks[this.props.currentBlock.id].config.metaData };
+    const newValues = metaData.master[option].values.filter(value => value !== selectedData);
+    metaData.master[option].values = newValues;
+    await this.props.updateBlockMetaData({ master: metaData.master }, this.props.currentBlock.id);
 
-    const isSelected = metaData.master[option].values.includes(selectedData);
-    if (isSelected) {
-      const newValues = metaData.master[option].values.filter(value => value !== selectedData);
-      metaData.master[option].values = newValues;
-      await this.props.updateBlockMetaData({ master: metaData.master }, this.props.currentBlock.id);
-
-      // update all the data blocks
-      const childBlocks = Object.values(this.props.dashboard.blocks).filter((block: BlockModel | any) => block.controlBlock === this.props.currentBlock.id)
-      childBlocks.forEach(async (block: BlockModel | any) => {
-        const blockMetaData = { ...block.config.metaData };
-        const newValues = blockMetaData[option].filter(value => value !== selectedData);
-        blockMetaData[option] = newValues;
-        blockMetaData[option] = newValues;
-        await this.props.updateBlockMetaData({ ...blockMetaData }, block.id);
-      })
-    }
+    // update all the data blocks
+    const childBlocks = Object.values(this.props.dashboard.blocks).filter((block: BlockModel | any) => block.controlBlock === this.props.currentBlock.id)
+    childBlocks.forEach(async (block: BlockModel | any) => {
+      const blockMetaData = { ...block.config.metaData };
+      const newValues = blockMetaData[option].filter(value => value !== selectedData);
+      blockMetaData[option] = newValues;
+      await this.props.updateBlockMetaData({ ...blockMetaData }, block.id);
+    })
   }
 
   selectDropDown = (option) => {
@@ -111,7 +119,6 @@ export default class ControlBlockEditor extends Component<any, any> {
           <Col span={24}>
             <Button
               type="primary"
-
               className="width-100"
               onClick={this.onAddControlledBlock}
             >

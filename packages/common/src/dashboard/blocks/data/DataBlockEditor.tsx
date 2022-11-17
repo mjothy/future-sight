@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import { Divider, Row, Tag } from 'antd';
 import SelectInput from '../utils/SelectInput';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 /**
  * The form in sidebar to add/edit dara block
@@ -87,7 +88,10 @@ export default class DataBlockEditor extends Component<any, any> {
         return (
           <div className='mt-20'>
             <strong>{key}: </strong> <br />
-            {controlBlock[key].map(element => {
+            {controlBlock[key].length <= 0 ? <div>
+
+              <p><ExclamationCircleOutlined /> No data selected</p>
+            </div> : controlBlock[key].map(element => {
               let color = "default";
               if (controlBlock.master[key].values.includes(element)) {
                 color = "blue";
