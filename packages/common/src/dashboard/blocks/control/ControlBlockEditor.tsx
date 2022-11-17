@@ -65,12 +65,12 @@ export default class ControlBlockEditor extends Component<any, any> {
   /**
    * Called on deselect a value from Select input
    * @param option input type (models, scenarios, ...)
-   * @param selectedData deselected data
+   * @param unselectedData deselected data
    */
-  updateControlView = async (option, selectedData) => {
+  updateControlView = async (option, unselectedData) => {
     // Check if the unselected value is selected in the view, if its the case update ControlBlockView
     const metaData = { ...this.props.dashboard.blocks[this.props.currentBlock.id].config.metaData };
-    const newValues = metaData.master[option].values.filter(value => value !== selectedData);
+    const newValues = metaData.master[option].values.filter(value => value !== unselectedData);
     metaData.master[option].values = newValues;
     await this.props.updateBlockMetaData({ master: metaData.master }, this.props.currentBlock.id);
 
@@ -78,7 +78,7 @@ export default class ControlBlockEditor extends Component<any, any> {
     const childBlocks = Object.values(this.props.dashboard.blocks).filter((block: BlockModel | any) => block.controlBlock === this.props.currentBlock.id)
     childBlocks.forEach(async (block: BlockModel | any) => {
       const blockMetaData = { ...block.config.metaData };
-      const newValues = blockMetaData[option].filter(value => value !== selectedData);
+      const newValues = blockMetaData[option].filter(value => value !== unselectedData);
       blockMetaData[option] = newValues;
       await this.props.updateBlockMetaData({ ...blockMetaData }, block.id);
     })

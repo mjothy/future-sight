@@ -68,6 +68,7 @@ export default class DashboardSelectionControl extends Component<
         );
 
         // Get the selected filter(s)
+        // Add function (fonction utilitaire)
         const filterOptions = Object.keys(dashboardJson.dataStructure)
           .filter((key) => dashboardJson.dataStructure[key].isFilter)
           .map((key) => key);
@@ -104,57 +105,24 @@ export default class DashboardSelectionControl extends Component<
     this.setState({ blockSelectedId });
   };
 
-  updateDashboardMetadata = (data, deletion?: any) => {
-    if (deletion) {
-      //remove all blocks associated to deletion.model
-      const blocks = { ...this.state.dashboard.blocks };
-      const layout = [...this.state.dashboard.layout];
-      const toRemove: string[] = []
-      for (const blockId in blocks) {
-        const block = blocks[blockId];
-        if (deletion.model in block.config.metaData.models) {
-          toRemove.push(blockId);
-        }
-      }
-      for (const blockId of toRemove) {
-        delete blocks[blockId];
-        const index = layout.findIndex((element) => element.i === blockId);
-        layout.splice(index, 1);
-      }
-      this.setState({
-        dashboard: {
-          ...this.state.dashboard,
-          blocks: blocks,
-          layout: layout,
-          ...data,
-        },
-      });
+  updateDashboardMetadata = (data) => {
+    if (data.dataStructure === undefined) {
+      this.setState({ dashboard: { ...this.state.dashboard, ...data } });
     } else {
-      // Check if dataStructure changed, if True delete all blocks that used the ancien data
-      if (data.dataStructure === undefined) {
-        this.setState({ dashboard: { ...this.state.dashboard, ...data } });
-      } else {
 
-        const newDataStructure = data.dataStructure;
-        const toDeleteBlocks = new Set<string>();
-        Object.values(this.state.dashboard.blocks).forEach((block: BlockModel | any) => {
-          if (block.blockType !== "text") {
-            block.config.metaData[this.state.selectedFilter].forEach(value => {
-              if (!newDataStructure[this.state.selectedFilter].selection.includes(value)) {
-                toDeleteBlocks.add(block.id);
-              }
-            })
-          }
-        })
-
-        console.log("toDelete: ", toDeleteBlocks);
-        this.setState({ dashboard: { ...this.state.dashboard, ...data } }, () => {
-          this.deleteBlocks(Array.from(toDeleteBlocks));
-        });
-      }
+      const newDataStructure = data.dataStructure;
+      const toDeleteBlocks = new Set<string>();
+      Object.values(this.state.dashboard.blocks).forEach((block: BlockModel | any) => {
+        if (block.blockType !== "text") {
+          block.config.metaData[this.state.selectedFilter].forEach(value => {
+            if (!newDataStructure[this.state.selectedFilter].selection.includes(value)) {
+              toDeleteBlocks.add(block.id);
+            }
+          })
+        }
+      });
     }
-  };
-
+  }
   /**
    * Update configuration metaData (selected models and scenarios)
    * @param data Block config metaData

@@ -8,8 +8,6 @@ import {
 import React from 'react';
 import SetupView from './form/SetupView';
 import { RoutingProps } from '../app/Routing';
-import { Button, Radio } from 'antd';
-import { FilterTwoTone } from '@ant-design/icons';
 
 interface DashboardViewProps
   extends ComponentPropsWithDataManager,
@@ -56,21 +54,6 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
     }
   }
 
-  handleStructureData = (data, deletion = undefined) => {
-    this.props.updateDashboardMetadata({ dataStructure: data }, deletion);
-  };
-
-  setupView = () => {
-    return (
-      <SetupView
-        {...this.props}
-        userData={this.props.dashboard.userData}
-        handleStructureData={this.handleStructureData}
-        visible={this.state.setupDashboardMode === 'setup'}
-      />
-    );
-  };
-
   render() {
     return (
       <>
@@ -78,7 +61,6 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
         <SetupView
           {...this.props}
           userData={this.props.dashboard.userData}
-          handleStructureData={this.handleStructureData}
         />
       </>
     );
