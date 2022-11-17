@@ -13,3 +13,5 @@ export { default as DataStructureModel } from './models/DataStructureModel';
 export { default as BlockDataModel } from './models/BlockDataModel';
 export { default as ConfigurationModel } from './models/ConfigurationModel'
 export { default as ReadOnlyDashboard } from './dashboard/ReadOnlyDashboard';
+export { getSelectedFilter } from './dashboard/blocks/utils/DashboardUtils';
+

@@ -4,6 +4,7 @@ import BlockModel from '../../models/BlockModel';
 import ConfigurationModel from '../../models/ConfigurationModel';
 import ControlBlockEditor from './control/ControlBlockEditor';
 import DataBlockEditor from './data/DataBlockEditor';
+import { getSelectedFilter } from './utils/DashboardUtils';
 
 export default class BlockFilterManager extends Component<any, any> {
     constructor(props) {
@@ -79,8 +80,9 @@ export default class BlockFilterManager extends Component<any, any> {
         this.checkIfBlockControlled();
 
         // Set options based on the initial filter, and after that updateDropdownData to filter by already selected data
-        if (this.props.selectedFilter !== '') {
-            const selectedFilter = this.props.selectedFilter;
+        const selectedFilter = getSelectedFilter(this.props.dashboard);
+
+        if (selectedFilter !== '') {
             const data = this.state.data;
 
             // Set the filter selection
@@ -185,12 +187,14 @@ export default class BlockFilterManager extends Component<any, any> {
                     }
                 });
 
+                const selectedFilter = getSelectedFilter(this.props.dashboard);
+
                 // Check if data exist in the top filter (data focus)
-                if (option === this.props.selectedFilter) {
-                    const selectedFilter =
-                        this.props.dashboard.dataStructure[this.props.selectedFilter]
+                if (option === selectedFilter) {
+                    const filterSelection =
+                        this.props.dashboard.dataStructure[selectedFilter]
                             .selection;
-                    if (!selectedFilter.includes(optionValue)) {
+                    if (!filterSelection.includes(optionValue)) {
                         isExist = false;
                     }
                 } else {

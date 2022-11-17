@@ -27,7 +27,6 @@ interface DashboardViewProps
   isDraft: boolean;
   readonly?: boolean;
   updateSelectedFilter: (filter: string) => void;
-  selectedFilter: string;
 }
 
 /**

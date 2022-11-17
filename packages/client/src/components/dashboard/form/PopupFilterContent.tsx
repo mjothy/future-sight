@@ -4,6 +4,7 @@ import {
   GlobalOutlined,
   LineChartOutlined,
 } from '@ant-design/icons';
+import { getSelectedFilter } from '@future-sight/common';
 import { Radio, RadioChangeEvent, Select, Space } from 'antd';
 import { Option } from 'antd/lib/mentions';
 import { Component } from 'react';
@@ -52,12 +53,13 @@ export default class PopupFilterContent extends Component<any, any> {
   };
 
   render() {
+    const selectedFilter = getSelectedFilter(this.props.dashboard);
     return (
       <div>
         <Radio.Group
           onChange={this.onChange}
           className="width-100"
-          value={this.props.selectedFilter}
+          value={selectedFilter}
         >
           <Space direction="vertical" className="width-100">
             <div className="mt-20">
@@ -65,7 +67,7 @@ export default class PopupFilterContent extends Component<any, any> {
                 <GlobalOutlined />
                 Regions
               </Radio>
-              {this.props.selectedFilter === 'regions' && (
+              {selectedFilter === 'regions' && (
                 <Select
                   mode="multiple"
                   className="width-100 mt-20"
@@ -87,7 +89,7 @@ export default class PopupFilterContent extends Component<any, any> {
                 <LineChartOutlined />
                 Variables
               </Radio>
-              {this.props.selectedFilter === 'variables' && (
+              {selectedFilter === 'variables' && (
                 <Select
                   mode="multiple"
                   className="width-100 mt-20"
@@ -108,7 +110,7 @@ export default class PopupFilterContent extends Component<any, any> {
                 <BranchesOutlined />
                 Scenarios
               </Radio>
-              {this.props.selectedFilter === 'scenarios' && (
+              {selectedFilter === 'scenarios' && (
                 <Select
                   mode="multiple"
                   className="width-100 mt-20"
@@ -129,7 +131,7 @@ export default class PopupFilterContent extends Component<any, any> {
                 <ControlOutlined />
                 Models
               </Radio>
-              {this.props.selectedFilter === 'models' && (
+              {selectedFilter === 'models' && (
                 <Select
                   mode="multiple"
                   className="width-100 mt-20"

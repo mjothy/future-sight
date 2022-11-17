@@ -1,6 +1,8 @@
 import {
   BlockModel,
   ComponentPropsWithDataManager,
+  DashboardModel,
+  getSelectedFilter,
   LayoutModel,
 } from '@future-sight/common';
 import { Component } from 'react';
@@ -112,14 +114,20 @@ export default class DashboardSelectionControl extends Component<
 
       const newDataStructure = data.dataStructure;
       const toDeleteBlocks = new Set<string>();
+      const selectedFilter = getSelectedFilter(this.state.dashboard);
+      console.log("selectedFilter: ", selectedFilter)
       Object.values(this.state.dashboard.blocks).forEach((block: BlockModel | any) => {
         if (block.blockType !== "text") {
-          block.config.metaData[this.state.selectedFilter].forEach(value => {
-            if (!newDataStructure[this.state.selectedFilter].selection.includes(value)) {
+          block.config.metaData[selectedFilter].forEach(value => {
+            if (!newDataStructure[selectedFilter].selection.includes(value)) {
               toDeleteBlocks.add(block.id);
             }
           })
         }
+      });
+      console.log("toDelete: ", toDeleteBlocks);
+      this.setState({ dashboard: { ...this.state.dashboard, ...data } }, () => {
+        this.deleteBlocks(Array.from(toDeleteBlocks));
       });
     }
   }
@@ -285,7 +293,7 @@ export default class DashboardSelectionControl extends Component<
         deleteBlock={this.deleteBlock}
         isDraft={this.state.isDraft}
         updateSelectedFilter={this.updateSelectedFilter}
-        selectedFilter={this.state.selectedFilter}
+        // selectedFilter={this.state.selectedFilter}
         {...this.props}
       />
     );

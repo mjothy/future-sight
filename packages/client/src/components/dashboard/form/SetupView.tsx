@@ -2,7 +2,7 @@ import { Component } from 'react';
 import PopupFilterContent from './PopupFilterContent';
 import { Modal, Button } from 'antd';
 import { FilterTwoTone } from '@ant-design/icons';
-import { DataStructureModel } from '@future-sight/common';
+import { DataStructureModel, getSelectedFilter } from '@future-sight/common';
 
 const { confirm } = Modal;
 
@@ -72,7 +72,8 @@ export default class SetupView extends Component<any, any> {
 
   updateDashboardDataStructure = () => {
     const newDataStructure = new DataStructureModel();
-    newDataStructure[this.props.selectedFilter] = this.state.dataStructure[this.props.selectedFilter];
+    const selectedFilter = getSelectedFilter(this.props.dashboard);
+    newDataStructure[selectedFilter] = this.state.dataStructure[selectedFilter];
     this.props.updateDashboardMetadata({
       dataStructure: newDataStructure,
     });
