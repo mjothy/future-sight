@@ -8,7 +8,7 @@ import {Button, Space} from 'antd';
 const ResponsiveGridLayout = WidthProvider(Responsive);
 const GRID_RATIO = 16 / 9
 const COLS = 12
-
+const INITIAL_ROW_HEIGHT = 1280 / COLS / GRID_RATIO
 /**
  * Manage react grid layout
  */
@@ -38,7 +38,7 @@ class DashboardConfigView extends Component<any, any> {
 
         this.state = {
             graphsSize: {},
-            rowHeight: 0,
+            rowHeight: INITIAL_ROW_HEIGHT,
         };
     }
 
@@ -48,11 +48,17 @@ class DashboardConfigView extends Component<any, any> {
 
         // Update graph dim after every resize
         window.addEventListener('resize', this.updateAllLayoutsView);
+        setTimeout(
+            () => {
+                window.dispatchEvent(new Event('resize'));
+            },
+            1
+        );
     }
 
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any) {
         // Update graphsize when rowheight is first updated
-        if (prevState.rowHeight == 0){
+        if (prevState.rowHeight == INITIAL_ROW_HEIGHT && this.state.rowHeight != INITIAL_ROW_HEIGHT){
             this.updateAllLayoutsView();
         }
     }

@@ -31,12 +31,6 @@ export default class Sidebar extends Component<any, any> {
                 visible: true,
             });
         }
-        setTimeout(
-            () => {
-                window.dispatchEvent(new Event('resize'));
-            },
-            200 // 200ms is the transition duration of closing the sider
-        );
     }
 
     toggleVisible = () => {
