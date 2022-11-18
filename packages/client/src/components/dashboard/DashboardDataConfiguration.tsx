@@ -26,8 +26,10 @@ class DashboardDataConfiguration extends Component<
   DashboardDataConfigurationProps,
   any
 > {
+  options: string[] = [];
   constructor(props) {
     super(props);
+    this.options = this.props.dataManager.getOptions();
     this.state = {
       filters: {
         regions: {},
@@ -175,7 +177,7 @@ class DashboardDataConfiguration extends Component<
     if (selectedFilter !== '' && this.state.isFetchData) {
       const data = this.state.filtreByDataFocus;
       data[selectedFilter] = dashboard.dataStructure[selectedFilter].selection;
-      Object.keys(this.state.filters).forEach((option) => {
+      this.options.forEach((option) => {
         if (option !== selectedFilter) {
           data[selectedFilter].forEach((filterValue) => {
             data[option] = Array.from(
@@ -209,6 +211,7 @@ class DashboardDataConfiguration extends Component<
         getPlotData={this.getPlotData}
         updateFilterByDataFocus={this.updateFilterByDataFocus}
         filtreByDataFocus={this.state.filtreByDataFocus}
+        options={this.options}
         {...this.props}
       />) || <div className="dashboard">
         <Spin className="centered" />

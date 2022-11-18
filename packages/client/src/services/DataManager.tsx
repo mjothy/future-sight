@@ -135,4 +135,8 @@ export default class DataManager implements IDataManager {
     }
   };
 
+  getOptions = () => {
+    return ["models", "scenarios", "variables", "regions"];
+  };
+
 }

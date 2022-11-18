@@ -10,12 +10,6 @@ import { Option } from 'antd/lib/mentions';
 import { Component } from 'react';
 
 export default class PopupFilterContent extends Component<any, any> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      options: Object.keys(this.props.filters)
-    }
-  }
 
   onRegionsChange = (regions: string[]) => {
     this.props.dataStructure.regions.selection = regions;
@@ -40,7 +34,7 @@ export default class PopupFilterContent extends Component<any, any> {
   onChange = (e: RadioChangeEvent) => {
     const filter = e.target.value;
     // tHE KEY can be: models/scenarios/regions/variables
-    Object.keys(this.props.dataStructure).map((key) => {
+    this.props.options.map((key) => {
       if (filter === key) {
         this.props.dataStructure[key].isFilter = true;
       } else {

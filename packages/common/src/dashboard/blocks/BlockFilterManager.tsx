@@ -23,7 +23,7 @@ export default class BlockFilterManager extends Component<any, any> {
             controlBlock: new BlockModel(),
 
             // TODO create a function that return selectOptions
-            selectOptions: Object.keys(this.props.filters),
+            selectOptions: this.props.options,
         };
     }
 
@@ -53,8 +53,7 @@ export default class BlockFilterManager extends Component<any, any> {
      */
     initialize = () => {
         const currentBlock = this.props.currentBlock.config.metaData;
-        const selectOptions = Object.keys(this.props.filters);
-
+        const selectOptions = this.props.options;
         // Set inputs that still emplty
         if (currentBlock.selectOrder.length > 0) {
             const newOptions: string[] = [];
@@ -113,7 +112,7 @@ export default class BlockFilterManager extends Component<any, any> {
         const filter = {};
         // To set the filter options (what is already selected, so fetch the data based on what in selections )
         const metaData = this.props.currentBlock.config.metaData;
-        Object.keys(this.props.filters).forEach((option) => {
+        this.props.options.forEach((option) => {
             if (this.state.controlBlock.id === undefined) {
                 filter[option] = metaData[option];
             } else {

@@ -22,4 +22,6 @@ export default interface IDataManager {
   fetchBrowseInitData: () => Promise<any>;
 
   browseData: (data: any) => Promise<any>;
+
+  getOptions: () => string[]
 }
