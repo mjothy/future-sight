@@ -53,7 +53,7 @@ export default class PopupFilterContent extends Component<any, any> {
   };
 
   render() {
-    const selectedFilter = getSelectedFilter(this.props.dashboard);
+    const selectedFilter = getSelectedFilter(this.props.dataStructure);
     return (
       <div>
         <Radio.Group

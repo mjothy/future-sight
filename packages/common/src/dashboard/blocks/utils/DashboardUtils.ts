@@ -1,8 +1,8 @@
-import DashboardModel from "../../../models/DashboardModel";
+import DataStructureModel from "../../../models/DataStructureModel";
 
-export function getSelectedFilter(dashboard: DashboardModel) {
-    const filterOptions = Object.keys(dashboard.dataStructure)
-        .filter((key) => dashboard.dataStructure[key].isFilter)
+export function getSelectedFilter(dataStructure: DataStructureModel) {
+    const filterOptions = Object.keys(dataStructure)
+        .filter((key) => dataStructure[key].isFilter)
         .map((key) => key);
     return filterOptions.length > 0 ? filterOptions[0] : '';
 }

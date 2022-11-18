@@ -21,6 +21,8 @@ export interface DashboardSelectionControlProps
   plotData: any[];
   blockData: (block: BlockModel) => any[];
   getPlotData: (blocks: BlockModel[]) => void;
+  updateFilterByDataFocus: (dashboard: DashboardModel, filtre: string) => void;
+  filtreByDataFocus: any;
 }
 
 export default class DashboardSelectionControl extends Component<
@@ -66,17 +68,10 @@ export default class DashboardSelectionControl extends Component<
           () => {
             // Get the data for graphs
             this.props.getPlotData(this.state.dashboard.blocks);
+            const selectedFilter = getSelectedFilter(this.state.dashboard.dataStructure);
+            this.props.updateFilterByDataFocus(this.state.dashboard, selectedFilter);
           }
         );
-
-        // Get the selected filter(s)
-        // Add function (fonction utilitaire)
-        const filterOptions = Object.keys(dashboardJson.dataStructure)
-          .filter((key) => dashboardJson.dataStructure[key].isFilter)
-          .map((key) => key);
-        if (filterOptions.length > 0) {
-          this.updateSelectedFilter(filterOptions[0]);
-        }
       } else {
         console.error('no draft found with id' + id);
       }
@@ -111,11 +106,10 @@ export default class DashboardSelectionControl extends Component<
     if (data.dataStructure === undefined) {
       this.setState({ dashboard: { ...this.state.dashboard, ...data } });
     } else {
-
+      const selectedFilter = getSelectedFilter(data.dataStructure);
+      // Update dataStructure (Data focus)      
       const newDataStructure = data.dataStructure;
       const toDeleteBlocks = new Set<string>();
-      const selectedFilter = getSelectedFilter(this.state.dashboard);
-      console.log("selectedFilter: ", selectedFilter)
       Object.values(this.state.dashboard.blocks).forEach((block: BlockModel | any) => {
         if (block.blockType !== "text") {
           block.config.metaData[selectedFilter].forEach(value => {
@@ -128,6 +122,7 @@ export default class DashboardSelectionControl extends Component<
       console.log("toDelete: ", toDeleteBlocks);
       this.setState({ dashboard: { ...this.state.dashboard, ...data } }, () => {
         this.deleteBlocks(Array.from(toDeleteBlocks));
+        this.props.updateFilterByDataFocus(this.state.dashboard, selectedFilter);
       });
     }
   }

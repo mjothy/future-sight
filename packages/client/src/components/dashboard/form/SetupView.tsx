@@ -72,7 +72,7 @@ export default class SetupView extends Component<any, any> {
 
   updateDashboardDataStructure = () => {
     const newDataStructure = new DataStructureModel();
-    const selectedFilter = getSelectedFilter(this.props.dashboard);
+    const selectedFilter = getSelectedFilter(this.state.dataStructure);
     newDataStructure[selectedFilter] = this.state.dataStructure[selectedFilter];
     this.props.updateDashboardMetadata({
       dataStructure: newDataStructure,

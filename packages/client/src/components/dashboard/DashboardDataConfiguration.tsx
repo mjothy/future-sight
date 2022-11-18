@@ -11,6 +11,7 @@ import { RoutingProps } from '../app/Routing';
 import DashboardSelectionControl from './DashboardSelectionControl';
 import { getDraft, removeDraft } from '../drafts/DraftUtils';
 import Utils from '../../services/Utils';
+import { Spin } from 'antd';
 
 export interface DashboardDataConfigurationProps
   extends ComponentPropsWithDataManager,
@@ -34,37 +35,31 @@ class DashboardDataConfiguration extends Component<
         scenarios: {},
         models: {},
       },
-      dashboardModelScenario: [],
+      filtreByDataFocus: {
+        regions: [],
+        variables: [],
+        scenarios: [],
+        models: [],
+      },
       /**
        * Data (with timeseries from IASA API)
        */
-      plotData: []
+      plotData: [],
+      isFetchData: false
     };
   }
 
-  componentDidMount(): void {
-    this.props.dataManager.fetchRegions().then((regions) => {
-      this.setState({
-        filters: { ...this.state.filters, regions }
-      })
+  async componentDidMount() {
+    const filters = this.state.filters;
+    try {
+      filters['regions'] = await this.props.dataManager.fetchRegions();
+      filters['variables'] = await this.props.dataManager.fetchVariables();
+      filters['models'] = await this.props.dataManager.fetchModels();
+      filters['scenarios'] = await this.props.dataManager.fetchScenarios();
+      this.setState({ filters, isFetchData: true });
+    } catch (error) {
+      console.log("ERROR FETCH: ", error);
     }
-    );
-    this.props.dataManager.fetchVariables().then((variables) =>
-      this.setState({
-        filters: { ...this.state.filters, variables }
-
-      })
-    );
-    this.props.dataManager.fetchScenarios().then((scenarios) =>
-      this.setState({
-        filters: { ...this.state.filters, scenarios }
-      })
-    );
-    this.props.dataManager.fetchModels().then((models) =>
-      this.setState({
-        filters: { ...this.state.filters, models }
-      })
-    );
   }
 
   saveData = async (id: string, image?: string) => {
@@ -171,9 +166,33 @@ class DashboardDataConfiguration extends Component<
       );
   }
 
+  /**
+   * Set the first filtered data (By data focus)
+   * @param dashboard the current dashboard
+   * @param selectedFilter dashboard selected filter
+   */
+  updateFilterByDataFocus = (dashboard, selectedFilter) => {
+    if (selectedFilter !== '' && this.state.isFetchData) {
+      const data = this.state.filtreByDataFocus;
+      data[selectedFilter] = dashboard.dataStructure[selectedFilter].selection;
+      Object.keys(this.state.filters).forEach((option) => {
+        if (option !== selectedFilter) {
+          data[selectedFilter].forEach((filterValue) => {
+            data[option] = Array.from(
+              new Set([
+                ...data[option],
+                ...this.state.filters[selectedFilter][filterValue][option],
+              ])
+            );
+          });
+        }
+      });
+      this.setState({ filtreByDataFocus: data });
+    }
+  }
+
   render() {
     const { readonly } = this.props;
-
     return readonly ? (
       <ReadOnlyDashboard
         shareButtonOnClickHandler={() => Utils.copyToClipboard()}
@@ -181,15 +200,21 @@ class DashboardDataConfiguration extends Component<
         {...this.props}
       />
     ) : (
-      <DashboardSelectionControl
+      (this.state.isFetchData && <DashboardSelectionControl
         saveData={this.saveData}
         filters={this.state.filters}
         setPlotData={this.setPlotData}
         plotData={this.state.plotData}
         blockData={this.blockData}
         getPlotData={this.getPlotData}
+        updateFilterByDataFocus={this.updateFilterByDataFocus}
+        filtreByDataFocus={this.state.filtreByDataFocus}
         {...this.props}
-      />
+      />) || <div className="dashboard">
+        <Spin className="centered" />
+      </div>
+
+      // TODO handle error 
     );
   }
 }

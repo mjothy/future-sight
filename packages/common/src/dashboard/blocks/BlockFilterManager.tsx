@@ -19,18 +19,10 @@ export default class BlockFilterManager extends Component<any, any> {
                 scenarios: [],
                 models: [],
             },
-            /**
-             * The data that we get by filter focus (add it on)
-             */
-            initializedData: {
-                regions: [],
-                variables: [],
-                scenarios: [],
-                models: [],
-            },
 
             controlBlock: new BlockModel(),
 
+            // TODO create a function that return selectOptions
             selectOptions: Object.keys(this.props.filters),
         };
     }
@@ -80,27 +72,9 @@ export default class BlockFilterManager extends Component<any, any> {
         this.checkIfBlockControlled();
 
         // Set options based on the initial filter, and after that updateDropdownData to filter by already selected data
-        const selectedFilter = getSelectedFilter(this.props.dashboard);
-
+        const selectedFilter = getSelectedFilter(this.props.dashboard.dataStructure);
         if (selectedFilter !== '') {
-            const data = this.state.data;
-
-            // Set the filter selection
-            data[selectedFilter] =
-                this.props.dashboard.dataStructure[selectedFilter].selection;
-            Object.keys(this.props.filters).forEach((option) => {
-                if (option !== selectedFilter) {
-                    data[selectedFilter].forEach((filterValue) => {
-                        data[option] = Array.from(
-                            new Set([
-                                ...data[option],
-                                ...this.props.filters[selectedFilter][filterValue][option],
-                            ])
-                        );
-                    });
-                }
-            });
-            this.setState({ data, initializedData: data });
+            this.setState({ data: this.props.filtreByDataFocus });
         }
     };
 
@@ -187,7 +161,7 @@ export default class BlockFilterManager extends Component<any, any> {
                     }
                 });
 
-                const selectedFilter = getSelectedFilter(this.props.dashboard);
+                const selectedFilter = getSelectedFilter(this.props.dashboard.dataStructure);
 
                 // Check if data exist in the top filter (data focus)
                 if (option === selectedFilter) {
@@ -198,7 +172,7 @@ export default class BlockFilterManager extends Component<any, any> {
                         isExist = false;
                     }
                 } else {
-                    if (!this.state.initializedData[option].includes(optionValue)) {
+                    if (!this.props.filtreByDataFocus[option].includes(optionValue)) {
                         isExist = false;
                     }
                 }
