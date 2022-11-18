@@ -16,7 +16,7 @@ const { TabPane } = Tabs;
  * Render the view edit block according the the selected type
  */
 export default class BlockEditorManager extends Component<any, any> {
-  blockType;
+
   readonly tabsTypes = [
     { title: 'Data', icon: <EditOutlined />, type: 'data' },
     { title: 'Visualization', icon: <EyeOutlined />, type: 'style' },
@@ -34,41 +34,34 @@ export default class BlockEditorManager extends Component<any, any> {
   };
 
   blockByType = () => {
-    const currentBlock = this.props.blocks[this.props.blockSelectedId];
-    switch (currentBlock.blockType) {
+    switch (this.props.currentBlock.blockType) {
       case 'data':
         if (this.state.tab === 'data') {
           return (
             <BlockFilterManager
-              blockType="data"
               {...this.props}
-              currentBlock={currentBlock}
             />
           );
         } else {
           return (
             <DataBlockVisualizationEditor
               {...this.props}
-              currentBlock={currentBlock}
             />
           );
         }
       case 'text':
-        return <TextBlockEditor {...this.props} currentBlock={currentBlock} />;
+        return <TextBlockEditor {...this.props} />;
       case 'control':
         if (this.state.tab === 'data') {
           return (
             <BlockFilterManager
-              blockType="control"
               {...this.props}
-              currentBlock={currentBlock}
             />
           );
         } else {
           return (
             <ControlBlockVisualizationEditor
               {...this.props}
-              currentBlock={currentBlock}
             />
           );
         }
@@ -82,16 +75,17 @@ export default class BlockEditorManager extends Component<any, any> {
   };
 
   render() {
+
     return (
       <>
         <Row
           justify={
-            this.hasTabs(this.props.blocks[this.props.blockSelectedId].blockType)
+            this.hasTabs(this.props.currentBlock.blockType)
               ? 'space-between'
               : 'end'
           }
         >
-          {this.hasTabs(this.props.blocks[this.props.blockSelectedId].blockType) && (
+          {this.hasTabs(this.props.currentBlock.blockType) && (
             <Col span={22}>
               <Tabs type="card" onChange={(activeKey) => this.tabsToggle(activeKey)}>
                 {this.tabsTypes.map((tab) => {

@@ -4,7 +4,7 @@ import { Button, Col, Row, notification, Modal } from 'antd';
 import { DashboardProps } from '../Dashboard';
 import { useNavigate } from 'react-router-dom';
 import html2canvas from 'html2canvas'
-import {DragOutlined, EditOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { DragOutlined, EditOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 
 const DEFAULT_PREVIEW_WIDTH = 800;
 const DEFAULT_PREVIEW_HEIGHT = 450;
@@ -25,7 +25,7 @@ const actions = [
 ];
 
 /**
- * Dashboard control: to set the block type and send a notification to parent (Dashboard) to add/edit block
+ * Sidebar when no block is selected (to create new block or publish dashboard)
  */
 const DashboardControl: React.FC<DashboardProps> = ({
   addBlock,
@@ -43,10 +43,10 @@ const DashboardControl: React.FC<DashboardProps> = ({
     const dashboard = document.querySelector(".dashboard-grid") as HTMLElement
     if (dashboard) {
       dashboard.classList.add('publishing');
-      const timer = setInterval(function() {
+      const timer = setInterval(function () {
         if (dashboard.classList.contains('publishing')) {
           //run some other function
-          makeAndResizePreview(dashboard).then(function(dataURL) {
+          makeAndResizePreview(dashboard).then(function (dataURL) {
             save(dataURL);
           });
           clearInterval(timer);
@@ -58,20 +58,19 @@ const DashboardControl: React.FC<DashboardProps> = ({
   };
 
   const makeAndResizePreview = (dashboard) => {
-    return html2canvas(dashboard).then((function(canvas) {
+    return html2canvas(dashboard).then((function (canvas) {
       const dataURL = canvas.toDataURL();
       return resizeDataURL(dataURL, DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT)
     }));
   }
 
   function resizeDataURL(datas, wantedWidth, wantedHeight) {
-    return new Promise<any>(async function (resolve, reject){
+    return new Promise<any>(async function (resolve, reject) {
       // We create an image to receive the Data URI
       const img = document.createElement('img');
 
       // When the event "onload" is triggered we can resize the image.
-      img.onload = function()
-      {
+      img.onload = function () {
         // We create a canvas and get its context.
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
@@ -91,7 +90,7 @@ const DashboardControl: React.FC<DashboardProps> = ({
     })
   }
 
-  const save = (image ?: string) => {
+  const save = (image?: string) => {
     saveDashboard((idPermanent) => {
       setPublishing(false);
       notification.success({
@@ -105,53 +104,53 @@ const DashboardControl: React.FC<DashboardProps> = ({
   }
 
   return (
-      <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            height: 'calc(100% - 64px)',
-            flex: "1"
-          }}
-      >
-        <Row >
-          {actions.map((action) => (
-              <Col key={action.type} span="8">
-                <AddButton
-                    label={action.label}
-                    type={action.type}
-                    clicked={() => clicked(action.type)}
-                />
-              </Col>
-          ))}
-        </Row>
-        <Row>
-          <Col span={24}>
-            <p><QuestionCircleOutlined /> <em>Click on the <EditOutlined /> button to modify a block !</em></p>
-            <p><QuestionCircleOutlined /> <em>Drag and drop the <DragOutlined /> button to move a block !</em></p>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: 'calc(100% - 64px)',
+        flex: "1"
+      }}
+    >
+      <Row >
+        {actions.map((action) => (
+          <Col key={action.type} span="8">
+            <AddButton
+              label={action.label}
+              type={action.type}
+              clicked={() => clicked(action.type)}
+            />
           </Col>
-        </Row>
-        <Row style={{marginTop: "auto"}}>
-          <Col span={24}>
-            <Button
-                type="primary"
-                danger
-                className="width-100"
-                onClick={() =>
-                    Modal.confirm({
-                      title: 'Do you want to publish the dashboard?',
-                      content: "The dashboard won't be editable anymore.",
-                      onOk() {
-                        onClickHandler();
-                      },
-                    })
-                }
-                loading={publishing}
-            >
-              Publish
-            </Button>
-          </Col>
-        </Row>
-      </div>
+        ))}
+      </Row>
+      <Row>
+        <Col span={24}>
+          <p><QuestionCircleOutlined /> <em>Click on the <EditOutlined /> button to modify a block !</em></p>
+          <p><QuestionCircleOutlined /> <em>Drag and drop the <DragOutlined /> button to move a block !</em></p>
+        </Col>
+      </Row>
+      <Row style={{ marginTop: "auto" }}>
+        <Col span={24}>
+          <Button
+            type="primary"
+            danger
+            className="width-100"
+            onClick={() =>
+              Modal.confirm({
+                title: 'Do you want to publish the dashboard?',
+                content: "The dashboard won't be editable anymore.",
+                onOk() {
+                  onClickHandler();
+                },
+              })
+            }
+            loading={publishing}
+          >
+            Publish
+          </Button>
+        </Col>
+      </Row>
+    </div>
   );
 };
 

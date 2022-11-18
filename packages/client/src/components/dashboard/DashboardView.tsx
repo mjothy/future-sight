@@ -13,9 +13,7 @@ interface DashboardViewProps extends ComponentPropsWithDataManager, RoutingProps
   dashboard: DashboardModel;
   addBlock: (blockType: string, masterBlockId?: string) => void;
   blockSelectedId: string;
-  layout: LayoutModel[];
   updateLayout: (layout: LayoutModel[]) => void;
-  blocks: { [id: string]: BlockModel };
   updateSelectedBlock: (blockSelectedId: string) => void;
   updateBlockMetaData: (data: any, blockId: any) => void;
   updateBlockStyleConfig: (data: any) => void;

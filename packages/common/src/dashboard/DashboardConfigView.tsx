@@ -108,7 +108,7 @@ class DashboardConfigView extends Component<any, any> {
      */
     updateAllLayoutsView = () => {
         const graphsSize = { ...this.state.graphsSize };
-        for (const layout of this.props.layout) {
+        for (const layout of this.props.dashboard.layout) {
             const key = layout.i
             graphsSize[key] = {
                 width: this.ref[key].clientWidth,
@@ -131,7 +131,7 @@ class DashboardConfigView extends Component<any, any> {
     }
 
     render() {
-        const { blocks, layout } = this.props;
+        const { blocks, layout } = this.props.dashboard;
         return (
             <ResponsiveGridLayout
                 className="dashboard-grid"

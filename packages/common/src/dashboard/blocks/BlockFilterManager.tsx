@@ -102,7 +102,7 @@ export default class BlockFilterManager extends Component<any, any> {
         const controlBlockId = this.props.currentBlock.controlBlock;
         let controlBlock = new BlockModel();
         if (controlBlockId !== '') {
-            controlBlock = this.props.blocks[controlBlockId];
+            controlBlock = this.props.dashboard.blocks[controlBlockId];
         }
         this.setState({ controlBlock });
     };
@@ -205,7 +205,7 @@ export default class BlockFilterManager extends Component<any, any> {
         );
     };
     render() {
-        return this.props.blockType === 'data' ? (
+        return this.props.currentBlock.blockType === 'data' ? (
             <DataBlockEditor
                 {...this.props}
                 updateDropdownData={this.updateDropdownData}

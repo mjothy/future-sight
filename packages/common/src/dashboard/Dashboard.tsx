@@ -6,7 +6,6 @@ import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithData
 
 import DashboardModel from '../models/DashboardModel';
 import LayoutModel from '../models/LayoutModel';
-import BlockModel from '../models/BlockModel';
 import { Layout } from "antd";
 import { Content } from "antd/es/layout/layout";
 
@@ -14,9 +13,7 @@ export interface DashboardProps extends ComponentPropsWithDataManager {
     dashboard: DashboardModel;
     addBlock: (blockType: string, masterBlockId?: string) => void;
     blockSelectedId: string;
-    layout: LayoutModel[];
     updateLayout: (layout: LayoutModel[]) => void;
-    blocks: { [id: string]: BlockModel };
     updateSelectedBlock: (blockSelectedId: string) => void;
     updateBlockMetaData: (data: any, blockId: any) => void;
     updateBlockStyleConfig: (data: any) => void;

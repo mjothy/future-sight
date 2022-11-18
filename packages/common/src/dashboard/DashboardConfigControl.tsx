@@ -17,7 +17,7 @@ export default class DashboardConfigControl extends Component<
 
   render() {
     return this.props.blockSelectedId ? (
-      <BlockEditorManager {...this.props} />
+      <BlockEditorManager {...this.props} currentBlock={this.props.dashboard.blocks[this.props.blockSelectedId]} />
     ) : (
       <DashboardControl {...this.props} />
     );

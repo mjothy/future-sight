@@ -4,8 +4,6 @@ import Plot from 'react-plotly.js';
 
 export default class PlotlyGraph extends Component<any, any> {
   getMargins = () => {
-    console.log("this.props: ", this.props);
-    console.log("this.props.layout: ", this.props.layout)
     let hasTitle = false;
     if (this.props.currentBlock !== undefined) {
       hasTitle = this.props.currentBlock.config.configStyle.title.isVisible

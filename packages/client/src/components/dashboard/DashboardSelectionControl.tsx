@@ -246,9 +246,7 @@ export default class DashboardSelectionControl extends Component<
         dashboard={this.state.dashboard}
         addBlock={this.addBlock}
         blockSelectedId={this.state.blockSelectedId}
-        layout={this.state.dashboard.layout}
         updateLayout={this.updateLayout}
-        blocks={this.state.dashboard.blocks}
         updateSelectedBlock={this.updateSelectedBlock}
         updateBlockMetaData={this.updateBlockMetaData}
         updateBlockStyleConfig={this.updateBlockStyleConfig}
