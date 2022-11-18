@@ -34,14 +34,11 @@ export default class DashboardSelectionControl extends Component<
     super(props);
     this.state = {
       dashboard: undefined,
-      sidebarVisible: false,
-
       /**
        * The selected block id
        */
       blockSelectedId: '',
       isDraft: false,
-      selectedFilter: '',
       plotData: [],
     };
   }
@@ -90,6 +87,7 @@ export default class DashboardSelectionControl extends Component<
     return lastId;
   };
 
+  // TODO delecte to remplace by updateDashboard
   updateLayout = (layout: LayoutModel[]) => {
     this.setState({
       dashboard: {
@@ -103,6 +101,7 @@ export default class DashboardSelectionControl extends Component<
     this.setState({ blockSelectedId });
   };
 
+  // TODO delecte to remplace by updateDashboard
   updateDashboardMetadata = (data) => {
     if (data.dataStructure === undefined) {
       this.setState({ dashboard: { ...this.state.dashboard, ...data } });
@@ -148,6 +147,7 @@ export default class DashboardSelectionControl extends Component<
     });
   };
 
+  // TODO delecte to remplace by updateDashboard
   updateBlockStyleConfig = (data) => {
     const dashboard = this.state.dashboard;
     dashboard.blocks[this.state.blockSelectedId].config.configStyle = data;
@@ -192,34 +192,6 @@ export default class DashboardSelectionControl extends Component<
     this.setState(state);
   };
 
-  deleteBlock = (blockId: string) => {
-    const blocks = { ...this.state.dashboard.blocks };
-    const layout = [...this.state.dashboard.layout];
-    const index = layout.findIndex((element) => element.i === blockId);
-    layout.splice(index, 1);
-    // delete childs
-    if (blocks[blockId].blockType === "control") {
-      const blockChilds = Object.values(blocks).filter((block: BlockModel | any) => block.controlBlock === blocks[blockId].id).map((block: BlockModel | any) => block.id);
-      blockChilds.forEach(id => {
-        delete blocks[id];
-        const index = layout.findIndex((element) => element.i === id);
-        layout.splice(index, 1);
-      });
-    }
-
-    delete blocks[blockId]
-
-    this.setState({
-      dashboard: {
-        ...this.state.dashboard,
-        blocks: blocks,
-        layout: layout,
-      },
-      blockSelectedId: '',
-    });
-
-  };
-
   deleteBlocks = (blocksId: string[]) => {
     const blocks = { ...this.state.dashboard.blocks };
     const layout = [...this.state.dashboard.layout];
@@ -261,10 +233,6 @@ export default class DashboardSelectionControl extends Component<
     }
   };
 
-  updateSelectedFilter = (selectedFilter) => {
-    this.setState({ selectedFilter });
-  };
-
   render() {
     if (!this.state.dashboard) {
       return (
@@ -286,10 +254,8 @@ export default class DashboardSelectionControl extends Component<
         updateBlockStyleConfig={this.updateBlockStyleConfig}
         saveDashboard={this.saveData}
         updateDashboardMetadata={this.updateDashboardMetadata}
-        deleteBlock={this.deleteBlock}
+        deleteBlocks={this.deleteBlocks}
         isDraft={this.state.isDraft}
-        updateSelectedFilter={this.updateSelectedFilter}
-        // selectedFilter={this.state.selectedFilter}
         {...this.props}
       />
     );

@@ -7,8 +7,8 @@ import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithData
 import DashboardModel from '../models/DashboardModel';
 import LayoutModel from '../models/LayoutModel';
 import BlockModel from '../models/BlockModel';
-import {Layout} from "antd";
-import {Content} from "antd/es/layout/layout";
+import { Layout } from "antd";
+import { Content } from "antd/es/layout/layout";
 
 export interface DashboardProps extends ComponentPropsWithDataManager {
     dashboard: DashboardModel;
@@ -22,33 +22,24 @@ export interface DashboardProps extends ComponentPropsWithDataManager {
     updateBlockStyleConfig: (data: any) => void;
     saveDashboard: (callback: (idPermanent) => void, image?: string) => void;
     isEmbedded?: boolean;
+    readonly?: boolean;
 }
 
 export default class Dashboard extends Component<DashboardProps, any> {
-    constructor(props) {
-        super(props);
-    }
-
-    componentDidMount() {
-        window.scrollTo(0, 0);
-    }
 
     render() {
         return (
             <Layout
                 className="dashboard"
-                style={{height: this.props.isEmbedded ? '100%' : undefined}}
+                style={{ height: this.props.isEmbedded ? '100%' : undefined }}
             >
-                {/*<Content className="dashboard-content">*/}
-                {/*  <DashboardConfigView {...this.props} />*/}
-                {/*</Content>*/}
-                <div className="no-sidebar-margin"/>
+                <div className="no-sidebar-margin" />
                 <Content className={"dashboard-content-wrapper"}>
                     <div className="dashboard-content">
                         <DashboardConfigView {...this.props} />
                     </div>
                 </Content>
-                <div className="no-sidebar-margin"/>
+                <div className="no-sidebar-margin" />
                 <Sidebar
                     onClose={() => this.props.updateSelectedBlock('')}
                     onCloseMenu={() => this.props.updateSelectedBlock('')}

@@ -13,32 +13,10 @@ export default class SetupView extends Component<any, any> {
   constructor(props) {
     super(props);
     this.state = {
-      dataStructure: structuredClone(this.props.dashboard.dataStructure),
-      visible: this.hasFilters() === undefined,
+      dataStructure: JSON.parse(JSON.stringify(this.props.dashboard.dataStructure)),
+      visible: getSelectedFilter(this.props.dashboard.dataStructure) === '',
       isSubmit: false
     };
-  }
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    // Update the filter state after modal open/close
-    if (this.state.visible !== prevState.visible) {
-      this.setState({ dataStructure: structuredClone(this.props.dashboard.dataStructure) })
-      Object.keys(this.props.dashboard.dataStructure).map((key) => {
-        if (this.props.dashboard.dataStructure[key].isFilter)
-          this.props.updateSelectedFilter(key);
-      });
-    }
-  }
-
-  hasFilters = () => {
-    let has: string | undefined = undefined;
-    for (const filter in this.props.dashboard.dataStructure) {
-      if (this.props.dashboard.dataStructure[filter].isFilter) {
-        has = filter
-        break;
-      }
-    }
-    return has;
   }
 
   show = () => {
@@ -46,11 +24,11 @@ export default class SetupView extends Component<any, any> {
   }
 
   handleCancel = () => {
-    this.setState({ visible: false })
-  }
-
-  hasFilledStructure = () => {
-    return Object.keys(this.props.structureData).length !== 0
+    this.setState({
+      isSubmit: false,
+      visible: false,
+      dataStructure: JSON.parse(JSON.stringify(this.props.dashboard.dataStructure)),
+    })
   }
 
   updateDataStructure = (dataStructure) => {
@@ -59,7 +37,7 @@ export default class SetupView extends Component<any, any> {
 
   handleOk = () => {
     // Check if there is an already selected filter
-    if (this.hasFilters() !== undefined) {
+    if (getSelectedFilter(this.props.dashboard.dataStructure) !== '') {
       this.setState({ isSubmit: true }, () => {
         this.showConfirm()
       })
@@ -73,10 +51,14 @@ export default class SetupView extends Component<any, any> {
   updateDashboardDataStructure = () => {
     const newDataStructure = new DataStructureModel();
     const selectedFilter = getSelectedFilter(this.state.dataStructure);
-    newDataStructure[selectedFilter] = this.state.dataStructure[selectedFilter];
+    newDataStructure[selectedFilter] = { ...this.state.dataStructure[selectedFilter] };
     this.props.updateDashboardMetadata({
       dataStructure: newDataStructure,
     });
+    this.setState({
+      visible: false,
+      dataStructure: newDataStructure
+    })
   }
 
   showConfirm = () => {
@@ -84,24 +66,24 @@ export default class SetupView extends Component<any, any> {
       title: 'Do you Want to update the current filter?',
       content: 'If you are removing data from your filter, that will remove all blocks using them.',
       onOk: () => {
-        console.log('OK');
-        this.setState({ visible: false });
         this.updateDashboardDataStructure();
       },
       onCancel: () => {
-        console.log('Cancel');
-        this.setState({ isSubmit: false });
         this.handleCancel();
       }
     });
   }
 
   render() {
+    let selectedFilter = getSelectedFilter(this.props.dashboard.dataStructure);
+    if (selectedFilter !== '') {
+      selectedFilter = ': ' + selectedFilter;
+    }
     return (
       <>
         <div className="back-to-setup">
           <Button value="setup" onClick={this.show}>
-            <FilterTwoTone />Data focus {this.hasFilters() ? ": " + this.hasFilters() : ""}
+            <FilterTwoTone />Data focus {selectedFilter}
           </Button>
         </div>
         <Modal

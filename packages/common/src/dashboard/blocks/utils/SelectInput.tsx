@@ -11,8 +11,8 @@ interface SelectOptionProps {
     value: string[];
     options: any;
     onChange: (type: string, selectedData: string[]) => void;
-    isClear: boolean;
-    onClear: (type, e) => void;
+    isClear?: boolean;
+    onClear?: (type, e) => void;
     onDropdownVisibleChange?: (option: string, e: any) => void;
     onDeselect?: (type: string, selectedData: string[]) => void;
 }
@@ -51,7 +51,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 {this.props.isClear && <Tooltip title="Clear">
                     <Button
                         type="default"
-                        onClick={(e) => this.props.onClear(this.props.type, e)}
+                        onClick={(e) => this.props.onClear?.(this.props.type, e)}
 
                         icon={<CloseCircleOutlined />}
                     />

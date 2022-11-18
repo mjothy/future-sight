@@ -4,34 +4,13 @@ import {
   GlobalOutlined,
   LineChartOutlined,
 } from '@ant-design/icons';
-import { getSelectedFilter } from '@future-sight/common';
-import { Radio, RadioChangeEvent, Select, Space } from 'antd';
-import { Option } from 'antd/lib/mentions';
+import { getSelectedFilter, SelectInput } from '@future-sight/common';
+import { Radio, RadioChangeEvent, Space } from 'antd';
 import { Component } from 'react';
 
 export default class PopupFilterContent extends Component<any, any> {
 
-  onRegionsChange = (regions: string[]) => {
-    this.props.dataStructure.regions.selection = regions;
-    this.props.updateDataStructure(this.props.dataStructure);
-  };
-
-  onVariablesChange = (variables: string[]) => {
-    this.props.dataStructure.variables.selection = variables;
-    this.props.updateDataStructure(this.props.dataStructure);
-  };
-
-  onScenariosChange = (scenarios: string[]) => {
-    this.props.dataStructure.scenarios.selection = scenarios;
-    this.props.updateDataStructure(this.props.dataStructure);
-  };
-
-  onModelsChange = (models: string[]) => {
-    this.props.dataStructure.models.selection = models;
-    this.props.updateDataStructure(this.props.dataStructure);
-  };
-
-  onChange = (e: RadioChangeEvent) => {
+  handleCheckedFilter = (e: RadioChangeEvent) => {
     const filter = e.target.value;
     // tHE KEY can be: models/scenarios/regions/variables
     this.props.options.map((key) => {
@@ -39,19 +18,31 @@ export default class PopupFilterContent extends Component<any, any> {
         this.props.dataStructure[key].isFilter = true;
       } else {
         this.props.dataStructure[key].isFilter = false;
-        // this.props.dataStructure[key].selection = [];
       }
     });
     this.props.updateDataStructure(this.props.dataStructure);
-    this.props.updateSelectedFilter(filter);
   };
+
+  onChange = (type: string, selectedData: string[]) => {
+    this.props.dataStructure[type].selection = selectedData;
+    this.props.updateDataStructure(this.props.dataStructure);
+  }
+
+  selectInput = (type) => {
+    return <SelectInput
+      type={type}
+      value={this.props.dataStructure[type].selection}
+      options={Object.keys(this.props.filters[type])}
+      onChange={this.onChange}
+    />
+  }
 
   render() {
     const selectedFilter = getSelectedFilter(this.props.dataStructure);
     return (
       <div>
         <Radio.Group
-          onChange={this.onChange}
+          onChange={this.handleCheckedFilter}
           className="width-100"
           value={selectedFilter}
         >
@@ -61,21 +52,7 @@ export default class PopupFilterContent extends Component<any, any> {
                 <GlobalOutlined />
                 Regions
               </Radio>
-              {selectedFilter === 'regions' && (
-                <Select
-                  mode="multiple"
-                  className="width-100 mt-20"
-                  placeholder="Regions"
-                  value={this.props.dataStructure.regions.selection}
-                  onChange={this.onRegionsChange}
-                >
-                  {Object.keys(this.props.filters.regions).map((option) => (
-                    <Option key={option} value={option}>
-                      {option}
-                    </Option>
-                  ))}
-                </Select>
-              )}
+              {selectedFilter === 'regions' && this.selectInput('regions')}
             </div>
 
             <div className="mt-20">
@@ -83,63 +60,21 @@ export default class PopupFilterContent extends Component<any, any> {
                 <LineChartOutlined />
                 Variables
               </Radio>
-              {selectedFilter === 'variables' && (
-                <Select
-                  mode="multiple"
-                  className="width-100 mt-20"
-                  placeholder="Variables"
-                  value={this.props.dataStructure.variables.selection}
-                  onChange={this.onVariablesChange}
-                >
-                  {Object.keys(this.props.filters.variables).map((option) => (
-                    <Option key={option} value={option}>
-                      {option}
-                    </Option>
-                  ))}
-                </Select>
-              )}
+              {selectedFilter === 'variables' && this.selectInput('variables')}
             </div>
             <div className="mt-20">
               <Radio value={'scenarios'}>
                 <BranchesOutlined />
                 Scenarios
               </Radio>
-              {selectedFilter === 'scenarios' && (
-                <Select
-                  mode="multiple"
-                  className="width-100 mt-20"
-                  placeholder="Scenarios"
-                  value={this.props.dataStructure.scenarios.selection}
-                  onChange={this.onScenariosChange}
-                >
-                  {Object.keys(this.props.filters.scenarios).map((option) => (
-                    <Option key={option} value={option}>
-                      {option}
-                    </Option>
-                  ))}
-                </Select>
-              )}
+              {selectedFilter === 'scenarios' && this.selectInput('scenarios')}
             </div>
             <div className="mt-20">
               <Radio value={'models'}>
                 <ControlOutlined />
                 Models
               </Radio>
-              {selectedFilter === 'models' && (
-                <Select
-                  mode="multiple"
-                  className="width-100 mt-20"
-                  placeholder="Models"
-                  value={this.props.dataStructure.models.selection}
-                  onChange={this.onModelsChange}
-                >
-                  {Object.keys(this.props.filters.models).map((option) => (
-                    <Option key={option} value={option}>
-                      {option}
-                    </Option>
-                  ))}
-                </Select>
-              )}
+              {selectedFilter === 'models' && this.selectInput('models')}
             </div>
           </Space>
         </Radio.Group>

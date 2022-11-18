@@ -1,9 +1,9 @@
-import {Component} from 'react';
-import {Responsive, WidthProvider} from 'react-grid-layout';
+import { Component } from 'react';
+import { Responsive, WidthProvider } from 'react-grid-layout';
 import BlockViewManager from './blocks/BlockViewManager';
 import PropTypes from 'prop-types';
-import {EditTwoTone, DragOutlined} from '@ant-design/icons';
-import {Button, Space} from 'antd';
+import { EditTwoTone, DragOutlined } from '@ant-design/icons';
+import { Button, Space } from 'antd';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 const GRID_RATIO = 16 / 9
@@ -52,7 +52,7 @@ class DashboardConfigView extends Component<any, any> {
 
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any) {
         // Update graphsize when rowheight is first updated
-        if (prevState.rowHeight == 0){
+        if (prevState.rowHeight == 0) {
             this.updateAllLayoutsView();
         }
     }
@@ -95,19 +95,19 @@ class DashboardConfigView extends Component<any, any> {
      * @param key
      */
     updateLayoutView = (key) => {
-        const graphsSize = {...this.state.graphsSize};
+        const graphsSize = { ...this.state.graphsSize };
         graphsSize[key] = {
             width: this.ref[key].clientWidth,
             height: this.ref[key].clientHeight,
         };
-        this.setState({graphsSize: graphsSize});
+        this.setState({ graphsSize: graphsSize });
     };
 
     /**
      * Update {width,height} of all blocks content on every block dimentions change
      */
     updateAllLayoutsView = () => {
-        const graphsSize = {...this.state.graphsSize};
+        const graphsSize = { ...this.state.graphsSize };
         for (const layout of this.props.layout) {
             const key = layout.i
             graphsSize[key] = {
@@ -115,7 +115,7 @@ class DashboardConfigView extends Component<any, any> {
                 height: this.ref[key].clientHeight,
             };
         }
-        this.setState({graphsSize});
+        this.setState({ graphsSize });
     };
 
     onBlockClick = (e, id) => {
@@ -127,20 +127,20 @@ class DashboardConfigView extends Component<any, any> {
 
     onWidthChange = (width, margin, cols, containerPadding) => {
         //  Update height to keep grid ratio to 16/9
-        this.setState({rowHeight: width / cols / GRID_RATIO});
+        this.setState({ rowHeight: width / cols / GRID_RATIO });
     }
 
     render() {
-        const {blocks, layout} = this.props;
+        const { blocks, layout } = this.props;
         return (
             <ResponsiveGridLayout
                 className="dashboard-grid"
                 id="ResponsiveGridLayout"
-                layouts={{lg: layout}}
+                layouts={{ lg: layout }}
                 isDraggable={!this.props.readonly}
                 isResizable={!this.props.readonly}
-                breakpoints={{lg: 1, md: 0, sm: 0, xs: 0, xxs: 0}}
-                cols={{lg: COLS, md: COLS, sm: COLS, xs: COLS, xxs: COLS}}
+                breakpoints={{ lg: 1, md: 0, sm: 0, xs: 0, xxs: 0 }}
+                cols={{ lg: COLS, md: COLS, sm: COLS, xs: COLS, xxs: COLS }}
                 rowHeight={this.state.rowHeight}
                 onLayoutChange={this.onLayoutChange}
                 onBreakpointChange={this.onBreakpointChange}
@@ -156,14 +156,14 @@ class DashboardConfigView extends Component<any, any> {
                                 ? this.props.blockSelectedId === layout.i
                                     ? 'selected-layout'
                                     : blocks[this.props.blockSelectedId]?.controlBlock ===
-                                    layout.i
+                                        layout.i
                                         ? 'selected-layout-master'
                                         : ''
                                 : this.props.blockSelectedId === layout.i
                                     ? 'selected-layout'
                                     : blocks[layout.i]?.controlBlock ===
-                                    this.props.blockSelectedId &&
-                                    blocks[layout.i]?.controlBlock !== ''
+                                        this.props.blockSelectedId &&
+                                        blocks[layout.i]?.controlBlock !== ''
                                         ? 'selected-layout-master'
                                         : ''
                         }
@@ -175,17 +175,17 @@ class DashboardConfigView extends Component<any, any> {
                         >
                             {!this.props.readonly && (
                                 <Space style={{ position: "fixed", top: 1, right: 1, zIndex: 2 }}>
-                                  <div className="block-edit">
-                                    <Button size="small" icon={<EditTwoTone />} onClick={(e) => this.onBlockClick(e, layout.i)} />
-                                  </div>
-                                  <div className="block-grab">
-                                    <Button size="small" icon={<DragOutlined />} />
-                                  </div>
+                                    <div className="block-edit">
+                                        <Button size="small" icon={<EditTwoTone />} onClick={(e) => this.onBlockClick(e, layout.i)} />
+                                    </div>
+                                    <div className="block-grab">
+                                        <Button size="small" icon={<DragOutlined />} />
+                                    </div>
                                 </Space>
                             )}
                             <BlockViewManager
                                 {...this.props}
-                                currentBlock={...blocks[layout.i]}
+                                currentBlock={blocks[layout.i]}
                                 width={
                                     this.state.graphsSize[layout.i]
                                         ? this.state.graphsSize[layout.i].width

@@ -9,9 +9,7 @@ import React from 'react';
 import SetupView from './form/SetupView';
 import { RoutingProps } from '../app/Routing';
 
-interface DashboardViewProps
-  extends ComponentPropsWithDataManager,
-  RoutingProps {
+interface DashboardViewProps extends ComponentPropsWithDataManager, RoutingProps {
   dashboard: DashboardModel;
   addBlock: (blockType: string, masterBlockId?: string) => void;
   blockSelectedId: string;
@@ -23,44 +21,20 @@ interface DashboardViewProps
   updateBlockStyleConfig: (data: any) => void;
   saveDashboard: (callback: (idPermanent) => void, image?: string) => void;
   updateDashboardMetadata: (data: any, deletion?: any) => void;
-  deleteBlock: (bockId: string) => void;
+  deleteBlocks: (bockId: string[]) => void;
   isDraft: boolean;
   readonly?: boolean;
-  updateSelectedFilter: (filter: string) => void;
 }
 
 /**
- * For adding or update a dashboard.
- * It manage set up view and ashboard view for adding/updating a dashboard
+ * Render dashboard and set up view (focus data filter)
  */
 class DashboardView extends React.Component<DashboardViewProps, any> {
-  data = {}; // TODO: remove ?
-  constructor(props) {
-    super(props);
-    this.state = {
-      isSubmited: false,
-      /**
-       * Selected data to work with in dashboard {model: {scenario: { variables: [], regions: []}}}
-       */
-      data: []
-    };
-  }
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    // Check if the dashboard exist or it's new
-    if (prevProps.isDraft !== this.props.isDraft && this.props.isDraft) {
-      this.setState({ isSubmited: true });
-    }
-  }
-
   render() {
     return (
       <>
         <Dashboard {...this.props} />
-        <SetupView
-          {...this.props}
-          userData={this.props.dashboard.userData}
-        />
+        <SetupView {...this.props} />
       </>
     );
   }

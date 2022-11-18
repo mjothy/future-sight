@@ -97,11 +97,11 @@ export default class BlockEditorManager extends Component<any, any> {
                 {this.tabsTypes.map((tab) => {
                   return (
                     <TabPane key={tab.type} tab={
-                        <span>
-                          {tab.icon}
-                          {tab.title}
-                        </span>
-                      }
+                      <span>
+                        {tab.icon}
+                        {tab.title}
+                      </span>
+                    }
                     />
                   );
                 })}
@@ -111,7 +111,7 @@ export default class BlockEditorManager extends Component<any, any> {
           <Col span={2}>
             <Popconfirm
               title="Are you sure you want to delete this block ?"
-              onConfirm={() => this.props.deleteBlock(this.props.blockSelectedId)}
+              onConfirm={() => this.props.deleteBlocks([this.props.blockSelectedId])}
               okText="Yes"
               cancelText="No"
             >
