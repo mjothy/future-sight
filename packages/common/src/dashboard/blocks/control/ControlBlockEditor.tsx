@@ -54,12 +54,14 @@ export default class ControlBlockEditor extends Component<any, any> {
     this.props.updateDropdownData();
 
     // update children data blocks
-    const childBlocks = Object.values(this.props.dashboard.blocks).filter((block: BlockModel | any) => block.controlBlock === this.props.currentBlock.id)
-    childBlocks.forEach(async (block: BlockModel | any) => {
-      const blockMetaData = { ...block.config.metaData };
-      blockMetaData[option] = [];
-      await this.props.updateBlockMetaData({ ...blockMetaData }, block.id);
-    })
+    if (block.config.metaData.master[option].isMaster) {
+      const childBlocks = Object.values(this.props.dashboard.blocks).filter((block: BlockModel | any) => block.controlBlock === this.props.currentBlock.id)
+      childBlocks.forEach(async (block: BlockModel | any) => {
+        const blockMetaData = { ...block.config.metaData };
+        blockMetaData[option] = [];
+        await this.props.updateBlockMetaData({ ...blockMetaData }, block.id);
+      })
+    }
   };
 
   /**
@@ -75,13 +77,15 @@ export default class ControlBlockEditor extends Component<any, any> {
     await this.props.updateBlockMetaData({ master: metaData.master }, this.props.currentBlock.id);
 
     // update all the data blocks
-    const childBlocks = Object.values(this.props.dashboard.blocks).filter((block: BlockModel | any) => block.controlBlock === this.props.currentBlock.id)
-    childBlocks.forEach(async (block: BlockModel | any) => {
-      const blockMetaData = { ...block.config.metaData };
-      const newValues = blockMetaData[option].filter(value => value !== unselectedData);
-      blockMetaData[option] = newValues;
-      await this.props.updateBlockMetaData({ ...blockMetaData }, block.id);
-    })
+    if (metaData.master[option].isMaster) {
+      const childBlocks = Object.values(this.props.dashboard.blocks).filter((block: BlockModel | any) => block.controlBlock === this.props.currentBlock.id)
+      childBlocks.forEach(async (block: BlockModel | any) => {
+        const blockMetaData = { ...block.config.metaData };
+        const newValues = blockMetaData[option].filter(value => value !== unselectedData);
+        blockMetaData[option] = newValues;
+        await this.props.updateBlockMetaData({ ...blockMetaData }, block.id);
+      })
+    }
   }
 
   selectDropDown = (option) => {
