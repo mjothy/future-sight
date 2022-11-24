@@ -197,18 +197,17 @@ export default class DashboardSelectionControl extends Component<
     let layout = [...this.state.dashboard.layout];
     blocksId.forEach(blockId => {
 
-      layout = layout.filter((element) => element.i !== blockId);
-
       // delete childs
       if (blocks[blockId] !== undefined && blocks[blockId].blockType === "control") {
-        const blockChilds = Object.values(blocks).filter((block: BlockModel | any) => block.controlBlock === blocks[blockId].id).map((block: BlockModel | any) => block.id);
+        const blockChilds = Object.values(blocks).filter((block: BlockModel | any) => block.controlBlock === blockId).map((block: BlockModel | any) => block.id);
         blockChilds.forEach(id => {
           delete blocks[id];
-          layout = layout.filter((element) => element.i !== blockId);
+          layout = layout.filter((element) => element.i !== id);
         });
       }
 
       delete blocks[blockId]
+      layout = layout.filter((element) => element.i !== blockId);
 
     })
 
