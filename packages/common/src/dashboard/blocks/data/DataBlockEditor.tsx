@@ -2,6 +2,7 @@ import { Component } from 'react';
 import { Divider, Row, Tag } from 'antd';
 import SelectInput from '../utils/SelectInput';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { getUnselectedInputOptions } from '../utils/BlockDataUtils';
 
 /**
  * The form in sidebar to add/edit dara block
@@ -17,8 +18,6 @@ export default class DataBlockEditor extends Component<any, any> {
           new Set<string>([...metaData.selectOrder, option])
         ),
       }, this.props.currentBlock.id);
-      const selectOptions = this.props.selectOptions.filter((e) => e != option);
-      this.props.updateSelectOptions(selectOptions);
     }
   };
 
@@ -29,20 +28,18 @@ export default class DataBlockEditor extends Component<any, any> {
     const index = metaData.selectOrder.indexOf(option);
     if (index >= 0) {
       const selectOrder = [...metaData.selectOrder];
-      const selectOptions = [...this.props.selectOptions];
 
       for (let i = index; i < metaData.selectOrder.length; i++) {
         selectOrder.splice(selectOrder.indexOf(metaData.selectOrder[i]), 1);
-        selectOptions.push(metaData.selectOrder[i]);
         data[metaData.selectOrder[i]] = [];
       }
-      this.props.updateSelectOptions(selectOptions);
       this.props.updateBlockMetaData({
         ...data,
         selectOrder: Array.from(new Set<string>([...selectOrder])),
       }, this.props.currentBlock.id);
     }
 
+    //TODO delete cuz its triggerd after component did update (dashboard update)
     this.props.updateDropdownData();
   };
 
@@ -68,7 +65,7 @@ export default class DataBlockEditor extends Component<any, any> {
             <SelectInput
               type={option}
               value={metaData[option]}
-              options={this.props.data[option]}
+              options={this.props.optionsData[option]}
               onChange={this.props.onChange}
               isClear={selected}
               onClear={this.clearClick}
@@ -127,7 +124,7 @@ export default class DataBlockEditor extends Component<any, any> {
           {/* show dropdown lists of unselected  */}
           <table className="width-100">
             <tr>
-              {this.props.selectOptions.map((option) => (
+              {getUnselectedInputOptions(this.props.currentBlock, this.props.options).map((option) => (
                 <td key={option}>{this.selectDropDownInput(option, false)}</td>
               ))}
             </tr>

@@ -14,6 +14,6 @@ export { default as BlockDataModel } from './models/BlockDataModel';
 export { default as ConfigurationModel } from './models/ConfigurationModel'
 export { default as ReadOnlyDashboard } from './dashboard/ReadOnlyDashboard';
 export { getSelectedFilter } from './dashboard/blocks/utils/DashboardUtils';
-export { getControlBlock } from './dashboard/blocks/utils/BlockDataUtils';
+export { getControlBlock, getUnselectedInputOptions } from './dashboard/blocks/utils/BlockDataUtils';
 export { default as SelectInput } from './dashboard/blocks/utils/SelectInput';
 

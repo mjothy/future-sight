@@ -103,7 +103,7 @@ export default class ControlBlockEditor extends Component<any, any> {
         <SelectInput
           type={option}
           value={metaData[option]}
-          options={this.props.data[option]}
+          options={this.props.optionsData[option]}
           onChange={this.props.onChange}
           isClear={true}
           onClear={this.clearClick}

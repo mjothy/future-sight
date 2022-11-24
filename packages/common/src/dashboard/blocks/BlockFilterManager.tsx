@@ -13,15 +13,12 @@ export default class BlockFilterManager extends Component<any, any> {
             /**
              * Data options in dropDown boxs
              */
-            data: {
+            optionsData: {
                 regions: [],
                 variables: [],
                 scenarios: [],
                 models: [],
-            },
-
-            // TODO create a function that return selectOptions
-            selectOptions: this.props.options,
+            }
         };
     }
 
@@ -29,7 +26,6 @@ export default class BlockFilterManager extends Component<any, any> {
         await this.initialize();
         await this.updateDropdownData();
         await this.checkIfSelectedInOptions();
-
     }
 
     async componentDidUpdate(prevProps, prevState, snapshot) {
@@ -50,26 +46,10 @@ export default class BlockFilterManager extends Component<any, any> {
      * Initialise the state of component
      */
     initialize = () => {
-        const currentBlock = this.props.currentBlock.config.metaData;
-        const selectOptions = this.props.options;
-        // Set inputs that still emplty
-        if (currentBlock.selectOrder.length > 0) {
-            const newOptions: string[] = [];
-            selectOptions.forEach((option) => {
-                if (!currentBlock.selectOrder.includes(option)) {
-                    newOptions.push(option);
-                }
-            });
-
-            this.setState({ selectOptions: newOptions });
-        } else {
-            this.setState({ selectOptions });
-        }
-
         // Set options based on the initial filter, and after that updateDropdownData to filter by already selected data
         const selectedFilter = getSelectedFilter(this.props.dashboard.dataStructure);
         if (selectedFilter !== '') {
-            this.setState({ data: this.props.filtreByDataFocus });
+            this.setState({ optionsData: this.props.filtreByDataFocus });
         }
     };
 
@@ -83,7 +63,7 @@ export default class BlockFilterManager extends Component<any, any> {
         const blockUpdatedData = { ...this.props.currentBlock.config.metaData };
 
         options.forEach(option => {
-            const existData = selected[option].filter(data => this.state.data[option].includes(data));
+            const existData = selected[option].filter(data => this.state.optionsData[option].includes(data));
 
             if (existData.length < selected[option].length) {
                 blockUpdatedData[option] = existData;
@@ -174,7 +154,7 @@ export default class BlockFilterManager extends Component<any, any> {
             optionsData[option] = Array.from(optionsData[option]);
         });
 
-        this.setState({ data: optionsData });
+        this.setState({ optionsData });
     };
 
     onChange = (option, selectedData: string[]) => {
@@ -184,30 +164,20 @@ export default class BlockFilterManager extends Component<any, any> {
         this.updateDropdownData();
     };
 
-    updateSelectOptions = (selectOptions) => {
-        this.setState(
-            {
-                selectOptions,
-            },
-            () => this.updateDropdownData()
-        );
-    };
     render() {
         return this.props.currentBlock.blockType === 'data' ? (
             <DataBlockEditor
                 {...this.props}
                 updateDropdownData={this.updateDropdownData}
-                updateSelectOptions={this.updateSelectOptions}
-                selectOptions={this.state.selectOptions}
                 onChange={this.onChange}
-                data={this.state.data}
+                optionsData={this.state.optionsData}
             />
         ) : (
             <ControlBlockEditor
                 {...this.props}
                 updateDropdownData={this.updateDropdownData}
                 onChange={this.onChange}
-                data={this.state.data}
+                optionsData={this.state.optionsData}
             />
         );
     }
