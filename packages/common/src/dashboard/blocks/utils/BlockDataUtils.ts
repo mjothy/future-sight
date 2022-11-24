@@ -1,7 +1,7 @@
 import BlockModel from "../../../models/BlockModel";
 import ConfigurationModel from "../../../models/ConfigurationModel";
 
-export function getControlBlock(blocks: BlockModel[], controlBlockId: string) {
+export function getBlock(blocks: BlockModel[], controlBlockId: string) {
     let controlBlock = new BlockModel();
     if (controlBlockId !== '') {
         controlBlock = blocks[controlBlockId];
@@ -23,4 +23,8 @@ export function getUnselectedInputOptions(block: BlockModel, options: string[]) 
     } else {
         return options;
     }
+}
+
+export function getChildrens(blocks, conyrolBlockId) {
+    return Object.values(blocks).filter((block: BlockModel | any) => block.controlBlock === conyrolBlockId)
 }

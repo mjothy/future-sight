@@ -39,8 +39,6 @@ export default class DataBlockEditor extends Component<any, any> {
       }, this.props.currentBlock.id);
     }
 
-    //TODO delete cuz its triggerd after component did update (dashboard update)
-    this.props.updateDropdownData();
   };
 
   selectDropDownInput = (option, selected) => {

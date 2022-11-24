@@ -3,6 +3,7 @@ import { Button, Col, Divider, Row } from 'antd';
 import Checkbox from 'antd/es/checkbox';
 import { Component } from 'react';
 import BlockModel from '../../../models/BlockModel';
+import { getChildrens } from '../utils/BlockDataUtils';
 import SelectInput from '../utils/SelectInput';
 
 /**
@@ -26,15 +27,9 @@ export default class ControlBlockEditor extends Component<any, any> {
 
     if (childrens.length > 0 && e) {
       childrens.map((child: BlockModel | any) => {
-        Object.keys(metaData.master).map((option) => {
-          if (metaData.master[option].isMaster) {
-            // Use setState instate of mutate it directly
-            const selectOrder = Array.from(
-              new Set([...child.config.metaData.selectOrder, option])
-            );
-            this.props.updateBlockMetaData({ selectOrder }, child.id);
-          }
-        });
+        let selectOrder = [...child.config.metaData.selectOrder];
+        selectOrder = Array.from(new Set([...selectOrder, option]));
+        this.props.updateBlockMetaData({ selectOrder }, child.id);
       });
     }
   };
@@ -51,11 +46,9 @@ export default class ControlBlockEditor extends Component<any, any> {
       ...metaData
     }, this.props.currentBlock.id);
 
-    this.props.updateDropdownData();
-
     // update children data blocks
     if (block.config.metaData.master[option].isMaster) {
-      const childBlocks = Object.values(this.props.dashboard.blocks).filter((block: BlockModel | any) => block.controlBlock === this.props.currentBlock.id)
+      const childBlocks = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id)
       childBlocks.forEach(async (block: BlockModel | any) => {
         const blockMetaData = { ...block.config.metaData };
         blockMetaData[option] = [];
@@ -78,7 +71,7 @@ export default class ControlBlockEditor extends Component<any, any> {
 
     // update all the data blocks
     if (metaData.master[option].isMaster) {
-      const childBlocks = Object.values(this.props.dashboard.blocks).filter((block: BlockModel | any) => block.controlBlock === this.props.currentBlock.id)
+      const childBlocks = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id)
       childBlocks.forEach(async (block: BlockModel | any) => {
         const blockMetaData = { ...block.config.metaData };
         const newValues = blockMetaData[option].filter(value => value !== unselectedData);
