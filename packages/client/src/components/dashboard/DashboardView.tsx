@@ -1,5 +1,4 @@
 import {
-  BlockModel,
   ComponentPropsWithDataManager,
   Dashboard,
   DashboardModel,

@@ -20,6 +20,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 models: [],
             },
 
+            // TODO: delete this from state, get the data from external function
             controlBlock: new BlockModel(),
 
             // TODO create a function that return selectOptions
@@ -77,16 +78,20 @@ export default class BlockFilterManager extends Component<any, any> {
         }
     };
 
+    /**
+     * Check if data in selection (selected data) are present in Select options
+     */
     checkIfSelectedInOptions = () => {
-        const options = this.state.data;
+        const options = this.props.options;
         const selected = this.props.currentBlock.config.metaData;
 
         const blockUpdatedData = { ...this.props.currentBlock.config.metaData };
 
-        Object.keys(options).forEach(option => {
-            const existData = selected[option].filter(data => options[option].includes(data));
+        options.forEach(option => {
+            const existData = selected[option].filter(data => this.state.data[option].includes(data));
             blockUpdatedData[option] = existData;
 
+            console.log("existData: ", existData, "/ option: ", option);
             if (existData.length < selected[option].length) {
                 notification.warning({
                     message: 'Data missing',
@@ -95,7 +100,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 });
             }
         });
-        this.props.updateBlockMetaData({ ...blockUpdatedData }, this.props.currentBlock.id);
+        // this.props.updateBlockMetaData({ ...blockUpdatedData }, this.props.currentBlock.id);
     }
 
     checkIfBlockControlled = () => {
@@ -109,34 +114,31 @@ export default class BlockFilterManager extends Component<any, any> {
 
     updateDropdownData = () => {
         // The selected data
-        const filter = {};
+        const selectedData = {};
         // To set the filter options (what is already selected, so fetch the data based on what in selections )
         const metaData = this.props.currentBlock.config.metaData;
         this.props.options.forEach((option) => {
             if (this.state.controlBlock.id === undefined) {
-                filter[option] = metaData[option];
+                selectedData[option] = metaData[option];
             } else {
-                const controlConfig = this.state.controlBlock
-                    .config as ConfigurationModel;
-
+                const controlConfig = this.state.controlBlock.config as ConfigurationModel;
                 if (controlConfig.metaData.master[option].isMaster) {
-                    filter[option] = controlConfig.metaData[option];
+                    selectedData[option] = controlConfig.metaData[option];
                 } else {
-                    filter[option] = metaData[option];
+                    selectedData[option] = metaData[option];
                 }
             }
         });
-        //Update all options
-        console.log("filter: ", filter);
-        this.filtreOptions(filter);
+        console.log("selectedData (filter): ", selectedData);
+        this.filtreOptions(selectedData);
     };
 
     /**
      * Update options of drop down lists
-     * @param filter selected drop down lists with selected data values
+     * @param selectedData selected data (block metaData)
      */
-    filtreOptions = (filter) => {
-        const optionData = {
+    filtreOptions = (selectedData) => {
+        const optionsData = {
             regions: new Set<string>(),
             variables: new Set<string>(),
             scenarios: new Set<string>(),
@@ -144,15 +146,30 @@ export default class BlockFilterManager extends Component<any, any> {
         };
         // Filter the inputes of columns based on the filters (selected drop down data)
         // Data union
-        const filtersJSON = this.props.filters;
-        Object.keys(filtersJSON).forEach((option) => {
-            Object.keys(filtersJSON[option]).forEach((optionValue) => {
+        const options = this.props.options;
+        let uncontroledOptions = [...this.props.options];
+        const filtreByDataFocus = this.props.filtreByDataFocus;
+        const globalFiltersJson = this.props.filters;
+        // set controlled options
+        if (this.state.controlBlock.id !== undefined) {
+            const controlConfig = this.state.controlBlock.config as ConfigurationModel;
+            uncontroledOptions = this.props.options.filter(option => {
+                if (controlConfig.metaData.master[option].isMaster) {
+                    optionsData[option] = selectedData[option]
+                } else {
+                    return option
+                }
+            });
+        }
+        // set uncontrolled options
+        uncontroledOptions.forEach((option) => {
+            filtreByDataFocus[option].forEach((optionValue) => {
                 let isExist = true;
-                Object.keys(filter).forEach((filterKey) => {
+                options.forEach((filterKey) => {
                     if (option !== filterKey) {
-                        filter[filterKey].forEach((value) => {
+                        selectedData[filterKey].forEach((value) => {
                             if (
-                                !filtersJSON[option][optionValue][filterKey].includes(value)
+                                !globalFiltersJson[option][optionValue][filterKey].includes(value)
                             ) {
                                 isExist = false;
                             }
@@ -160,33 +177,17 @@ export default class BlockFilterManager extends Component<any, any> {
                     }
                 });
 
-                const selectedFilter = getSelectedFilter(this.props.dashboard.dataStructure);
-
-                // Check if data exist in the top filter (data focus)
-                if (option === selectedFilter) {
-                    const filterSelection =
-                        this.props.dashboard.dataStructure[selectedFilter]
-                            .selection;
-                    if (!filterSelection.includes(optionValue)) {
-                        isExist = false;
-                    }
-                } else {
-                    if (!this.props.filtreByDataFocus[option].includes(optionValue)) {
-                        isExist = false;
-                    }
-                }
-
                 if (isExist) {
-                    optionData[option].add(optionValue);
+                    optionsData[option].add(optionValue);
                 }
             });
         });
 
-        Object.keys(optionData).forEach((option) => {
-            optionData[option] = Array.from(optionData[option]);
+        options.forEach((option) => {
+            optionsData[option] = Array.from(optionsData[option]);
         });
 
-        this.setState({ data: optionData });
+        this.setState({ data: optionsData });
     };
 
     onChange = (option, selectedData: string[]) => {
