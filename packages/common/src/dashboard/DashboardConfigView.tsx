@@ -9,6 +9,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 const GRID_RATIO = 16 / 9
 const COLS = 12
 const INITIAL_ROW_HEIGHT = 1280 / COLS / GRID_RATIO
+
 /**
  * Manage react grid layout
  */
@@ -58,7 +59,7 @@ class DashboardConfigView extends Component<any, any> {
 
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any) {
         // Update graphsize when rowheight is first updated
-        if (prevState.rowHeight == INITIAL_ROW_HEIGHT && this.state.rowHeight != INITIAL_ROW_HEIGHT){
+        if (prevState.rowHeight == INITIAL_ROW_HEIGHT && this.state.rowHeight != INITIAL_ROW_HEIGHT) {
             this.updateAllLayoutsView();
         }
     }
@@ -136,7 +137,27 @@ class DashboardConfigView extends Component<any, any> {
         this.setState({rowHeight: width / cols / GRID_RATIO});
     }
 
+    getCols = () => {
+        let n_cols
+        if (this.props.readonly) {
+            n_cols = 0
+            for (const element of this.props.layout) {
+                const temp_cols = element.x + element.w
+                if (temp_cols > n_cols) {
+                    n_cols = temp_cols
+                }
+            }
+        } else {
+            n_cols = COLS
+        }
+        return n_cols
+    }
+
     render() {
+
+        const n_cols = this.getCols()
+        // const n_cols = this.getCols()
+
         const {blocks, layout} = this.props;
         return (
             <ResponsiveGridLayout
@@ -146,7 +167,7 @@ class DashboardConfigView extends Component<any, any> {
                 isDraggable={!this.props.readonly}
                 isResizable={!this.props.readonly}
                 breakpoints={{lg: 1, md: 0, sm: 0, xs: 0, xxs: 0}}
-                cols={{lg: COLS, md: COLS, sm: COLS, xs: COLS, xxs: COLS}}
+                cols={{lg: n_cols, md: n_cols, sm: n_cols, xs: n_cols, xxs: n_cols}}
                 rowHeight={this.state.rowHeight}
                 onLayoutChange={this.onLayoutChange}
                 onBreakpointChange={this.onBreakpointChange}
@@ -180,13 +201,14 @@ class DashboardConfigView extends Component<any, any> {
                             className={'width-100 height-100 bg-white'}
                         >
                             {!this.props.readonly && (
-                                <Space style={{ position: "fixed", top: 1, right: 1, zIndex: 2 }}>
-                                  <div className="block-edit">
-                                    <Button size="small" icon={<EditTwoTone />} onClick={(e) => this.onBlockClick(e, layout.i)} />
-                                  </div>
-                                  <div className="block-grab">
-                                    <Button size="small" icon={<DragOutlined />} />
-                                  </div>
+                                <Space style={{position: "fixed", top: 1, right: 1, zIndex: 2}}>
+                                    <div className="block-edit">
+                                        <Button size="small" icon={<EditTwoTone/>}
+                                                onClick={(e) => this.onBlockClick(e, layout.i)}/>
+                                    </div>
+                                    <div className="block-grab">
+                                        <Button size="small" icon={<DragOutlined/>}/>
+                                    </div>
                                 </Space>
                             )}
                             <BlockViewManager
