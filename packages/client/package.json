@@ -30,8 +30,10 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
+    "@craco/craco": "6.4.5",
     "@future-sight/common": "^1.0.0",
     "antd": "^4.21.4",
+    "craco-less": "^2.0.0",
     "html2canvas": "^1.4.1",
     "plotly.js": "^2.12.1",
     "react": "^17.0.2",
@@ -43,9 +45,9 @@
     "web-vitals": "^2.1.0"
   },
   "scripts": {
-    "dev": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "dev": "craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "eject": "craco eject"
   }
 }
