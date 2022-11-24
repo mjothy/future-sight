@@ -1,9 +1,9 @@
 import { notification } from 'antd';
 import React, { Component } from 'react';
-import BlockModel from '../../models/BlockModel';
 import ConfigurationModel from '../../models/ConfigurationModel';
 import ControlBlockEditor from './control/ControlBlockEditor';
 import DataBlockEditor from './data/DataBlockEditor';
+import { getControlBlock } from './utils/BlockDataUtils';
 import { getSelectedFilter } from './utils/DashboardUtils';
 
 export default class BlockFilterManager extends Component<any, any> {
@@ -20,9 +20,6 @@ export default class BlockFilterManager extends Component<any, any> {
                 models: [],
             },
 
-            // TODO: delete this from state, get the data from external function
-            controlBlock: new BlockModel(),
-
             // TODO create a function that return selectOptions
             selectOptions: this.props.options,
         };
@@ -37,12 +34,12 @@ export default class BlockFilterManager extends Component<any, any> {
 
     async componentDidUpdate(prevProps, prevState, snapshot) {
         // the second condition to not update the dropdown list of ControlData
+        // TODO delete initialize
         if (prevProps.blockSelectedId !== this.props.blockSelectedId) {
             await this.initialize();
             await this.updateDropdownData();
             await this.checkIfSelectedInOptions();
         }
-
         if (this.props.dashboard != prevProps.dashboard) {
             await this.initialize();
             this.updateDropdownData();
@@ -69,8 +66,6 @@ export default class BlockFilterManager extends Component<any, any> {
             this.setState({ selectOptions });
         }
 
-        this.checkIfBlockControlled();
-
         // Set options based on the initial filter, and after that updateDropdownData to filter by already selected data
         const selectedFilter = getSelectedFilter(this.props.dashboard.dataStructure);
         if (selectedFilter !== '') {
@@ -89,10 +84,10 @@ export default class BlockFilterManager extends Component<any, any> {
 
         options.forEach(option => {
             const existData = selected[option].filter(data => this.state.data[option].includes(data));
-            blockUpdatedData[option] = existData;
 
-            console.log("existData: ", existData, "/ option: ", option);
             if (existData.length < selected[option].length) {
+                blockUpdatedData[option] = existData;
+                this.props.updateBlockMetaData({ ...blockUpdatedData }, this.props.currentBlock.id);
                 notification.warning({
                     message: 'Data missing',
                     description: 'Some selected data are not available  in existing options (due to your latest modifications), block will be updated automatically ',
@@ -100,28 +95,19 @@ export default class BlockFilterManager extends Component<any, any> {
                 });
             }
         });
-        // this.props.updateBlockMetaData({ ...blockUpdatedData }, this.props.currentBlock.id);
     }
-
-    checkIfBlockControlled = () => {
-        const controlBlockId = this.props.currentBlock.controlBlock;
-        let controlBlock = new BlockModel();
-        if (controlBlockId !== '') {
-            controlBlock = this.props.dashboard.blocks[controlBlockId];
-        }
-        this.setState({ controlBlock });
-    };
 
     updateDropdownData = () => {
         // The selected data
         const selectedData = {};
         // To set the filter options (what is already selected, so fetch the data based on what in selections )
         const metaData = this.props.currentBlock.config.metaData;
+        const controlBlock = getControlBlock(this.props.dashboard.blocks, this.props.currentBlock.controlBlock);
         this.props.options.forEach((option) => {
-            if (this.state.controlBlock.id === undefined) {
+            if (controlBlock.id === undefined) {
                 selectedData[option] = metaData[option];
             } else {
-                const controlConfig = this.state.controlBlock.config as ConfigurationModel;
+                const controlConfig = controlBlock.config as ConfigurationModel;
                 if (controlConfig.metaData.master[option].isMaster) {
                     selectedData[option] = controlConfig.metaData[option];
                 } else {
@@ -150,9 +136,10 @@ export default class BlockFilterManager extends Component<any, any> {
         let uncontroledOptions = [...this.props.options];
         const filtreByDataFocus = this.props.filtreByDataFocus;
         const globalFiltersJson = this.props.filters;
+        const controlBlock = getControlBlock(this.props.dashboard.blocks, this.props.currentBlock.controlBlock);
         // set controlled options
-        if (this.state.controlBlock.id !== undefined) {
-            const controlConfig = this.state.controlBlock.config as ConfigurationModel;
+        if (controlBlock.id !== undefined) {
+            const controlConfig = controlBlock.config as ConfigurationModel;
             uncontroledOptions = this.props.options.filter(option => {
                 if (controlConfig.metaData.master[option].isMaster) {
                     optionsData[option] = selectedData[option]
@@ -210,9 +197,6 @@ export default class BlockFilterManager extends Component<any, any> {
             <DataBlockEditor
                 {...this.props}
                 updateDropdownData={this.updateDropdownData}
-                isBlockControlled={
-                    this.state.controlBlock.id !== undefined ? true : false
-                }
                 updateSelectOptions={this.updateSelectOptions}
                 selectOptions={this.state.selectOptions}
                 onChange={this.onChange}
@@ -222,10 +206,6 @@ export default class BlockFilterManager extends Component<any, any> {
             <ControlBlockEditor
                 {...this.props}
                 updateDropdownData={this.updateDropdownData}
-                isBlockControlled={
-                    this.state.controlBlock.id !== undefined ? true : false
-                }
-                updateSelectOptions={this.updateSelectOptions}
                 onChange={this.onChange}
                 data={this.state.data}
             />

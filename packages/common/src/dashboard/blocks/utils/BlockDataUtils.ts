@@ -1,8 +1,10 @@
+import BlockModel from "../../../models/BlockModel";
 
-export function currentFilter(dashboard) {
-    const dataStructure = dashboard.dataStructure;
-    const filterOptions = Object.keys(dataStructure)
-        .filter((key) => dataStructure[key].isFilter)
-        .map((key) => key);
-    return filterOptions;
+export function getControlBlock(blocks: BlockModel[], controlBlockId: string) {
+    console.log(blocks, 'controlBlockId', controlBlockId);
+    let controlBlock = new BlockModel();
+    if (controlBlockId !== '') {
+        controlBlock = blocks[controlBlockId];
+    }
+    return controlBlock;
 }
