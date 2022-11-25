@@ -2,7 +2,6 @@ import {
   ComponentPropsWithDataManager,
   Dashboard,
   DashboardModel,
-  LayoutModel,
 } from '@future-sight/common';
 import React from 'react';
 import SetupView from './form/SetupView';
@@ -14,7 +13,6 @@ interface DashboardViewProps extends ComponentPropsWithDataManager, RoutingProps
   blockSelectedId: string;
   updateSelectedBlock: (blockSelectedId: string) => void;
   saveDashboard: (callback: (idPermanent) => void, image?: string) => void;
-  updateDashboardMetadata: (data: any, deletion?: any) => void;
   deleteBlocks: (bockId: string[]) => void;
   isDraft: boolean;
   readonly?: boolean;

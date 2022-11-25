@@ -39,6 +39,8 @@ export default class SetupView extends Component<any, any> {
     // Check if there is an already selected filter
     if (getSelectedFilter(this.props.dashboard.dataStructure) !== '') {
       this.setState({ isSubmit: true }, () => {
+        console.log("dashboard state before0: ", this.props.dashboard.dataStructure)
+
         this.showConfirm()
       })
     } else {
@@ -49,15 +51,16 @@ export default class SetupView extends Component<any, any> {
   }
 
   updateDashboardDataStructure = () => {
-    const newDataStructure = new DataStructureModel();
+    const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+    dashboard.dataStructure = new DataStructureModel();
     const selectedFilter = getSelectedFilter(this.state.dataStructure);
-    newDataStructure[selectedFilter] = { ...this.state.dataStructure[selectedFilter] };
-    this.props.updateDashboardMetadata({
-      dataStructure: newDataStructure,
-    });
+    dashboard.dataStructure[selectedFilter] = JSON.parse(JSON.stringify(this.state.dataStructure[selectedFilter]));
+
+    this.props.updateDashboard(dashboard);
+
     this.setState({
       visible: false,
-      dataStructure: newDataStructure
+      dataStructure: JSON.parse(JSON.stringify(dashboard.dataStructure))
     })
   }
 

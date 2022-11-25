@@ -1,5 +1,7 @@
 import {
   BlockModel,
+  blocksIdToDelete,
+  compareDataStructure,
   ComponentPropsWithDataManager,
   DashboardModel,
   getSelectedFilter,
@@ -91,32 +93,6 @@ export default class DashboardSelectionControl extends Component<
     this.setState({ blockSelectedId });
   };
 
-  // TODO delecte to remplace by updateDashboard
-  updateDashboardMetadata = (data) => {
-    if (data.dataStructure === undefined) {
-      this.setState({ dashboard: { ...this.state.dashboard, ...data } });
-    } else {
-      const selectedFilter = getSelectedFilter(data.dataStructure);
-      // Update dataStructure (Data focus)      
-      const newDataStructure = data.dataStructure;
-      const toDeleteBlocks = new Set<string>();
-      Object.values(this.state.dashboard.blocks).forEach((block: BlockModel | any) => {
-        if (block.blockType !== "text") {
-          block.config.metaData[selectedFilter].forEach(value => {
-            if (!newDataStructure[selectedFilter].selection.includes(value)) {
-              toDeleteBlocks.add(block.id);
-            }
-          })
-        }
-      });
-      console.log("toDelete: ", toDeleteBlocks);
-      this.setState({ dashboard: { ...this.state.dashboard, ...data } }, () => {
-        this.deleteBlocks(Array.from(toDeleteBlocks));
-        this.props.updateFilterByDataFocus(this.state.dashboard, selectedFilter);
-      });
-    }
-  }
-
   updateBlockConfig = (data, idBlock: string) => {
     const dashboard = { ...this.state.dashboard };
     const config = dashboard.blocks[idBlock].config;
@@ -125,7 +101,20 @@ export default class DashboardSelectionControl extends Component<
   }
 
   updateDashboard = (dashboard: DashboardModel) => {
-    this.setState({ dashboard });
+    const isUpdateDataStructure = compareDataStructure(this.state.dashboard.dataStructure, dashboard.dataStructure);
+    if (isUpdateDataStructure) {
+      // Update dataStructure (Data focus)      
+      const newDataStructure = dashboard.dataStructure;
+      const toDeleteBlocks = blocksIdToDelete(Object.values(this.state.dashboard.blocks), newDataStructure);
+      const selectedFilter = getSelectedFilter(newDataStructure);
+
+      this.setState({ dashboard }, () => {
+        this.deleteBlocks(Array.from(toDeleteBlocks));
+        this.props.updateFilterByDataFocus(this.state.dashboard, selectedFilter);
+      });
+    } else {
+      this.setState({ dashboard });
+    }
   }
 
   addBlock = (blockType: string, masterBlockId?: string) => {
@@ -219,8 +208,6 @@ export default class DashboardSelectionControl extends Component<
         updateDashboard={this.updateDashboard}
         updateBlockConfig={this.updateBlockConfig}
         saveDashboard={this.saveData}
-        // TODO REPLACE by update dashboard
-        updateDashboardMetadata={this.updateDashboardMetadata}
         deleteBlocks={this.deleteBlocks}
         isDraft={this.state.isDraft}
         {...this.props}
