@@ -40,12 +40,19 @@ class DashboardConfigView extends Component<any, any> {
         this.state = {
             graphsSize: {},
             rowHeight: INITIAL_ROW_HEIGHT,
+            cols: COLS
         };
     }
 
     componentDidMount() {
         // Adjust the width and height of the graph in case the blocks already exist
         this.updateAllLayoutsView();
+
+        const n_cols = this.getCols()
+        this.setState({
+            cols: n_cols,
+            rowHeight: 1280 / n_cols / GRID_RATIO }
+        )
 
         // Update graph dim after every resize
         window.addEventListener('resize', this.updateAllLayoutsView);
@@ -55,6 +62,7 @@ class DashboardConfigView extends Component<any, any> {
             },
             1
         );
+
     }
 
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any) {
@@ -62,10 +70,40 @@ class DashboardConfigView extends Component<any, any> {
         if (prevState.rowHeight == INITIAL_ROW_HEIGHT && this.state.rowHeight != INITIAL_ROW_HEIGHT) {
             this.updateAllLayoutsView();
         }
+
+        if (prevProps.readonly === false && this.props.readonly === true) {
+            this.setState({
+                cols: this.getCols(),
+            })
+            setTimeout(
+                () => {
+                    window.dispatchEvent(new Event('resize'));
+                },
+                1
+            );
+        }
+
+
     }
 
     componentWillUnmount() {
         window.removeEventListener('resize', this.updateAllLayoutsView);
+    }
+
+    getCols = () => {
+        let n_cols
+        if (this.props.readonly) {
+            n_cols = 0
+            for (const element of this.props.layout) {
+                const temp_cols = element.x + element.w
+                if (temp_cols > n_cols) {
+                    n_cols = temp_cols
+                }
+            }
+        } else {
+            n_cols = COLS
+        }
+        return n_cols
     }
 
     /**
@@ -137,25 +175,9 @@ class DashboardConfigView extends Component<any, any> {
         this.setState({rowHeight: width / cols / GRID_RATIO});
     }
 
-    getCols = () => {
-        let n_cols
-        if (this.props.readonly) {
-            n_cols = 0
-            for (const element of this.props.layout) {
-                const temp_cols = element.x + element.w
-                if (temp_cols > n_cols) {
-                    n_cols = temp_cols
-                }
-            }
-        } else {
-            n_cols = COLS
-        }
-        return n_cols
-    }
 
     render() {
 
-        const n_cols = this.getCols()
         // const n_cols = this.getCols()
 
         const {blocks, layout} = this.props;
@@ -167,7 +189,7 @@ class DashboardConfigView extends Component<any, any> {
                 isDraggable={!this.props.readonly}
                 isResizable={!this.props.readonly}
                 breakpoints={{lg: 1, md: 0, sm: 0, xs: 0, xxs: 0}}
-                cols={{lg: n_cols, md: n_cols, sm: n_cols, xs: n_cols, xxs: n_cols}}
+                cols={{lg: this.state.cols, md: this.state.cols, sm: this.state.cols, xs: this.state.cols, xxs: this.state.cols}}
                 rowHeight={this.state.rowHeight}
                 onLayoutChange={this.onLayoutChange}
                 onBreakpointChange={this.onBreakpointChange}

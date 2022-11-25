@@ -1,13 +1,7 @@
-import React, { useState } from 'react';
 import AddButton from './actions/AddButton';
-import { Button, Col, Row, notification, Modal } from 'antd';
-import { DashboardProps } from '../Dashboard';
-import { useNavigate } from 'react-router-dom';
-import html2canvas from 'html2canvas'
+import { Button, Col, Row, Modal } from 'antd';
 import {DragOutlined, EditOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 
-const DEFAULT_PREVIEW_WIDTH = 800;
-const DEFAULT_PREVIEW_HEIGHT = 450;
 
 const actions = [
   {
@@ -27,82 +21,15 @@ const actions = [
 /**
  * Dashboard control: to set the block type and send a notification to parent (Dashboard) to add/edit block
  */
-const DashboardControl: React.FC<DashboardProps> = ({
-  addBlock,
-  saveDashboard,
+const DashboardControl: React.FC<any> = ({
+                                                        addBlock,
+                                                        onPublish,
+                                                        publishing
 }) => {
-  const [publishing, setPublishing] = useState(false);
-  const navigate = useNavigate();
 
   const clicked = (blockType: string) => {
     addBlock(blockType);
   };
-
-  const onClickHandler = () => {
-    setPublishing(true);
-    const dashboard = document.querySelector(".dashboard-grid") as HTMLElement
-    if (dashboard) {
-      dashboard.classList.add('publishing');
-      const timer = setInterval(function() {
-        if (dashboard.classList.contains('publishing')) {
-          //run some other function
-          makeAndResizePreview(dashboard).then(function(dataURL) {
-            save(dataURL);
-          });
-          clearInterval(timer);
-        }
-      }, 200);
-    } else {
-      save()
-    }
-  };
-
-  const makeAndResizePreview = (dashboard) => {
-    return html2canvas(dashboard).then((function(canvas) {
-      const dataURL = canvas.toDataURL();
-      return resizeDataURL(dataURL, DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT)
-    }));
-  }
-
-  function resizeDataURL(datas, wantedWidth, wantedHeight) {
-    return new Promise<any>(async function (resolve, reject){
-      // We create an image to receive the Data URI
-      const img = document.createElement('img');
-
-      // When the event "onload" is triggered we can resize the image.
-      img.onload = function()
-      {
-        // We create a canvas and get its context.
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-
-        // We set the dimensions at the wanted size.
-        canvas.width = wantedWidth;
-        canvas.height = wantedHeight;
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, wantedWidth, wantedHeight);
-          const dataURI = canvas.toDataURL("image/jpeg");
-          resolve(dataURI);
-        } else {
-          resolve(undefined);
-        }
-      };
-      img.src = datas;
-    })
-  }
-
-  const save = (image ?: string) => {
-    saveDashboard((idPermanent) => {
-      setPublishing(false);
-      notification.success({
-        message: 'The dashboard has been correctly published',
-        placement: 'topRight',
-      });
-      setTimeout(() => {
-        navigate('/view?id=' + idPermanent);
-      }, 1000);
-    }, image);
-  }
 
   return (
       <div
@@ -141,7 +68,7 @@ const DashboardControl: React.FC<DashboardProps> = ({
                       title: 'Do you want to publish the dashboard?',
                       content: "The dashboard won't be editable anymore.",
                       onOk() {
-                        onClickHandler();
+                        onPublish();
                       },
                     })
                 }
