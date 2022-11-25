@@ -10,19 +10,18 @@ import { getUnselectedInputOptions } from '../utils/BlockDataUtils';
 export default class DataBlockEditor extends Component<any, any> {
 
   onDropdownVisibleChange = (option, e) => {
-    const metaData = this.props.currentBlock.config.metaData;
+    const metaData = { ...this.props.currentBlock.config.metaData };
     if (!e && metaData[option].length > 0) {
       // Update the order of selection
-      this.props.updateBlockMetaData({
-        selectOrder: Array.from(
-          new Set<string>([...metaData.selectOrder, option])
-        ),
-      }, this.props.currentBlock.id);
+      metaData.selectOrder = Array.from(
+        new Set<string>([...metaData.selectOrder, option])
+      );
+      this.props.updateBlockConfig({ metaData }, this.props.currentBlock.id);
     }
   };
 
   clearClick = (option, e) => {
-    const data = {};
+    const data = { ...this.props.currentBlock.config.metaData };
 
     const metaData = this.props.currentBlock.config.metaData;
     const index = metaData.selectOrder.indexOf(option);
@@ -33,10 +32,8 @@ export default class DataBlockEditor extends Component<any, any> {
         selectOrder.splice(selectOrder.indexOf(metaData.selectOrder[i]), 1);
         data[metaData.selectOrder[i]] = [];
       }
-      this.props.updateBlockMetaData({
-        ...data,
-        selectOrder: Array.from(new Set<string>([...selectOrder])),
-      }, this.props.currentBlock.id);
+      data.selectOrder = Array.from(new Set<string>([...selectOrder]));
+      this.props.updateBlockConfig({ metaData: data }, this.props.currentBlock.id);
     }
 
   };

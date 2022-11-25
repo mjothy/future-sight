@@ -76,8 +76,7 @@ export default class DashboardGlobalInfo extends Component<any, any> {
 
   handleOk = () => {
     try {
-      // TODO update (dashboard)
-      this.props.updateDashboardMetadata({ userData: this.state.userDataTemp });
+      this.props.updateDashboard({ ...this.props.dashboard, userData: this.state.userDataTemp });
       this.props.closeGlobalInfoModal();
       this.openNotificationWithIcon('success', 'Update dashboard', 'Dashboard information updated successfully')
     } catch (e) {

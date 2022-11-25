@@ -5,7 +5,6 @@ import Sidebar from './sidebar/Sidebar';
 import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
 
 import DashboardModel from '../models/DashboardModel';
-import LayoutModel from '../models/LayoutModel';
 import { Layout } from "antd";
 import { Content } from "antd/es/layout/layout";
 
@@ -13,10 +12,7 @@ export interface DashboardProps extends ComponentPropsWithDataManager {
     dashboard: DashboardModel;
     addBlock: (blockType: string, masterBlockId?: string) => void;
     blockSelectedId: string;
-    updateLayout: (layout: LayoutModel[]) => void;
     updateSelectedBlock: (blockSelectedId: string) => void;
-    updateBlockMetaData: (data: any, blockId: any) => void;
-    updateBlockStyleConfig: (data: any) => void;
     saveDashboard: (callback: (idPermanent) => void, image?: string) => void;
     isEmbedded?: boolean;
     readonly?: boolean;

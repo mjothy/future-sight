@@ -12,15 +12,14 @@ interface DashboardViewProps extends ComponentPropsWithDataManager, RoutingProps
   dashboard: DashboardModel;
   addBlock: (blockType: string, masterBlockId?: string) => void;
   blockSelectedId: string;
-  updateLayout: (layout: LayoutModel[]) => void;
   updateSelectedBlock: (blockSelectedId: string) => void;
-  updateBlockMetaData: (data: any, blockId: any) => void;
-  updateBlockStyleConfig: (data: any) => void;
   saveDashboard: (callback: (idPermanent) => void, image?: string) => void;
   updateDashboardMetadata: (data: any, deletion?: any) => void;
   deleteBlocks: (bockId: string[]) => void;
   isDraft: boolean;
   readonly?: boolean;
+  updateDashboard: (dashboard: DashboardModel) => void;
+  updateBlockConfig: (data: any, idBlock) => void
 }
 
 /**

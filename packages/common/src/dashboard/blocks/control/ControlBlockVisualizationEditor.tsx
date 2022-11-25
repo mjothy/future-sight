@@ -1,4 +1,4 @@
-import { Col, Input, Row} from 'antd';
+import { Col, Input, Row } from 'antd';
 import Checkbox from 'antd/es/checkbox';
 import { Component } from 'react';
 import BlockStyleModel from '../../../models/BlockStyleModel';
@@ -13,12 +13,12 @@ export default class ControlBlockVisualizationEditor extends Component<any, any>
 
   onTitleChange = (e) => {
     this.configStyle.title.value = e.target.value;
-    this.props.updateBlockStyleConfig(this.configStyle);
+    this.props.updateBlockConfig({ configStyle: this.configStyle }, this.props.currentBlock.id);
   };
 
   onTitleVisibilityChange = (e) => {
     this.configStyle.title.isVisible = e.target.checked;
-    this.props.updateBlockStyleConfig(this.configStyle);
+    this.props.updateBlockConfig({ configStyle: this.configStyle }, this.props.currentBlock.id);
   };
 
   render() {

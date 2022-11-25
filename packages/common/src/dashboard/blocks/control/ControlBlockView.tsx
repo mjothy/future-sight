@@ -2,6 +2,7 @@ import { Col, Row, Select } from 'antd';
 import { Component } from 'react';
 import BlockModel from '../../../models/BlockModel';
 import BlockStyleModel from '../../../models/BlockStyleModel';
+import { getChildrens } from '../utils/BlockDataUtils';
 
 const { Option } = Select;
 
@@ -10,24 +11,19 @@ export default class ControlBlockView extends Component<any, any> {
   onChange = (option, selectedData: string[]) => {
     const metaData = this.props.currentBlock.config.metaData;
     metaData.master[option].values = selectedData;
-    this.props.updateBlockMetaData(
-      { master: metaData.master },
-      this.props.currentBlock.id
-    );
+    this.props.updateBlockConfig({ metaData }, this.props.currentBlock.id);
 
     // Update also children
-    const childrens = Object.values(this.props.dashboard.blocks).filter((block: BlockModel | any) => block.controlBlock === this.props.currentBlock.id);
+    const childrens = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id);
 
     if (childrens.length > 0) {
       childrens.map((child: BlockModel | any) => {
+        const childMetaData = this.props.dashboard.blocks[child.id].config.metaData
         Object.keys(metaData.master).map((option) => {
           if (metaData.master[option].isMaster) {
             // Use setState instate of mutate it directly
-            const data = {};
-            data[option] = metaData.master[option].values;
-            this.props.updateBlockMetaData(data,
-              child.id
-            );
+            childMetaData[option] = metaData.master[option].values;
+            this.props.updateBlockConfig({ childMetaData }, child.id);
           }
         });
       });

@@ -18,7 +18,7 @@ export default class ControlBlockEditor extends Component<any, any> {
   onCheckChange = (option, e) => {
     const metaData = this.props.currentBlock.config.metaData;
     metaData.master[option].isMaster = e.target.checked;
-    this.props.updateBlockMetaData({ master: metaData.master }, this.props.currentBlock.id);
+    this.props.updateBlockConfig({ metaData }, this.props.currentBlock.id);
     // Update also children
     const childrens = Object.values(this.props.dashboard.blocks).filter(
       (block: BlockModel | any) =>
@@ -27,9 +27,9 @@ export default class ControlBlockEditor extends Component<any, any> {
 
     if (childrens.length > 0 && e) {
       childrens.map((child: BlockModel | any) => {
-        let selectOrder = [...child.config.metaData.selectOrder];
-        selectOrder = Array.from(new Set([...selectOrder, option]));
-        this.props.updateBlockMetaData({ selectOrder }, child.id);
+        const metaData = { ...child.config.metaData };
+        metaData.selectOrder = Array.from(new Set([...child.config.metaData.selectOrder, option]));
+        this.props.updateBlockConfig({ metaData }, child.id);
       });
     }
   };
@@ -42,8 +42,8 @@ export default class ControlBlockEditor extends Component<any, any> {
     // Update the control view
     metaData.master[option].values = [];
 
-    this.props.updateBlockMetaData({
-      ...metaData
+    this.props.updateBlockConfig({
+      metaData
     }, this.props.currentBlock.id);
 
     // update children data blocks
@@ -52,7 +52,7 @@ export default class ControlBlockEditor extends Component<any, any> {
       childBlocks.forEach(async (block: BlockModel | any) => {
         const blockMetaData = { ...block.config.metaData };
         blockMetaData[option] = [];
-        await this.props.updateBlockMetaData({ ...blockMetaData }, block.id);
+        await this.props.updateBlockConfig({ blockMetaData }, block.id);
       })
     }
   };
@@ -67,7 +67,7 @@ export default class ControlBlockEditor extends Component<any, any> {
     const metaData = { ...this.props.dashboard.blocks[this.props.currentBlock.id].config.metaData };
     const newValues = metaData.master[option].values.filter(value => value !== unselectedData);
     metaData.master[option].values = newValues;
-    await this.props.updateBlockMetaData({ master: metaData.master }, this.props.currentBlock.id);
+    await this.props.updateBlockConfig({ metaData }, this.props.currentBlock.id);
 
     // update all the data blocks
     if (metaData.master[option].isMaster) {
@@ -76,7 +76,7 @@ export default class ControlBlockEditor extends Component<any, any> {
         const blockMetaData = { ...block.config.metaData };
         const newValues = blockMetaData[option].filter(value => value !== unselectedData);
         blockMetaData[option] = newValues;
-        await this.props.updateBlockMetaData({ ...blockMetaData }, block.id);
+        await this.props.updateBlockConfig({ metaData: blockMetaData }, block.id);
       })
     }
   }

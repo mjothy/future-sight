@@ -41,14 +41,14 @@ export default class BlockFilterManager extends Component<any, any> {
         const options = this.props.options;
         const selected = this.props.currentBlock.config.metaData;
 
-        const blockUpdatedData = { ...this.props.currentBlock.config.metaData };
+        const metaData = { ...this.props.currentBlock.config.metaData };
 
         options.forEach(option => {
             const existData = selected[option].filter(data => this.state.optionsData[option].includes(data));
 
             if (existData.length < selected[option].length) {
-                blockUpdatedData[option] = existData;
-                this.props.updateBlockMetaData({ ...blockUpdatedData }, this.props.currentBlock.id);
+                metaData[option] = existData;
+                this.props.updateBlockConfig({ metaData }, this.props.currentBlock.id);
                 notification.warning({
                     message: 'Data missing',
                     description: 'Some selected data are not available  in existing options (due to your latest modifications), block will be updated automatically ',
@@ -153,9 +153,9 @@ export default class BlockFilterManager extends Component<any, any> {
     };
 
     onChange = (option, selectedData: string[]) => {
-        const data = {};
-        data[option] = selectedData;
-        this.props.updateBlockMetaData({ ...data }, this.props.currentBlock.id);
+        const metaData = { ...this.props.currentBlock.config.metaData };
+        metaData[option] = selectedData;
+        this.props.updateBlockConfig({ metaData }, this.props.currentBlock.id);
     };
 
     render() {

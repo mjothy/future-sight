@@ -76,7 +76,10 @@ class DashboardConfigView extends Component<any, any> {
      */
     onLayoutChange = (layout) => {
         if (!this.props.readonly) {
-            this.props.updateLayout(layout);
+            this.props.updateDashboard({
+                ...this.props.dashboard,
+                layout: layout,
+            })
             this.updateAllLayoutsView();
         }
     };

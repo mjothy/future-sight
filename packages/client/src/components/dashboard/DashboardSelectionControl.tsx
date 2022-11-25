@@ -87,16 +87,6 @@ export default class DashboardSelectionControl extends Component<
     return lastId;
   };
 
-  // TODO delecte to remplace by updateDashboard
-  updateLayout = (layout: LayoutModel[]) => {
-    this.setState({
-      dashboard: {
-        ...this.state.dashboard,
-        layout: layout,
-      },
-    });
-  };
-
   updateSelectedBlock = (blockSelectedId: string) => {
     this.setState({ blockSelectedId });
   };
@@ -126,35 +116,17 @@ export default class DashboardSelectionControl extends Component<
       });
     }
   }
-  /**
-   * Update configuration metaData (selected models and scenarios)
-   * @param data Block config metaData
-   * @param idBlock In case of controling dataBlocks by controlBlock (so the control block is not necessarily selected, we need mandatory the id of controlBlock)
-   */
-  updateBlockMetaData = (data, idBlock) => {
-    const dashboard = this.state.dashboard;
-    // store the selected data
-    const selectedBlock = dashboard.blocks[idBlock];
-    if (selectedBlock.blockType === 'text') {
-      selectedBlock.config = { value: data };
-    } else {
-      let metaData = selectedBlock.config.metaData;
-      metaData = { ...metaData, ...data };
-      selectedBlock.config.metaData = metaData;
-    }
-    this.setState({
-      dashboard: { ...this.state.dashboard, blocks: dashboard.blocks },
-    });
-  };
 
-  // TODO delecte to remplace by updateDashboard
-  updateBlockStyleConfig = (data) => {
-    const dashboard = this.state.dashboard;
-    dashboard.blocks[this.state.blockSelectedId].config.configStyle = data;
-    this.setState({
-      dashboard: { ...this.state.dashboard, blocks: dashboard.blocks },
-    });
-  };
+  updateBlockConfig = (data, idBlock: string) => {
+    const dashboard = { ...this.state.dashboard };
+    const config = dashboard.blocks[idBlock].config;
+    dashboard.blocks[idBlock].config = { ...config, ...data };
+    this.updateDashboard(dashboard)
+  }
+
+  updateDashboard = (dashboard: DashboardModel) => {
+    this.setState({ dashboard });
+  }
 
   addBlock = (blockType: string, masterBlockId?: string) => {
     const layoutItem = new LayoutModel((this.getLastId() + 1).toString());
@@ -243,11 +215,11 @@ export default class DashboardSelectionControl extends Component<
         dashboard={this.state.dashboard}
         addBlock={this.addBlock}
         blockSelectedId={this.state.blockSelectedId}
-        updateLayout={this.updateLayout}
         updateSelectedBlock={this.updateSelectedBlock}
-        updateBlockMetaData={this.updateBlockMetaData}
-        updateBlockStyleConfig={this.updateBlockStyleConfig}
+        updateDashboard={this.updateDashboard}
+        updateBlockConfig={this.updateBlockConfig}
         saveDashboard={this.saveData}
+        // TODO REPLACE by update dashboard
         updateDashboardMetadata={this.updateDashboardMetadata}
         deleteBlocks={this.deleteBlocks}
         isDraft={this.state.isDraft}

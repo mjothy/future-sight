@@ -133,8 +133,8 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
             )}
             <div className="dashboard-content">
                 {(isLoading || !dashboard) && <Spin />}
-            {/*<div className="dashboard-content" style={{width: `${TEST_RATIO*100}vh`}}>*/}
-                {(isLoading || !dashboard) && <Spin/>}
+                {/*<div className="dashboard-content" style={{width: `${TEST_RATIO*100}vh`}}>*/}
+                {(isLoading || !dashboard) && <Spin />}
                 {dashboard && (
                     <DashboardConfigView
                         dashboard={dashboard}
@@ -144,9 +144,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                         updateSelectedBlock={(blockSelectedId: string) => {
                         }}
                         blockSelectedId={undefined}
-                        updateBlockMetaData={updateBlockMetaData}
-                        updateBlockStyleConfig={(data) => {
-                        }}
+                        updateBlockConfig={updateBlockMetaData}
                         updateDashboardMetadata={(data) => {
                         }}
                         readonly
