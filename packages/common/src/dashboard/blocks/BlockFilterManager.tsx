@@ -122,7 +122,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 }
             });
         }
-        
+
         // set uncontrolled options
         uncontroledOptions.forEach((option) => {
             filtreByDataFocus[option].forEach((optionValue) => {
@@ -162,14 +162,12 @@ export default class BlockFilterManager extends Component<any, any> {
         return this.props.currentBlock.blockType === 'data' ? (
             <DataBlockEditor
                 {...this.props}
-                updateDropdownData={this.updateDropdownData}
                 onChange={this.onChange}
                 optionsData={this.state.optionsData}
             />
         ) : (
             <ControlBlockEditor
                 {...this.props}
-                updateDropdownData={this.updateDropdownData}
                 onChange={this.onChange}
                 optionsData={this.state.optionsData}
             />

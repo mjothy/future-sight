@@ -1,21 +1,13 @@
 /* eslint-disable prefer-const */
 import { ColumnsType } from 'antd/lib/table';
 import React, { Component } from 'react';
-import BlockDataModel from '../../../models/BlockDataModel';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
 
 export default class DataBlockView extends Component<any, any> {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      visualizeData: [],
-      layout: this.prepareLayout([])
-    }
-  }
-
   componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): void {
+    // TODO verifie if props.currentBlock or dashboard
     if (this.props.dashboard !== prevProps.dashboard || this.props.plotData !== prevProps.plotData) {
       // this will be run infinitely if no data exist of {model, scenario, variable, region }
       this.settingPlotData();
