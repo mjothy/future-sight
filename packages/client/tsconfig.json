@@ -5,6 +5,5 @@
     "jsx": "react-jsx",
     "noEmit": true
   },
-  "references": [{ "path": "../common" }],
   "include": ["src"]
 }
