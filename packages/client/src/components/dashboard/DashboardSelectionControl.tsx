@@ -38,6 +38,7 @@ export default class DashboardSelectionControl extends Component<
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevState.dashboard != this.state.dashboard) {
+      console.log("update dashboard")
       setDraft(this.state.dashboard.id, this.state.dashboard);
     }
   }
@@ -95,10 +96,10 @@ export default class DashboardSelectionControl extends Component<
       const newDataStructure = dashboard.dataStructure;
       const toDeleteBlocks = blocksIdToDelete(Object.values(this.state.dashboard.blocks), newDataStructure);
       const selectedFilter = getSelectedFilter(newDataStructure);
+      const blockAndLayouts = this.deleteBlocks(Array.from(toDeleteBlocks));
 
-      //TODO: set dashboard one time (here we set state seconde time after delete blocks)
+      dashboard = { ...dashboard, ...blockAndLayouts }
       this.setState({ dashboard }, () => {
-        this.deleteBlocks(Array.from(toDeleteBlocks));
         this.props.updateFilterByDataFocus(this.state.dashboard, selectedFilter);
       });
     } else {
@@ -161,15 +162,14 @@ export default class DashboardSelectionControl extends Component<
 
     })
 
-    this.setState({
-      dashboard: {
-        ...this.state.dashboard,
-        blocks: blocks,
-        layout: layout,
-      },
-      blockSelectedId: '',
-    });
+    this.setState({ blockSelectedId: '' })
 
+    const blocksAndLayouts = {
+      blocks: blocks,
+      layout: layout,
+    }
+
+    return blocksAndLayouts;
   };
 
   saveData = async (callback?: (idPermanent) => void, image?: string) => {

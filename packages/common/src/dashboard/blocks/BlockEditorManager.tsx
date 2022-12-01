@@ -74,6 +74,11 @@ export default class BlockEditorManager extends Component<any, any> {
     this.setState({ tab: tabType });
   };
 
+  onConfirm = () => {
+    const blocksAndLayout = this.props.deleteBlocks([this.props.blockSelectedId])
+    this.props.updateDashboard({ ...this.props.dashboard, ...blocksAndLayout });
+  }
+
   render() {
 
     return (
@@ -105,7 +110,7 @@ export default class BlockEditorManager extends Component<any, any> {
           <Col span={2}>
             <Popconfirm
               title="Are you sure you want to delete this block ?"
-              onConfirm={() => this.props.deleteBlocks([this.props.blockSelectedId])}
+              onConfirm={this.onConfirm}
               okText="Yes"
               cancelText="No"
             >
