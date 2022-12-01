@@ -3,6 +3,7 @@ import {
   BlockModel,
   ComponentPropsWithDataManager,
   ConfigurationModel,
+  getBlock,
   ReadOnlyDashboard,
 } from '@future-sight/common';
 import { Component } from 'react';
@@ -123,7 +124,6 @@ class DashboardDataConfiguration extends Component<
 
       if (missingData.length > 0) {
         this.retreiveAllTimeSeriesData(missingData);
-        console.log("run enter")
       }
       return data;
     }
@@ -138,7 +138,19 @@ class DashboardDataConfiguration extends Component<
   getPlotData = (blocks: BlockModel[]) => {
     const data: any[] = [];
     Object.values(blocks).forEach((block: any) => {
-      const metaData: BlockDataModel = block.config.metaData;
+      const metaData: BlockDataModel = { ...block.config.metaData };
+
+      // get all possible data from controlled blocks
+      const controlBlock = getBlock(blocks, block.controlBlock);
+      if (controlBlock.id !== '') {
+        const config = controlBlock.config as ConfigurationModel;
+        this.optionsLabel.forEach(option => {
+          if (config.metaData.master[option].isMaster) {
+            metaData[option] = config.metaData[option];
+          }
+        })
+      }
+
       // Check if the block type != text
       if (
         metaData !== undefined &&
@@ -164,6 +176,7 @@ class DashboardDataConfiguration extends Component<
   retreiveAllTimeSeriesData = (data) => {
     this.props.dataManager.fetchPlotData(data)
       .then(res => {
+        console.log("debug call: ", data);
         this.setState({ plotData: [...this.state.plotData, ...res] });
       }
       );

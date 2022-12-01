@@ -37,13 +37,6 @@ export default class DashboardSelectionControl extends Component<
     this.state = this.initialize()
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevState.dashboard != this.state.dashboard) {
-      console.log("update dashboard")
-      setDraft(this.state.dashboard.id, this.state.dashboard);
-    }
-  }
-
   initialize() {
     // Check first if dashboard in draft
     const state = {
@@ -63,9 +56,6 @@ export default class DashboardSelectionControl extends Component<
       if (dashboardJson) {
         state.dashboard = dashboardJson;
         state.isDraft = true;
-        this.props.getPlotData(dashboardJson.blocks);
-        const selectedFilter = getSelectedFilter(dashboardJson.dataStructure);
-        this.props.updateFilterByDataFocus(dashboardJson, selectedFilter);
       } else {
         console.error('no draft found with id' + id);
       }
@@ -73,6 +63,21 @@ export default class DashboardSelectionControl extends Component<
     }
 
     return state;
+  }
+
+  componentDidMount(): void {
+    if (this.state.dashboard != undefined) {
+      this.props.getPlotData(this.state.dashboard.blocks);
+      const selectedFilter = getSelectedFilter(this.state.dashboard.dataStructure);
+      this.props.updateFilterByDataFocus(this.state.dashboard, selectedFilter);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevState.dashboard != this.state.dashboard) {
+      console.log("update dashboard")
+      setDraft(this.state.dashboard.id, this.state.dashboard);
+    }
   }
 
   getLastId = () => {
