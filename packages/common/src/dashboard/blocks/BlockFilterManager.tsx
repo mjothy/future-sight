@@ -1,4 +1,3 @@
-import { notification } from 'antd';
 import React, { Component } from 'react';
 import ConfigurationModel from '../../models/ConfigurationModel';
 import ControlBlockEditor from './control/ControlBlockEditor';
@@ -22,54 +21,24 @@ export default class BlockFilterManager extends Component<any, any> {
     }
 
     componentDidMount() {
-        const optionsData = this.updateDropdownData();
-        this.checkIfSelectedInOptions(optionsData);
-        this.setState({ optionsData })
-
+        this.updateDropdownData();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.blockSelectedId !== this.props.blockSelectedId || this.props.dashboard != prevProps.dashboard) {
-            const optionsData = this.updateDropdownData();
-            this.checkIfSelectedInOptions(optionsData);
-            this.setState({ optionsData })
+            this.updateDropdownData();
         }
-    }
-
-    /**
-     * Check if data in selection (selected data) are present in Select options
-     */
-    checkIfSelectedInOptions = (optionsData) => {
-        const optionsLabel = this.props.optionsLabel;
-        const dashboard = { ...this.props.dashboard };
-        const config = this.props.currentBlock.config;
-        let isDashboardUpdated = false;
-        optionsLabel.forEach(option => {
-            const dataInOptionsData = config.metaData[option].filter(data => optionsData[option].includes(data));
-
-            if (dataInOptionsData.length < config.metaData[option].length) {
-                isDashboardUpdated = true;
-                config.metaData[option] = dataInOptionsData;
-                dashboard.blocks[this.props.currentBlock.id].config = { ...config };
-            }
-        });
-
-        if (isDashboardUpdated) {
-            this.props.updateDashboard(dashboard);
-            notification.warning({
-                message: 'Data missing',
-                description: 'Some selected data are not available  in existing options (due to your latest modifications), block will be updated automatically ',
-                placement: 'top',
-            });
-        }
-
     }
 
     updateDropdownData = () => {
         const selectedData = this.getSelectedData();
 
         console.log("selectedData (filter): ", selectedData);
-        return this.filtreOptions(selectedData);
+        const optionsData = this.filtreOptions(selectedData);
+
+        this.setState({ optionsData })
+        this.props.checkIfSelectedInOptions(optionsData, this.props.currentBlock);
+
     };
 
     /**

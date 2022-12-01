@@ -200,6 +200,7 @@ class DashboardDataConfiguration extends Component<
       <ReadOnlyDashboard
         shareButtonOnClickHandler={() => Utils.copyToClipboard()}
         blockData={this.blockData}
+        optionsLabel={this.optionsLabel}
         {...this.props}
       />
     ) : (
