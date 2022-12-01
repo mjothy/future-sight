@@ -23,6 +23,7 @@ interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
     isEmbedded?: boolean;
     shareButtonOnClickHandler: () => void;
     blockData: (block: BlockModel) => any[];
+    optionsLabel: string[]
 }
 
 type LocationState = { dashboard: DashboardModel };
@@ -41,29 +42,8 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
      * @param data Block config metaData
      * @param idBlock In case of controling dataBlocks by controlBlock (so the control block is not necessarily selected, we need mandatory the id of controlBlock)
      */
-    const updateBlockMetaData = (data, idBlock = '') => {
-
-        if (!!dashboard) {
-            // store the selected data
-            const f_dashboard: DashboardModel = dashboard
-            let f_blockSelectedId: string;
-            if (blockSelectedId === '') {
-                f_blockSelectedId = idBlock;
-            } else {
-                f_blockSelectedId = blockSelectedId;
-            }
-
-            const selectedBlock = f_dashboard.blocks[f_blockSelectedId];
-            if (selectedBlock.blockType !== 'text') {
-                const config = selectedBlock.config as ConfigurationModel
-                let metaData = config.metaData;
-                metaData = { ...metaData, ...data };
-                config.metaData = metaData;
-            } else {
-                selectedBlock.config = { value: data };
-            }
-            setDashboard({ ...dashboard, blocks: f_dashboard.blocks });
-        }
+    const updateDashboard = (updatedDashboard) => {
+        setDashboard({ ...updatedDashboard });
     };
 
 
@@ -71,13 +51,11 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
         const locationState = location.state as LocationState;
         if (locationState?.dashboard) {
             setDashboard(locationState.dashboard);
-            // props.setDashboardModelScenario(locationState.dashboard.dataStructure);
         } else {
             const id = searchParams.get('id') as string;
             const fetchDashboard = async (id: string) => {
                 await props.dataManager.getDashboard(id).then((dashboard) => {
                     setDashboard(dashboard);
-                    // props.setDashboardModelScenario(dashboard.dataStructure);
                 });
             };
             fetchDashboard(id);
@@ -138,17 +116,16 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                 {dashboard && (
                     <DashboardConfigView
                         dashboard={dashboard}
-                        layout={dashboard.layout}
-                        blocks={dashboard.blocks}
                         getData={() => { }}
                         updateSelectedBlock={(blockSelectedId: string) => {
                         }}
                         blockSelectedId={undefined}
-                        updateBlockConfig={updateBlockMetaData}
+                        updateDashboard={updateDashboard}
                         updateDashboardMetadata={(data) => {
                         }}
                         readonly
                         blockData={props.blockData}
+                        optionsLabel={props.optionsLabel}
                     />
                 )}
             </div>
