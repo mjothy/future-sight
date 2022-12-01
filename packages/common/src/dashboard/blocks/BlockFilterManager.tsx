@@ -21,48 +21,55 @@ export default class BlockFilterManager extends Component<any, any> {
         };
     }
 
-    async componentDidMount(): Promise<void> {
-        await this.updateDropdownData();
-        await this.checkIfSelectedInOptions();
+    componentDidMount() {
+        const optionsData = this.updateDropdownData();
+        this.checkIfSelectedInOptions(optionsData);
+        this.setState({ optionsData })
+
     }
 
-    async componentDidUpdate(prevProps, prevState, snapshot) {
-        // the second condition to not update the dropdown list of ControlData
+    componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.blockSelectedId !== this.props.blockSelectedId || this.props.dashboard != prevProps.dashboard) {
-            await this.updateDropdownData();
-            await this.checkIfSelectedInOptions();
+            const optionsData = this.updateDropdownData();
+            this.checkIfSelectedInOptions(optionsData);
+            this.setState({ optionsData })
         }
     }
 
     /**
      * Check if data in selection (selected data) are present in Select options
      */
-    checkIfSelectedInOptions = () => {
-        const options = this.props.options;
+    checkIfSelectedInOptions = (optionsData) => {
+        const optionsLabel = this.props.optionsLabel;
         const dashboard = { ...this.props.dashboard };
         const config = this.props.currentBlock.config;
+        let isDashboardUpdated = false;
+        optionsLabel.forEach(option => {
+            const dataInOptionsData = config.metaData[option].filter(data => optionsData[option].includes(data));
 
-        options.forEach(option => {
-            const existData = config.metaData[option].filter(data => this.state.optionsData[option].includes(data));
-
-            if (existData.length < config.metaData[option].length) {
-                config.metaData[option] = existData;
+            if (dataInOptionsData.length < config.metaData[option].length) {
+                isDashboardUpdated = true;
+                config.metaData[option] = dataInOptionsData;
                 dashboard.blocks[this.props.currentBlock.id].config = { ...config };
-                this.props.updateDashboard(dashboard);
-                notification.warning({
-                    message: 'Data missing',
-                    description: 'Some selected data are not available  in existing options (due to your latest modifications), block will be updated automatically ',
-                    placement: 'top',
-                });
             }
         });
+
+        if (isDashboardUpdated) {
+            this.props.updateDashboard(dashboard);
+            notification.warning({
+                message: 'Data missing',
+                description: 'Some selected data are not available  in existing options (due to your latest modifications), block will be updated automatically ',
+                placement: 'top',
+            });
+        }
+
     }
 
     updateDropdownData = () => {
         const selectedData = this.getSelectedData();
 
         console.log("selectedData (filter): ", selectedData);
-        this.filtreOptions(selectedData);
+        return this.filtreOptions(selectedData);
     };
 
     /**
@@ -78,7 +85,7 @@ export default class BlockFilterManager extends Component<any, any> {
         };
         const metaData = this.props.currentBlock.config.metaData;
         const controlBlock = getBlock(this.props.dashboard.blocks, this.props.currentBlock.controlBlock);
-        this.props.options.forEach((option) => {
+        this.props.optionsLabel.forEach((option) => {
             if (controlBlock.id === undefined) {
                 selectedData[option] = metaData[option];
             } else {
@@ -105,8 +112,8 @@ export default class BlockFilterManager extends Component<any, any> {
             scenarios: new Set<string>(),
             models: new Set<string>(),
         };
-        const options = this.props.options;
-        let uncontroledOptions = [...this.props.options];
+        const optionsLabel = this.props.optionsLabel;
+        let uncontroledOptionsLabel = [...this.props.optionsLabel];
         const filtreByDataFocus = this.props.filtreByDataFocus;
         const globalFiltersJson = this.props.filters;
 
@@ -114,7 +121,7 @@ export default class BlockFilterManager extends Component<any, any> {
         const controlBlock = getBlock(this.props.dashboard.blocks, this.props.currentBlock.controlBlock);
         if (controlBlock.id !== undefined) {
             const controlConfig = controlBlock.config as ConfigurationModel;
-            uncontroledOptions = this.props.options.filter(option => {
+            uncontroledOptionsLabel = this.props.optionsLabel.filter(option => {
                 if (controlConfig.metaData.master[option].isMaster) {
                     optionsData[option] = selectedData[option]
                 } else {
@@ -124,10 +131,10 @@ export default class BlockFilterManager extends Component<any, any> {
         }
 
         // set uncontrolled options
-        uncontroledOptions.forEach((option) => {
+        uncontroledOptionsLabel.forEach((option) => {
             filtreByDataFocus[option].forEach((optionValue) => {
                 let isExist = true;
-                options.forEach((filterKey) => {
+                optionsLabel.forEach((filterKey) => {
                     if (option !== filterKey) {
                         selectedData[filterKey].forEach((value) => {
                             if (
@@ -145,11 +152,11 @@ export default class BlockFilterManager extends Component<any, any> {
             });
         });
 
-        options.forEach((option) => {
+        optionsLabel.forEach((option) => {
             optionsData[option] = Array.from(optionsData[option]);
         });
 
-        this.setState({ optionsData });
+        return optionsData;
     };
 
     onChange = (option, selectedData: string[]) => {

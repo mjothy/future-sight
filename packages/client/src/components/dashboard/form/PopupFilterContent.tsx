@@ -13,7 +13,7 @@ export default class PopupFilterContent extends Component<any, any> {
   handleCheckedFilter = (e: RadioChangeEvent) => {
     const filter = e.target.value;
     // tHE KEY can be: models/scenarios/regions/variables
-    this.props.options.map((key) => {
+    this.props.optionsLabel.map((key) => {
       if (filter === key) {
         this.props.dataStructure[key].isFilter = true;
       } else {

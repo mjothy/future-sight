@@ -26,10 +26,10 @@ class DashboardDataConfiguration extends Component<
   DashboardDataConfigurationProps,
   any
 > {
-  options: string[] = [];
+  optionsLabel: string[] = [];
   constructor(props) {
     super(props);
-    this.options = this.props.dataManager.getOptions();
+    this.optionsLabel = this.props.dataManager.getOptions();
     this.state = {
       filters: {
         regions: {},
@@ -122,7 +122,7 @@ class DashboardDataConfiguration extends Component<
       }
 
       if (missingData.length > 0) {
-        this.setPlotData(missingData);
+        this.retreiveAllTimeSeriesData(missingData);
         console.log("run enter")
       }
       return data;
@@ -158,10 +158,10 @@ class DashboardDataConfiguration extends Component<
         });
       }
     });
-    this.setPlotData(data);
+    this.retreiveAllTimeSeriesData(data);
   };
 
-  setPlotData = (data) => {
+  retreiveAllTimeSeriesData = (data) => {
     this.props.dataManager.fetchPlotData(data)
       .then(res => {
         this.setState({ plotData: [...this.state.plotData, ...res] });
@@ -178,7 +178,7 @@ class DashboardDataConfiguration extends Component<
     if (selectedFilter !== '' && this.state.isFetchData) {
       const data = this.state.filtreByDataFocus;
       data[selectedFilter] = dashboard.dataStructure[selectedFilter].selection;
-      this.options.forEach((option) => {
+      this.optionsLabel.forEach((option) => {
         if (option !== selectedFilter) {
           data[selectedFilter].forEach((filterValue) => {
             data[option] = Array.from(
@@ -206,13 +206,12 @@ class DashboardDataConfiguration extends Component<
       (this.state.isFetchData && <DashboardSelectionControl
         saveData={this.saveData}
         filters={this.state.filters}
-        setPlotData={this.setPlotData}
         plotData={this.state.plotData}
         blockData={this.blockData}
         getPlotData={this.getPlotData}
         updateFilterByDataFocus={this.updateFilterByDataFocus}
         filtreByDataFocus={this.state.filtreByDataFocus}
-        options={this.options}
+        optionsLabel={this.optionsLabel}
         {...this.props}
       />) || <div className="dashboard">
         <Spin className="centered" />

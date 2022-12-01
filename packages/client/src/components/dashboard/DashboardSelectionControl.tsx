@@ -19,13 +19,12 @@ export interface DashboardSelectionControlProps
   RoutingProps {
   saveData: (id: string, image?: string) => Promise<any>;
   filters: any;
-  setPlotData: (data: any[]) => void;
   plotData: any[];
   blockData: (block: BlockModel) => any[];
   getPlotData: (blocks: BlockModel[]) => void;
   updateFilterByDataFocus: (dashboard: DashboardModel, filtre: string) => void;
   filtreByDataFocus: any;
-  options: string[]
+  optionsLabel: string[]
 }
 
 export default class DashboardSelectionControl extends Component<
@@ -39,7 +38,6 @@ export default class DashboardSelectionControl extends Component<
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevState.dashboard != this.state.dashboard) {
-      console.log("update dashboard")
       setDraft(this.state.dashboard.id, this.state.dashboard);
     }
   }
@@ -98,6 +96,7 @@ export default class DashboardSelectionControl extends Component<
       const toDeleteBlocks = blocksIdToDelete(Object.values(this.state.dashboard.blocks), newDataStructure);
       const selectedFilter = getSelectedFilter(newDataStructure);
 
+      //TODO: set dashboard one time (here we set state seconde time after delete blocks)
       this.setState({ dashboard }, () => {
         this.deleteBlocks(Array.from(toDeleteBlocks));
         this.props.updateFilterByDataFocus(this.state.dashboard, selectedFilter);
