@@ -17,7 +17,6 @@ interface DashboardViewProps extends ComponentPropsWithDataManager, RoutingProps
   isDraft: boolean;
   readonly?: boolean;
   updateDashboard: (dashboard: DashboardModel) => void;
-  updateBlockConfig: (data: any, idBlock) => void
 }
 
 /**

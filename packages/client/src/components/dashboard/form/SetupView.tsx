@@ -39,8 +39,6 @@ export default class SetupView extends Component<any, any> {
     // Check if there is an already selected filter
     if (getSelectedFilter(this.props.dashboard.dataStructure) !== '') {
       this.setState({ isSubmit: true }, () => {
-        console.log("dashboard state before0: ", this.props.dashboard.dataStructure)
-
         this.showConfirm()
       })
     } else {

@@ -16,45 +16,51 @@ export default class ControlBlockEditor extends Component<any, any> {
   };
 
   onCheckChange = (option, e) => {
-    const metaData = this.props.currentBlock.config.metaData;
-    metaData.master[option].isMaster = e.target.checked;
-    this.props.updateBlockConfig({ metaData }, this.props.currentBlock.id);
-    // Update also children
-    const childrens = Object.values(this.props.dashboard.blocks).filter(
-      (block: BlockModel | any) =>
-        block.controlBlock === this.props.currentBlock.id
-    );
+
+    const dashboard = { ...this.props.dashboard };
+    const config = this.props.currentBlock.config;
+
+    // update current block config (metadata)
+    config.metaData.master[option].isMaster = e.target.checked;
+    dashboard.blocks[this.props.currentBlock.id].config = { ...config };
+    config.metaData.master[option].values = [];
+
+    // Update children
+    const childrens = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id);
 
     if (childrens.length > 0 && e) {
       childrens.map((child: BlockModel | any) => {
-        const metaData = { ...child.config.metaData };
-        metaData.selectOrder = Array.from(new Set([...child.config.metaData.selectOrder, option]));
-        this.props.updateBlockConfig({ metaData }, child.id);
+        const config = child.config;
+        config.metaData.selectOrder = Array.from(new Set([...child.config.metaData.selectOrder, option]));
+        config.metaData[option] = [];
+        dashboard.blocks[child.id].config = { ...config };
       });
     }
+
+    this.props.updateDashboard(dashboard);
   };
 
   clearClick = (option, e) => {
-    const block = this.props.dashboard.blocks[this.props.blockSelectedId];
-    const metaData = block.config.metaData;
 
-    metaData[option] = [];
-    // Update the control view
-    metaData.master[option].values = [];
+    const dashboard = { ...this.props.dashboard };
+    const config = this.props.currentBlock.config;
 
-    this.props.updateBlockConfig({
-      metaData
-    }, this.props.currentBlock.id);
+    // update current block config (metadata)
+    config.metaData[option] = [];
+    config.metaData.master[option].values = [];
+    dashboard.blocks[this.props.currentBlock.id].config = { ...config };
 
-    // update children data blocks
-    if (block.config.metaData.master[option].isMaster) {
-      const childBlocks = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id)
-      childBlocks.forEach(async (block: BlockModel | any) => {
-        const blockMetaData = { ...block.config.metaData };
-        blockMetaData[option] = [];
-        await this.props.updateBlockConfig({ blockMetaData }, block.id);
+    const isMaster = config.metaData.master[option].isMaster;
+    if (isMaster) {
+      const childrens = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id)
+      childrens.forEach((child: BlockModel | any) => {
+        const configChild = child.config;
+        configChild.metaData[option] = [];
+        dashboard.blocks[child.id].config = { ...configChild };
       })
     }
+
+    this.props.updateDashboard(dashboard);
   };
 
   /**
@@ -62,23 +68,27 @@ export default class ControlBlockEditor extends Component<any, any> {
    * @param option input type (models, scenarios, ...)
    * @param unselectedData deselected data
    */
-  updateControlView = async (option, unselectedData) => {
-    // Check if the unselected value is selected in the view, if its the case update ControlBlockView
-    const metaData = { ...this.props.dashboard.blocks[this.props.currentBlock.id].config.metaData };
-    const newValues = metaData.master[option].values.filter(value => value !== unselectedData);
-    metaData.master[option].values = newValues;
-    await this.props.updateBlockConfig({ metaData }, this.props.currentBlock.id);
+  updateControlView = (option, unselectedData) => {
+    // Check if the unselected value is selected in the view, if its the case update ControlBlockView and childs
+    const dashboard = { ...this.props.dashboard };
+    const config = this.props.currentBlock.config;
+    const newValues = config.metaData.master[option].values.filter(value => value !== unselectedData);
+    config.metaData.master[option].values = newValues;
+    dashboard.blocks[this.props.currentBlock.id].config = { ...config };
 
+    const isMaster = this.props.currentBlock.config.metaData.master[option].isMaster;
     // update all the data blocks
-    if (metaData.master[option].isMaster) {
-      const childBlocks = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id)
-      childBlocks.forEach(async (block: BlockModel | any) => {
-        const blockMetaData = { ...block.config.metaData };
-        const newValues = blockMetaData[option].filter(value => value !== unselectedData);
-        blockMetaData[option] = newValues;
-        await this.props.updateBlockConfig({ metaData: blockMetaData }, block.id);
+    if (isMaster) {
+      const childrens = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id)
+      childrens.forEach((child: BlockModel | any) => {
+        const configChild = { ...child.config };
+        const newValues = configChild.metaData[option].filter(value => value !== unselectedData);
+        configChild.metaData[option] = newValues;
+        dashboard.blocks[child.id].config = { ...configChild };
       })
     }
+
+    this.props.updateDashboard(dashboard);
   }
 
   selectDropDown = (option) => {

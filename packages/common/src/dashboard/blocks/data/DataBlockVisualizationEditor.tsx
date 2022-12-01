@@ -31,25 +31,25 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   onPlotTypeChange = (selectedType: string) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.graphType = selectedType;
-    this.props.updateBlockConfig({ configStyle }, this.props.currentBlock.id)
+    this.updateBlockConfig({ configStyle: configStyle })
   };
 
   onTitleChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.title.value = e.target.value;
-    this.props.updateBlockConfig({ configStyle }, this.props.currentBlock.id)
+    this.updateBlockConfig({ configStyle: configStyle })
   };
 
   onTitleVisibilityChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.title.isVisible = e.target.checked;
-    this.props.updateBlockConfig({ configStyle }, this.props.currentBlock.id)
+    this.updateBlockConfig({ configStyle: configStyle })
   };
 
   onLegendChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.showLegend = e.target.checked;
-    this.props.updateBlockConfig({ configStyle }, this.props.currentBlock.id)
+    this.updateBlockConfig({ configStyle: configStyle })
   };
 
   onLegendContentChange = (checkedValues) => {
@@ -63,7 +63,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     for (const value of checkedValues) {
       configStyle.legend[value] = true;
     }
-    this.props.updateBlockConfig({ configStyle }, this.props.currentBlock.id)
+    this.updateBlockConfig({ configStyle: configStyle })
   };
 
   legendOptions = () => {
@@ -73,21 +73,28 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   onYAxisLabelChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.YAxis.label = e.target.checked;
-    this.props.updateBlockConfig({ configStyle }, this.props.currentBlock.id)
+    this.updateBlockConfig({ configStyle: configStyle })
   }
 
   onYAxisUnitChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.YAxis.unit = e.target.checked;
-    this.props.updateBlockConfig({ configStyle }, this.props.currentBlock.id)
+    this.updateBlockConfig({ configStyle: configStyle })
   }
 
   onYAxisForceChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.YAxis.force0 = e.target.checked;
-    this.props.updateBlockConfig({ configStyle }, this.props.currentBlock.id)
+    this.updateBlockConfig({ configStyle: configStyle })
   }
 
+
+  updateBlockConfig = (configStyle) => {
+    const dashboard = { ...this.props.dashboard };
+    const config = dashboard.blocks[this.props.currentBlock.id].config;
+    dashboard.blocks[this.props.currentBlock.id].config = { ...config, ...configStyle };
+    this.props.updateDashboard(dashboard)
+  }
   render() {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     const legend = this.props.currentBlock.config.configStyle.legend;

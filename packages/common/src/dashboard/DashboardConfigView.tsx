@@ -75,8 +75,6 @@ class DashboardConfigView extends Component<any, any> {
      * @param layout the update layouts
      */
     onLayoutChange = (layout) => {
-        console.log("dashboard enter 1")
-
         if (!this.props.readonly) {
             this.props.updateDashboard({
                 ...this.props.dashboard,

@@ -9,26 +9,30 @@ const { Option } = Select;
 export default class ControlBlockView extends Component<any, any> {
 
   onChange = (option, selectedData: string[]) => {
-    const metaData = this.props.currentBlock.config.metaData;
-    metaData.master[option].values = selectedData;
-    this.props.updateBlockConfig({ metaData }, this.props.currentBlock.id);
+    const dashboard = { ...this.props.dashboard };
+    const config = this.props.dashboard.blocks[this.props.currentBlock.id].config;
 
-    // Update also children
+    // update current block config (metadata)
+    config.metaData.master[option].values = selectedData;
+    dashboard.blocks[this.props.currentBlock.id].config = { ...config };
+
+    // Update children
     const childrens = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id);
 
     if (childrens.length > 0) {
       childrens.map((child: BlockModel | any) => {
-        const childMetaData = this.props.dashboard.blocks[child.id].config.metaData
-        Object.keys(metaData.master).map((option) => {
-          if (metaData.master[option].isMaster) {
-            // Use setState instate of mutate it directly
-            childMetaData[option] = metaData.master[option].values;
-            this.props.updateBlockConfig({ childMetaData }, child.id);
+        const configChild = child.config;
+        this.props.options.map((option) => {
+          const isMaster = config.metaData.master[option].isMaster;
+          if (isMaster) {
+            configChild.metaData[option] = config.metaData.master[option].values;
+            dashboard.blocks[child.id].config = { ...configChild };
           }
         });
       });
     }
 
+    this.props.updateDashboard(dashboard)
   };
 
   selectDropDown = (option) => {

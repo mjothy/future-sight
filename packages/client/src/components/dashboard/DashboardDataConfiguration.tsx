@@ -123,6 +123,7 @@ class DashboardDataConfiguration extends Component<
 
       if (missingData.length > 0) {
         this.setPlotData(missingData);
+        console.log("run enter")
       }
       return data;
     }

@@ -6,13 +6,13 @@ import PlotlyGraph from '../../graphs/PlotlyGraph';
 
 export default class DataBlockView extends Component<any, any> {
 
-  componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): void {
-    // TODO verifie if props.currentBlock or dashboard
-    if (this.props.dashboard !== prevProps.dashboard || this.props.plotData !== prevProps.plotData) {
-      // this will be run infinitely if no data exist of {model, scenario, variable, region }
-      this.settingPlotData();
-    }
-  }
+  // componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): void {
+  //   // TODO verifie if props.currentBlock or dashboard
+  //   if (this.props.dashboard !== prevProps.dashboard || this.props.plotData !== prevProps.plotData) {
+  //     // this will be run infinitely if no data exist of {model, scenario, variable, region }
+  //     this.settingPlotData();
+  //   }
+  // }
 
   /**
    * Preparing the fetched data to adapt plotly data OR antd table
@@ -21,7 +21,7 @@ export default class DataBlockView extends Component<any, any> {
   settingPlotData = () => {
     const { currentBlock } = this.props;
     const data: any[] = this.props.blockData(currentBlock);
-    console.log("Run settingPlotData", data);
+    console.log("Run settingPlotData", currentBlock.blockType);
     const showData: any[] = [];
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
@@ -214,7 +214,9 @@ export default class DataBlockView extends Component<any, any> {
   }
 
   render() {
+    console.log("enter")
     const { data, layout } = this.settingPlotData();
+    let i =1;
     return <PlotlyGraph {...this.props} data={data} layout={layout} />;
   }
 }

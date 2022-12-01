@@ -9,7 +9,10 @@ export default class TextBlockEditor extends React.Component<any, any> {
                 className={"mt-20"}
                 value={this.props.currentBlock.config.value}
                 onChange={(value?: string | undefined) => {
-                    this.props.updateBlockConfig({ value }, this.props.currentBlock.id);
+                    const dashboard = { ...this.props.dashboard };
+                    const config = dashboard.blocks[this.props.currentBlock.id].config;
+                    dashboard.blocks[this.props.currentBlock.id].config = { ...config, value };
+                    this.props.updateDashboard(dashboard)
                 }}
                 previewOptions={{
                     rehypePlugins: [[rehypeSanitize]],

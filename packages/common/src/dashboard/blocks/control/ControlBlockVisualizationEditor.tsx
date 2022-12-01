@@ -13,13 +13,20 @@ export default class ControlBlockVisualizationEditor extends Component<any, any>
 
   onTitleChange = (e) => {
     this.configStyle.title.value = e.target.value;
-    this.props.updateBlockConfig({ configStyle: this.configStyle }, this.props.currentBlock.id);
+    this.updateBlockConfig({ configStyle: this.configStyle })
   };
 
   onTitleVisibilityChange = (e) => {
     this.configStyle.title.isVisible = e.target.checked;
-    this.props.updateBlockConfig({ configStyle: this.configStyle }, this.props.currentBlock.id);
+    this.updateBlockConfig({ configStyle: this.configStyle })
   };
+
+  updateBlockConfig = (configStyle) => {
+    const dashboard = { ...this.props.dashboard };
+    const config = dashboard.blocks[this.props.currentBlock.id].config;
+    dashboard.blocks[this.props.currentBlock.id].config = { ...config, ...configStyle };
+    this.props.updateDashboard(dashboard)
+  }
 
   render() {
     this.configStyle = this.props.currentBlock.config.configStyle;

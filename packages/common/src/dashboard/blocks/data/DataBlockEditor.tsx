@@ -10,30 +10,34 @@ import { getUnselectedInputOptions } from '../utils/BlockDataUtils';
 export default class DataBlockEditor extends Component<any, any> {
 
   onDropdownVisibleChange = (option, e) => {
-    const metaData = { ...this.props.currentBlock.config.metaData };
-    if (!e && metaData[option].length > 0) {
+    const dashboard = { ...this.props.dashboard };
+    const config = this.props.currentBlock.config;
+    if (!e && config.metaData[option].length > 0) {
       // Update the order of selection
-      metaData.selectOrder = Array.from(
-        new Set<string>([...metaData.selectOrder, option])
+      config.metaData.selectOrder = Array.from(
+        new Set<string>([...config.metaData.selectOrder, option])
       );
-      this.props.updateBlockConfig({ metaData }, this.props.currentBlock.id);
+      dashboard.blocks[this.props.currentBlock.id].config = { ...config };
+      this.props.updateDashboard(dashboard);
     }
   };
 
   clearClick = (option, e) => {
-    const data = { ...this.props.currentBlock.config.metaData };
+    const dashboard = { ...this.props.dashboard };
+    const config = this.props.currentBlock.config;
 
-    const metaData = this.props.currentBlock.config.metaData;
-    const index = metaData.selectOrder.indexOf(option);
+    const index = config.metaData.selectOrder.indexOf(option);
     if (index >= 0) {
-      const selectOrder = [...metaData.selectOrder];
+      const selectOrder = [...config.metaData.selectOrder];
 
-      for (let i = index; i < metaData.selectOrder.length; i++) {
-        selectOrder.splice(selectOrder.indexOf(metaData.selectOrder[i]), 1);
-        data[metaData.selectOrder[i]] = [];
+      for (let i = index; i < config.metaData.selectOrder.length; i++) {
+        selectOrder.splice(selectOrder.indexOf(config.metaData.selectOrder[i]), 1);
+        // TODO add condition for controlled inputs
+        config.metaData[config.metaData.selectOrder[i]] = [];
       }
-      data.selectOrder = Array.from(new Set<string>([...selectOrder]));
-      this.props.updateBlockConfig({ metaData: data }, this.props.currentBlock.id);
+      config.metaData.selectOrder = Array.from(new Set<string>([...selectOrder]));
+      dashboard.blocks[this.props.currentBlock.id].config = { ...config };
+      this.props.updateDashboard(dashboard);
     }
 
   };
