@@ -131,7 +131,7 @@ export default class DataBlockView extends Component<any, any> {
           x: this.getX(dataElement),
           y: this.getY(dataElement),
           mode: 'none',
-          name: this.getLegend(dataElement, configStyle.legend),
+          name: this.getLabel(this.getLegend(dataElement, configStyle.legend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
         };
@@ -141,7 +141,7 @@ export default class DataBlockView extends Component<any, any> {
           type: configStyle.graphType,
           x: this.getX(dataElement),
           y: this.getY(dataElement),
-          name: this.getLegend(dataElement, configStyle.legend),
+          name: this.getLabel(this.getLegend(dataElement, configStyle.legend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
         };
@@ -204,11 +204,15 @@ export default class DataBlockView extends Component<any, any> {
   prepareLayout = (data) => {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
     return {
+      margin: {
+        l: 1000
+      },
       YAxis: {
         title: {
-          text: this.getYAxisLabel(data)
+          text: this.getLabel(this.getYAxisLabel(data), this.props.height, "ytitle"),
         },
-        rangemode: configStyle.YAxis.force0 ? "tozero" : "normal"
+        rangemode: configStyle.YAxis.force0 ? "tozero" : "normal",
+        automargin: true
       }
     }
   }
@@ -240,6 +244,40 @@ export default class DataBlockView extends Component<any, any> {
     } else {
       return undefined;
     }
+  }
+
+  // TODO change position
+  getLabel = (str, size, element) => {
+    if (str != undefined) {
+      let width = size / 10;
+      const doc = document.getElementsByClassName(element)[0];
+      if (doc !== undefined) {
+        const fontSize: any = window.getComputedStyle(doc).getPropertyValue("font-size").split("px")[0];
+        const sizeChar = parseFloat(fontSize);
+        if (!isNaN(sizeChar)) {
+          width = size / sizeChar;
+        }
+      }
+      let res = this.stringDivider(str, width, "<br>");
+      return res;
+
+    }
+    else return undefined;
+
+  }
+  // TODO change position
+  stringDivider = (str, width, spaceReplacer) => {
+    if (str.length > width) {
+      let p = width
+      for (; p > 0 && str[p] != ' '; p--) {
+        if (p > 0) {
+          let left = str.substring(0, p);
+          let right = str.substring(p + 1);
+          return left + spaceReplacer + this.stringDivider(right, width, spaceReplacer);
+        }
+      }
+    }
+    return str;
   }
 
   render() {
