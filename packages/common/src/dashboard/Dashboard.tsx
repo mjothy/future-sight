@@ -8,7 +8,7 @@ import DashboardModel from '../models/DashboardModel';
 import LayoutModel from '../models/LayoutModel';
 import BlockModel from '../models/BlockModel';
 import {Layout, notification} from "antd";
-import {Content} from "antd/es/layout/layout";
+const {Content} = Layout;
 import html2canvas from "html2canvas";
 
 const DEFAULT_PREVIEW_WIDTH = 800;

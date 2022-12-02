@@ -1,6 +1,5 @@
 import {AreaChartOutlined, BarChartOutlined, LineChartOutlined, TableOutlined} from '@ant-design/icons';
-import {Col, Input, Row, Select} from 'antd';
-import Checkbox from 'antd/es/checkbox';
+import {Col, Input, Row, Select, Checkbox} from 'antd';
 import {Component} from 'react';
 
 const { Option } = Select;

@@ -1,7 +1,4 @@
-import {
-  IDataManager,
-  DataModel,
-} from '@future-sight/common';
+import type {IDataManager, DataModel} from '@future-sight/common';
 
 export default class DataManager implements IDataManager {
   getBaseUrl() {
