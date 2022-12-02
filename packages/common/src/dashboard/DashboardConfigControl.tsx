@@ -4,11 +4,16 @@ import PropTypes from 'prop-types';
 import { DashboardProps } from './Dashboard';
 import BlockEditorManager from './blocks/BlockEditorManager';
 
+export interface DashboardConfigControlProps extends DashboardProps {
+  publishing: boolean
+  onPublish: () => void
+}
+
 /**
  * Show {Edit selected block} OR {Add new block}
  */
 export default class DashboardConfigControl extends Component<
-  DashboardProps,
+    DashboardConfigControlProps,
   any
 > {
   static propTypes = {

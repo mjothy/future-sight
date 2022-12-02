@@ -14,7 +14,7 @@ import html2canvas from "html2canvas";
 const DEFAULT_PREVIEW_WIDTH = 800;
 const DEFAULT_PREVIEW_HEIGHT = 450;
 
-export const  withNavigation = (Comp : Component) => {
+export const  withNavigation = (Comp : React.ComponentType) => {
     return (props) => <Comp {...props} navigate={useNavigate()} />;
 }
 
@@ -30,6 +30,7 @@ export interface DashboardProps extends ComponentPropsWithDataManager {
     updateBlockStyleConfig: (data: any) => void;
     saveDashboard: (callback: (idPermanent) => void, image?: string) => void;
     isEmbedded?: boolean;
+    navigate:(any)=> any;
 }
 
 class Dashboard extends Component<DashboardProps, any> {
