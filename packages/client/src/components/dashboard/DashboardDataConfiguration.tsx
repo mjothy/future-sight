@@ -176,7 +176,6 @@ class DashboardDataConfiguration extends Component<
   retreiveAllTimeSeriesData = (data) => {
     this.props.dataManager.fetchPlotData(data)
       .then(res => {
-        console.log("debug call: ", data);
         this.setState({ plotData: [...this.state.plotData, ...res] });
       }
       );
