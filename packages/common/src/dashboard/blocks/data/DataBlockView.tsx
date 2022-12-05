@@ -1,4 +1,4 @@
-import {ColumnsType} from 'antd/lib/table';
+import type {ColumnsType} from 'antd/lib/table';
 import React, {Component} from 'react';
 import BlockDataModel from '../../../models/BlockDataModel';
 import BlockStyleModel from '../../../models/BlockStyleModel';

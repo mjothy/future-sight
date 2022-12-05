@@ -3,7 +3,7 @@ import { Col, Row, Space } from 'antd';
 import Preview from "./Preview";
 
 import "./PreviewGroup.css"
-import { DashboardModel } from '@future-sight/common';
+import type {DashboardModel} from '@future-sight/common';
 
 export default class PreviewGroup extends React.Component<any, any> {
     render() {

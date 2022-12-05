@@ -1,9 +1,5 @@
-import {
-  BlockModel,
-  ComponentPropsWithDataManager,
-  DataModel,
-  LayoutModel,
-} from '@future-sight/common';
+import type {ComponentPropsWithDataManager, DataModel} from '@future-sight/common';
+import {BlockModel, LayoutModel} from '@future-sight/common';
 import { Component } from 'react';
 import { RoutingProps } from '../app/Routing';
 

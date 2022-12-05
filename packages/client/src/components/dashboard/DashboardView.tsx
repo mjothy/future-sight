@@ -1,10 +1,5 @@
-import {
-  BlockModel,
-  ComponentPropsWithDataManager,
-  Dashboard,
-  DashboardModel,
-  LayoutModel,
-} from '@future-sight/common';
+import type {ComponentPropsWithDataManager, DashboardModel} from '@future-sight/common';
+import {BlockModel, Dashboard, LayoutModel} from '@future-sight/common';
 import React from 'react';
 import SetupView from './form/SetupView';
 import { RoutingProps } from '../app/Routing';

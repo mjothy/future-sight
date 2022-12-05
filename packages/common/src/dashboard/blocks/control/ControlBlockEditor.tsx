@@ -1,5 +1,4 @@
-import { Button, Col, Row, Select } from 'antd';
-import Checkbox from 'antd/es/checkbox';
+import { Button, Col, Row, Select, Checkbox } from 'antd';
 import { Component } from 'react';
 import DataBlockTableSelection from '../component/DataBlockTableSelection';
 
