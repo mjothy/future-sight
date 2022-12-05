@@ -99,7 +99,10 @@ export default class DashboardSelectionControl extends Component<
         const block = blocks[blockId];
         if (block.blockType !== 'text') {
           if (deletion.model in block.config.metaData.models) {
-            toRemove.push(blockId)
+            const scenarios = block.config.metaData.models[deletion.model]
+            if (scenarios.some((scenario)=>{return deletion.scenarios.includes(scenario)})){
+              toRemove.push(blockId)
+            }
           }
         }
       }
