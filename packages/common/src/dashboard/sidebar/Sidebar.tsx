@@ -8,8 +8,9 @@ import {
     PicLeftOutlined,
     PicRightOutlined,
 } from '@ant-design/icons';
-import {Button, Space, Tooltip} from 'antd';
-import Sider from "antd/es/layout/Sider";
+import {Button, Space, Tooltip, Layout} from 'antd';
+
+const { Sider } = Layout;
 
 export default class Sidebar extends Component<any, any> {
     static propTypes = {

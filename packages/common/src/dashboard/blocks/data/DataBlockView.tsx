@@ -1,4 +1,4 @@
-import { ColumnsType } from 'antd/lib/table';
+import type { ColumnsType } from 'antd/lib/table';
 import React, { Component } from 'react';
 import BlockDataModel from '../../../models/BlockDataModel';
 import BlockStyleModel from '../../../models/BlockStyleModel';
@@ -205,9 +205,6 @@ export default class DataBlockView extends Component<any, any> {
   prepareLayout = (data) => {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
     return {
-      margin: {
-        l: 1000
-      },
       YAxis: {
         title: {
           text: PlotlyUtils.getLabel(this.getYAxisLabel(data), this.props.height, "ytitle"),

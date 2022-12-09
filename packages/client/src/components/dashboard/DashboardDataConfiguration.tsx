@@ -1,8 +1,5 @@
-import {
-  ComponentPropsWithDataManager,
-  DataModel,
-  ReadOnlyDashboard,
-} from '@future-sight/common';
+import type {ComponentPropsWithDataManager, DataModel} from '@future-sight/common';
+import {ReadOnlyDashboard} from '@future-sight/common';
 import { Component } from 'react';
 import withDataManager from '../../services/withDataManager';
 import { RoutingProps } from '../app/Routing';
