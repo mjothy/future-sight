@@ -25,7 +25,10 @@ export default class PlotlyGraph extends Component<any, any> {
     let layout: any = {
       width: this.props.width,
       height: this.props.height,
-      legend: { orientation: 'h' },
+      legend: {
+        // x: -0.25,
+        orientation: "h",
+      },
       autosize: false,
       margin: this.getMargins(),
       font: {

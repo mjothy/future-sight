@@ -1,8 +1,9 @@
-import {ColumnsType} from 'antd/lib/table';
-import React, {Component} from 'react';
+import { ColumnsType } from 'antd/lib/table';
+import React, { Component } from 'react';
 import BlockDataModel from '../../../models/BlockDataModel';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
+import PlotlyUtils from '../../graphs/PlotlyUtils';
 
 export default class DataBlockView extends Component<any, any> {
 
@@ -56,14 +57,14 @@ export default class DataBlockView extends Component<any, any> {
 
     let plotData;
     if (configStyle.graphType === 'table') {
-      plotData =  this.prepareTableData(data);
+      plotData = this.prepareTableData(data);
     } else {
       data.map((dataElement) => {
         showData.push(this.preparePlotData(dataElement, configStyle));
       });
       plotData = showData;
     }
-    return {data: plotData, layout: this.prepareLayout(data)}
+    return { data: plotData, layout: this.prepareLayout(data) }
   }
 
   prepareTableData = (data) => {
@@ -100,11 +101,11 @@ export default class DataBlockView extends Component<any, any> {
   getLegend = (dataElement, legend) => {
     if (!legend) {
       return dataElement.region
-          + " - " + dataElement.variable
-          + " - " + dataElement.scenario
-          + " - " + dataElement.model
+        + " - " + dataElement.variable
+        + " - " + dataElement.scenario
+        + " - " + dataElement.model
     } else {
-      let label: any[] = [];
+      const label: any[] = [];
       if (legend.Region && dataElement.region) {
         label.push(dataElement.region)
       }
@@ -131,7 +132,7 @@ export default class DataBlockView extends Component<any, any> {
           x: this.getX(dataElement),
           y: this.getY(dataElement),
           mode: 'none',
-          name: this.getLabel(this.getLegend(dataElement, configStyle.legend), this.props.width, "legendtext"),
+          name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
         };
@@ -141,7 +142,7 @@ export default class DataBlockView extends Component<any, any> {
           type: configStyle.graphType,
           x: this.getX(dataElement),
           y: this.getY(dataElement),
-          name: this.getLabel(this.getLegend(dataElement, configStyle.legend), this.props.width, "legendtext"),
+          name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
         };
@@ -209,10 +210,10 @@ export default class DataBlockView extends Component<any, any> {
       },
       YAxis: {
         title: {
-          text: this.getLabel(this.getYAxisLabel(data), this.props.height, "ytitle"),
+          text: PlotlyUtils.getLabel(this.getYAxisLabel(data), this.props.height, "ytitle"),
         },
         rangemode: configStyle.YAxis.force0 ? "tozero" : "normal",
-        automargin: true
+        automargin: true,
       }
     }
   }
@@ -220,68 +221,34 @@ export default class DataBlockView extends Component<any, any> {
   getYAxisLabel = (data) => {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
-    let labels = {}
-    for (let dataElement of data) {
+    const labels = {}
+    for (const dataElement of data) {
       labels[dataElement.variable] = dataElement.unit
     }
-    let label: any[] = []
-    for (let key of Object.keys(labels)) {
+    const label: any[] = []
+    for (const key of Object.keys(labels)) {
       let text;
       if (configStyle.YAxis.unit && configStyle.YAxis.label) {
-        text = key + " (" + labels[key] + ") "
+        text = key + "<br>" + labels[key]
       } else if (configStyle.YAxis.unit) {
         text = labels[key]
       } else if (configStyle.YAxis.label) {
         text = key
       }
-      if(text) {
+      if (text) {
         label.push(text)
       }
     }
     if (label.length > 0) {
-      let uniqueItems = [...new Set(label)]
-      return uniqueItems.join(" - ")
+      const uniqueItems = [...new Set(label)]
+      return uniqueItems.join("<br>")
     } else {
       return undefined;
     }
   }
 
-  // TODO change position
-  getLabel = (str, size, element) => {
-    if (str != undefined) {
-      let width = size / 10;
-      const doc = document.getElementsByClassName(element)[0];
-      if (doc !== undefined) {
-        const fontSize: any = window.getComputedStyle(doc).getPropertyValue("font-size").split("px")[0];
-        const sizeChar = parseFloat(fontSize);
-        if (!isNaN(sizeChar)) {
-          width = size / sizeChar;
-        }
-      }
-      let res = this.stringDivider(str, width, "<br>");
-      return res;
-
-    }
-    else return undefined;
-
-  }
-  // TODO change position
-  stringDivider = (str, width, spaceReplacer) => {
-    if (str.length > width) {
-      let p = width
-      for (; p > 0 && str[p] != ' '; p--) {
-        if (p > 0) {
-          let left = str.substring(0, p);
-          let right = str.substring(p + 1);
-          return left + spaceReplacer + this.stringDivider(right, width, spaceReplacer);
-        }
-      }
-    }
-    return str;
-  }
-
   render() {
-    const {data, layout} = this.settingPlotData();
+    const { data, layout } = this.settingPlotData();
     return <PlotlyGraph {...this.props} data={data} layout={layout} />;
   }
 }
