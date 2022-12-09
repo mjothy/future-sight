@@ -230,7 +230,7 @@ class DashboardDataConfiguration extends Component<
         <Spin className="centered" />
       </div>
 
-      // TODO handle error 
+      // TODO handle error
     );
   }
 }

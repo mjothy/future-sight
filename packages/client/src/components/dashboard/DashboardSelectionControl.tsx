@@ -84,9 +84,7 @@ export default class DashboardSelectionControl extends Component<
     const dashboardJson = this.state.dashboard;
     let lastId = 0;
     if (Object.keys(dashboardJson.blocks).length > 0) {
-      lastId = Math.max(
-        ...Object.keys(dashboardJson.blocks).map((key) => parseInt(key))
-      );
+      lastId = Math.max(...Object.keys(dashboardJson.blocks).map((key => parseInt(key))));
     }
     return lastId;
   };
@@ -98,7 +96,7 @@ export default class DashboardSelectionControl extends Component<
   updateDashboard = (dashboard: DashboardModel) => {
     const isUpdateDataStructure = compareDataStructure(this.state.dashboard.dataStructure, dashboard.dataStructure);
     if (isUpdateDataStructure) {
-      // Update dataStructure (Data focus)      
+      // Update dataStructure (Data focus)
       const newDataStructure = dashboard.dataStructure;
       const toDeleteBlocks = blocksIdToDelete(Object.values(this.state.dashboard.blocks), newDataStructure);
       const selectedFilter = getSelectedFilter(newDataStructure);
@@ -144,7 +142,7 @@ export default class DashboardSelectionControl extends Component<
         blocks: dashboard.blocks,
         layout: dashboard.layout,
       },
-      blockSelectedId: layoutItem.i,
+      blockSelectedId: layoutItem.i
     };
     this.setState(state);
   };

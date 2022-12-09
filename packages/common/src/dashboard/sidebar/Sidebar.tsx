@@ -9,9 +9,9 @@ import {
   PicLeftOutlined,
   PicRightOutlined,
 } from '@ant-design/icons';
-import { Button, Drawer, Space, Tooltip } from 'antd';
+import { Button, Space, Tooltip, Layout } from 'antd';
 import DashboardGlobalInfo from './DashboardGlobalInfo';
-import Sider from "antd/es/layout/Sider";
+const { Sider } = Layout;
 
 export default class Sidebar extends Component<any, any> {
   static propTypes = {
@@ -34,12 +34,6 @@ export default class Sidebar extends Component<any, any> {
         visible: true,
       });
     }
-    setTimeout(
-      () => {
-        window.dispatchEvent(new Event('resize'));
-      },
-      200 // 200ms is the transition duration of closing the sider
-    );
   }
 
   toggleVisible = () => {
@@ -53,7 +47,7 @@ export default class Sidebar extends Component<any, any> {
   getTitle = () => {
     if (this.props.blockSelectedId !== '') {
       return (
-        <Space>
+        <Space className={"ant-drawer-title"}>
           <Tooltip title="Back to block creation" placement={"left"}>
             <Button icon={<ArrowLeftOutlined />} onClick={this.props.onClose} />
           </Tooltip>
@@ -61,7 +55,7 @@ export default class Sidebar extends Component<any, any> {
         </Space>
       )
     } else {
-      return (<Space>
+      return (<Space className={"ant-drawer-title"}>
         <strong>{this.props.dashboard.userData.title}</strong>
         <em>- by {this.props.dashboard.userData.author}</em>
 

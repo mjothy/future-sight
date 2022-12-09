@@ -2,12 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "sourceMap": true,
-    "composite": true,
     "module": "commonjs",
     "jsx": "react-jsx",
     "rootDir": "src",
-    "outDir": "build"
+    "outDir": "build",
+    "declaration": true
   },
-  "include": ["src", "assets"],
-  "files": ["src/models/dashboardModel.json"]
+  "include": ["src", "src/**/*.json"]
 }

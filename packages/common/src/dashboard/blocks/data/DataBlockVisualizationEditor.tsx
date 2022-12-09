@@ -1,7 +1,6 @@
-import { AreaChartOutlined, BarChartOutlined, LineChartOutlined, TableOutlined } from '@ant-design/icons';
-import { Col, Input, Row, Select } from 'antd';
-import Checkbox from 'antd/es/checkbox';
-import { Component } from 'react';
+import {AreaChartOutlined, BarChartOutlined, LineChartOutlined, TableOutlined} from '@ant-design/icons';
+import {Col, Input, Row, Select, Checkbox} from 'antd';
+import {Component} from 'react';
 
 const { Option } = Select;
 const ATTRIBUTES = {
@@ -20,10 +19,10 @@ const ATTRIBUTES = {
 }
 
 const plotTypes = [
-  { type: 'line', label: 'Line', icon: <LineChartOutlined /> },
-  { type: 'bar', label: 'Bar', icon: <BarChartOutlined /> },
-  { type: 'area', label: 'Area', icon: <AreaChartOutlined /> },
-  { type: 'table', label: 'Table', icon: <TableOutlined /> },
+  {type: 'line', label: 'Line', icon: <LineChartOutlined/>},
+  {type: 'bar', label: 'Bar', icon: <BarChartOutlined />},
+  {type: 'area', label: 'Area', icon: <AreaChartOutlined />},
+  {type: 'table', label: 'Table', icon: <TableOutlined />},
 ];
 
 export default class DataBlockVisualizationEditor extends Component<any, any> {
@@ -186,13 +185,13 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
           </Col>
         </Row>
         <Row>
-          <Col span={2} />
+          <Col span={2}/>
           <Col span={8}>
             <label>Legend info: </label>
           </Col>
         </Row>
         <Row>
-          <Col span={2} />
+          <Col span={2}/>
           <Col>
             <Checkbox.Group options={this.legendOptions()} value={defaultLegendOptions} onChange={this.onLegendContentChange} />
           </Col>
