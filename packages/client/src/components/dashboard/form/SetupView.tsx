@@ -1,9 +1,10 @@
 import { Component } from 'react';
-import UserDataForm from './UserDataForm';
-import DataStructureForm from './DataStructureForm';
-import {Alert, Button, Divider, Row, Space, Typography } from 'antd';
+import PopupFilterContent from './PopupFilterContent';
+import { Modal, Button } from 'antd';
+import { FilterTwoTone } from '@ant-design/icons';
+import { DataStructureModel, getSelectedFilter } from '@future-sight/common';
 
-const { Title } = Typography;
+const { confirm } = Modal;
 
 /**
  * The view for setting dashboard mataData
@@ -11,59 +12,100 @@ const { Title } = Typography;
 export default class SetupView extends Component<any, any> {
   constructor(props) {
     super(props);
+    this.state = {
+      dataStructure: JSON.parse(JSON.stringify(this.props.dashboard.dataStructure)),
+      visible: getSelectedFilter(this.props.dashboard.dataStructure) === '',
+      isSubmit: false
+    };
   }
 
-  /**
-   * Submit the meta data to send it to dashboard
-   */
-  handleSubmit = () => {
-    this.props.submitEvent('dashboard');
-  };
+  show = () => {
+    this.setState({ visible: true })
+  }
 
-  /**
-   * Receive the user data from UserDataForm and send it to DashboardView to update the parent state
-   * @param data contains the information of the dashboard {title, author and tags}
-   */
-  handleUserData = (data) => {
-    this.props.updateUserData(data);
-  };
+  handleCancel = () => {
+    this.setState({
+      isSubmit: false,
+      visible: false,
+      dataStructure: JSON.parse(JSON.stringify(this.props.dashboard.dataStructure)),
+    })
+  }
 
-  hasFilledStructure = () => {
-      return Object.keys(this.props.structureData).length !== 0
+  updateDataStructure = (dataStructure) => {
+    this.setState({ dataStructure });
+  }
+
+  handleOk = () => {
+    // Check if there is an already selected filter
+    if (getSelectedFilter(this.props.dashboard.dataStructure) !== '') {
+      this.setState({ isSubmit: true }, () => {
+        this.showConfirm()
+      })
+    } else {
+      this.setState({ visible: false });
+      this.updateDashboardDataStructure();
+    }
+
+  }
+
+  updateDashboardDataStructure = () => {
+    const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+    dashboard.dataStructure = new DataStructureModel();
+    const selectedFilter = getSelectedFilter(this.state.dataStructure);
+    dashboard.dataStructure[selectedFilter] = JSON.parse(JSON.stringify(this.state.dataStructure[selectedFilter]));
+
+    this.props.updateDashboard(dashboard);
+
+    this.setState({
+      visible: false,
+      dataStructure: JSON.parse(JSON.stringify(dashboard.dataStructure))
+    })
+  }
+
+  showConfirm = () => {
+    confirm({
+      title: 'Do you Want to update the current filter?',
+      content: 'If you are removing data from your filter, that will remove all blocks using them.',
+      onOk: () => {
+        this.updateDashboardDataStructure();
+      },
+      onCancel: () => {
+        this.handleCancel();
+      }
+    });
   }
 
   render() {
+    let selectedFilter = getSelectedFilter(this.props.dashboard.dataStructure);
+    if (selectedFilter !== '') {
+      selectedFilter = ': ' + selectedFilter;
+    }
     return (
-      <div className="setupView-content">
-        <UserDataForm
-          {...this.props}
-          handleUserData={this.handleUserData}
-          userData={this.props.userData}
-        />
-        <Divider />
-
-        <Title level={4} className="center">
-          Data Structure
-        </Title>
-        <DataStructureForm
-          {...this.props}
-          handleStructureData={this.props.handleStructureData}
-          structureData={this.props.structureData}
-        />
-
-        <Divider />
-        <Row justify="end">
-            <Space>
-                {!this.hasFilledStructure() ? (
-                        <Alert message="You must select at least one Model and Scenario" type="warning" />
-                    ) : undefined
-                }
-                <Button type="primary" onClick={this.handleSubmit} disabled={!this.hasFilledStructure()}>
-                    Submit
-                </Button>
-            </Space>
-        </Row>
-      </div>
+      <>
+        <div className="back-to-setup">
+          <Button value="setup" onClick={this.show}>
+            <FilterTwoTone />Data focus {selectedFilter}
+          </Button>
+        </div>
+        <Modal
+          title="Choose the data to focus on:"
+          visible={this.state.visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          closable={false}
+          maskClosable={false}
+          zIndex={2}
+          okText={'submit'}
+          destroyOnClose={true}
+        >
+          <PopupFilterContent
+            {...this.props}
+            dataStructure={this.state.dataStructure}
+            updateDataStructure={this.updateDataStructure}
+            handleOk={this.handleOk}
+          />
+        </Modal>
+      </>
     );
   }
 }

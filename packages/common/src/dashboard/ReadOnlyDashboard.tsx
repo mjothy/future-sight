@@ -1,12 +1,14 @@
+/* eslint-disable prefer-const */
+/* eslint-disable no-extra-boolean-cast */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import {LinkOutlined} from '@ant-design/icons';
-import {Spin, Button, PageHeader} from 'antd';
-import React, {useEffect, useState} from 'react';
-import {useLocation, useSearchParams} from 'react-router-dom';
+import { LinkOutlined } from '@ant-design/icons';
+import { Button, PageHeader, Spin } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
+import BlockModel from '../models/BlockModel';
 import ConfigurationModel from '../models/ConfigurationModel';
 import DashboardModel from '../models/DashboardModel';
-import DataModel from '../models/DataModel';
 import DashboardConfigView from './DashboardConfigView';
 
 /*TODO Check that embedded and published view have the same purpose and always look ok,
@@ -17,11 +19,11 @@ import DashboardConfigView from './DashboardConfigView';
 // TODO Change published URL to youtube embedded standard embed/... instead of view?.../embedded
 
 interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
-    getData: (data: DataModel[]) => any[];
     setEnableSwitchEmbeddedMode: (enable: boolean) => void;
     isEmbedded?: boolean;
-    setDashboardModelScenario: (selection) => void;
-    shareButtonOnClickHandler?: () => void;
+    shareButtonOnClickHandler: () => void;
+    blockData: (block: BlockModel) => any[];
+    optionsLabel: string[]
 }
 
 type LocationState = { dashboard: DashboardModel };
@@ -40,29 +42,8 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
      * @param data Block config metaData
      * @param idBlock In case of controling dataBlocks by controlBlock (so the control block is not necessarily selected, we need mandatory the id of controlBlock)
      */
-    const updateBlockMetaData = (data, idBlock = '') => {
-
-        if (!!dashboard) {
-            // store the selected data
-            const f_dashboard: DashboardModel = dashboard
-            let f_blockSelectedId: string;
-            if (blockSelectedId === '') {
-                f_blockSelectedId = idBlock;
-            } else {
-                f_blockSelectedId = blockSelectedId;
-            }
-
-            const selectedBlock = f_dashboard.blocks[f_blockSelectedId];
-            if (selectedBlock.blockType !== 'text') {
-                const config = selectedBlock.config as ConfigurationModel
-                let metaData = config.metaData;
-                metaData = {...metaData, ...data};
-                config.metaData = metaData;
-            } else {
-                selectedBlock.config = {value: data};
-            }
-            setDashboard({...dashboard, blocks: f_dashboard.blocks});
-        }
+    const updateDashboard = (updatedDashboard) => {
+        setDashboard({ ...updatedDashboard });
     };
 
 
@@ -70,13 +51,11 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
         const locationState = location.state as LocationState;
         if (locationState?.dashboard) {
             setDashboard(locationState.dashboard);
-            props.setDashboardModelScenario(locationState.dashboard.dataStructure);
         } else {
             const id = searchParams.get('id') as string;
             const fetchDashboard = async (id: string) => {
                 await props.dataManager.getDashboard(id).then((dashboard) => {
                     setDashboard(dashboard);
-                    props.setDashboardModelScenario(dashboard.dataStructure);
                 });
             };
             fetchDashboard(id);
@@ -92,12 +71,12 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
         ? ""
         : new Date(dashboard.date).toLocaleString(
             [],
-            {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'})
+            { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 
     return (
         <div
             className="dashboard readonly"
-            style={{height: props.isEmbedded ? '100%' : undefined}}
+            style={{ height: props.isEmbedded ? '100%' : undefined }}
         >
             {dashboard && (
                 <PageHeader
@@ -113,7 +92,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                             key="share"
                             type="default"
                             size="small"
-                            icon={<LinkOutlined/>}
+                            icon={<LinkOutlined />}
                             onClick={props.shareButtonOnClickHandler}
                         >
                             Share
@@ -127,27 +106,26 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                         //   Download the data
                         // </Button>,
                     ]}
-                    avatar={{alt: 'logo-short', shape: 'square', size: 'large'}}
+                    avatar={{ alt: 'logo-short', shape: 'square', size: 'large' }}
                 />
             )}
             <div className="dashboard-content">
-            {/*<div className="dashboard-content" style={{width: `${TEST_RATIO*100}vh`}}>*/}
-                {(isLoading || !dashboard) && <Spin/>}
+                {(isLoading || !dashboard) && <Spin />}
+                {/*<div className="dashboard-content" style={{width: `${TEST_RATIO*100}vh`}}>*/}
+                {(isLoading || !dashboard) && <Spin />}
                 {dashboard && (
                     <DashboardConfigView
                         dashboard={dashboard}
-                        layout={dashboard.layout}
-                        blocks={dashboard.blocks}
-                        getData={props.getData}
+                        getData={() => { }}
                         updateSelectedBlock={(blockSelectedId: string) => {
                         }}
                         blockSelectedId={undefined}
-                        updateBlockMetaData={updateBlockMetaData}
-                        updateBlockStyleConfig={(data) => {
-                        }}
+                        updateDashboard={updateDashboard}
                         updateDashboardMetadata={(data) => {
                         }}
                         readonly
+                        blockData={props.blockData}
+                        optionsLabel={props.optionsLabel}
                     />
                 )}
             </div>

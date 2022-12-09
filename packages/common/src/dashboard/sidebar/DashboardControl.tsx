@@ -19,7 +19,7 @@ const actions = [
 ];
 
 /**
- * Dashboard control: to set the block type and send a notification to parent (Dashboard) to add/edit block
+ * Sidebar when no block is selected (to create new block or publish dashboard)
  */
 const DashboardControl: React.FC<any> = ({
                                                         addBlock,

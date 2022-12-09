@@ -1,4 +1,7 @@
 export default interface IDataProxy {
     getData: () => any[];
-    getModels: () => object;
+    getModels: () => any;
+    getVariables: () => any;
+    getScenarios: () => any;
+    getRegions: () => any;
 }

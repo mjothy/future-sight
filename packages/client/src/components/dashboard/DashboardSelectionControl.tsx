@@ -1,18 +1,31 @@
-import type {ComponentPropsWithDataManager, DataModel} from '@future-sight/common';
-import {BlockModel, LayoutModel} from '@future-sight/common';
+import {
+  BlockModel,
+  blocksIdToDelete,
+  compareDataStructure,
+  ComponentPropsWithDataManager,
+  ConfigurationModel,
+  DashboardModel,
+  getSelectedFilter,
+  LayoutModel,
+} from '@future-sight/common';
 import { Component } from 'react';
 import { RoutingProps } from '../app/Routing';
 
 import DashboardView from './DashboardView';
 import { getDraft, setDraft } from '../drafts/DraftUtils';
-import { Spin } from 'antd';
+import { notification, Spin } from 'antd';
 
 export interface DashboardSelectionControlProps
   extends ComponentPropsWithDataManager,
   RoutingProps {
-  getData: (data: DataModel[]) => any[];
   saveData: (id: string, image?: string) => Promise<any>;
-  setDashboardModelScenario: (selection) => void;
+  filters: any;
+  plotData: any[];
+  blockData: (block: BlockModel) => any[];
+  getPlotData: (blocks: BlockModel[]) => void;
+  updateFilterByDataFocus: (dashboard: DashboardModel, filtre: string) => void;
+  filtreByDataFocus: any;
+  optionsLabel: string[]
 }
 
 export default class DashboardSelectionControl extends Component<
@@ -21,45 +34,49 @@ export default class DashboardSelectionControl extends Component<
 > {
   constructor(props) {
     super(props);
-    this.state = {
-      dashboard: undefined,
-      sidebarVisible: false,
+    this.state = this.initialize()
+  }
 
+  initialize() {
+    // Check first if dashboard in draft
+    const state = {
+      dashboard: {},
       /**
        * The selected block id
        */
       blockSelectedId: '',
       isDraft: false,
     };
-  }
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevState.dashboard != this.state.dashboard) {
-      setDraft(this.state.dashboard.id, this.state.dashboard);
-      if (this.state.dashboard) {
-        this.props.setDashboardModelScenario(
-          this.state.dashboard.dataStructure
-        );
-      }
-    }
-  }
-
-  componentDidMount() {
-    // Check first if dashboard in draft
     const w_location = window.location.pathname;
     if (w_location.includes('draft')) {
       const locationSearch = window.location.search;
       const params = new URLSearchParams(locationSearch);
       const id = params.get('id');
-      const dashboardJson = getDraft(id);
+      const dashboardJson: any = getDraft(id);
       if (dashboardJson) {
-        this.setState({
-          dashboard: dashboardJson,
-          isDraft: true
-        });
+        state.dashboard = dashboardJson;
+        state.isDraft = true;
       } else {
         console.error('no draft found with id' + id);
       }
+
+    }
+
+    return state;
+  }
+
+  componentDidMount(): void {
+    if (this.state.dashboard != undefined) {
+      this.props.getPlotData(this.state.dashboard.blocks);
+      const selectedFilter = getSelectedFilter(this.state.dashboard.dataStructure);
+      this.props.updateFilterByDataFocus(this.state.dashboard, selectedFilter);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevState.dashboard != this.state.dashboard) {
+      console.log("update dashboard")
+      setDraft(this.state.dashboard.id, this.state.dashboard);
     }
   }
 
@@ -70,84 +87,29 @@ export default class DashboardSelectionControl extends Component<
       lastId = Math.max(...Object.keys(dashboardJson.blocks).map((key => parseInt(key))));
     }
     return lastId;
-  }
-
-  updateLayout = (layout: LayoutModel[]) => {
-    this.setState({
-      dashboard: {
-        ...this.state.dashboard,
-        layout: layout,
-      },
-    });
   };
 
   updateSelectedBlock = (blockSelectedId: string) => {
     this.setState({ blockSelectedId });
   };
 
-  updateDashboardMetadata = (data, deletion?: any) => {
-    if (deletion) {
-      //remove all blocks associated to deletion.model
-      const blocks = { ...this.state.dashboard.blocks };
-      const layout = [...this.state.dashboard.layout];
-      const toRemove: string[] = []
-      for (const blockId in blocks) {
-        const block = blocks[blockId];
-        if (block.blockType !== 'text') {
-          if (deletion.model in block.config.metaData.models) {
-            const scenarios = block.config.metaData.models[deletion.model]
-            if (scenarios.some((scenario)=>{return deletion.scenarios.includes(scenario)})){
-              toRemove.push(blockId)
-            }
-          }
-        }
-      }
-      for (const blockId of toRemove) {
-        delete blocks[blockId];
-        const index = layout.findIndex((element) => element.i === blockId);
-        layout.splice(index, 1);
-      }
-      this.setState({
-        dashboard: {
-          ...this.state.dashboard,
-          blocks: blocks,
-          layout: layout,
-          ...data
-        }
-      })
-    } else {
-      this.setState({ dashboard: { ...this.state.dashboard, ...data } });
-    }
-  };
+  updateDashboard = (dashboard: DashboardModel) => {
+    const isUpdateDataStructure = compareDataStructure(this.state.dashboard.dataStructure, dashboard.dataStructure);
+    if (isUpdateDataStructure) {
+      // Update dataStructure (Data focus)
+      const newDataStructure = dashboard.dataStructure;
+      const toDeleteBlocks = blocksIdToDelete(Object.values(this.state.dashboard.blocks), newDataStructure);
+      const selectedFilter = getSelectedFilter(newDataStructure);
+      const blockAndLayouts = this.deleteBlocks(Array.from(toDeleteBlocks));
 
-  /**
-   * Update configuration metaData (selected models and scenarios)
-   * @param data Block config metaData
-   * @param idBlock In case of controling dataBlocks by controlBlock (so the control block is not necessarily selected, we need mandatory the id of controlBlock)
-   */
-  updateBlockMetaData = (data, idBlock) => {
-    const dashboard = this.state.dashboard;
-    // store the selected data
-    const selectedBlock = dashboard.blocks[idBlock];
-    if (selectedBlock.blockType === 'text') {
-      selectedBlock.config = { value: data };
+      dashboard = { ...dashboard, ...blockAndLayouts }
+      this.setState({ dashboard }, () => {
+        this.props.updateFilterByDataFocus(this.state.dashboard, selectedFilter);
+      });
     } else {
-      let metaData = selectedBlock.config.metaData;
-      metaData = { ...metaData, ...data };
-      selectedBlock.config.metaData = metaData;
+      this.setState({ dashboard });
     }
-    this.setState({
-      dashboard: { ...this.state.dashboard, blocks: dashboard.blocks },
-    });
-  };
-
-  updateBlockStyleConfig = (data) => {
-    const dashboard = this.state.dashboard;
-    dashboard.blocks[this.state.blockSelectedId].config.configStyle = data;
-    this.setState({
-      dashboard: { ...this.state.dashboard, blocks: dashboard.blocks },
-    });
-  };
+  }
 
   addBlock = (blockType: string, masterBlockId?: string) => {
     const layoutItem = new LayoutModel((this.getLastId() + 1).toString());
@@ -158,6 +120,20 @@ export default class DashboardSelectionControl extends Component<
 
     if (masterBlockId) {
       dashboard.blocks[layoutItem.i].controlBlock = masterBlockId;
+      const master = dashboard.blocks[masterBlockId].config.metaData.master;
+      Object.keys(master).forEach((option) => {
+        if (master[option].isMaster) {
+          dashboard.blocks[layoutItem.i].config.metaData.selectOrder =
+            Array.from(
+              new Set([
+                ...dashboard.blocks[layoutItem.i].config.metaData.selectOrder,
+                option,
+              ])
+            );
+          dashboard.blocks[layoutItem.i].config.metaData[option] =
+            master[option].values;
+        }
+      });
     }
 
     const state = {
@@ -171,30 +147,34 @@ export default class DashboardSelectionControl extends Component<
     this.setState(state);
   };
 
-  deleteBlock = (blockId: string) => {
+  deleteBlocks = (blocksId: string[]) => {
     const blocks = { ...this.state.dashboard.blocks };
-    const layout = [...this.state.dashboard.layout];
-    const index = layout.findIndex((element) => element.i === blockId);
-    layout.splice(index, 1);
-    // delete childs
-    if (blocks[blockId].blockType === "control") {
-      const blockChilds = Object.values(blocks).filter((block: BlockModel | any) => block.controlBlock === blocks[blockId].id).map((block: BlockModel | any) => block.id);
-      blockChilds.forEach(id => {
-        delete blocks[id];
-        const index = layout.findIndex((element) => element.i === id);
-        layout.splice(index, 1);
-      });
-    }
-    delete blocks[blockId]
-    this.setState({
-      dashboard: {
-        ...this.state.dashboard,
-        blocks: blocks,
-        layout: layout,
-      },
-      blockSelectedId: ""
+    let layout = [...this.state.dashboard.layout];
+    blocksId.forEach(blockId => {
+
+      // delete childs
+      if (blocks[blockId] !== undefined && blocks[blockId].blockType === "control") {
+        const blockChilds = Object.values(blocks).filter((block: BlockModel | any) => block.controlBlock === blockId).map((block: BlockModel | any) => block.id);
+        blockChilds.forEach(id => {
+          delete blocks[id];
+          layout = layout.filter((element) => element.i !== id);
+        });
+      }
+
+      delete blocks[blockId]
+      layout = layout.filter((element) => element.i !== blockId);
+
     })
-  }
+
+    this.setState({ blockSelectedId: '' })
+
+    const blocksAndLayouts = {
+      blocks: blocks,
+      layout: layout,
+    }
+
+    return blocksAndLayouts;
+  };
 
   saveData = async (callback?: (idPermanent) => void, image?: string) => {
     const { id } = this.state.dashboard;
@@ -203,6 +183,35 @@ export default class DashboardSelectionControl extends Component<
       callback(idPermanent);
     }
   };
+
+  /**
+ * Check if data in selection (selected data) are present in Select options
+ */
+  checkIfSelectedInOptions = (optionsData, block: BlockModel) => {
+    const optionsLabel = this.props.optionsLabel;
+    const dashboard = { ...this.state.dashboard };
+    const config = block.config as ConfigurationModel;
+    let isDashboardUpdated = false;
+    optionsLabel.forEach(option => {
+      const dataInOptionsData = config.metaData[option].filter(data => optionsData[option].includes(data));
+
+      if (dataInOptionsData.length < config.metaData[option].length) {
+        isDashboardUpdated = true;
+        config.metaData[option] = dataInOptionsData;
+        dashboard.blocks[block.id as string].config = { ...config };
+      }
+    });
+
+    if (isDashboardUpdated) {
+      this.updateDashboard(dashboard);
+      notification.warning({
+        message: 'Data missing',
+        description: 'Some selected data are not available  in existing options (due to your latest modifications), block will be updated automatically ',
+        placement: 'top',
+      });
+    }
+
+  }
 
   render() {
     if (!this.state.dashboard) {
@@ -217,15 +226,11 @@ export default class DashboardSelectionControl extends Component<
         dashboard={this.state.dashboard}
         addBlock={this.addBlock}
         blockSelectedId={this.state.blockSelectedId}
-        layout={this.state.dashboard.layout}
-        updateLayout={this.updateLayout}
-        blocks={this.state.dashboard.blocks}
         updateSelectedBlock={this.updateSelectedBlock}
-        updateBlockMetaData={this.updateBlockMetaData}
-        updateBlockStyleConfig={this.updateBlockStyleConfig}
+        updateDashboard={this.updateDashboard}
         saveDashboard={this.saveData}
-        updateDashboardMetadata={this.updateDashboardMetadata}
-        deleteBlock={this.deleteBlock}
+        deleteBlocks={this.deleteBlocks}
+        checkIfSelectedInOptions={this.checkIfSelectedInOptions}
         isDraft={this.state.isDraft}
         {...this.props}
       />

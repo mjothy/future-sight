@@ -13,7 +13,7 @@ const ATTRIBUTES = {
   Scenario: {
 
   },
-  Model : {
+  Model: {
 
   }
 }
@@ -27,49 +27,42 @@ const plotTypes = [
 
 export default class DataBlockVisualizationEditor extends Component<any, any> {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      configStyle :  this.props.currentBlock.config.configStyle
-    }
-  }
-
   onPlotTypeChange = (selectedType: string) => {
-    let configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.graphType = selectedType;
-    this.props.updateBlockStyleConfig(configStyle);
+    this.updateBlockConfig({ configStyle: configStyle })
   };
 
   onTitleChange = (e) => {
-    let configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.title.value = e.target.value;
-    this.props.updateBlockStyleConfig(configStyle);
+    this.updateBlockConfig({ configStyle: configStyle })
   };
 
   onTitleVisibilityChange = (e) => {
-    let configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.title.isVisible = e.target.checked;
-    this.props.updateBlockStyleConfig(configStyle);
+    this.updateBlockConfig({ configStyle: configStyle })
   };
 
   onLegendChange = (e) => {
-    let configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.showLegend = e.target.checked;
-    this.props.updateBlockStyleConfig(configStyle);
+    this.updateBlockConfig({ configStyle: configStyle })
   };
 
   onLegendContentChange = (checkedValues) => {
-    let configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.legend = {
       Model: false,
       Scenario: false,
       Region: false,
       Variable: false
     }
-    for (let value of checkedValues) {
+    for (const value of checkedValues) {
       configStyle.legend[value] = true;
     }
-    this.props.updateBlockStyleConfig(configStyle);
+    this.updateBlockConfig({ configStyle: configStyle })
   };
 
   legendOptions = () => {
@@ -77,28 +70,35 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   }
 
   onYAxisLabelChange = (e) => {
-    let configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.YAxis.label = e.target.checked;
-    this.props.updateBlockStyleConfig(configStyle);
+    this.updateBlockConfig({ configStyle: configStyle })
   }
 
   onYAxisUnitChange = (e) => {
-    let configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.YAxis.unit = e.target.checked;
-    this.props.updateBlockStyleConfig(configStyle);
+    this.updateBlockConfig({ configStyle: configStyle })
   }
 
   onYAxisForceChange = (e) => {
-    let configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.YAxis.force0 = e.target.checked;
-    this.props.updateBlockStyleConfig(configStyle);
+    this.updateBlockConfig({ configStyle: configStyle })
   }
 
+
+  updateBlockConfig = (configStyle) => {
+    const dashboard = { ...this.props.dashboard };
+    const config = dashboard.blocks[this.props.currentBlock.id].config;
+    dashboard.blocks[this.props.currentBlock.id].config = { ...config, ...configStyle };
+    this.props.updateDashboard(dashboard)
+  }
   render() {
-    let configStyle = structuredClone(this.props.currentBlock.config.configStyle);
-    let legend = this.props.currentBlock.config.configStyle.legend;
-    let defaultLegendOptions : any[] = [];
-    for (let key of Object.keys(legend)) {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const legend = this.props.currentBlock.config.configStyle.legend;
+    const defaultLegendOptions: any[] = [];
+    for (const key of Object.keys(legend)) {
       if (legend[key]) {
         defaultLegendOptions.push(key);
       }
@@ -142,8 +142,8 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         <Row>
           <Col span={2} className={'checkbox-col'}>
             <Checkbox
-                onChange={this.onYAxisForceChange}
-                checked={configStyle.YAxis.force0}
+              onChange={this.onYAxisForceChange}
+              checked={configStyle.YAxis.force0}
             />
           </Col>
           <Col span={16} className={'checkbox-col-label'}>
@@ -153,8 +153,8 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         <Row>
           <Col span={2} className={'checkbox-col'}>
             <Checkbox
-                onChange={this.onYAxisLabelChange}
-                checked={configStyle.YAxis.label}
+              onChange={this.onYAxisLabelChange}
+              checked={configStyle.YAxis.label}
             />
           </Col>
           <Col span={16} className={'checkbox-col-label'}>
@@ -164,8 +164,8 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         <Row>
           <Col span={2} className={'checkbox-col'}>
             <Checkbox
-                onChange={this.onYAxisUnitChange}
-                checked={configStyle.YAxis.unit}
+              onChange={this.onYAxisUnitChange}
+              checked={configStyle.YAxis.unit}
             />
           </Col>
           <Col span={16} className={'checkbox-col-label'}>

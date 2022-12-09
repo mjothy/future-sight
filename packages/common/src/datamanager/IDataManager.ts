@@ -7,6 +7,12 @@ export default interface IDataManager {
 
   fetchModels: () => Promise<any>;
 
+  fetchScenarios: () => Promise<any>;
+
+  fetchVariables: () => Promise<any>;
+
+  fetchRegions: () => Promise<any>;
+
   getDashboard: (id: string) => Promise<any>;
 
   getDashboards: () => Promise<any>;
@@ -16,4 +22,6 @@ export default interface IDataManager {
   fetchBrowseInitData: () => Promise<any>;
 
   browseData: (data: any) => Promise<any>;
+
+  getOptions: () => string[]
 }

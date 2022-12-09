@@ -4,7 +4,10 @@ import Plot from 'react-plotly.js';
 
 export default class PlotlyGraph extends Component<any, any> {
   getMargins = () => {
-    const hasTitle = this.props.currentBlock.config.configStyle.title.isVisible
+    let hasTitle = false;
+    if (this.props.currentBlock !== undefined) {
+      hasTitle = this.props.currentBlock.config.configStyle.title.isVisible
+    }
     return {
       l: this.props.layout.YAxis.title ? 60 : 40,
       r: 10,
@@ -43,7 +46,7 @@ export default class PlotlyGraph extends Component<any, any> {
       };
     }
 
-    return currentBlock.config.configStyle.graphType === 'table' ? (
+    return currentBlock.config.configStyle.graphType === 'table' && this.props.data.values.length > 0 ? (
       <Table
         // Make the height 100% of the div (not working)
         style={{ minHeight: '100%' }}

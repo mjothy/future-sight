@@ -1,15 +1,22 @@
-import type {ComponentPropsWithDataManager, DataModel} from '@future-sight/common';
-import {ReadOnlyDashboard} from '@future-sight/common';
+import {
+  BlockDataModel,
+  BlockModel,
+  ComponentPropsWithDataManager,
+  ConfigurationModel,
+  getBlock,
+  ReadOnlyDashboard,
+} from '@future-sight/common';
 import { Component } from 'react';
 import withDataManager from '../../services/withDataManager';
 import { RoutingProps } from '../app/Routing';
 import DashboardSelectionControl from './DashboardSelectionControl';
 import { getDraft, removeDraft } from '../drafts/DraftUtils';
 import Utils from '../../services/Utils';
+import { Spin } from 'antd';
 
 export interface DashboardDataConfigurationProps
   extends ComponentPropsWithDataManager,
-    RoutingProps {
+  RoutingProps {
   readonly?: boolean;
 }
 
@@ -20,107 +27,43 @@ class DashboardDataConfiguration extends Component<
   DashboardDataConfigurationProps,
   any
 > {
+  optionsLabel: string[] = [];
   constructor(props) {
     super(props);
+    this.optionsLabel = this.props.dataManager.getOptions();
     this.state = {
+      filters: {
+        regions: {},
+        variables: {},
+        scenarios: {},
+        models: {},
+      },
+      filtreByDataFocus: {
+        regions: [],
+        variables: [],
+        scenarios: [],
+        models: [],
+      },
       /**
        * Data (with timeseries from IASA API)
        */
-      data: [],
-      dashboardModelScenario: [],
+      plotData: [],
+      isFetchData: false
     };
   }
 
-  /**
-   * Compare each { model, scenario } in a and b
-   * @param a the first array of { model, scenario }
-   * @param b the second array of { model, scenario }
-   * @returns whether a and b contain the same objects
-   */
-  modelScenarioIsEqual = (a: any[], b: any[]) => {
-    if (a.length != b.length) {
-      return false;
-    }
-    let i = 0; // a and b should keep the objects order
-    while (i < a.length) {
-      if (a[i].model !== b[i].model && a[i].scenario !== b[i].scenario) {
-        return false;
-      }
-      i++;
-    }
-    return true;
-  };
-
-  componentDidUpdate(
-    prevProps: Readonly<DashboardDataConfigurationProps>,
-    prevState: Readonly<any>,
-    snapshot?: any
-  ): void {
-    const shouldUpdate = !this.modelScenarioIsEqual(
-      prevState.dashboardModelScenario,
-      this.state.dashboardModelScenario
-    ); // A child updated the models and scenarios selected
-    if (shouldUpdate) {
-      this.fetchData();
+  async componentDidMount() {
+    const filters = this.state.filters;
+    try {
+      filters['regions'] = await this.props.dataManager.fetchRegions();
+      filters['variables'] = await this.props.dataManager.fetchVariables();
+      filters['models'] = await this.props.dataManager.fetchModels();
+      filters['scenarios'] = await this.props.dataManager.fetchScenarios();
+      this.setState({ filters, isFetchData: true });
+    } catch (error) {
+      console.log("ERROR FETCH: ", error);
     }
   }
-
-  /**
-   * Add the { model, scenario } selected by the user to the state
-   * @param selection the dashboard dataStructure
-   */
-  setDashboardModelScenario = (selection) => {
-    const modelScenarios: any[] = [];
-    Object.keys(selection).forEach((model) => {
-      Object.keys(selection[model]).forEach((scenario) => {
-        modelScenarios.push({ model, scenario });
-      });
-    });
-
-    this.setState({ dashboardModelScenario: modelScenarios });
-  };
-
-  /**
-   * Fetch the data missing from the state
-   */
-  fetchData = async () => {
-    try {
-      /**
-       * Find modelScenario in the state.data
-       * @param modelScenario the { model, scenario } to find
-       * @returns the object wrapping the data related to the modelScenario, or null if the modelScenario was not found
-       */
-      const findModelScenario = (modelScenario) => {
-        const element = this.state.data.find(
-          (dataElement) =>
-            dataElement.model === modelScenario.model &&
-            dataElement.scenario === modelScenario.scenario
-        );
-        return element ? element : null;
-      };
-
-      const missingData = this.state.dashboardModelScenario.filter(
-        (modelScenario) => {
-          return findModelScenario(modelScenario) === null;
-        }
-      );
-      const res = await this.props.dataManager.fetchPlotData(missingData);
-      this.setState((prev) => {
-        return { data: prev.data.concat(res) };
-      });
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  /**
-   *
-   * @param data [{model, scenario, variable, region}]
-   * @returns the fetched data from API with timeseries
-   */
-  getData = (data: DataModel[]) => {
-    return this.settingPlotData(data);
-  };
 
   saveData = async (id: string, image?: string) => {
     const data = getDraft(id);
@@ -138,51 +81,156 @@ class DashboardDataConfiguration extends Component<
     }
   };
 
-  settingPlotData(data: DataModel[] = []) {
-    const plotData: any[] = [];
-    data.map((dataElement) => {
-      const existData = this.isDataExist(dataElement);
-      if (existData !== null) plotData.push(existData);
-    });
+  /**
+   * to dispatch data for diffrenet plots (based on block id)
+   * @param block the block
+   * @returns the fetched data from API with timeseries
+   */
+  blockData = (block: BlockModel) => {
 
-    return plotData;
+    if (block.blockType !== "text") {
+      const config: ConfigurationModel | any = block.config;
+      const metaData: BlockDataModel = config.metaData;
+      const data: any[] = [];
+      const missingData: any[] = [];
+
+      if (
+        metaData.models &&
+        metaData.scenarios &&
+        metaData.variables &&
+        metaData.regions
+      ) {
+        metaData.models.forEach((model) => {
+          metaData.scenarios.forEach((scenario) => {
+            metaData.variables.forEach((variable) => {
+              metaData.regions.forEach((region) => {
+                const d = this.state.plotData.find(
+                  (e) =>
+                    e.model === model &&
+                    e.scenario === scenario &&
+                    e.variable === variable &&
+                    e.region === region
+                );
+                if (d) {
+                  data.push(d);
+                } else {
+                  missingData.push({ model, scenario, variable, region });
+                }
+              });
+            });
+          });
+        });
+      }
+
+      if (missingData.length > 0) {
+        this.retreiveAllTimeSeriesData(missingData);
+      }
+      return data;
+    }
+
+    return [];
+  };
+
+  /**
+   * If dashboard is draft, get first all the possible data to visualize
+   * This function called one time on draft dashboard rendered
+   */
+  getPlotData = (blocks: BlockModel[]) => {
+    const data: any[] = [];
+    Object.values(blocks).forEach((block: any) => {
+      const metaData: BlockDataModel = { ...block.config.metaData };
+
+      // get all possible data from controlled blocks
+      const controlBlock = getBlock(blocks, block.controlBlock);
+      if (controlBlock.id !== '') {
+        const config = controlBlock.config as ConfigurationModel;
+        this.optionsLabel.forEach(option => {
+          if (config.metaData.master[option].isMaster) {
+            metaData[option] = config.metaData[option];
+          }
+        })
+      }
+
+      // Check if the block type != text
+      if (
+        metaData !== undefined &&
+        metaData.models &&
+        metaData.scenarios &&
+        metaData.variables &&
+        metaData.regions
+      ) {
+        metaData.models.forEach((model) => {
+          metaData.scenarios.forEach((scenario) => {
+            metaData.variables.forEach((variable) => {
+              metaData.regions.forEach((region) => {
+                data.push({ model, scenario, variable, region });
+              });
+            });
+          });
+        });
+      }
+    });
+    this.retreiveAllTimeSeriesData(data);
+  };
+
+  retreiveAllTimeSeriesData = (data) => {
+    this.props.dataManager.fetchPlotData(data)
+      .then(res => {
+        this.setState({ plotData: [...this.state.plotData, ...res] });
+      }
+      );
   }
 
   /**
-   * To limit requests to IASA API, we verify if we have already fetched the element
-   * Check if this.data contains that element (already fetched by other block)
-   * @param reqData
-   * @returns Data element if it's exist (null if not)
+   * Set the first filtered data (By data focus)
+   * @param dashboard the current dashboard
+   * @param selectedFilter dashboard selected filter
    */
-  isDataExist = (reqData: DataModel) => {
-    const data = this.state.data;
-    const element = data.find(
-      (dataElement) =>
-        dataElement.model === reqData.model &&
-        dataElement.scenario === reqData.scenario &&
-        dataElement.variable === reqData.variable &&
-        dataElement.region === reqData.region
-    );
-    return element ? element : null;
-  };
+  updateFilterByDataFocus = (dashboard, selectedFilter) => {
+    if (selectedFilter !== '' && this.state.isFetchData) {
+      const data = this.state.filtreByDataFocus;
+      data[selectedFilter] = dashboard.dataStructure[selectedFilter].selection;
+      this.optionsLabel.forEach((option) => {
+        if (option !== selectedFilter) {
+          data[selectedFilter].forEach((filterValue) => {
+            data[option] = Array.from(
+              new Set([
+                ...data[option],
+                ...this.state.filters[selectedFilter][filterValue][option],
+              ])
+            );
+          });
+        }
+      });
+      this.setState({ filtreByDataFocus: data });
+    }
+  }
 
   render() {
     const { readonly } = this.props;
-
     return readonly ? (
       <ReadOnlyDashboard
-        getData={this.getData}
-        setDashboardModelScenario={this.setDashboardModelScenario}
         shareButtonOnClickHandler={() => Utils.copyToClipboard()}
+        blockData={this.blockData}
+        optionsLabel={this.optionsLabel}
         {...this.props}
       />
     ) : (
-      <DashboardSelectionControl
-        getData={this.getData}
+      (this.state.isFetchData && <DashboardSelectionControl
         saveData={this.saveData}
-        setDashboardModelScenario={this.setDashboardModelScenario}
+        filters={this.state.filters}
+        plotData={this.state.plotData}
+        blockData={this.blockData}
+        getPlotData={this.getPlotData}
+        updateFilterByDataFocus={this.updateFilterByDataFocus}
+        filtreByDataFocus={this.state.filtreByDataFocus}
+        optionsLabel={this.optionsLabel}
         {...this.props}
-      />
+      />) || <div className="dashboard">
+        <Spin className="centered" />
+      </div>
+
+      // TODO handle error
     );
   }
 }

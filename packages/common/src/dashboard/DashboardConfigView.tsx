@@ -95,7 +95,7 @@ class DashboardConfigView extends Component<any, any> {
         let n_cols
         if (this.props.readonly) {
             n_cols = 0
-            for (const element of this.props.layout) {
+            for (const element of this.props.dashboard.layout) {
                 const temp_cols = element.x + element.w
                 if (temp_cols > n_cols) {
                     n_cols = temp_cols
@@ -122,7 +122,10 @@ class DashboardConfigView extends Component<any, any> {
      */
     onLayoutChange = (layout) => {
         if (!this.props.readonly) {
-            this.props.updateLayout(layout);
+            this.props.updateDashboard({
+                ...this.props.dashboard,
+                layout: layout,
+            })
             this.updateAllLayoutsView();
         }
     };
@@ -154,7 +157,7 @@ class DashboardConfigView extends Component<any, any> {
      */
     updateAllLayoutsView = () => {
         const graphsSize = { ...this.state.graphsSize };
-        for (const layout of this.props.layout) {
+        for (const layout of this.props.dashboard.layout) {
             const key = layout.i
             graphsSize[key] = {
                 width: this.ref[key].clientWidth,
@@ -176,12 +179,8 @@ class DashboardConfigView extends Component<any, any> {
         this.setState({ rowHeight: width / cols / GRID_RATIO });
     }
 
-
     render() {
-
-        // const n_cols = this.getCols()
-
-        const { blocks, layout } = this.props;
+        const { blocks, layout } = this.props.dashboard;
         return (
             <ResponsiveGridLayout
                 className="dashboard-grid"
@@ -236,7 +235,7 @@ class DashboardConfigView extends Component<any, any> {
                             )}
                             <BlockViewManager
                                 {...this.props}
-                                currentBlock={...blocks[layout.i]}
+                                currentBlock={blocks[layout.i]}
                                 width={
                                     this.state.graphsSize[layout.i]
                                         ? this.state.graphsSize[layout.i].width

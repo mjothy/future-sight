@@ -58,30 +58,13 @@ export default class ExpressServer {
       res.send(`Hello , From server`);
     });
 
-    this.app.post('/api/data', (req, res) => {
-      const body = req.body;
-      this.dataProxy.getData().map((e) => {
-        if (
-          e.model === body.model &&
-          e.scenario === body.scenario &&
-          e.region === body.region &&
-          e.variable === body.variable
-        ) {
-          res.status(200).send(e);
-        }
-      });
-      res.status(404).send([]);
-    });
-
     this.app.post('/api/plotData', (req, res) => {
       const body = req.body;
       const response: any[] = [];
       for (const reqData of body) {
-        const elements = this.dataProxy
-          .getData()
-          .filter(
-            (e) => e.model === reqData.model && e.scenario === reqData.scenario
-          );
+        const elements = this.dataProxy.getData().filter(
+          (e) => e.model === reqData.model && e.scenario === reqData.scenario && e.variable === reqData.variable && e.region === reqData.region
+        );
         if (elements) {
           response.push(...elements);
         }
@@ -93,6 +76,17 @@ export default class ExpressServer {
       res.send(this.dataProxy.getModels());
     });
 
+    this.app.get('/api/scenarios', (req, res) => {
+      res.send(this.dataProxy.getScenarios());
+    });
+
+    this.app.get(`/api/variables`, (req, res) => {
+      res.send(this.dataProxy.getVariables());
+    });
+
+    this.app.get(`/api/regions`, (req, res) => {
+      res.send(this.dataProxy.getRegions());
+    });
     const appendDashboardIdToIndexList = async (id: string, indexListKey: string, value: string) => {
       // Initialize the key if it does not exist
       const valueTransform = value.replace(/ /g, '%');

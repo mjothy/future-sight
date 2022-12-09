@@ -1,70 +1,32 @@
 import type { ColumnsType } from 'antd/lib/table';
 import React, { Component } from 'react';
-import BlockDataModel from '../../../models/BlockDataModel';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
 import PlotlyUtils from '../../graphs/PlotlyUtils';
 
 export default class DataBlockView extends Component<any, any> {
 
-  constructor(props) {
-    super(props);
-  }
-
-  /**
-   * Getting the data to visualize on the graphf
-   * @returns Data with timeseries
-   */
-  getPlotData = () => {
-    // 2 options: if the block controlled or not
-    // if the models is control, it will take the data from his master
-    const { currentBlock } = this.props;
-    const metaData: BlockDataModel = currentBlock.config.metaData;
-    if (currentBlock.controlBlock !== '') {
-      const controlBlock =
-        this.props.blocks[currentBlock.controlBlock].config.metaData;
-      if (controlBlock.master['models'].isMaster)
-        metaData.models = controlBlock.master['models'].values;
-      if (controlBlock.master['variables'].isMaster)
-        metaData.variables = controlBlock.master['variables'].values;
-      if (controlBlock.master['regions'].isMaster)
-        metaData.regions = controlBlock.master['regions'].values;
-    }
-    const data: any[] = [];
-    if (metaData.models && metaData.variables && metaData.regions) {
-      Object.keys(metaData.models).map((model) => {
-        metaData.models[model].map((scenario) => {
-          metaData.variables.map((variable) => {
-            metaData.regions.map((region) => {
-              data.push({ model, scenario, variable, region });
-            });
-          });
-        });
-      });
-
-      return this.props.getData(data);
-    }
-  };
-
   /**
    * Preparing the fetched data to adapt plotly data OR antd table
    * @returns
    */
   settingPlotData = () => {
-    const data: any[] = this.getPlotData();
+    const { currentBlock } = this.props;
+    const data: any[] = this.props.blockData(currentBlock);
+    console.log("Run settingPlotData", currentBlock.blockType);
     const showData: any[] = [];
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
-    let plotData;
+    let visualizeData: any = [];
     if (configStyle.graphType === 'table') {
-      plotData = this.prepareTableData(data);
+      visualizeData = this.prepareTableData(data);
     } else {
       data.map((dataElement) => {
         showData.push(this.preparePlotData(dataElement, configStyle));
       });
-      plotData = showData;
+      visualizeData = showData;
     }
-    return { data: plotData, layout: this.prepareLayout(data) }
+    return { data: visualizeData, layout: this.prepareLayout(data) }
   }
 
   prepareTableData = (data) => {

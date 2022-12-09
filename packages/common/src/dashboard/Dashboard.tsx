@@ -3,18 +3,16 @@ import DashboardConfigView from './DashboardConfigView';
 import DashboardConfigControl from './DashboardConfigControl';
 import Sidebar from './sidebar/Sidebar';
 import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import DashboardModel from '../models/DashboardModel';
-import LayoutModel from '../models/LayoutModel';
-import BlockModel from '../models/BlockModel';
-import {Layout, notification} from "antd";
-const {Content} = Layout;
+import { Layout, notification } from "antd";
+const { Content } = Layout;
 import html2canvas from "html2canvas";
 
 const DEFAULT_PREVIEW_WIDTH = 800;
 const DEFAULT_PREVIEW_HEIGHT = 450;
 
-export const  withNavigation = (Comp : React.ComponentType) => {
+export const withNavigation = (Comp: React.ComponentType) => {
     return (props) => <Comp {...props} navigate={useNavigate()} />;
 }
 
@@ -22,15 +20,11 @@ export interface DashboardProps extends ComponentPropsWithDataManager {
     dashboard: DashboardModel;
     addBlock: (blockType: string, masterBlockId?: string) => void;
     blockSelectedId: string;
-    layout: LayoutModel[];
-    updateLayout: (layout: LayoutModel[]) => void;
-    blocks: { [id: string]: BlockModel };
     updateSelectedBlock: (blockSelectedId: string) => void;
-    updateBlockMetaData: (data: any, blockId: any) => void;
-    updateBlockStyleConfig: (data: any) => void;
     saveDashboard: (callback: (idPermanent) => void, image?: string) => void;
     isEmbedded?: boolean;
-    navigate:(any)=> any;
+    readonly?: boolean;
+    navigate: (any) => any;
 }
 
 class Dashboard extends Component<DashboardProps, any> {
@@ -54,13 +48,12 @@ class Dashboard extends Component<DashboardProps, any> {
     }
 
     resizeDataURL = (datas, wantedWidth, wantedHeight) => {
-        return new Promise<any>(async function (resolve, reject){
+        return new Promise<any>(async function (resolve, reject) {
             // We create an image to receive the Data URI
             const img = document.createElement('img');
 
             // When the event "onload" is triggered we can resize the image.
-            img.onload = function()
-            {
+            img.onload = function () {
                 // We create a canvas and get its context.
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
@@ -80,9 +73,9 @@ class Dashboard extends Component<DashboardProps, any> {
         })
     }
 
-    save = (image ?: string) => {
+    save = (image?: string) => {
         this.props.saveDashboard((idPermanent) => {
-            this.setState({publishing:false});
+            this.setState({ publishing: false });
             notification.success({
                 message: 'The dashboard has been correctly published',
                 placement: 'topRight',
@@ -102,11 +95,11 @@ class Dashboard extends Component<DashboardProps, any> {
         const dashboard = document.querySelector(".dashboard-grid") as HTMLElement
         if (dashboard) {
             const timer = setInterval(() => {
-                    //run some other function
+                //run some other function
                 this.makeAndResizePreview(dashboard).then((dataURL) => {
-                        this.save(dataURL);
-                    });
-                    clearInterval(timer);
+                    this.save(dataURL);
+                });
+                clearInterval(timer);
             }, 200);
         } else {
             this.save()
@@ -119,18 +112,15 @@ class Dashboard extends Component<DashboardProps, any> {
         return (
             <Layout
                 className="dashboard"
-                style={{height: this.props.isEmbedded ? '100%' : undefined}}
+                style={{ height: this.props.isEmbedded ? '100%' : undefined }}
             >
-                {/*<Content className="dashboard-content">*/}
-                {/*  <DashboardConfigView {...this.props} />*/}
-                {/*</Content>*/}
-                <div className="no-sidebar-margin"/>
+                <div className="no-sidebar-margin" />
                 <Content className={"dashboard-content-wrapper"}>
                     <div className="dashboard-content">
-                        <DashboardConfigView {...this.props} readonly={this.state.readonly}/>
+                        <DashboardConfigView {...this.props} readonly={this.state.readonly} />
                     </div>
                 </Content>
-                <div className="no-sidebar-margin"/>
+                <div className="no-sidebar-margin" />
                 <Sidebar
                     onClose={() => this.props.updateSelectedBlock('')}
                     onCloseMenu={() => this.props.updateSelectedBlock('')}
