@@ -1,37 +1,26 @@
-export default class BlockDataModel {
-  /**
-   * The key is the model name, and data is table lf scenarios
-   */
-  models: string[] = [];
-  scenarios: string[] = [];
-  regions: string[] = [];
-  variables: string[] = [];
+import FilterDefinitionModel from "./FilterDefinitionModel";
 
-  /**
-   * Selection order
-   */
+export default class BlockDataModel {
+
+  constructor(filtersDefinition: {[id: string]: FilterDefinitionModel}) {
+    this.filters = {};
+    this.master = {};
+    for (const key of Object.keys(filtersDefinition)) {
+      this.filters[key] = [];
+      this.master[key] = {
+        isMaster: false,
+        values: [],
+      };
+    }
+  }
+  // Where data is stored
+  filters: {[filter_id: string]: string[]};
+
+  // If type of block is control
+  master: {[filter_id: string]: {isMaster: boolean, values: string[]}}
+
+  // Selection order
   selectOrder: string[] = [];
 
-  /**
-   * If type of block is control
-   */
-  master = {
-    models: {
-      isMaster: false,
-      values: [],
-    },
-    scenarios: {
-      isMaster: false,
-      values: [],
-    },
-    regions: {
-      isMaster: false,
-      values: [],
-    },
-    variables: {
-      isMaster: false,
-      values: [],
-    },
-  };
 
 }

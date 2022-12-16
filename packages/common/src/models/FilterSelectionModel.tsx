@@ -1,4 +1,4 @@
-export default class FilterModel {
+export default class FilterSelectionModel {
 
     isFilter = false;
     selection: string[] = [];

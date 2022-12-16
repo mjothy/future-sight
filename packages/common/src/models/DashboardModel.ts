@@ -4,16 +4,18 @@ import LayoutModel from './LayoutModel';
 import UserDataModel from './UserDataModel';
 
 import defaultJson from './dashboardModel.json'
+import FilterDefinitionModel from "./FilterDefinitionModel";
 
 export default class DashboardModel {
-  constructor(id?: string) {
+  constructor(filtersDefinition: {[id: string]: FilterDefinitionModel}, id?: string) {
     this.id = id;
+    this.dataStructure = new DataStructureModel(filtersDefinition);
   }
 
-  static fromDraft(id?: string): DashboardModel {
-    const ret = new DashboardModel(id)
+  static fromDraft(filtersDefinition: {[id: string]: FilterDefinitionModel}, id?: string): DashboardModel {
+    const ret = new DashboardModel(filtersDefinition, id)
     ret.layout = defaultJson.layout
-    ret.blocks = defaultJson.blocks
+    ret.blocks = {"1": new BlockModel("1", "data", filtersDefinition)}
     ret.date = new Date()
     return ret
   }
@@ -21,7 +23,7 @@ export default class DashboardModel {
   id?: string;
   userData: UserDataModel = new UserDataModel();
   // Dict of data: keys are models
-  dataStructure: DataStructureModel = new DataStructureModel();
+  dataStructure: DataStructureModel
   layout: LayoutModel[] = [];
   blocks: { [id: string]: BlockModel } = {};
   date?: Date |string;
