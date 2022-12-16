@@ -20,6 +20,16 @@ export default class DataManager implements IDataManager {
       .catch(console.error);
   };
 
+  fetchFilter = (api_endpoint: string) => {
+    return fetch(`${this.getBaseUrl()}/${api_endpoint}`)
+        .then((response) => response.json())
+        .then((data) => {
+          return data;
+        })
+        .catch(console.error);
+  };
+
+
   fetchModels = () => {
     return fetch(`${this.getBaseUrl()}/models`)
       .then((response) => response.json())
