@@ -4,7 +4,7 @@ import { Component } from 'react';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 
 export default class ControlBlockVisualizationEditor extends Component<any, any> {
-  configStyle: BlockStyleModel = new BlockStyleModel();
+  configStyle: BlockStyleModel;
 
   constructor(props) {
     super(props);

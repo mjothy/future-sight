@@ -117,10 +117,10 @@ export default class ControlBlockEditor extends Component<any, any> {
   };
 
   render() {
-    const optionsLabel = this.props.optionsLabel;
+    const filtersId = this.props.filtersId;
     return (
       <>
-        <div>{optionsLabel.map((option) => this.selectDropDown(option))}</div>
+        <div>{filtersId.map((option) => this.selectDropDown(option))}</div>
         <Divider />
         <Row style={{ marginTop: "auto" }}>
           <Col span={24}>

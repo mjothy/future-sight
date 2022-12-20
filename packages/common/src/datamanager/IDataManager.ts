@@ -5,13 +5,7 @@ export default interface IDataManager {
 
   fetchPlotData: (data: DataModel) => Promise<any>;
 
-  fetchModels: () => Promise<any>;
-
-  fetchScenarios: () => Promise<any>;
-
-  fetchVariables: () => Promise<any>;
-
-  fetchRegions: () => Promise<any>;
+  fetchFilter: (api_endpoint: string) => Promise<any>;
 
   getDashboard: (id: string) => Promise<any>;
 
@@ -22,6 +16,4 @@ export default interface IDataManager {
   fetchBrowseInitData: () => Promise<any>;
 
   browseData: (data: any) => Promise<any>;
-
-  getOptions: () => string[]
 }

@@ -15,6 +15,6 @@ export { default as DataStructureModel } from './models/DataStructureModel';
 export { default as BlockDataModel } from './models/BlockDataModel';
 export { default as ConfigurationModel } from './models/ConfigurationModel'
 export { getSelectedFilter, compareDataStructure, blocksIdToDelete } from './dashboard/blocks/utils/DashboardUtils';
-export { getBlock, getUnselectedInputOptions, getChildrens} from './dashboard/blocks/utils/BlockDataUtils';
+export { getControlBlock, getUnselectedInputOptions, getChildrens} from './dashboard/blocks/utils/BlockDataUtils';
 export { default as SelectInput } from './dashboard/blocks/utils/SelectInput';
 

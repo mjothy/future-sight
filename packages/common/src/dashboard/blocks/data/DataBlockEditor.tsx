@@ -123,7 +123,7 @@ export default class DataBlockEditor extends Component<any, any> {
           {/* show dropdown lists of unselected  */}
           <table className="width-100">
             <tr>
-              {getUnselectedInputOptions(this.props.currentBlock, this.props.optionsLabel).map((option) => (
+              {getUnselectedInputOptions(this.props.currentBlock, this.props.filtersId).map((option) => (
                 <td key={option}>{this.selectDropDownInput(option, false)}</td>
               ))}
             </tr>

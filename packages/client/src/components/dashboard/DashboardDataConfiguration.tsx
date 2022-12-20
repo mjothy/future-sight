@@ -1,10 +1,10 @@
 import {
-  BlockDataModel,
-  BlockModel,
-  ComponentPropsWithDataManager,
-  ConfigurationModel,
-  getBlock,
-  ReadOnlyDashboard,
+    BlockDataModel,
+    BlockModel,
+    ComponentPropsWithDataManager,
+    ConfigurationModel,
+    getControlBlock,
+    ReadOnlyDashboard,
 } from '@future-sight/common';
 import { Component } from 'react';
 import withDataManager from '../../services/withDataManager';
@@ -27,43 +27,38 @@ class DashboardDataConfiguration extends Component<
   DashboardDataConfigurationProps,
   any
 > {
-  optionsLabel: string[] = [];
-  constructor(props) {
-    super(props);
-    this.optionsLabel = this.props.dataManager.getOptions();
-    this.state = {
-      filters: {
-        regions: {},
-        variables: {},
-        scenarios: {},
-        models: {},
-      },
-      filtreByDataFocus: {
-        regions: [],
-        variables: [],
-        scenarios: [],
-        models: [],
-      },
-      /**
-       * Data (with timeseries from IASA API)
-       */
-      plotData: [],
-      isFetchData: false
-    };
-  }
+    filtersId: string[] = [];
+    constructor(props) {
+        super(props);
+        const filtersId: string[] = [];
+        const filters = {}
+        const filterByDataFocus = {}
+        this.state = {
+            filters,
+            filterByDataFocus,
+            filtersId,
+            /**
+             * Data (with timeseries from IASA API)
+             */
+            plotData: [],
+            isFetchData: false
+        };
 
-  async componentDidMount() {
-    const filters = this.state.filters;
-    try {
-      filters['regions'] = await this.props.dataManager.fetchRegions();
-      filters['variables'] = await this.props.dataManager.fetchVariables();
-      filters['models'] = await this.props.dataManager.fetchModels();
-      filters['scenarios'] = await this.props.dataManager.fetchScenarios();
-      this.setState({ filters, isFetchData: true });
-    } catch (error) {
-      console.log("ERROR FETCH: ", error);
     }
-  }
+
+    async componentDidMount() {
+        try {
+            const filters = {...this.state.filters};
+            const filtersId = [...this.state.filtersId]
+            for (const filter_def of Object.values(FILTERS_DEFINITION)) {
+                filtersId.push(filter_def.id)
+                filters[filter_def.id] = await this.props.dataManager.fetchFilter(filter_def.api_endpoint)
+            }
+            this.setState({filters, filtersId, isFetchData: true});
+        } catch (error) {
+            console.log("ERROR FETCH: ", error);
+        }
+    }
 
   saveData = async (id: string, image?: string) => {
     const data = getDraft(id);

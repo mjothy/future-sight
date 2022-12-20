@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ConfigurationModel from '../../models/ConfigurationModel';
 import ControlBlockEditor from './control/ControlBlockEditor';
 import DataBlockEditor from './data/DataBlockEditor';
-import { getBlock } from './utils/BlockDataUtils';
+import { getControlBlock } from './utils/BlockDataUtils';
 
 export default class BlockFilterManager extends Component<any, any> {
     constructor(props) {
@@ -53,9 +53,9 @@ export default class BlockFilterManager extends Component<any, any> {
             models: [],
         };
         const metaData = this.props.currentBlock.config.metaData;
-        const controlBlock = getBlock(this.props.dashboard.blocks, this.props.currentBlock.controlBlock);
-        this.props.optionsLabel.forEach((option) => {
-            if (controlBlock.id === undefined) {
+        const controlBlock = getControlBlock(this.props.dashboard.blocks, this.props.currentBlock.controlBlock);
+        this.props.filtersId.forEach((option) => {
+            if (!controlBlock) {
                 selectedData[option] = metaData[option];
             } else {
                 // if block is controlled, we get selected data from the block master
@@ -81,16 +81,16 @@ export default class BlockFilterManager extends Component<any, any> {
             scenarios: new Set<string>(),
             models: new Set<string>(),
         };
-        const optionsLabel = this.props.optionsLabel;
-        let uncontroledOptionsLabel = [...this.props.optionsLabel];
-        const filtreByDataFocus = this.props.filtreByDataFocus;
+        const filtersId = this.props.filtersId;
+        let uncontrolledFiltersId = [...this.props.filtersId];
+        const filterByDataFocus = this.props.filterByDataFocus;
         const globalFiltersJson = this.props.filters;
 
         // set controlled options
-        const controlBlock = getBlock(this.props.dashboard.blocks, this.props.currentBlock.controlBlock);
-        if (controlBlock.id !== undefined) {
+        const controlBlock = getControlBlock(this.props.dashboard.blocks, this.props.currentBlock.controlBlock);
+        if (controlBlock) {
             const controlConfig = controlBlock.config as ConfigurationModel;
-            uncontroledOptionsLabel = this.props.optionsLabel.filter(option => {
+            uncontrolledFiltersId = this.props.filtersId.filter(option => {
                 if (controlConfig.metaData.master[option].isMaster) {
                     optionsData[option] = selectedData[option]
                 } else {
@@ -100,10 +100,10 @@ export default class BlockFilterManager extends Component<any, any> {
         }
 
         // set uncontrolled options
-        uncontroledOptionsLabel.forEach((option) => {
-            filtreByDataFocus[option].forEach((optionValue) => {
+        uncontrolledFiltersId.forEach((option) => {
+            filterByDataFocus[option].forEach((optionValue) => {
                 let isExist = true;
-                optionsLabel.forEach((filterKey) => {
+                filtersId.forEach((filterKey) => {
                     if (option !== filterKey) {
                         selectedData[filterKey].forEach((value) => {
                             if (
@@ -121,7 +121,7 @@ export default class BlockFilterManager extends Component<any, any> {
             });
         });
 
-        optionsLabel.forEach((option) => {
+        filtersId.forEach((option) => {
             optionsData[option] = Array.from(optionsData[option]);
         });
 

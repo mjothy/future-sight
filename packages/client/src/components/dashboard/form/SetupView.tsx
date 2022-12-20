@@ -3,6 +3,7 @@ import PopupFilterContent from './PopupFilterContent';
 import { Modal, Button } from 'antd';
 import { FilterTwoTone } from '@ant-design/icons';
 import { DataStructureModel, getSelectedFilter } from '@future-sight/common';
+import FILTERS_DEFINITION from "../../filter/FiltersDefinition";
 
 const { confirm } = Modal;
 
@@ -50,7 +51,7 @@ export default class SetupView extends Component<any, any> {
 
   updateDashboardDataStructure = () => {
     const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
-    dashboard.dataStructure = new DataStructureModel();
+    dashboard.dataStructure = new DataStructureModel(FILTERS_DEFINITION);
     const selectedFilter = getSelectedFilter(this.state.dataStructure);
     dashboard.dataStructure[selectedFilter] = JSON.parse(JSON.stringify(this.state.dataStructure[selectedFilter]));
 

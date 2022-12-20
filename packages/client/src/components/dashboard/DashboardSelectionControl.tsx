@@ -24,8 +24,8 @@ export interface DashboardSelectionControlProps
   blockData: (block: BlockModel) => any[];
   getPlotData: (blocks: BlockModel[]) => void;
   updateFilterByDataFocus: (dashboard: DashboardModel, filtre: string) => void;
-  filtreByDataFocus: any;
-  optionsLabel: string[]
+  filterByDataFocus: any;
+  filtersId: string[]
 }
 
 export default class DashboardSelectionControl extends Component<
@@ -188,11 +188,11 @@ export default class DashboardSelectionControl extends Component<
  * Check if data in selection (selected data) are present in Select options
  */
   checkIfSelectedInOptions = (optionsData, block: BlockModel) => {
-    const optionsLabel = this.props.optionsLabel;
+    const filtersId = this.props.filtersId;
     const dashboard = { ...this.state.dashboard };
     const config = block.config as ConfigurationModel;
     let isDashboardUpdated = false;
-    optionsLabel.forEach(option => {
+    filtersId.forEach(option => {
       const dataInOptionsData = config.metaData[option].filter(data => optionsData[option].includes(data));
 
       if (dataInOptionsData.length < config.metaData[option].length) {

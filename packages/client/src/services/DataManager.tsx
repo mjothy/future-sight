@@ -29,47 +29,6 @@ export default class DataManager implements IDataManager {
         .catch(console.error);
   };
 
-
-  fetchModels = () => {
-    return fetch(`${this.getBaseUrl()}/models`)
-      .then((response) => response.json())
-      .then((data) => {
-        return data;
-      })
-      .catch(console.error);
-  };
-
-  fetchScenarios = () => {
-    return fetch(`${this.getBaseUrl()}/scenarios`)
-      .then((response) => response.json())
-      .then((data) => {
-        return data;
-      })
-      .catch(console.error);
-  };
-
-  fetchVariables = () => {
-    return fetch(
-      `${this.getBaseUrl()}/variables`
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        return data;
-      })
-      .catch(console.error);
-  };
-
-  fetchRegions = () => {
-    return fetch(
-      `${this.getBaseUrl()}/regions`
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        return data;
-      })
-      .catch(console.error);
-  };
-
   addDashboard = (data) => {
     return fetch(`${this.getBaseUrl()}/dashboard`, {
       method: 'POST',
@@ -140,10 +99,6 @@ export default class DataManager implements IDataManager {
     } catch (err) {
       console.error(err);
     }
-  };
-
-  getOptions = () => {
-    return ["models", "scenarios", "variables", "regions"];
   };
 
 }

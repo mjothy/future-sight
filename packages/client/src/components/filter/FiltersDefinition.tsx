@@ -1,4 +1,4 @@
-import FilterDefinitionModel from "@future-sight/common/build/models/FilterModel";
+import FilterDefinitionModel from "@future-sight/common/build/models/FilterDefinitionModel";
 
 const FILTERS_DEFINITION: {[id: string]: FilterDefinitionModel} = {
     models: {

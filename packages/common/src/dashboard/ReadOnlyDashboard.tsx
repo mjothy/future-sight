@@ -23,7 +23,7 @@ interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
     isEmbedded?: boolean;
     shareButtonOnClickHandler: () => void;
     blockData: (block: BlockModel) => any[];
-    optionsLabel: string[]
+    filtersId: string[]
 }
 
 type LocationState = { dashboard: DashboardModel };
@@ -125,7 +125,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                         }}
                         readonly
                         blockData={props.blockData}
-                        optionsLabel={props.optionsLabel}
+                        filtersId={props.filtersId}
                     />
                 )}
             </div>
