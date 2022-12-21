@@ -1,9 +1,13 @@
-import type { ColumnsType } from 'antd/lib/table';
-import React, { Component } from 'react';
+import type {ColumnsType} from 'antd/lib/table';
+import React, {Component} from 'react';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
 import PlotlyUtils from '../../graphs/PlotlyUtils';
+import FiltersDefinitionModel from "../../../models/FiltersDefinitionModel";
+import PlotDataModel from "../../../models/PlotDataModel";
 
+
+//TODO WIP
 export default class DataBlockView extends Component<any, any> {
 
   /**
@@ -12,7 +16,7 @@ export default class DataBlockView extends Component<any, any> {
    */
   settingPlotData = () => {
     const { currentBlock } = this.props;
-    const data: any[] = this.props.blockData(currentBlock);
+    const data:PlotDataModel[] = this.props.getBlockData(currentBlock);
     console.log("Run settingPlotData", currentBlock.blockType);
     const showData: any[] = [];
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
@@ -30,29 +34,35 @@ export default class DataBlockView extends Component<any, any> {
   }
 
   prepareTableData = (data) => {
-    const columns: ColumnsType<any> = [
-      { title: 'model', dataIndex: 'model' },
-      { title: 'scenario', dataIndex: 'scenario' },
-      { title: 'variable', dataIndex: 'variable' },
-      { title: 'region', dataIndex: 'region' },
-    ];
+    const columns: ColumnsType<any>=[]
+
+    for (const filter of Object.values(this.props.filtersDefinition as FiltersDefinitionModel)){
+        columns.push({
+            title: filter.id_singular,
+            dataIndex: filter.id_singular
+        })
+    }
+
     for (let year = 2005; year <= 2100; year = year + 5) {
       columns.push({
         title: year,
         dataIndex: year,
       });
     }
+
     const values: any[] = [];
     data.map((dataElement) => {
       const obj = {};
+      const temp_filters = Object.fromEntries(
+          Object.values(this.props.filtersDefinition as FiltersDefinitionModel).map(
+              (filter)=>[filter.id_singular, dataElement[filter.id_singular]]
+          )
+      )
       dataElement.data.map((e) => {
         obj[e.year] = e.value;
       });
       values.push({
-        model: dataElement.model,
-        scenario: dataElement.scenario,
-        variable: dataElement.variable,
-        region: dataElement.region,
+        ...temp_filters,
         ...obj,
       });
     });
@@ -60,31 +70,25 @@ export default class DataBlockView extends Component<any, any> {
     return { columns, values };
   }
 
-  getLegend = (dataElement, legend) => {
+  getLegend = (dataElement: PlotDataModel, legend) => {
     if (!legend) {
-      return dataElement.region
-        + " - " + dataElement.variable
-        + " - " + dataElement.scenario
-        + " - " + dataElement.model
+      const description = Object.values(this.props.filtersDefinition as FiltersDefinitionModel)
+          .map((filter)=> dataElement[filter.id_singular])
+      return description.join(' - ')
     } else {
       const label: any[] = [];
-      if (legend.Region && dataElement.region) {
-        label.push(dataElement.region)
-      }
-      if (legend.Variable && dataElement.variable) {
-        label.push(dataElement.variable)
-      }
-      if (legend.Scenario && dataElement.scenario) {
-        label.push(dataElement.scenario)
-      }
-      if (legend.Model && dataElement.model) {
-        label.push(dataElement.model)
-      }
+      Object.values(this.props.filtersDefinition as FiltersDefinitionModel)
+          .forEach((filter)=>{
+            if (legend[filter.id_singular] && dataElement[filter.id_singular]) {
+              label.push(dataElement[filter.id_singular])
+            }
+          }
+          )
       return label.join(' - ')
     }
   }
 
-  preparePlotData = (dataElement, configStyle: BlockStyleModel) => {
+  preparePlotData = (dataElement: PlotDataModel, configStyle: BlockStyleModel) => {
     let obj;
     switch (configStyle.graphType) {
       case 'area':
@@ -113,21 +117,14 @@ export default class DataBlockView extends Component<any, any> {
     return obj;
   }
 
-  plotHoverText = (dataElement) => {
+  plotHoverText = (dataElement: PlotDataModel) => {
     let textHover = '';
     const result: string[] = [];
 
     dataElement.data.map((e) => {
-      textHover =
-        dataElement.model +
-        '/' +
-        dataElement.scenario +
-        '<br>' +
-        'region:' +
-        dataElement.region +
-        '<br>' +
-        'variable: ' +
-        dataElement.variable;
+      textHover = Object.values(this.props.filtersDefinition as FiltersDefinitionModel)
+              .map((filter)=> filter.label_singular + ": " + dataElement[filter.id_singular])
+              .join("<br>")
       result.push(textHover);
     });
 
@@ -136,12 +133,12 @@ export default class DataBlockView extends Component<any, any> {
 
   /**
    * Extract the x axis from data
-   * @param data The retreived data (from API)
+   * @param dataElement The retreived data (from API)
    * @returns Axis x (array of values)
    */
-  getX = (data) => {
+  getX = (dataElement: PlotDataModel) => {
     const x: any[] = [];
-    data.data.map((d) => {
+    dataElement.data.map((d) => {
       if (d.value !== "") {
         x.push(d.year)
       }
@@ -151,12 +148,12 @@ export default class DataBlockView extends Component<any, any> {
 
   /**
    * Extract the y axis from data
-   * @param data The retreived data (from API)
+   * @param dataElement The retreived data (from API)
    * @returns Axis y (array of values)
    */
-  getY = (data) => {
+  getY = (dataElement: PlotDataModel) => {
     const y: any[] = [];
-    data.data.map((d) => {
+    dataElement.data.map((d) => {
       if (d.value !== "") {
         y.push(d.value)
       }
@@ -164,7 +161,7 @@ export default class DataBlockView extends Component<any, any> {
     return y;
   };
 
-  prepareLayout = (data) => {
+  prepareLayout = (data: PlotDataModel[]) => {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
     return {
       YAxis: {
@@ -177,27 +174,27 @@ export default class DataBlockView extends Component<any, any> {
     }
   }
 
-  getYAxisLabel = (data) => {
+  getYAxisLabel = (data: PlotDataModel[]) => {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
-
-    const labels = {}
-    for (const dataElement of data) {
-      labels[dataElement.variable] = dataElement.unit
-    }
     const label: any[] = []
-    for (const key of Object.keys(labels)) {
-      let text;
-      if (configStyle.YAxis.unit && configStyle.YAxis.label) {
-        text = key + "<br>" + labels[key]
-      } else if (configStyle.YAxis.unit) {
-        text = labels[key]
-      } else if (configStyle.YAxis.label) {
-        text = key
+    for (const dataElement of data) {
+      const text: any[] = [];
+
+      if (configStyle.YAxis.unit) {
+        text.push(dataElement.unit);
       }
-      if (text) {
-        label.push(text)
+
+      if (configStyle.YAxis.label) {
+        for (const filter of Object.values(this.props.filtersDefinition as FiltersDefinitionModel)){
+          if (filter.isYAxisLabel) text.push(dataElement[filter.id_singular]);
+        }
+      }
+
+      if (text.length>0) {
+        label.push(text.join("<br>"));
       }
     }
+
     if (label.length > 0) {
       const uniqueItems = [...new Set(label)]
       return uniqueItems.join("<br>")
