@@ -10,6 +10,7 @@ export type { default as IDataManager } from './datamanager/IDataManager';
 export type { default as ComponentPropsWithDataManager } from './datamanager/ComponentPropsWithDataManager';
 export type { default as ModelScenarioData } from './datamanager/ModelScenarioData';
 export type { default as DataModel } from './models/DataModel';
+export type { default as PlotDataModel } from './models/PlotDataModel';
 export type { DashboardProps } from './dashboard/Dashboard';
 export { default as DataStructureModel } from './models/DataStructureModel';
 export { default as BlockDataModel } from './models/BlockDataModel';

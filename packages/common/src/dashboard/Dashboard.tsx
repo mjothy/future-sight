@@ -8,6 +8,7 @@ import DashboardModel from '../models/DashboardModel';
 import { Layout, notification } from "antd";
 const { Content } = Layout;
 import html2canvas from "html2canvas";
+import FiltersDefinitionModel from "../models/FiltersDefinitionModel";
 
 const DEFAULT_PREVIEW_WIDTH = 800;
 const DEFAULT_PREVIEW_HEIGHT = 450;
@@ -25,6 +26,7 @@ export interface DashboardProps extends ComponentPropsWithDataManager {
     isEmbedded?: boolean;
     readonly?: boolean;
     navigate: (any) => any;
+    filtersDefinition: FiltersDefinitionModel
 }
 
 class Dashboard extends Component<DashboardProps, any> {

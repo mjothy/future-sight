@@ -1,11 +1,11 @@
-import type {IDataManager, DataModel} from '@future-sight/common';
+import type {IDataManager, DataModel, PlotDataModel} from '@future-sight/common';
 
 export default class DataManager implements IDataManager {
   getBaseUrl() {
     return '/api';
   }
 
-  fetchPlotData = (data: DataModel) => {
+  fetchPlotData = (data: DataModel[]): Promise<PlotDataModel[]> => {
     return fetch(`${this.getBaseUrl()}/plotData`, {
       method: 'POST',
       headers: {
@@ -14,8 +14,8 @@ export default class DataManager implements IDataManager {
       body: JSON.stringify(data),
     })
       .then((response) => response.json())
-      .then((data) => {
-        return data;
+      .then((res_json) => {
+        return res_json;
       })
       .catch(console.error);
   };

@@ -1,10 +1,10 @@
 import FilterSelectionModel from "./FilterSelectionModel";
-import FilterDefinitionModel from "./FilterDefinitionModel";
+import FiltersDefinitionModel from "./FiltersDefinitionModel";
 
 
 // TODO Pas très propre de faire ça non?
 export default class DataStructureModel {
-    constructor(filtersDefinition: {[id: string]: FilterDefinitionModel}) {
+    constructor(filtersDefinition: FiltersDefinitionModel) {
         for (const key of Object.keys(filtersDefinition)) {
             this[key] = new FilterSelectionModel();
         }

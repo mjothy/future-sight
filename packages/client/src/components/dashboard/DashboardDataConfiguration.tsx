@@ -2,8 +2,8 @@ import {
     BlockDataModel,
     BlockModel,
     ComponentPropsWithDataManager,
-    ConfigurationModel, DashboardModel,
-    getControlBlock,
+    ConfigurationModel, DashboardModel, DataModel,
+    getControlBlock, PlotDataModel,
     ReadOnlyDashboard,
 } from '@future-sight/common';
 import {Component} from 'react';
@@ -106,7 +106,7 @@ class DashboardDataConfiguration extends Component<
      * @param block the block
      * @returns the fetched data from API with timeseries
      */
-    blockData = (block: BlockModel) => {
+    getBlockData = (block: BlockModel): PlotDataModel[] => {
 
         if (block.blockType === "text") {
             return []
@@ -114,13 +114,13 @@ class DashboardDataConfiguration extends Component<
 
         const config: ConfigurationModel | any = block.config;
         const metaData: BlockDataModel = config.metaData;
-        const data: any[] = [];
+        const data: PlotDataModel[] = [];
         const missingData: any[] = [];
 
         if (
             this.state.filtersId.every((filter_id) => metaData.filters[filter_id])
         ) {
-            // Go through all combinations and check that there is no missing data
+            // Go through all combinations of filters and check that there is no missing data
             this.lazyProduct(
                 this.state.filtersId.map((filter_id) => metaData.filters[filter_id]),
                 (...filter_combo) => {
@@ -162,7 +162,7 @@ class DashboardDataConfiguration extends Component<
      * This function called one time on draft dashboard rendered
      */
     getPlotData = (blocks: BlockModel[]) => {
-        const data: any[] = [];
+        const data: DataModel[] = [];
         Object.values(blocks).forEach((block: any) => {
             const metaData: BlockDataModel = {...block.config.metaData};
 
@@ -199,7 +199,7 @@ class DashboardDataConfiguration extends Component<
         this.retreiveAllTimeSeriesData(data);
     };
 
-    retreiveAllTimeSeriesData = (data) => {
+    retreiveAllTimeSeriesData = (data: DataModel[]) => {
         this.props.dataManager.fetchPlotData(data)
             .then(res => {
                     this.setState({plotData: [...this.state.plotData, ...res]});
@@ -237,8 +237,9 @@ class DashboardDataConfiguration extends Component<
         return readonly ? (
             <ReadOnlyDashboard
                 shareButtonOnClickHandler={() => Utils.copyToClipboard()}
-                blockData={this.blockData}
+                getBlockData={this.getBlockData}
                 filtersId={this.filtersId}
+                filtersDefinition={FILTERS_DEFINITION}
                 {...this.props}
             />
         ) : (
@@ -246,7 +247,7 @@ class DashboardDataConfiguration extends Component<
                 saveData={this.saveData}
                 filters={this.state.filters}
                 plotData={this.state.plotData}
-                blockData={this.blockData}
+                getBlockData={this.getBlockData}
                 getPlotData={this.getPlotData}
                 updateFilterByDataFocus={this.updateFilterByDataFocus}
                 filterByDataFocus={this.state.filterByDataFocus}

@@ -1,10 +1,10 @@
-import FilterDefinitionModel from "./FilterDefinitionModel";
+import FiltersDefinitionModel from "./FiltersDefinitionModel";
 
 export default class BlockStyleModel {
-  constructor(filtersDefinition: {[id: string]: FilterDefinitionModel}) {
+  constructor(filtersDefinition: FiltersDefinitionModel) {
     this.legend = {};
-    for (const key of Object.keys(filtersDefinition)) {
-      this.legend[key] = false
+    for (const filter of Object.values(filtersDefinition)) {
+      this.legend[filter.id_singular] = false
     }
   }
 

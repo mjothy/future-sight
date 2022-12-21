@@ -10,6 +10,8 @@ import BlockModel from '../models/BlockModel';
 import ConfigurationModel from '../models/ConfigurationModel';
 import DashboardModel from '../models/DashboardModel';
 import DashboardConfigView from './DashboardConfigView';
+import FiltersDefinitionModel from "../models/FiltersDefinitionModel";
+import PlotDataModel from "../models/PlotDataModel";
 
 /*TODO Check that embedded and published view have the same purpose and always look ok,
 * For instance, do we want full width with scrolling when in published view
@@ -22,8 +24,9 @@ interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
     setEnableSwitchEmbeddedMode: (enable: boolean) => void;
     isEmbedded?: boolean;
     shareButtonOnClickHandler: () => void;
-    blockData: (block: BlockModel) => any[];
+    getBlockData: (block: BlockModel) => PlotDataModel[];
     filtersId: string[]
+    filtersDefinition: FiltersDefinitionModel
 }
 
 type LocationState = { dashboard: DashboardModel };
@@ -124,7 +127,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                         updateDashboardMetadata={(data) => {
                         }}
                         readonly
-                        blockData={props.blockData}
+                        getBlockData={props.getBlockData}
                         filtersId={props.filtersId}
                     />
                 )}

@@ -1,9 +1,10 @@
 import DataModel from '../models/DataModel';
+import PlotDataModel from "../models/PlotDataModel";
 
 export default interface IDataManager {
   getBaseUrl: () => string;
 
-  fetchPlotData: (data: DataModel) => Promise<any>;
+  fetchPlotData: (data: DataModel[]) => Promise<PlotDataModel[]>;
 
   fetchFilter: (api_endpoint: string) => Promise<any>;
 

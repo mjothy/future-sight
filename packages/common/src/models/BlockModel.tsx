@@ -1,9 +1,9 @@
 import ConfigurationModel from './ConfigurationModel';
 import TextConfigurationModel from './TextConfigurationModel';
-import FilterDefinitionModel from "./FilterDefinitionModel";
+import FiltersDefinitionModel from "./FiltersDefinitionModel";
 
 export default class BlockModel {
-  constructor(id?: string, blockType?: string, filtersDefinition?: {[id: string]: FilterDefinitionModel}) {
+  constructor(id?: string, blockType?: string, filtersDefinition?: FiltersDefinitionModel) {
     this.id = id;
     this.blockType = blockType;
     if (blockType === 'text') {

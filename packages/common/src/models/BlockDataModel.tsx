@@ -1,8 +1,8 @@
-import FilterDefinitionModel from "./FilterDefinitionModel";
+import FiltersDefinitionModel from "./FiltersDefinitionModel";
 
 export default class BlockDataModel {
 
-  constructor(filtersDefinition: {[id: string]: FilterDefinitionModel}) {
+  constructor(filtersDefinition: FiltersDefinitionModel) {
     this.filters = {};
     this.master = {};
     for (const key of Object.keys(filtersDefinition)) {

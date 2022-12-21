@@ -6,7 +6,7 @@ import {
   ConfigurationModel,
   DashboardModel,
   getSelectedFilter,
-  LayoutModel,
+  LayoutModel, PlotDataModel,
 } from '@future-sight/common';
 import { Component } from 'react';
 import { RoutingProps } from '../app/Routing';
@@ -14,6 +14,7 @@ import { RoutingProps } from '../app/Routing';
 import DashboardView from './DashboardView';
 import { getDraft, setDraft } from '../drafts/DraftUtils';
 import { notification, Spin } from 'antd';
+import FiltersDefinitionModel from "@future-sight/common/build/models/FiltersDefinitionModel";
 
 export interface DashboardSelectionControlProps
   extends ComponentPropsWithDataManager,
@@ -21,11 +22,11 @@ export interface DashboardSelectionControlProps
   saveData: (id: string, image?: string) => Promise<any>;
   filters: any;
   plotData: any[];
-  blockData: (block: BlockModel) => any[];
+  getBlockData: (block: BlockModel) => PlotDataModel[];
   getPlotData: (blocks: BlockModel[]) => void;
   updateFilterByDataFocus: (dashboard: DashboardModel, filtre: string) => void;
   filterByDataFocus: any;
-  filtersId: string[]
+  filtersId: string[];
 }
 
 export default class DashboardSelectionControl extends Component<

@@ -1,9 +1,9 @@
 import BlockDataModel from './BlockDataModel';
 import BlockStyleModel from './BlockStyleModel';
-import FilterDefinitionModel from "./FilterDefinitionModel";
+import FiltersDefinitionModel from "./FiltersDefinitionModel";
 
 export default class ConfigurationModel {
-  constructor(filtersDefinition: {[id: string]: FilterDefinitionModel}) {
+  constructor(filtersDefinition: FiltersDefinitionModel) {
     this.configStyle = new BlockStyleModel(filtersDefinition);
     this.metaData = new BlockDataModel(filtersDefinition);
   }
