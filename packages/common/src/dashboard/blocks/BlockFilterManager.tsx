@@ -11,12 +11,7 @@ export default class BlockFilterManager extends Component<any, any> {
             /**
              * Data options in dropDown Inputs
              */
-            optionsData: {
-                regions: [],
-                variables: [],
-                scenarios: [],
-                models: [],
-            }
+            optionsData: {}
         };
     }
 
@@ -46,24 +41,22 @@ export default class BlockFilterManager extends Component<any, any> {
      * @returns return {regions: [], variables: [], .....}
      */
     getSelectedData = () => {
-        const selectedData = {
-            regions: [],
-            variables: [],
-            scenarios: [],
-            models: [],
-        };
+        const selectedData = {};
         const metaData = this.props.currentBlock.config.metaData;
         const controlBlock = getControlBlock(this.props.dashboard.blocks, this.props.currentBlock.controlBlock);
-        this.props.filtersId.forEach((option) => {
+
+        Object.keys(this.props.filtersDefinition).forEach((filter_id) => {
             if (!controlBlock) {
-                selectedData[option] = metaData[option];
+                selectedData[filter_id] = metaData[filter_id];
             } else {
                 // if block is controlled, we get selected data from the block master
                 const controlConfig = controlBlock.config as ConfigurationModel;
-                if (controlConfig.metaData.master[option].isMaster) {
-                    selectedData[option] = controlConfig.metaData[option];
+                if (controlConfig.metaData.master[filter_id].isMaster) {
+                    // TODO CHECK What is the difference between metadata.master.values and metadata.filters[filter_id]
+                    // Might assign controlConfig.metaData.master[filter_id].values instead
+                    selectedData[filter_id] = controlConfig.metaData.filters[filter_id];
                 } else {
-                    selectedData[option] = metaData[option];
+                    selectedData[filter_id] = metaData.filters[filter_id];
                 }
             }
         });
@@ -75,14 +68,13 @@ export default class BlockFilterManager extends Component<any, any> {
      * @param selectedData selected data (block metaData)
      */
     filtreOptions = (selectedData) => {
-        const optionsData = {
-            regions: new Set<string>(),
-            variables: new Set<string>(),
-            scenarios: new Set<string>(),
-            models: new Set<string>(),
-        };
-        const filtersId = this.props.filtersId;
-        let uncontrolledFiltersId = [...this.props.filtersId];
+        const optionsData: {[filter_id: string]: any}= Object.fromEntries(
+            Object.keys(this.props.filtersDefinition).map(
+                (filter_id)=>[filter_id, new Set<string>()]
+            )
+        );
+        const filtersId = Object.keys(this.props.filtersDefinition);
+        let uncontrolledFiltersId = [...filtersId];
         const filterByDataFocus = this.props.filterByDataFocus;
         const globalFiltersJson = this.props.filters;
 
@@ -90,24 +82,24 @@ export default class BlockFilterManager extends Component<any, any> {
         const controlBlock = getControlBlock(this.props.dashboard.blocks, this.props.currentBlock.controlBlock);
         if (controlBlock) {
             const controlConfig = controlBlock.config as ConfigurationModel;
-            uncontrolledFiltersId = this.props.filtersId.filter(option => {
-                if (controlConfig.metaData.master[option].isMaster) {
-                    optionsData[option] = selectedData[option]
+            uncontrolledFiltersId = uncontrolledFiltersId.filter(filter_id => {
+                if (controlConfig.metaData.master[filter_id].isMaster) {
+                    optionsData[filter_id] = selectedData[filter_id]
                 } else {
-                    return option;
+                    return filter_id;
                 }
             });
         }
 
         // set uncontrolled options
-        uncontrolledFiltersId.forEach((option) => {
-            filterByDataFocus[option].forEach((optionValue) => {
+        uncontrolledFiltersId.forEach((filter_id) => {
+            filterByDataFocus[filter_id].forEach((filterValue) => {
                 let isExist = true;
                 filtersId.forEach((filterKey) => {
-                    if (option !== filterKey) {
+                    if (filter_id !== filterKey) {
                         selectedData[filterKey].forEach((value) => {
                             if (
-                                !globalFiltersJson[option][optionValue][filterKey].includes(value)
+                                !globalFiltersJson[filter_id][filterValue][filterKey].includes(value)
                             ) {
                                 isExist = false;
                             }
@@ -116,23 +108,23 @@ export default class BlockFilterManager extends Component<any, any> {
                 });
 
                 if (isExist) {
-                    optionsData[option].add(optionValue);
+                    optionsData[filter_id].add(filterValue);
                 }
             });
         });
 
-        filtersId.forEach((option) => {
-            optionsData[option] = Array.from(optionsData[option]);
+        filtersId.forEach((filter_id) => {
+            optionsData[filter_id] = Array.from(optionsData[filter_id].values());
         });
 
         return optionsData;
     };
 
-    onChange = (option, selectedData: string[]) => {
+    onChange = (filter_id, selectedData: string[]) => {
         const dashboard = { ...this.props.dashboard };
         const config = this.props.currentBlock.config;
         // Update config (metaData)
-        config.metaData[option] = selectedData;
+        config.metaData[filter_id] = selectedData;
         dashboard.blocks[this.props.currentBlock.id].config = { ...config };
         this.props.updateDashboard(dashboard)
     };
