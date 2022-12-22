@@ -47,7 +47,7 @@ export default class BlockFilterManager extends Component<any, any> {
 
         Object.keys(this.props.filtersDefinition).forEach((filter_id) => {
             if (!controlBlock) {
-                selectedData[filter_id] = metaData[filter_id];
+                selectedData[filter_id] = metaData.filters[filter_id];
             } else {
                 // if block is controlled, we get selected data from the block master
                 const controlConfig = controlBlock.config as ConfigurationModel;
@@ -124,7 +124,7 @@ export default class BlockFilterManager extends Component<any, any> {
         const dashboard = { ...this.props.dashboard };
         const config = this.props.currentBlock.config;
         // Update config (metaData)
-        config.metaData[filter_id] = selectedData;
+        config.metaData.filters[filter_id] = selectedData;
         dashboard.blocks[this.props.currentBlock.id].config = { ...config };
         this.props.updateDashboard(dashboard)
     };

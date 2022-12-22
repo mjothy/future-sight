@@ -6,15 +6,15 @@ import {
   ConfigurationModel,
   DashboardModel,
   getSelectedFilter,
-  LayoutModel, PlotDataModel,
+  LayoutModel,
+  PlotDataModel,
 } from '@future-sight/common';
-import { Component } from 'react';
-import { RoutingProps } from '../app/Routing';
+import {Component} from 'react';
+import {RoutingProps} from '../app/Routing';
 
 import DashboardView from './DashboardView';
-import { getDraft, setDraft } from '../drafts/DraftUtils';
-import { notification, Spin } from 'antd';
-import FiltersDefinitionModel from "@future-sight/common/build/models/FiltersDefinitionModel";
+import {getDraft, setDraft} from '../drafts/DraftUtils';
+import {notification, Spin} from 'antd';
 
 export interface DashboardSelectionControlProps
   extends ComponentPropsWithDataManager,
@@ -131,7 +131,7 @@ export default class DashboardSelectionControl extends Component<
                 option,
               ])
             );
-          dashboard.blocks[layoutItem.i].config.metaData[option] =
+          dashboard.blocks[layoutItem.i].config.metaData.filters[option] =
             master[option].values;
         }
       });
@@ -194,11 +194,11 @@ export default class DashboardSelectionControl extends Component<
     const config = block.config as ConfigurationModel;
     let isDashboardUpdated = false;
     filtersId.forEach(option => {
-      const dataInOptionsData = config.metaData[option].filter(data => optionsData[option].includes(data));
+      const dataInOptionsData = config.metaData.filters[option].filter(data => optionsData[option].includes(data));
 
-      if (dataInOptionsData.length < config.metaData[option].length) {
+      if (dataInOptionsData.length < config.metaData.filters[option].length) {
         isDashboardUpdated = true;
-        config.metaData[option] = dataInOptionsData;
+        config.metaData.filters[option] = dataInOptionsData;
         dashboard.blocks[block.id as string].config = { ...config };
       }
     });

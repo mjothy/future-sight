@@ -32,7 +32,7 @@ export default class ControlBlockEditor extends Component<any, any> {
       childrens.map((child: BlockModel | any) => {
         const config = child.config;
         config.metaData.selectOrder = Array.from(new Set([...child.config.metaData.selectOrder, option]));
-        config.metaData[option] = [];
+        config.metaData.filters[option] = [];
         dashboard.blocks[child.id].config = { ...config };
       });
     }
@@ -46,7 +46,7 @@ export default class ControlBlockEditor extends Component<any, any> {
     const config = this.props.currentBlock.config;
 
     // update current block config (metadata)
-    config.metaData[option] = [];
+    config.metaData.filters[option] = [];
     config.metaData.master[option].values = [];
     dashboard.blocks[this.props.currentBlock.id].config = { ...config };
 
@@ -55,7 +55,7 @@ export default class ControlBlockEditor extends Component<any, any> {
       const childrens = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id)
       childrens.forEach((child: BlockModel | any) => {
         const configChild = child.config;
-        configChild.metaData[option] = [];
+        configChild.metaData.filters[option] = [];
         dashboard.blocks[child.id].config = { ...configChild };
       })
     }
@@ -82,8 +82,8 @@ export default class ControlBlockEditor extends Component<any, any> {
       const childrens = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id)
       childrens.forEach((child: BlockModel | any) => {
         const configChild = { ...child.config };
-        const newValues = configChild.metaData[option].filter(value => value !== unselectedData);
-        configChild.metaData[option] = newValues;
+        const newValues = configChild.metaData.filters[option].filter(value => value !== unselectedData);
+        configChild.metaData.filters[option] = newValues;
         dashboard.blocks[child.id].config = { ...configChild };
       })
     }
@@ -105,7 +105,7 @@ export default class ControlBlockEditor extends Component<any, any> {
 
         <SelectInput
           type={option}
-          value={metaData[option]}
+          value={metaData.filters[option]}
           options={this.props.optionsData[option]}
           onChange={this.props.onChange}
           isClear={true}
@@ -117,7 +117,7 @@ export default class ControlBlockEditor extends Component<any, any> {
   };
 
   render() {
-    const filtersId = this.props.filtersId;
+    const filtersId = Object.keys(this.props.filtersDefinition);
     return (
       <>
         <div>{filtersId.map((option) => this.selectDropDown(option))}</div>

@@ -12,7 +12,7 @@ export default class DataBlockEditor extends Component<any, any> {
   onDropdownVisibleChange = (option, e) => {
     const dashboard = { ...this.props.dashboard };
     const config = this.props.currentBlock.config;
-    if (!e && config.metaData[option].length > 0) {
+    if (!e && config.metaData.filters[option].length > 0) {
       // Update the order of selection
       config.metaData.selectOrder = Array.from(
         new Set<string>([...config.metaData.selectOrder, option])
@@ -33,7 +33,7 @@ export default class DataBlockEditor extends Component<any, any> {
       for (let i = index; i < config.metaData.selectOrder.length; i++) {
         selectOrder.splice(selectOrder.indexOf(config.metaData.selectOrder[i]), 1);
         // TODO add condition for controlled inputs
-        config.metaData[config.metaData.selectOrder[i]] = [];
+        config.metaData.filters[config.metaData.selectOrder[i]] = [];
       }
       config.metaData.selectOrder = Array.from(new Set<string>([...selectOrder]));
       dashboard.blocks[this.props.currentBlock.id].config = { ...config };
@@ -63,7 +63,7 @@ export default class DataBlockEditor extends Component<any, any> {
             <h4>{option}</h4>
             <SelectInput
               type={option}
-              value={metaData[option]}
+              value={metaData.filters[option]}
               options={this.props.optionsData[option]}
               onChange={this.props.onChange}
               isClear={selected}
@@ -123,7 +123,7 @@ export default class DataBlockEditor extends Component<any, any> {
           {/* show dropdown lists of unselected  */}
           <table className="width-100">
             <tr>
-              {getUnselectedInputOptions(this.props.currentBlock, this.props.filtersId).map((option) => (
+              {getUnselectedInputOptions(this.props.currentBlock, Object.keys(this.props.filtersDefinition)).map((option) => (
                 <td key={option}>{this.selectDropDownInput(option, false)}</td>
               ))}
             </tr>

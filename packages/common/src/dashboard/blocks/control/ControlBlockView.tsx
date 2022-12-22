@@ -25,7 +25,7 @@ export default class ControlBlockView extends Component<any, any> {
         this.props.filtersId.map((option) => {
           const isMaster = config.metaData.master[option].isMaster;
           if (isMaster) {
-            configChild.metaData[option] = config.metaData.master[option].values;
+            configChild.metaData.filters[option] = config.metaData.master[option].values;
             dashboard.blocks[child.id].config = { ...configChild };
           }
         });
@@ -51,7 +51,7 @@ export default class ControlBlockView extends Component<any, any> {
             onChange={(e) => this.onChange(option, e)}
             dropdownMatchSelectWidth={false}
           >
-            {metaData[option].map((element) => (
+            {metaData.filters[option].map((element) => (
               <Option key={element} value={element}>
                 {element}
               </Option>

@@ -35,7 +35,7 @@ export function blocksIdToDelete(blocks, dataStructure) {
 
     blocks.forEach((block: BlockModel | any) => {
         if (block.blockType !== "text") {
-            block.config.metaData[selectedFilter].forEach(value => {
+            block.config.metaData.filters[selectedFilter].forEach(value => {
                 if (!dataStructure[selectedFilter].selection.includes(value)) {
                     toDeleteBlocks.add(block.id);
                 }

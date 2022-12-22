@@ -172,7 +172,7 @@ class DashboardDataConfiguration extends Component<
                 const config = controlBlock.config as ConfigurationModel;
                 this.filtersId.forEach(filter_id => {
                     if (config.metaData.master[filter_id].isMaster) {
-                        metaData[filter_id] = config.metaData[filter_id];
+                        metaData.filters[filter_id] = config.metaData.filters[filter_id];
                     }
                 })
             }
