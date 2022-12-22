@@ -1,4 +1,5 @@
 import FiltersDefinitionModel from "@future-sight/common/build/models/FiltersDefinitionModel";
+import {BranchesOutlined, ControlOutlined, GlobalOutlined, LineChartOutlined} from "@ant-design/icons";
 
 const FILTERS_DEFINITION: FiltersDefinitionModel = {
     models: {
@@ -7,7 +8,8 @@ const FILTERS_DEFINITION: FiltersDefinitionModel = {
         label: "Models",
         label_singular: "Model",
         api_endpoint: "models",
-        isYAxisLabel: false
+        isYAxisLabel: false,
+        icon: <ControlOutlined/>
     },
     scenarios: {
         id: "scenarios",
@@ -15,7 +17,8 @@ const FILTERS_DEFINITION: FiltersDefinitionModel = {
         label: "Scenarios",
         label_singular: "Scenario",
         api_endpoint: "scenarios",
-        isYAxisLabel: false
+        isYAxisLabel: false,
+        icon: <BranchesOutlined/>
     },
     variables: {
         id: "variables",
@@ -23,7 +26,8 @@ const FILTERS_DEFINITION: FiltersDefinitionModel = {
         label: "Variables",
         label_singular: "Variable",
         api_endpoint: "variables",
-        isYAxisLabel: true
+        isYAxisLabel: true,
+        icon: <LineChartOutlined/>
     },
     regions: {
         id: "regions",
@@ -31,7 +35,8 @@ const FILTERS_DEFINITION: FiltersDefinitionModel = {
         label: "Regions",
         label_singular: "Region",
         api_endpoint: "regions",
-        isYAxisLabel: false
+        isYAxisLabel: false,
+        icon: <GlobalOutlined/>
     },
 }
 

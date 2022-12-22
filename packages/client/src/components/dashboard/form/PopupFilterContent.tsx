@@ -1,30 +1,21 @@
-import {
-  BranchesOutlined,
-  ControlOutlined,
-  GlobalOutlined,
-  LineChartOutlined,
-} from '@ant-design/icons';
-import { getSelectedFilter, SelectInput } from '@future-sight/common';
-import { Radio, RadioChangeEvent, Space } from 'antd';
-import { Component } from 'react';
+import {getSelectedFilter, SelectInput} from '@future-sight/common';
+import {Radio, RadioChangeEvent, Space} from 'antd';
+import {Component} from 'react';
+import FILTERS_DEFINITION from "../../filter/FiltersDefinition";
 
 export default class PopupFilterContent extends Component<any, any> {
 
   handleCheckedFilter = (e: RadioChangeEvent) => {
     const filter = e.target.value;
     // tHE KEY can be: models/scenarios/regions/variables
-    this.props.filtersId.map((key) => {
-      if (filter === key) {
-        this.props.dataStructure[key].isFilter = true;
-      } else {
-        this.props.dataStructure[key].isFilter = false;
-      }
+    Object.keys(FILTERS_DEFINITION).map((key) => {
+      this.props.dataStructure[key].isFilter = filter === key;
     });
     this.props.updateDataStructure(this.props.dataStructure);
   };
 
-  onChange = (type: string, selectedData: string[]) => {
-    this.props.dataStructure[type].selection = selectedData;
+  onChange = (filter_id: string, selectedData: string[]) => {
+    this.props.dataStructure[filter_id].selection = selectedData;
     this.props.updateDataStructure(this.props.dataStructure);
   }
 
@@ -37,6 +28,20 @@ export default class PopupFilterContent extends Component<any, any> {
     />
   }
 
+  getRadioList = (selectedFilter) => {
+    return Object.values(FILTERS_DEFINITION).map(
+        (filter)=>{
+          return <div key = {"radio_"+filter.id} className="mt-20">
+            <Radio value={filter.id}>
+              {filter.icon}
+              {filter.label}
+            </Radio>
+            {selectedFilter === filter.id && this.selectInput(filter.id)}
+          </div>
+        }
+    )
+  }
+
   render() {
     const selectedFilter = getSelectedFilter(this.props.dataStructure);
     return (
@@ -47,35 +52,7 @@ export default class PopupFilterContent extends Component<any, any> {
           value={selectedFilter}
         >
           <Space direction="vertical" className="width-100">
-            <div className="mt-20">
-              <Radio value={'regions'}>
-                <GlobalOutlined />
-                Regions
-              </Radio>
-              {selectedFilter === 'regions' && this.selectInput('regions')}
-            </div>
-
-            <div className="mt-20">
-              <Radio value={'variables'}>
-                <LineChartOutlined />
-                Variables
-              </Radio>
-              {selectedFilter === 'variables' && this.selectInput('variables')}
-            </div>
-            <div className="mt-20">
-              <Radio value={'scenarios'}>
-                <BranchesOutlined />
-                Scenarios
-              </Radio>
-              {selectedFilter === 'scenarios' && this.selectInput('scenarios')}
-            </div>
-            <div className="mt-20">
-              <Radio value={'models'}>
-                <ControlOutlined />
-                Models
-              </Radio>
-              {selectedFilter === 'models' && this.selectInput('models')}
-            </div>
+            {this.getRadioList(selectedFilter)}
           </Space>
         </Radio.Group>
       </div>
