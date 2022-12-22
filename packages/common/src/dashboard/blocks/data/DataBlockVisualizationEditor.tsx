@@ -1,22 +1,9 @@
 import {AreaChartOutlined, BarChartOutlined, LineChartOutlined, TableOutlined} from '@ant-design/icons';
 import {Col, Input, Row, Select, Checkbox} from 'antd';
 import {Component} from 'react';
+import FiltersDefinitionModel from "../../../models/FiltersDefinitionModel";
 
 const { Option } = Select;
-const ATTRIBUTES = {
-  Region: {
-
-  },
-  Variable: {
-
-  },
-  Scenario: {
-
-  },
-  Model: {
-
-  }
-}
 
 const plotTypes = [
   {type: 'line', label: 'Line', icon: <LineChartOutlined/>},
@@ -53,20 +40,19 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
 
   onLegendContentChange = (checkedValues) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
-    configStyle.legend = {
-      Model: false,
-      Scenario: false,
-      Region: false,
-      Variable: false
+    for (const key of configStyle.legend){
+      configStyle.legend[key]=false
     }
     for (const value of checkedValues) {
       configStyle.legend[value] = true;
     }
-    this.updateBlockConfig({ configStyle: configStyle })
+    this.updateBlockConfig({ configStyle })
   };
 
   legendOptions = () => {
-    return Object.keys(ATTRIBUTES).map((att) => { return { "label": att, "value": att } });
+    return Object.values(this.props.filtersDefinition as FiltersDefinitionModel).map(
+        (filter) => { return { "label": filter.id_singular, "value": filter.id_singular } }
+    );
   }
 
   onYAxisLabelChange = (e) => {
@@ -111,7 +97,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
           <Col span={16}>
             <Select
               className="width-100"
-              placeholder="Variables"
+              placeholder="Type de graphique"
               value={configStyle.graphType}
               onChange={this.onPlotTypeChange}
             >
