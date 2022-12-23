@@ -33,8 +33,7 @@ export default class PopupFilterContent extends Component<any, any> {
         (filter)=>{
           return <div key = {"radio_"+filter.id} className="mt-20">
             <Radio value={filter.id}>
-              {filter.icon}
-              {filter.label}
+              {filter.icon} {filter.label}
             </Radio>
             {selectedFilter === filter.id && this.selectInput(filter.id)}
           </div>

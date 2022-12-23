@@ -55,10 +55,9 @@ export default class DataBlockEditor extends Component<any, any> {
     }
 
     const metaData = this.props.currentBlock.config.metaData;
-
     return (
       !isControlled && (
-        <div className={selected ? 'transition' : ''}>
+        <div className={selected ? 'transition' : ''} key={option}>
           <Row className="width-100 mt-16">
             <h4>{option}</h4>
             <SelectInput
@@ -78,18 +77,18 @@ export default class DataBlockEditor extends Component<any, any> {
 
   controlledInputs = () => {
     const id = this.props.currentBlock.controlBlock;
-    const controlBlock = this.props.dashboard.blocks[id].config.metaData;
-    return Object.keys(controlBlock.master).map((key) => {
-      if (controlBlock.master[key].isMaster) {
+    const controlBlockData = this.props.dashboard.blocks[id].config.metaData;
+    return Object.keys(controlBlockData.master).map((key) => {
+      if (controlBlockData.master[key].isMaster) {
         return (
           <div className='mt-20'>
             <strong>{key}: </strong> <br />
-            {controlBlock[key].length <= 0 ? <div>
+            {controlBlockData.filters[key].length <= 0 ? <div>
 
               <p><ExclamationCircleOutlined /> No data selected</p>
-            </div> : controlBlock[key].map(element => {
+            </div> : controlBlockData.filters[key].map(element => {
               let color = "default";
-              if (controlBlock.master[key].values.includes(element)) {
+              if (controlBlockData.master[key].values.includes(element)) {
                 color = "blue";
               }
               return <Tag key={element} color={color}>{element}</Tag>
@@ -104,31 +103,37 @@ export default class DataBlockEditor extends Component<any, any> {
     const metaData = this.props.currentBlock.config.metaData;
 
     return (
-      <div>
-        <div className={'block-flex'}>
-          {/* show inputs if they are controlled */}
-          {this.props.currentBlock.controlBlock !== '' && (
-            <div>
-              <strong>Controlled inputs</strong>
-              {this.controlledInputs()}
-              <Divider />
-            </div>
-          )}
+      <div className={'block-flex'}>
+        {/* show inputs if they are controlled */}
+        {this.props.currentBlock.controlBlock !== '' && (
+          <div>
+            <strong>Controlled inputs</strong>
+            {this.controlledInputs()}
+            <Divider />
+          </div>
+        )}
 
-          {/* show dropdown lists of selected  */}
-          {metaData.selectOrder.map((option) =>
-            this.selectDropDownInput(option, true)
-          )}
-          <Divider />
-          {/* show dropdown lists of unselected  */}
-          <table className="width-100">
+        {/* show dropdown lists of selected  */}
+        {metaData.selectOrder.map((option) =>
+          this.selectDropDownInput(option, true)
+        )}
+        <Divider />
+        {/* show dropdown lists of unselected  */}
+        <table className="width-100">
+          <tbody>
             <tr>
-              {getUnselectedInputOptions(this.props.currentBlock, Object.keys(this.props.filtersDefinition)).map((option) => (
-                <td key={option}>{this.selectDropDownInput(option, false)}</td>
-              ))}
+              {
+                getUnselectedInputOptions(
+                    this.props.currentBlock,
+                    Object.keys(this.props.filtersDefinition)
+                ).map((option, idx) => (
+                        <td key={idx.toString()}>{this.selectDropDownInput(option, false)}</td>
+                    )
+                )
+              }
             </tr>
-          </table>
-        </div>
+          </tbody>
+        </table>
       </div>
     );
   }

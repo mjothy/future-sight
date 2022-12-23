@@ -91,11 +91,11 @@ export default class ControlBlockEditor extends Component<any, any> {
     this.props.updateDashboard(dashboard);
   }
 
-  selectDropDown = (option) => {
+  selectDropDown = (option, list_key="") => {
     const metaData = this.props.currentBlock.config.metaData;
 
     return (
-      <div className='mb-20'>
+      <div className='mb-20' key={list_key}>
         <Checkbox
           onChange={(e) => this.onCheckChange(option, e)}
           checked={metaData.master[option].isMaster}
@@ -120,7 +120,7 @@ export default class ControlBlockEditor extends Component<any, any> {
     const filtersId = Object.keys(this.props.filtersDefinition);
     return (
       <>
-        <div>{filtersId.map((option) => this.selectDropDown(option))}</div>
+        <div>{filtersId.map((option, idx) => this.selectDropDown(option, idx.toString()))}</div>
         <Divider />
         <Row style={{ marginTop: "auto" }}>
           <Col span={24}>

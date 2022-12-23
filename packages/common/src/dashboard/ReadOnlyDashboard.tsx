@@ -129,6 +129,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                         readonly
                         getBlockData={props.getBlockData}
                         filtersId={props.filtersId}
+                        filtersDefinition={props.filtersDefinition}
                     />
                 )}
             </div>

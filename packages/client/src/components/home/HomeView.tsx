@@ -8,6 +8,7 @@ import './HomeView.css';
 import { createUUID, getDrafts, setDraft } from '../drafts/DraftUtils';
 import Footer from '../footer/Footer';
 import PreviewGroup from '../PreviewGroup';
+import FILTERS_DEFINITION from "../filter/FiltersDefinition";
 
 const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
   const [draftFromURL, setDraftFromURL] = useState('');
@@ -51,7 +52,7 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
 
   const newDraft = () => {
     const uuid = createUUID();
-    setDraft(uuid, DashboardModel.fromDraft(uuid));
+    setDraft(uuid, DashboardModel.fromDraft(FILTERS_DEFINITION, uuid));
     navigate('draft?id=' + uuid);
   };
 

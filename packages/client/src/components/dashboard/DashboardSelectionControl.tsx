@@ -15,6 +15,8 @@ import {RoutingProps} from '../app/Routing';
 import DashboardView from './DashboardView';
 import {getDraft, setDraft} from '../drafts/DraftUtils';
 import {notification, Spin} from 'antd';
+import FiltersDefinitionModel from "@future-sight/common/build/models/FiltersDefinitionModel";
+import FILTERS_DEFINITION from "../filter/FiltersDefinition";
 
 export interface DashboardSelectionControlProps
   extends ComponentPropsWithDataManager,
@@ -27,6 +29,7 @@ export interface DashboardSelectionControlProps
   updateFilterByDataFocus: (dashboard: DashboardModel, filtre: string) => void;
   filterByDataFocus: any;
   filtersId: string[];
+  filtersDefinition: FiltersDefinitionModel;
 }
 
 export default class DashboardSelectionControl extends Component<
@@ -76,7 +79,6 @@ export default class DashboardSelectionControl extends Component<
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevState.dashboard != this.state.dashboard) {
-      console.log("update dashboard")
       setDraft(this.state.dashboard.id, this.state.dashboard);
     }
   }
@@ -116,7 +118,7 @@ export default class DashboardSelectionControl extends Component<
     const layoutItem = new LayoutModel((this.getLastId() + 1).toString());
     const dashboard = this.state.dashboard;
 
-    dashboard.blocks[layoutItem.i] = new BlockModel(layoutItem.i, blockType);
+    dashboard.blocks[layoutItem.i] = new BlockModel(layoutItem.i, blockType, FILTERS_DEFINITION);
     dashboard.layout = [layoutItem, ...dashboard.layout];
 
     if (masterBlockId) {

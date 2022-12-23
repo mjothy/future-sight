@@ -5,7 +5,7 @@ export class FilterDefinitionModel {
     label_singular = "";
     api_endpoint = "";
     isYAxisLabel = false;
-    icon = undefined;
+    icon: any = undefined;
 }
 
 export default class FiltersDefinitionModel {

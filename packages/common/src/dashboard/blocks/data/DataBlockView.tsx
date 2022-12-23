@@ -7,7 +7,6 @@ import FiltersDefinitionModel from "../../../models/FiltersDefinitionModel";
 import PlotDataModel from "../../../models/PlotDataModel";
 
 
-//TODO WIP
 export default class DataBlockView extends Component<any, any> {
 
   /**

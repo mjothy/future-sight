@@ -40,7 +40,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
 
   onLegendContentChange = (checkedValues) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
-    for (const key of configStyle.legend){
+    for (const key in configStyle.legend){
       configStyle.legend[key]=false
     }
     for (const value of checkedValues) {
@@ -50,8 +50,9 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   };
 
   legendOptions = () => {
-    return Object.values(this.props.filtersDefinition as FiltersDefinitionModel).map(
-        (filter) => { return { "label": filter.id_singular, "value": filter.id_singular } }
+    return Object.values(this.props.filtersDefinition as FiltersDefinitionModel)
+        .map(
+            (filter) => { return { "label": filter.id_singular, "value": filter.id_singular } }
     );
   }
 
@@ -84,7 +85,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     const legend = this.props.currentBlock.config.configStyle.legend;
     const defaultLegendOptions: any[] = [];
-    for (const key of Object.keys(legend)) {
+    for (const key in legend) {
       if (legend[key]) {
         defaultLegendOptions.push(key);
       }

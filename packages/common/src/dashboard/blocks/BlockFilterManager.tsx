@@ -27,13 +27,9 @@ export default class BlockFilterManager extends Component<any, any> {
 
     updateDropdownData = () => {
         const selectedData = this.getSelectedData();
-
-        console.log("selectedData (filter): ", selectedData);
         const optionsData = this.filtreOptions(selectedData);
-
         this.setState({ optionsData })
         this.props.checkIfSelectedInOptions(optionsData, this.props.currentBlock);
-
     };
 
     /**
@@ -68,7 +64,7 @@ export default class BlockFilterManager extends Component<any, any> {
      * @param selectedData selected data (block metaData)
      */
     filtreOptions = (selectedData) => {
-        const optionsData: {[filter_id: string]: any}= Object.fromEntries(
+        const optionsData: {[filter_id: string]: any} = Object.fromEntries(
             Object.keys(this.props.filtersDefinition).map(
                 (filter_id)=>[filter_id, new Set<string>()]
             )
@@ -91,24 +87,25 @@ export default class BlockFilterManager extends Component<any, any> {
             });
         }
 
+        // TODO not optimal, right now filterByDataFocus should have only 1 key/values as we can select
+        //  only one filter in popupfilter
         // set uncontrolled options
         uncontrolledFiltersId.forEach((filter_id) => {
-            filterByDataFocus[filter_id].forEach((filterValue) => {
+            filterByDataFocus[filter_id]?.forEach((focusValue) => {
                 let isExist = true;
-                filtersId.forEach((filterKey) => {
-                    if (filter_id !== filterKey) {
-                        selectedData[filterKey].forEach((value) => {
-                            if (
-                                !globalFiltersJson[filter_id][filterValue][filterKey].includes(value)
-                            ) {
-                                isExist = false;
-                            }
-                        });
-                    }
+                const filters_without_filter_id = filtersId.filter((id)=>id!==filter_id)
+                filters_without_filter_id.forEach((filterKey) => {
+                    selectedData[filterKey].forEach((value) => {
+                        if (
+                            !globalFiltersJson[filter_id][focusValue][filterKey].includes(value)
+                        ) {
+                            isExist = false;
+                        }
+                    });
                 });
 
                 if (isExist) {
-                    optionsData[filter_id].add(filterValue);
+                    optionsData[filter_id].add(focusValue);
                 }
             });
         });

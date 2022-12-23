@@ -1,12 +1,8 @@
-import {
-  BlockModel,
-  ComponentPropsWithDataManager,
-  Dashboard,
-  DashboardModel,
-} from '@future-sight/common';
+import {BlockModel, ComponentPropsWithDataManager, Dashboard, DashboardModel,} from '@future-sight/common';
 import React from 'react';
 import SetupView from './form/SetupView';
-import { RoutingProps } from '../app/Routing';
+import {RoutingProps} from '../app/Routing';
+import FiltersDefinitionModel from "@future-sight/common/build/models/FiltersDefinitionModel";
 
 interface DashboardViewProps extends ComponentPropsWithDataManager, RoutingProps {
   dashboard: DashboardModel;
@@ -19,6 +15,7 @@ interface DashboardViewProps extends ComponentPropsWithDataManager, RoutingProps
   readonly?: boolean;
   updateDashboard: (dashboard: DashboardModel) => void;
   checkIfSelectedInOptions: (optionsData, block: BlockModel) => void;
+  filtersDefinition: FiltersDefinitionModel;
 }
 
 /**

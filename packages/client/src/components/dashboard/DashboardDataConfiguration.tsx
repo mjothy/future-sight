@@ -28,7 +28,6 @@ class DashboardDataConfiguration extends Component<
   DashboardDataConfigurationProps,
   any
 > {
-    filtersId: string[] = [];
     constructor(props) {
         super(props);
         const filtersId: string[] = [];
@@ -170,7 +169,7 @@ class DashboardDataConfiguration extends Component<
             const controlBlock = getControlBlock(blocks, block.controlBlock);
             if (controlBlock) {
                 const config = controlBlock.config as ConfigurationModel;
-                this.filtersId.forEach(filter_id => {
+                this.state.filtersId.forEach(filter_id => {
                     if (config.metaData.master[filter_id].isMaster) {
                         metaData.filters[filter_id] = config.metaData.filters[filter_id];
                     }
@@ -216,12 +215,13 @@ class DashboardDataConfiguration extends Component<
         if (selectedFilter !== '' && this.state.isFetchData) {
             const data = {...this.state.filterByDataFocus};
             data[selectedFilter] = dashboard.dataStructure[selectedFilter].selection;
-            this.filtersId.forEach((filterId) => {
+            const filters_without_selected_filter = this.state.filtersId.filter((id)=>id!==selectedFilter)
+            filters_without_selected_filter.forEach((filterId) => {
                 if (filterId !== selectedFilter) {
                     data[selectedFilter].forEach((filterValue) => {
                         data[filterId] = Array.from(
                             new Set([
-                                ...data[filterId],
+                                ...(data[filterId] || []),
                                 ...this.state.filters[selectedFilter][filterValue][filterId],
                             ])
                         );
@@ -238,7 +238,7 @@ class DashboardDataConfiguration extends Component<
             <ReadOnlyDashboard
                 shareButtonOnClickHandler={() => Utils.copyToClipboard()}
                 getBlockData={this.getBlockData}
-                filtersId={this.filtersId}
+                filtersId={this.state.filtersId}
                 filtersDefinition={FILTERS_DEFINITION}
                 {...this.props}
             />
@@ -251,7 +251,8 @@ class DashboardDataConfiguration extends Component<
                 getPlotData={this.getPlotData}
                 updateFilterByDataFocus={this.updateFilterByDataFocus}
                 filterByDataFocus={this.state.filterByDataFocus}
-                filtersId={this.filtersId}
+                filtersId={this.state.filtersId}
+                filtersDefinition={FILTERS_DEFINITION}
                 {...this.props}
             />) || <div className="dashboard">
                 <Spin className="centered"/>

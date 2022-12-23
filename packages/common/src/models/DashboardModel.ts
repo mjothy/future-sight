@@ -12,7 +12,7 @@ export default class DashboardModel {
     this.dataStructure = new DataStructureModel(filtersDefinition);
   }
 
-  static fromDraft(filtersDefinition: FiltersDefinitionModel, id?: string): DashboardModel {
+  static fromDraft(filtersDefinition: FiltersDefinitionModel, id: string): DashboardModel {
     const ret = new DashboardModel(filtersDefinition, id)
     ret.layout = defaultJson.layout
     ret.blocks = {"1": new BlockModel("1", "data", filtersDefinition)}

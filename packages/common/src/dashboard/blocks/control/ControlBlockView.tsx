@@ -35,10 +35,10 @@ export default class ControlBlockView extends Component<any, any> {
     this.props.updateDashboard(dashboard)
   };
 
-  selectDropDown = (option) => {
+  selectDropDown = (option, list_key="") => {
     const metaData = this.props.currentBlock.config.metaData;
     return (
-      <Row className="mb-10">
+      <Row className="mb-10" key={list_key}>
         <Col span={6}>
           <h4>{option}: </h4>
         </Col>
@@ -79,9 +79,9 @@ export default class ControlBlockView extends Component<any, any> {
         ) : undefined
         }
 
-        {Object.keys(metaData.master).map((option) => {
+        {Object.keys(metaData.master).map((option, idx) => {
           if (metaData.master[option].isMaster) {
-            return this.selectDropDown(option);
+            return this.selectDropDown(option, idx.toString());
           }
         })}
       </div>
