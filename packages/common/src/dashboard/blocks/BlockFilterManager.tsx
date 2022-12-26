@@ -11,14 +11,48 @@ export default class BlockFilterManager extends Component<any, any> {
             /**
              * Data options in dropDown Inputs
              */
+            initialoptionsData: {
+                regions: [],
+                variables: [],
+                scenarios: [],
+                models: [],
+            },
             optionsData: {
+                regions: [],
+                variables: [],
+                scenarios: [],
+                models: [],
+            },
+
+            dataRaws: {
                 regions: [],
                 variables: [],
                 scenarios: [],
                 models: [],
             }
         };
+
+        this.props.optionsLabel.map(option => {
+            // eslint-disable-next-line react/no-direct-mutation-state
+            this.state.optionsData[option] = (this.props.firstFilterRaws as Array<any>).map(raw => {
+                return raw[option.slice(0, -1)];
+            })
+        });
+
+        this.props.optionsLabel.forEach(option => {
+            // eslint-disable-next-line react/no-direct-mutation-state
+            this.state.optionsData[option] = Array.from(new Set(this.state.optionsData[option]));
+            this.state.initialoptionsData[option] = Array.from(new Set(this.state.optionsData[option]));
+        })
     }
+
+    // initialize = () =>{
+    //     this.props.optionsLabel.map(option => {
+    //         this.state.optionsData[option] = (this.props.firstFilterRaws as Array<any>).map(raw => {
+    //             return raw[option.slice(0, -1)];
+    //         })
+    //     });
+    // }
 
     componentDidMount() {
         this.updateDropdownData();
@@ -34,11 +68,11 @@ export default class BlockFilterManager extends Component<any, any> {
         const selectedData = this.getSelectedData();
 
         console.log("selectedData (filter): ", selectedData);
-        const optionsData = this.filtreOptions(selectedData);
+        const { optionsData, dataRaws } = this.filtreOptions(selectedData);
 
-        this.setState({ optionsData })
-        this.props.checkIfSelectedInOptions(optionsData, this.props.currentBlock);
-
+        this.setState({ optionsData, dataRaws }, () => {
+            // this.props.checkIfSelectedInOptions(this.state.optionsData, this.state.currentBlockCopy);
+        })
     };
 
     /**
@@ -121,12 +155,85 @@ export default class BlockFilterManager extends Component<any, any> {
             });
         });
 
-        optionsLabel.forEach((option) => {
-            optionsData[option] = Array.from(optionsData[option]);
-        });
+        // const raws = this.filter();
+        // this.props.optionsLabel.map(option => {
+        //     optionsData[option] = raws.map(raw => {
+        //         return raw[option.slice(0, -1)];
+        //     })
+        // });
 
-        return optionsData;
+        // optionsLabel.forEach((option) => {
+        //     optionsData[option] = Array.from(new Set(optionsData[option]));
+        // });
+
+        // console.log("optionsData: ", optionsData);
+
+        return this.filter();
     };
+
+    filter = () => {
+        let optionsData = { ...this.state.initialoptionsData };
+
+        const dataRaws = { ...this.state.dataRaws }
+
+        const metaData = this.props.currentBlock.config.metaData;
+        const options = this.props.optionsLabel;
+
+        // Update dataRaws
+        if (metaData.selectOrder.length == 1) {
+            const option = metaData.selectOrder[0];
+            dataRaws[option] = this.props.firstFilterRaws.filter(raw => metaData[option].includes(raw[option.slice(0, -1)]));
+        }
+        console.log("dataRaws avant: ", dataRaws);
+        // For each index(option label [model, scenario, ....] return the possible lines)
+        if (metaData.selectOrder.length > 0) {
+            const option_unselected = this.props.optionsLabel.filter(option => !metaData.selectOrder.includes(option))
+            option_unselected.forEach((option) => {
+                const current_option = option;
+                const prev_option = metaData.selectOrder[metaData.selectOrder.length - 1]; // last label selected (drop down)
+                dataRaws[current_option] = dataRaws[prev_option].filter(raw => metaData[prev_option].includes(raw[prev_option.slice(0, -1)]));
+            })
+        }
+
+        // Update optionsData
+        if (metaData.selectOrder.length <= 0) {
+            optionsData = this.state.optionsData;
+        } else {
+            // Update options based on selected data
+            this.props.optionsLabel.forEach(current_option => {
+                this.props.optionsLabel.forEach(prev_option => {
+                    if (current_option !== prev_option) {
+                        if (metaData[prev_option].length > 0) {
+                            const possible_options = new Set();
+                            optionsData[current_option].forEach(value => {
+                                let isExist = true;
+                                metaData[prev_option].map(selectedValue => {
+                                    if (!dataRaws[current_option].find(raw => raw[current_option.slice(0, -1)] === value && raw[prev_option.slice(0, -1)] === selectedValue)) {
+                                        isExist = false
+                                    }
+                                })
+                                if (isExist) {
+                                    possible_options.add(value);
+                                }
+                            })
+                            optionsData[current_option] = possible_options;
+                        }
+
+                    }
+                })
+            })
+        }
+
+        console.log("dataRaws apres: ", dataRaws);
+
+        options.forEach(option => {
+            optionsData[option] = Array.from(new Set(optionsData[option]));
+        })
+
+        console.log("optionsData: ", optionsData);
+        return { optionsData, dataRaws };
+    }
+
 
     onChange = (option, selectedData: string[]) => {
         const dashboard = { ...this.props.dashboard };

@@ -48,7 +48,8 @@ class DashboardDataConfiguration extends Component<
        * Data (with timeseries from IASA API)
        */
       plotData: [],
-      isFetchData: false
+      isFetchData: false,
+      firstFilterRaws: {}
     };
   }
 
@@ -187,6 +188,7 @@ class DashboardDataConfiguration extends Component<
    * @param selectedFilter dashboard selected filter
    */
   updateFilterByDataFocus = (dashboard, selectedFilter) => {
+    console.log("Update data by focus")
     if (selectedFilter !== '' && this.state.isFetchData) {
       const data = this.state.filtreByDataFocus;
       data[selectedFilter] = dashboard.dataStructure[selectedFilter].selection;
@@ -203,8 +205,29 @@ class DashboardDataConfiguration extends Component<
         }
       });
       this.setState({ filtreByDataFocus: data });
+      const filters = {};
+      filters[selectedFilter] = data[selectedFilter];
+      this.fetchRaws({ filters }).then(res => {
+        this.setState({ firstFilterRaws: res })
+      });
+
     }
   }
+
+  fetchRaws = (data) => {
+    return fetch(`api/filter`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        return data;
+      })
+      .catch(console.error);
+  };
 
   render() {
     const { readonly } = this.props;
@@ -226,6 +249,7 @@ class DashboardDataConfiguration extends Component<
         filtreByDataFocus={this.state.filtreByDataFocus}
         optionsLabel={this.optionsLabel}
         {...this.props}
+        firstFilterRaws={this.state.firstFilterRaws}
       />) || <div className="dashboard">
         <Spin className="centered" />
       </div>
