@@ -48,7 +48,8 @@ class DashboardDataConfiguration extends Component<
        * Data (with timeseries from IASA API)
        */
       plotData: [],
-      isFetchData: false
+      isFetchData: false,
+      firstFilterRaws: []
     };
   }
 
@@ -203,6 +204,12 @@ class DashboardDataConfiguration extends Component<
         }
       });
       this.setState({ filtreByDataFocus: data });
+      const filters = {};
+      filters[selectedFilter] = data[selectedFilter];
+      this.props.dataManager.fetchRaws({ filters }).then(res => {
+        this.setState({ firstFilterRaws: res })
+      });
+
     }
   }
 
@@ -226,6 +233,7 @@ class DashboardDataConfiguration extends Component<
         filtreByDataFocus={this.state.filtreByDataFocus}
         optionsLabel={this.optionsLabel}
         {...this.props}
+        firstFilterRaws={this.state.firstFilterRaws}
       />) || <div className="dashboard">
         <Spin className="centered" />
       </div>
