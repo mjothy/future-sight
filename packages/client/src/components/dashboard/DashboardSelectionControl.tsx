@@ -25,7 +25,8 @@ export interface DashboardSelectionControlProps
   getPlotData: (blocks: BlockModel[]) => void;
   updateFilterByDataFocus: (dashboard: DashboardModel, filtre: string) => void;
   filtreByDataFocus: any;
-  optionsLabel: string[]
+  optionsLabel: string[];
+  firstFilterRaws: any;
 }
 
 export default class DashboardSelectionControl extends Component<

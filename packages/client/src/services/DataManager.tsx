@@ -136,4 +136,18 @@ export default class DataManager implements IDataManager {
     return ["models", "scenarios", "variables", "regions"];
   };
 
+  fetchRaws = (data) => {
+    return fetch(`api/filter`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        return data;
+      })
+      .catch(console.error);
+  };
 }

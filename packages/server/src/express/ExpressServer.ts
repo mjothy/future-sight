@@ -6,6 +6,8 @@ import path, { join } from 'path';
 import RedisClient from '../redis/RedisClient';
 import IDataProxy from './IDataProxy';
 
+import dataUnion from './../data/dataUnion.json';
+
 export default class ExpressServer {
   private app: any;
   private readonly port: number;
@@ -198,6 +200,36 @@ export default class ExpressServer {
         }
 
         res.send(results);
+      } catch (err) {
+        console.error(err);
+        next(err);
+      }
+    });
+
+    this.app.post('/api/filter', async (req, res, next) => {
+      try {
+        // models: [m1, m2], variables: [var1, var2]
+        const filters = req.body.filters;
+        const options = Object.keys(filters);
+
+        let dataUnionNew = dataUnion;
+        options.map(option => {
+          const newRaws = filters[option].map(valeur => {
+            return (dataUnionNew as Array<any>).filter(raw => {
+              if (raw[option.slice(0, -1)] === valeur) {
+                return raw
+              }
+            });
+          })
+          if (filters[option].length > 0) {
+            let table: any = []
+            newRaws.forEach(tab => {
+              table = [...table, ...tab]
+            });
+            dataUnionNew = table;
+          }
+        })
+        res.send(dataUnionNew);
       } catch (err) {
         console.error(err);
         next(err);

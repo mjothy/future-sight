@@ -8,6 +8,12 @@ export default class BlockFilterManager extends Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {
+            initialoptionsData: {
+                regions: [],
+                variables: [],
+                scenarios: [],
+                models: [],
+            },
             /**
              * Data options in dropDown Inputs
              */
@@ -16,8 +22,27 @@ export default class BlockFilterManager extends Component<any, any> {
                 variables: [],
                 scenarios: [],
                 models: [],
+            },
+
+            dataRaws: {
+                regions: [],
+                variables: [],
+                scenarios: [],
+                models: [],
             }
         };
+
+        this.props.firstFilterRaws.forEach(raw => {
+            this.props.optionsLabel.forEach(option => {
+                this.state.optionsData[option].push(raw[option.slice(0, -1)]);
+            })
+        });
+        this.props.optionsLabel.forEach(option => {
+            // eslint-disable-next-line react/no-direct-mutation-state
+            this.state.optionsData[option] = Array.from(new Set(this.state.optionsData[option]));
+            this.state.initialoptionsData[option] = [...this.state.optionsData[option]];
+            this.state.dataRaws[option] = this.props.firstFilterRaws;
+        })
     }
 
     componentDidMount() {
@@ -25,8 +50,21 @@ export default class BlockFilterManager extends Component<any, any> {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (prevProps.blockSelectedId !== this.props.blockSelectedId || this.props.dashboard != prevProps.dashboard) {
+        if (this.props.dashboard != prevProps.dashboard) {
             this.updateDropdownData();
+        }
+
+        if (prevProps.blockSelectedId !== this.props.blockSelectedId) {
+            const dataRaws = {
+                regions: [],
+                variables: [],
+                scenarios: [],
+                models: [],
+            };
+            this.props.optionsLabel.forEach(option => {
+                dataRaws[option] = this.props.firstFilterRaws;
+            })
+            this.setState({ dataRaws }, () => this.updateDropdownData())
         }
     }
 
@@ -34,11 +72,11 @@ export default class BlockFilterManager extends Component<any, any> {
         const selectedData = this.getSelectedData();
 
         console.log("selectedData (filter): ", selectedData);
-        const optionsData = this.filtreOptions(selectedData);
+        const { optionsData, dataRaws } = this.filtreOptions(selectedData);
 
-        this.setState({ optionsData })
-        this.props.checkIfSelectedInOptions(optionsData, this.props.currentBlock);
-
+        this.setState({ optionsData, dataRaws }, () => {
+            // this.props.checkIfSelectedInOptions(this.state.optionsData, this.state.currentBlockCopy);
+        })
     };
 
     /**
@@ -121,12 +159,81 @@ export default class BlockFilterManager extends Component<any, any> {
             });
         });
 
-        optionsLabel.forEach((option) => {
-            optionsData[option] = Array.from(optionsData[option]);
-        });
+        // const raws = this.filter();
+        // this.props.optionsLabel.map(option => {
+        //     optionsData[option] = raws.map(raw => {
+        //         return raw[option.slice(0, -1)];
+        //     })
+        // });
 
-        return optionsData;
+        // optionsLabel.forEach((option) => {
+        //     optionsData[option] = Array.from(new Set(optionsData[option]));
+        // });
+
+        // console.log("optionsData: ", optionsData);
+
+        return this.filter();
     };
+
+    filter = () => {
+        const optionsData = JSON.parse(JSON.stringify(this.state.initialoptionsData));
+        const metaData = this.props.currentBlock.config.metaData;
+        const options = this.props.optionsLabel;
+
+        // Foreach index(option label [model, scenario, ....]) return the possible lines based on select order
+        const dataRaws = this.setRaws();
+        if (metaData.selectOrder.length > 0) {
+            this.props.optionsLabel.forEach(current_option => {
+                this.props.optionsLabel.forEach(other_option => {
+                    if (current_option !== other_option) {
+                        if (metaData[other_option].length > 0) {
+                            const possible_options = new Set();
+                            optionsData[current_option].forEach(value => {
+                                let isExist = true;
+                                metaData[other_option].map(selectedValue => {
+                                    if (!dataRaws[current_option].find(raw => raw[current_option.slice(0, -1)] === value && raw[other_option.slice(0, -1)] === selectedValue)) {
+                                        isExist = false
+                                    }
+                                })
+                                if (isExist) {
+                                    possible_options.add(value);
+                                }
+                            })
+                            optionsData[current_option] = possible_options;
+                        }
+
+                    }
+                })
+            })
+        }
+
+        options.forEach(option => {
+            optionsData[option] = Array.from(new Set(optionsData[option]));
+        })
+        return { optionsData, dataRaws };
+    }
+
+    setRaws = () => {
+        const metaData = this.props.currentBlock.config.metaData;
+        const dataRaws = { ...this.state.dataRaws }
+        if (metaData.selectOrder.length > 0) {
+            const option_unselected = this.props.optionsLabel.filter(option => !metaData.selectOrder.includes(option));
+            const option_selected = metaData.selectOrder;
+            // set possible raws for selected inputs
+            for (let i = 1; i < option_selected.length; i++) {
+                const current_option = metaData.selectOrder[i];
+                const prev_option = metaData.selectOrder[i - 1];
+                dataRaws[current_option] = dataRaws[prev_option].filter(raw => metaData[prev_option].includes(raw[prev_option.slice(0, -1)]));
+            }
+            // set possible raws for unselected inputs
+            option_unselected.forEach((option) => {
+                const current_option = option;
+                const prev_option = metaData.selectOrder[metaData.selectOrder.length - 1]; // last label selected (drop down)
+                dataRaws[current_option] = dataRaws[prev_option].filter(raw => metaData[prev_option].includes(raw[prev_option.slice(0, -1)]));
+            })
+        }
+        return dataRaws;
+    }
 
     onChange = (option, selectedData: string[]) => {
         const dashboard = { ...this.props.dashboard };
