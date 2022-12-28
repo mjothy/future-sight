@@ -9,19 +9,6 @@ import { getUnselectedInputOptions } from '../utils/BlockDataUtils';
  */
 export default class DataBlockEditor extends Component<any, any> {
 
-  onDropdownVisibleChange = (option, e) => {
-    const dashboard = { ...this.props.dashboard };
-    const config = this.props.currentBlock.config;
-    if (!e && config.metaData[option].length > 0) {
-      // Update the order of selection
-      config.metaData.selectOrder = Array.from(
-        new Set<string>([...config.metaData.selectOrder, option])
-      );
-      dashboard.blocks[this.props.currentBlock.id].config = { ...config };
-      this.props.updateDashboard(dashboard);
-    }
-  };
-
   clearClick = (option, e) => {
     const dashboard = { ...this.props.dashboard };
     const config = this.props.currentBlock.config;
@@ -68,7 +55,7 @@ export default class DataBlockEditor extends Component<any, any> {
               onChange={this.props.onChange}
               isClear={selected}
               onClear={this.clearClick}
-              onDropdownVisibleChange={this.onDropdownVisibleChange}
+              onDropdownVisibleChange={this.props.onDropdownVisibleChange}
             />
           </Row>
         </div>

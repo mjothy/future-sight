@@ -18,27 +18,40 @@ export default class ControlBlockEditor extends Component<any, any> {
   onCheckChange = (option, e) => {
 
     const dashboard = { ...this.props.dashboard };
-    const config = this.props.currentBlock.config;
+    const configParent = this.props.currentBlock.config;
 
     // update current block config (metadata)
-    config.metaData.master[option].isMaster = e.target.checked;
-    dashboard.blocks[this.props.currentBlock.id].config = { ...config };
-    config.metaData.master[option].values = [];
+    configParent.metaData.master[option].isMaster = e.target.checked;
+    configParent.metaData.master[option].values = []; // clear selected data in control block view
 
-    // Update children
-    const childrens = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id);
-
-    if (childrens.length > 0 && e) {
-      childrens.map((child: BlockModel | any) => {
-        const config = child.config;
-        config.metaData.selectOrder = Array.from(new Set([...child.config.metaData.selectOrder, option]));
-        config.metaData[option] = [];
-        dashboard.blocks[child.id].config = { ...config };
-      });
+    if (!e.target.checked) {
+      configParent.metaData[option] = [];
+      configParent.metaData.selectOrder = configParent.metaData.selectOrder.filter(optionFilter => optionFilter !== option);
     }
+
+    dashboard.blocks[this.props.currentBlock.id].config = { ...configParent };
+
+    // Update children (this function is mutable)
+    this.updateChildsBlocks(dashboard, this.props.currentBlock.id);
 
     this.props.updateDashboard(dashboard);
   };
+
+  updateChildsBlocks = (dashboard, controlBlockId) => {
+    const configParent = this.props.dashboard.blocks[controlBlockId].config;
+    const childrens = getChildrens(dashboard.blocks, controlBlockId);
+
+    if (childrens.length > 0) {
+      childrens.map((child: BlockModel | any) => {
+        const configChild = child.config;
+        configChild.metaData.selectOrder = configParent.metaData.selectOrder;
+        this.props.optionsLabel.forEach(option => {
+          configChild.metaData[option] = [];
+        })
+        dashboard.blocks[child.id].config = { ...configChild };
+      });
+    }
+  }
 
   clearClick = (option, e) => {
 
@@ -50,15 +63,7 @@ export default class ControlBlockEditor extends Component<any, any> {
     config.metaData.master[option].values = [];
     dashboard.blocks[this.props.currentBlock.id].config = { ...config };
 
-    const isMaster = config.metaData.master[option].isMaster;
-    if (isMaster) {
-      const childrens = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id)
-      childrens.forEach((child: BlockModel | any) => {
-        const configChild = child.config;
-        configChild.metaData[option] = [];
-        dashboard.blocks[child.id].config = { ...configChild };
-      })
-    }
+    this.updateChildsBlocks(dashboard, this.props.currentBlock.id);
 
     this.props.updateDashboard(dashboard);
   };
@@ -103,7 +108,7 @@ export default class ControlBlockEditor extends Component<any, any> {
           <h4>{option}</h4>
         </Checkbox>
 
-        <SelectInput
+        {metaData.master[option].isMaster && <SelectInput
           type={option}
           value={metaData[option]}
           options={this.props.optionsData[option]}
@@ -111,7 +116,8 @@ export default class ControlBlockEditor extends Component<any, any> {
           isClear={true}
           onClear={this.clearClick}
           onDeselect={this.updateControlView}
-        />
+          onDropdownVisibleChange={this.props.onDropdownVisibleChange}
+        />}
       </div>
     );
   };
