@@ -23,6 +23,7 @@ export interface DashboardProps extends ComponentPropsWithDataManager {
     updateSelectedBlock: (blockSelectedId: string) => void;
     saveDashboard: (callback: (idPermanent) => void, image?: string) => void;
     isEmbedded?: boolean;
+    isFullscreen?: boolean;
     readonly?: boolean;
     navigate: (any) => any;
 }
@@ -112,7 +113,7 @@ class Dashboard extends Component<DashboardProps, any> {
         return (
             <Layout
                 className="dashboard"
-                style={{ height: this.props.isEmbedded ? '100%' : undefined }}
+                style={{ height: (this.props.isEmbedded || this.props.isFullscreen) ? '100%' : undefined }}
             >
                 <div className="no-sidebar-margin" />
                 <Content className={"dashboard-content-wrapper"}>

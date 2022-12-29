@@ -8,7 +8,8 @@ import BrowseView from '../browse/BrowseView';
 
 export interface RoutingProps {
   isEmbedded: boolean;
-  setEnableSwitchEmbeddedMode: (enable: boolean) => void;
+  isFullscreen: boolean;
+  setEnableSwitchFullscreenMode: (enable: boolean) => void;
 }
 
 export default class Routing extends React.Component<RoutingProps> {
