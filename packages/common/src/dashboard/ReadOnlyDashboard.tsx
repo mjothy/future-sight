@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-extra-boolean-cast */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { LinkOutlined } from '@ant-design/icons';
+import {LinkOutlined, PicCenterOutlined} from '@ant-design/icons';
 import { Button, PageHeader, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
@@ -19,9 +19,11 @@ import DashboardConfigView from './DashboardConfigView';
 // TODO Change published URL to youtube embedded standard embed/... instead of view?.../embedded
 
 interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
-    setEnableSwitchEmbeddedMode: (enable: boolean) => void;
+    setEnableSwitchFullscreenMode: (enable: boolean) => void;
     isEmbedded?: boolean;
+    isFullscreen?: boolean;
     shareButtonOnClickHandler: () => void;
+    embedButtonOnClickHandler: () => void;
     blockData: (block: BlockModel) => any[];
     optionsLabel: string[]
 }
@@ -61,9 +63,9 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
             fetchDashboard(id);
         }
         setIsLoading(false);
-        props.setEnableSwitchEmbeddedMode(true);
+        props.setEnableSwitchFullscreenMode(true);
         return () => {
-            props.setEnableSwitchEmbeddedMode(false);
+            props.setEnableSwitchFullscreenMode(false);
         };
     }, []);
 
@@ -76,7 +78,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
     return (
         <div
             className="dashboard readonly"
-            style={{ height: props.isEmbedded ? '100%' : undefined }}
+            style={{ height: (props.isEmbedded|| props.isFullscreen) ? '100%' : undefined }}
         >
             {dashboard && (
                 <PageHeader
@@ -96,6 +98,15 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                             onClick={props.shareButtonOnClickHandler}
                         >
                             Share
+                        </Button>,
+                        !props.isEmbedded && <Button
+                            key="embed"
+                            type="default"
+                            size="small"
+                            icon={<PicCenterOutlined/>}
+                            onClick={props.embedButtonOnClickHandler}
+                        >
+                            Embed
                         </Button>,
                         // <Button
                         //   key="download"

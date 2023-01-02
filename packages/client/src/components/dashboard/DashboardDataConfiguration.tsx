@@ -221,6 +221,7 @@ class DashboardDataConfiguration extends Component<
     return readonly ? (
       <ReadOnlyDashboard
         shareButtonOnClickHandler={() => Utils.copyToClipboard()}
+        embedButtonOnClickHandler={() => Utils.copyToClipboard(undefined, "&embedded")}
         blockData={this.blockData}
         optionsLabel={this.optionsLabel}
         {...this.props}

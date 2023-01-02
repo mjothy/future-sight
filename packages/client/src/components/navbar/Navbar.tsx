@@ -12,13 +12,13 @@ import './Navbar.css';
 import Logo from '../../assets/images/ECEMF_logo.png';
 
 interface NavbarProps {
-  enableSwitchEmbeddedMode: boolean;
+  enableSwitchFullscreenMode: boolean;
 }
 
 const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const switchEmbeddedMode = () => {
-    searchParams.append('embedded', '');
+  const switchFullscreenMode = () => {
+    searchParams.append('fullscreen', '');
     setSearchParams(searchParams);
   };
 
@@ -37,12 +37,12 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
           <Link to={'/'}>Home</Link>
         </Menu.Item>
 
-        {props.enableSwitchEmbeddedMode && (
+        {props.enableSwitchFullscreenMode && (
           <Menu.Item key="embedded" style={{ backgroundColor: '#001529' }}>
             <Button
               type="primary"
               icon={<FullscreenOutlined />}
-              onClick={switchEmbeddedMode}
+              onClick={switchFullscreenMode}
               style={{ backgroundColor: '#001529' }}
             >
               Full Screen Mode
