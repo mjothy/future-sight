@@ -3,6 +3,7 @@ import {
   blocksIdToDelete,
   compareDataStructure,
   ComponentPropsWithDataManager,
+  ConfigurationModel,
   DashboardModel,
   getSelectedFilter,
   LayoutModel,
@@ -12,7 +13,7 @@ import { RoutingProps } from '../app/Routing';
 
 import DashboardView from './DashboardView';
 import { getDraft, setDraft } from '../drafts/DraftUtils';
-import { Spin } from 'antd';
+import { notification, Spin } from 'antd';
 
 export interface DashboardSelectionControlProps
   extends ComponentPropsWithDataManager,
@@ -184,6 +185,39 @@ export default class DashboardSelectionControl extends Component<
     }
   };
 
+  /**
+  * Check if data in selection (selected data) are present in Select options
+  */
+  checkIfSelectedInOptions = (optionsData, block: BlockModel) => {
+    console.log("options data: ", optionsData)
+    const optionsLabel = this.props.optionsLabel;
+    const dashboard = { ...this.state.dashboard };
+    const config = block.config as ConfigurationModel;
+    let isDashboardUpdated = false;
+    optionsLabel.forEach(option => {
+      // Check if selected data (metaData[option]) are in options of drop down list
+      const dataInOptionsData = config.metaData[option].filter(data => optionsData[option].includes(data));
+
+      if (dataInOptionsData.length < config.metaData[option].length) {
+        isDashboardUpdated = true;
+        config.metaData[option] = dataInOptionsData;
+        if (config.metaData[option].length === 0) {
+          config.metaData.selectOrder = config.metaData.selectOrder.filter(option1 => option1 !== option);
+        }
+        dashboard.blocks[block.id as string].config = { ...config };
+      }
+    });
+
+    if (isDashboardUpdated) {
+      this.updateDashboard(dashboard);
+      notification.warning({
+        message: 'Data missing',
+        description: 'Some selected data are not available in existing options (due to your latest modifications), block will be updated automatically ',
+        placement: 'top',
+      });
+    }
+  }
+
   render() {
     if (!this.state.dashboard) {
       return (
@@ -201,6 +235,7 @@ export default class DashboardSelectionControl extends Component<
         updateDashboard={this.updateDashboard}
         saveDashboard={this.saveData}
         deleteBlocks={this.deleteBlocks}
+        checkIfSelectedInOptions={this.checkIfSelectedInOptions}
         isDraft={this.state.isDraft}
         {...this.props}
       />
