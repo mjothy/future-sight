@@ -6,8 +6,6 @@ import path, { join } from 'path';
 import RedisClient from '../redis/RedisClient';
 import IDataProxy from './IDataProxy';
 
-import dataUnion from './../data/dataUnion.json';
-
 export default class ExpressServer {
   private app: any;
   private readonly port: number;
@@ -211,8 +209,7 @@ export default class ExpressServer {
         // models: [m1, m2], variables: [var1, var2]
         const filters = req.body.filters;
         const options = Object.keys(filters);
-
-        let dataUnionNew = dataUnion;
+        let dataUnionNew = this.dataProxy.getDataUnion();
         options.map(option => {
           const newRaws = filters[option].map(valeur => {
             return (dataUnionNew as Array<any>).filter(raw => {
