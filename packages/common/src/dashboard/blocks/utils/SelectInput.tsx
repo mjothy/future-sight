@@ -1,7 +1,7 @@
 import { CloseCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { Button, Input, Select, Tooltip } from 'antd'
-import { Option } from 'antd/lib/mentions';
 import React, { Component } from 'react'
+const { Option } = Select;
 
 interface SelectOptionProps {
     /**

@@ -4,7 +4,58 @@ import BlockStyleModel from '../../../models/BlockStyleModel';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
 import PlotlyUtils from '../../graphs/PlotlyUtils';
 
+const indexToColor = {
+  regions: {
+    "EU27": "red",
+    "Asia (R5)": "blue",
+  },
+  variables:{
+    "Emissions|CO2|Energy|Supply|Electricity":"purple",
+    "Emissions|CO2|Energy|Supply|Gases":"green"
+  }
+}
+
 export default class DataBlockView extends Component<any, any> {
+
+  /**
+   * Get index used in this data block. Can be a filter or a combination of filter
+   * The order of the index depends on their order of appearance in the
+   *  constant filters or in the future FiltersDefinition
+   * @returns string index
+   */
+  getColorIndex = () => {
+
+    //TODO Est ce que ça sert à qqchose d'utiliser un hash vs garder un string pour une compréhension plus facile du code couleur?
+    console.log("getIndex")
+
+    const currentBlock = this.props.currentBlock
+    const filterKeys = Object.keys(this.props.filters)
+    let indexKeys
+    //Normal block
+    if (!currentBlock.controlBlock){
+      indexKeys = filterKeys.filter(
+          (filterKey)=> currentBlock.config.metaData[filterKey].length>1
+      )
+      console.log(indexKeys)
+    }
+
+    //Controlled block
+    else {
+      const controlBlock = this.props.dashboard.blocks[currentBlock.controlBlock]
+      indexKeys = filterKeys.filter(
+          (filterKey) => {
+            if (controlBlock.config.metaData.master[filterKey].isMaster){
+              return controlBlock.config.metaData.master[filterKey].values.length>1
+            } else {
+              return currentBlock.config.metaData[filterKey].length>1
+            }
+          }
+      )
+      console.log(indexKeys)
+    }
+
+     return indexKeys
+  }
 
   /**
    * Preparing the fetched data to adapt plotly data OR antd table
@@ -86,14 +137,23 @@ export default class DataBlockView extends Component<any, any> {
 
   preparePlotData = (dataElement, configStyle: BlockStyleModel) => {
     let obj;
+    const colorIndex = this.getColorIndex()[0]
+    let color
+    if (colorIndex) {
+      const indexValue = dataElement[colorIndex?.slice(0, -1)]
+      color = indexToColor[colorIndex][indexValue]
+      console.log(color)
+    }
     switch (configStyle.graphType) {
       case 'area':
         obj = {
           type: 'scatter',
           fill: 'tozeroy',
+          // fillcolor: "#FF0000"+"50",
+          fillcolor: "red",
           x: this.getX(dataElement),
           y: this.getY(dataElement),
-          mode: 'none',
+          mode: color || null,
           name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
@@ -107,6 +167,7 @@ export default class DataBlockView extends Component<any, any> {
           name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
+          marker: {color: color || null}
         };
     }
 
