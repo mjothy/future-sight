@@ -1,6 +1,8 @@
 import AddButton from './actions/AddButton';
-import { Button, Col, Row, Modal } from 'antd';
-import {DragOutlined, EditOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import {Button, Col, Row} from 'antd';
+import {DragOutlined, EditOutlined, QuestionCircleOutlined} from '@ant-design/icons';
+import DashboardGlobalInfo from "./DashboardGlobalInfo";
+import React, {useState} from "react";
 
 
 const actions = [
@@ -21,15 +23,15 @@ const actions = [
 /**
  * Sidebar when no block is selected (to create new block or publish dashboard)
  */
-const DashboardControl: React.FC<any> = ({
-                                                        addBlock,
-                                                        onPublish,
-                                                        publishing
-}) => {
+const DashboardControl: React.FC<any> = (props) => {
 
   const clicked = (blockType: string) => {
-    addBlock(blockType);
+    props.addBlock(blockType);
   };
+
+  const [showPublishInfo, setShowPublishInfo] = useState(false);
+
+
 
   return (
       <div
@@ -63,21 +65,22 @@ const DashboardControl: React.FC<any> = ({
                 type="primary"
                 danger
                 className="width-100"
-                onClick={() =>
-                    Modal.confirm({
-                      title: 'Do you want to publish the dashboard?',
-                      content: "The dashboard won't be editable anymore.",
-                      onOk() {
-                        onPublish();
-                      },
-                    })
-                }
-                loading={publishing}
+                onClick={() => setShowPublishInfo(true)}
+                loading={props.publishing}
             >
               Publish
             </Button>
           </Col>
         </Row>
+        <DashboardGlobalInfo
+            key={"publishDashboardGlobalInfo"}
+            closeGlobalInfoModal={()=>setShowPublishInfo(false)}
+            isShowGlobalInfo={showPublishInfo}
+            title={"Do you want to publish the dashboard?"}
+            message={"The dashboard won't be editable anymore"}
+            onOk={props.onPublish}
+            {...props}
+        />
       </div>
   );
 };
