@@ -189,15 +189,15 @@ export default class DashboardSelectionControl extends Component<
   * Check if data in selection (selected data) are present in Select options
   */
   checkIfSelectedInOptions = (optionsData, block: BlockModel) => {
-    console.log("options data: ", optionsData)
     const optionsLabel = this.props.optionsLabel;
     const dashboard = { ...this.state.dashboard };
     const config = block.config as ConfigurationModel;
     let isDashboardUpdated = false;
+    const missingData = {}
     optionsLabel.forEach(option => {
       // Check if selected data (metaData[option]) are in options of drop down list
       const dataInOptionsData = config.metaData[option].filter(data => optionsData[option].includes(data));
-
+      missingData[option] = config.metaData[option].filter(data => !optionsData[option].includes(data));
       if (dataInOptionsData.length < config.metaData[option].length) {
         isDashboardUpdated = true;
         config.metaData[option] = dataInOptionsData;
@@ -211,11 +211,28 @@ export default class DashboardSelectionControl extends Component<
     if (isDashboardUpdated) {
       this.updateDashboard(dashboard);
       notification.warning({
-        message: 'Data missing',
-        description: 'Some selected data are not available in existing options (due to your latest modifications), block will be updated automatically ',
-        placement: 'top',
+        message: 'Data missing in selection box',
+        description: (<div dangerouslySetInnerHTML={{ __html: this.notifDesc(missingData) }}></div>),
+        placement: 'bottomRight',
       });
     }
+  }
+
+  notifDesc = (missingData) => {
+    console.log("missingData: ", missingData);
+    let notif = "Some selected data are not available in existing options: <br/>";
+    Object.keys(missingData).forEach(key => {
+      if (missingData[key].length > 0) {
+        let msg = '';
+        missingData[key].forEach(value => {
+          msg = msg + value + ', ';
+        })
+
+        notif = notif + key + ': ' + msg + '<br/>';
+      }
+    })
+
+    return notif;
   }
 
   render() {

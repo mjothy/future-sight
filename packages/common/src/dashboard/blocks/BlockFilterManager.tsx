@@ -74,32 +74,13 @@ export default class BlockFilterManager extends Component<any, any> {
         const dataRaws = this.getRaws(metaData);
 
         if (metaData.selectOrder.length > 0) {
-            // Filter options in drop down list based on data selection (metaData)
-            this.props.optionsLabel.forEach(to_filter_option => {
-                this.props.optionsLabel.forEach(other_option => {
-                    if (to_filter_option !== other_option) {
-                        metaData[other_option].forEach(selectedValue => {
-                            const possible_options = new Set();
-                            //Filter on options in dropdown list of "to_filter_option"
-                            //Check for each value if exist raw with selected data in other options label
-                            optionsData[to_filter_option].forEach(value => {
-                                if (dataRaws[to_filter_option].find(raw => raw[to_filter_option.slice(0, -1)] === value && raw[other_option.slice(0, -1)] === selectedValue)) {
-                                    possible_options.add(value);
-                                }
-                            })
-                            optionsData[to_filter_option] = possible_options;
-                        })
-                    }
-                })
+            // get possible options from filtered dataRaws
+            options.forEach(option => {
+                optionsData[option] = Array.from(new Set(dataRaws[option].map(raw => raw[option.slice(0, -1)])))
             })
         }
-
-        options.forEach(option => {
-            optionsData[option] = Array.from(new Set(optionsData[option]));
-        })
         return { optionsData, dataRaws };
     }
-
 
     /**
      * Get possible raws based on selected order config.metaData.selectOrder
