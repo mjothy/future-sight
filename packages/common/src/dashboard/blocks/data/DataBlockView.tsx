@@ -5,6 +5,21 @@ import PlotlyGraph from '../../graphs/PlotlyGraph';
 import PlotlyUtils from '../../graphs/PlotlyUtils';
 
 export default class DataBlockView extends Component<any, any> {
+  constructor(props) {
+    super(props);
+    const { data, layout } = this.settingPlotData();
+    this.state = { data, layout };
+  }
+
+  componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): void {
+    if (this.props.dashboard != prevProps.dashboard || this.props.plotData.length != prevProps.plotData.length) {
+      // const metaData = this.props.currentBlock.config.metaData;
+      // if (metaData.selectOrder.length == 4) {
+      const { data, layout } = this.settingPlotData();
+      this.setState({ data, layout })
+      // }
+    }
+  }
 
   /**
    * Preparing the fetched data to adapt plotly data OR antd table
@@ -207,7 +222,6 @@ export default class DataBlockView extends Component<any, any> {
   }
 
   render() {
-    const { data, layout } = this.settingPlotData();
-    return <PlotlyGraph {...this.props} data={data} layout={layout} />;
+    return <PlotlyGraph {...this.props} data={this.state.data} layout={this.state.layout} />;
   }
 }

@@ -48,6 +48,7 @@ class DashboardDataConfiguration extends Component<
        * Data (with timeseries from IASA API)
        */
       plotData: [],
+      missingData: [],
       isFetchData: false,
       firstFilterRaws: []
     };
@@ -177,10 +178,15 @@ class DashboardDataConfiguration extends Component<
   retreiveAllTimeSeriesData = (data) => {
     this.props.dataManager.fetchPlotData(data)
       .then(res => {
-        console.log("no data for", data);
         if (res.length > 0) {
+          console.log("res: ", res)
           this.setState({ plotData: [...this.state.plotData, ...res] });
         }
+        // else {
+        //   this.setState({ missingData: [...this.state.missingData, ...data] }, () => {
+        //     console.log("missing: ", this.state.missingData)
+        //   })
+        // }
       }
       );
   }
@@ -191,37 +197,37 @@ class DashboardDataConfiguration extends Component<
    * @param selectedFilter dashboard selected filter
    */
   updateFilterByDataFocus = (dashboard, selectedFilter) => {
-    if (this.state.isFetchData){
-        const data = {...this.state.filtreByDataFocus}
+    if (this.state.isFetchData) {
+      const data = { ...this.state.filtreByDataFocus }
 
-        if (selectedFilter === "" || dashboard.dataStructure[selectedFilter].selection === []){
-          for (const [key, valueDict] of Object.entries(this.state.filters)){
-            data[key]=Object.keys(valueDict as {string: unknown})
+      if (selectedFilter === "" || dashboard.dataStructure[selectedFilter].selection === []) {
+        for (const [key, valueDict] of Object.entries(this.state.filters)) {
+          data[key] = Object.keys(valueDict as { string: unknown })
+        }
+      }
+
+      else if (selectedFilter !== '') {
+        data[selectedFilter] = dashboard.dataStructure[selectedFilter].selection;
+        this.optionsLabel.forEach((option) => {
+          if (option !== selectedFilter) {
+            data[selectedFilter].forEach((filterValue) => {
+              data[option] = Array.from(
+                new Set([
+                  ...data[option],
+                  ...this.state.filters[selectedFilter][filterValue][option],
+                ])
+              );
+            });
           }
-        }
-
-        else if (selectedFilter !== '') {
-          data[selectedFilter] = dashboard.dataStructure[selectedFilter].selection;
-          this.optionsLabel.forEach((option) => {
-            if (option !== selectedFilter) {
-              data[selectedFilter].forEach((filterValue) => {
-                data[option] = Array.from(
-                  new Set([
-                    ...data[option],
-                    ...this.state.filters[selectedFilter][filterValue][option],
-                  ])
-                );
-              });
-            }
-          });
-        }
-
-        this.setState({ filtreByDataFocus: data });
-        const filters = {};
-        filters[selectedFilter] = data[selectedFilter];
-        this.props.dataManager.fetchRaws({ filters }).then(res => {
-        this.setState({ firstFilterRaws: res })
         });
+      }
+
+      this.setState({ filtreByDataFocus: data });
+      const filters = {};
+      filters[selectedFilter] = data[selectedFilter];
+      this.props.dataManager.fetchRaws({ filters }).then(res => {
+        this.setState({ firstFilterRaws: res })
+      });
     }
   }
 
@@ -233,6 +239,7 @@ class DashboardDataConfiguration extends Component<
         embedButtonOnClickHandler={() => Utils.copyToClipboard(undefined, "&embedded")}
         blockData={this.blockData}
         optionsLabel={this.optionsLabel}
+        plotData={this.state.plotData}
         {...this.props}
       />
     ) : (

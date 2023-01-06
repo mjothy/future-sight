@@ -68,7 +68,7 @@ export default class DashboardSelectionControl extends Component<
 
   componentDidMount(): void {
     if (this.state.dashboard != undefined) {
-      this.props.getPlotData(this.state.dashboard.blocks);
+      // this.props.getPlotData(this.state.dashboard.blocks);
       const selectedFilter = getSelectedFilter(this.state.dashboard.dataStructure);
       this.props.updateFilterByDataFocus(this.state.dashboard, selectedFilter);
     }
@@ -76,7 +76,6 @@ export default class DashboardSelectionControl extends Component<
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevState.dashboard != this.state.dashboard) {
-      console.log("update dashboard")
       setDraft(this.state.dashboard.id, this.state.dashboard);
     }
   }
