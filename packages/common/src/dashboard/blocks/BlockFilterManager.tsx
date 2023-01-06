@@ -29,6 +29,12 @@ export default class BlockFilterManager extends Component<any, any> {
                 variables: [],
                 scenarios: [],
                 models: [],
+            },
+            missingData: {
+                regions: [],
+                variables: [],
+                scenarios: [],
+                models: [],
             }
         };
 
@@ -54,8 +60,65 @@ export default class BlockFilterManager extends Component<any, any> {
 
     updateDropdownData = () => {
         const { optionsData, dataRaws } = this.filtreOptions();
-        this.setState({ optionsData, dataRaws }, () => this.props.checkIfSelectedInOptions(optionsData, this.props.currentBlock))
+        this.setState({ optionsData, dataRaws }, () => {
+            this.props.checkIfSelectedInOptions(optionsData, this.props.currentBlock)
+
+        })
+        this.missingData();
     };
+
+    missingData = () => {
+        let metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
+
+        if (this.props.currentBlock.controlBlock !== '') {
+            metaData = this.getMetaDataIfControlled();
+        }
+
+        if (metaData.selectOrder.length == 4) {
+            const existDataRaws = this.getExistingRaws(metaData);
+
+            const data = {
+                regions: [],
+                variables: [],
+                scenarios: [],
+                models: [],
+            }
+
+            this.props.optionsLabel.forEach(option => {
+                data[option] = Array.from(new Set(existDataRaws.map(raw => raw[option.slice(0, -1)])))
+                data[option] = metaData[option].filter(value => !data[option].includes(value))
+            })
+
+            this.setState({ missingData: data });
+        }
+    };
+
+    getExistingRaws = (metaData) => {
+        const existDataRaws: any[] = [];
+
+        metaData.models.forEach((model) => {
+            metaData.scenarios.forEach((scenario) => {
+                metaData.variables.forEach((variable) => {
+                    metaData.regions.forEach((region) => {
+                        const d = this.props.plotData.find(
+                            (e) =>
+                                e.model === model &&
+                                e.scenario === scenario &&
+                                e.variable === variable &&
+                                e.region === region
+                        );
+                        if (d) {
+                            existDataRaws.push({ model, scenario, variable, region });
+                        }
+                    });
+                });
+            });
+        });
+
+        console.log("existDataRaws: ", existDataRaws)
+
+        return existDataRaws;
+    }
 
     /**
      * Update options of drop down lists (filter)
@@ -184,6 +247,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 onChange={this.onChange}
                 optionsData={this.state.optionsData}
                 onDropdownVisibleChange={this.onDropdownVisibleChange}
+                missingData={this.state.missingData}
             />
         ) : (
             <ControlBlockEditor
@@ -191,6 +255,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 onChange={this.onChange}
                 optionsData={this.state.optionsData}
                 onDropdownVisibleChange={this.onDropdownVisibleChange}
+                missingData={this.state.missingData}
             />
         );
     }

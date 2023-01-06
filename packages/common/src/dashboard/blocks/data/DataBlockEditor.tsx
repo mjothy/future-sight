@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import { Divider, Row, Tag } from 'antd';
+import { Alert, Divider, Form, Row, Tag } from 'antd';
 import SelectInput from '../utils/SelectInput';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { getUnselectedInputOptions } from '../utils/BlockDataUtils';
@@ -29,6 +29,17 @@ export default class DataBlockEditor extends Component<any, any> {
 
   };
 
+  getMessage = (missing) => {
+    let msg = '';
+    missing.forEach(value => {
+      msg = msg + value + ', ';
+    })
+    if (msg.length > 0) {
+      msg = "No data for: " + msg.slice(0, -2);
+    }
+    return msg;
+  }
+
   selectDropDownInput = (option, selected) => {
     // In case the block is controlled
     const id = this.props.currentBlock.controlBlock;
@@ -48,15 +59,20 @@ export default class DataBlockEditor extends Component<any, any> {
         <div className={selected ? 'transition' : ''}>
           <Row className="width-100 mt-16">
             <h4>{option}</h4>
-            <SelectInput
-              type={option}
-              value={metaData[option]}
-              options={this.props.optionsData[option]}
-              onChange={this.props.onChange}
-              isClear={selected}
-              onClear={this.clearClick}
-              onDropdownVisibleChange={this.props.onDropdownVisibleChange}
-            />
+            <Form.Item
+              className="width-100 missing-data"
+              help={metaData.selectOrder.length == 4 && this.props.missingData[option].length > 0 ? this.getMessage(this.props.missingData[option]) : ''}
+            >
+              <SelectInput
+                type={option}
+                value={metaData[option]}
+                options={this.props.optionsData[option]}
+                onChange={this.props.onChange}
+                isClear={selected}
+                onClear={this.clearClick}
+                onDropdownVisibleChange={this.props.onDropdownVisibleChange}
+              />
+            </Form.Item>
           </Row>
         </div>
       )
