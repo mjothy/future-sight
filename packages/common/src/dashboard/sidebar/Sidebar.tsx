@@ -134,8 +134,7 @@ export default class Sidebar extends Component<any, any> {
           this.props.onCloseMenu();
         }}
       />,
-      <>                {this.state.isShowGlobalInfo && <DashboardGlobalInfo openGlobalInfoModal={this.openGlobalInfoModal} closeGlobalInfoModal={this.closeGlobalInfoModal} isShowGlobalInfo={this.state.isShowGlobalInfo}  {...this.props} />}
-      </>
+      <DashboardGlobalInfo key={"Dashboard-global-info"} openGlobalInfoModal={this.openGlobalInfoModal} closeGlobalInfoModal={this.closeGlobalInfoModal} isShowGlobalInfo={this.state.isShowGlobalInfo}  {...this.props} />
     ]
 
     )

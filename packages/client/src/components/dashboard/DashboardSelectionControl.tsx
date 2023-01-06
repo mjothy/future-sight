@@ -102,7 +102,6 @@ export default class DashboardSelectionControl extends Component<
       const toDeleteBlocks = blocksIdToDelete(Object.values(this.state.dashboard.blocks), newDataStructure);
       const selectedFilter = getSelectedFilter(newDataStructure);
       const blockAndLayouts = this.deleteBlocks(Array.from(toDeleteBlocks));
-
       dashboard = { ...dashboard, ...blockAndLayouts }
       this.setState({ dashboard }, () => {
         this.props.updateFilterByDataFocus(this.state.dashboard, selectedFilter);

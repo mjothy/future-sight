@@ -191,28 +191,37 @@ class DashboardDataConfiguration extends Component<
    * @param selectedFilter dashboard selected filter
    */
   updateFilterByDataFocus = (dashboard, selectedFilter) => {
-    if (selectedFilter !== '' && this.state.isFetchData) {
-      const data = this.state.filtreByDataFocus;
-      data[selectedFilter] = dashboard.dataStructure[selectedFilter].selection;
-      this.optionsLabel.forEach((option) => {
-        if (option !== selectedFilter) {
-          data[selectedFilter].forEach((filterValue) => {
-            data[option] = Array.from(
-              new Set([
-                ...data[option],
-                ...this.state.filters[selectedFilter][filterValue][option],
-              ])
-            );
+    if (this.state.isFetchData){
+        const data = {...this.state.filtreByDataFocus}
+
+        if (selectedFilter === "" || dashboard.dataStructure[selectedFilter].selection === []){
+          for (const [key, valueDict] of Object.entries(this.state.filters)){
+            data[key]=Object.keys(valueDict as {string: unknown})
+          }
+        }
+
+        else if (selectedFilter !== '') {
+          data[selectedFilter] = dashboard.dataStructure[selectedFilter].selection;
+          this.optionsLabel.forEach((option) => {
+            if (option !== selectedFilter) {
+              data[selectedFilter].forEach((filterValue) => {
+                data[option] = Array.from(
+                  new Set([
+                    ...data[option],
+                    ...this.state.filters[selectedFilter][filterValue][option],
+                  ])
+                );
+              });
+            }
           });
         }
-      });
-      this.setState({ filtreByDataFocus: data });
-      const filters = {};
-      filters[selectedFilter] = data[selectedFilter];
-      this.props.dataManager.fetchRaws({ filters }).then(res => {
-        this.setState({ firstFilterRaws: res })
-      });
 
+        this.setState({ filtreByDataFocus: data });
+        const filters = {};
+        filters[selectedFilter] = data[selectedFilter];
+        this.props.dataManager.fetchRaws({ filters }).then(res => {
+        this.setState({ firstFilterRaws: res })
+        });
     }
   }
 

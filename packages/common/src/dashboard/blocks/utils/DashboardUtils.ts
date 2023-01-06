@@ -33,15 +33,17 @@ export function blocksIdToDelete(blocks, dataStructure) {
     const selectedFilter = getSelectedFilter(dataStructure);
     const toDeleteBlocks = new Set<string>();
 
-    blocks.forEach((block: BlockModel | any) => {
-        if (block.blockType !== "text") {
-            block.config.metaData[selectedFilter].forEach(value => {
-                if (!dataStructure[selectedFilter].selection.includes(value)) {
-                    toDeleteBlocks.add(block.id);
-                }
-            })
-        }
-    });
-
+    if (dataStructure[selectedFilter].selection.length > 0) {
+        blocks.forEach((block: BlockModel | any) => {
+            if (block.blockType !== "text") {
+                block.config.metaData[selectedFilter].forEach(value => {
+                    if (!dataStructure[selectedFilter].selection.includes(value)) {
+                        toDeleteBlocks.add(block.id);
+                    }
+                })
+            }
+        });
+    }
+    
     return toDeleteBlocks;
 }
