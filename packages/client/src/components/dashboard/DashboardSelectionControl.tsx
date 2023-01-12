@@ -22,7 +22,6 @@ export interface DashboardSelectionControlProps
   filters: any;
   plotData: any[];
   blockData: (block: BlockModel) => any[];
-  // getPlotData: (blocks: BlockModel[]) => void;
   updateFilterByDataFocus: (dashboard: DashboardModel, filtre: string) => void;
   filtreByDataFocus: any;
   optionsLabel: string[];
@@ -69,7 +68,6 @@ export default class DashboardSelectionControl extends Component<
 
   componentDidMount(): void {
     if (this.state.dashboard != undefined) {
-      // this.props.getPlotData(this.state.dashboard.blocks);
       const selectedFilter = getSelectedFilter(this.state.dashboard.dataStructure);
       this.props.updateFilterByDataFocus(this.state.dashboard, selectedFilter);
     }

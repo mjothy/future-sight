@@ -133,48 +133,6 @@ class DashboardDataConfiguration extends Component<
     return [];
   };
 
-  /**
-   * If dashboard is draft, get first all the possible data to visualize
-   * This function called one time on draft dashboard rendered
-   */
-  // getPlotData = (blocks: BlockModel[]) => {
-  //   const data: any[] = [];
-  //   Object.values(blocks).forEach((block: any) => {
-  //     const metaData: BlockDataModel = { ...block.config.metaData };
-
-  //     // get all possible data from controlled blocks
-  //     const controlBlock = getBlock(blocks, block.controlBlock);
-  //     if (controlBlock.id !== '') {
-  //       const config = controlBlock.config as ConfigurationModel;
-  //       this.optionsLabel.forEach(option => {
-  //         if (config.metaData.master[option].isMaster) {
-  //           metaData[option] = config.metaData[option];
-  //         }
-  //       })
-  //     }
-
-  //     // Check if the block type != text
-  //     if (
-  //       metaData !== undefined &&
-  //       metaData.models &&
-  //       metaData.scenarios &&
-  //       metaData.variables &&
-  //       metaData.regions
-  //     ) {
-  //       metaData.models.forEach((model) => {
-  //         metaData.scenarios.forEach((scenario) => {
-  //           metaData.variables.forEach((variable) => {
-  //             metaData.regions.forEach((region) => {
-  //               data.push({ model, scenario, variable, region });
-  //             });
-  //           });
-  //         });
-  //       });
-  //     }
-  //   });
-  //   this.retreiveAllTimeSeriesData(data);
-  // };
-
   retreiveAllTimeSeriesData = (data) => {
     this.props.dataManager.fetchPlotData(data)
       .then(res => {
@@ -193,7 +151,12 @@ class DashboardDataConfiguration extends Component<
    */
   updateFilterByDataFocus = (dashboard, selectedFilter) => {
     if (this.state.isFetchData) {
-      const data = { ...this.state.filtreByDataFocus }
+      const data = {
+        regions: [],
+        variables: [],
+        scenarios: [],
+        models: [],
+      }
 
       if (selectedFilter === "" || dashboard.dataStructure[selectedFilter].selection.length == 0) {
         for (const [key, valueDict] of Object.entries(this.state.filters)) {
@@ -243,7 +206,6 @@ class DashboardDataConfiguration extends Component<
         filters={this.state.filters}
         plotData={this.state.plotData}
         blockData={this.blockData}
-        // getPlotData={this.getPlotData}
         updateFilterByDataFocus={this.updateFilterByDataFocus}
         filtreByDataFocus={this.state.filtreByDataFocus}
         optionsLabel={this.optionsLabel}
