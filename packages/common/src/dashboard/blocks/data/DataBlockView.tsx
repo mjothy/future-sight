@@ -12,12 +12,20 @@ export default class DataBlockView extends Component<any, any> {
   }
 
   componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): void {
-    if (this.props.dashboard != prevProps.dashboard || this.props.plotData.length != prevProps.plotData.length) {
-      // const metaData = this.props.currentBlock.config.metaData;
-      // if (metaData.selectOrder.length == 4) {
+    if (this.props.currentSelectedBlock != null && this.props.currentSelectedBlock != undefined) {
+      // Set state only for current selected block
+      if (this.props.currentSelectedBlock != prevProps.currentSelectedBlock && this.props.currentBlock.id == this.props.currentSelectedBlock.id) {
+        const { data, layout } = this.settingPlotData();
+        this.setState({ data, layout })
+
+      }
+    } else if (this.props.dashboard != prevProps.dashboard || this.props.plotData.length != prevProps.plotData.length) { //if dashboard layout change, rerender all blocks
       const { data, layout } = this.settingPlotData();
       this.setState({ data, layout })
-      // }
+    }
+    if (this.props.plotData.length != prevProps.plotData.length) {
+      const { data, layout } = this.settingPlotData();
+      this.setState({ data, layout })
     }
   }
 

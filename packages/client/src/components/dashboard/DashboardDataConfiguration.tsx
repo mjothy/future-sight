@@ -182,11 +182,6 @@ class DashboardDataConfiguration extends Component<
           console.log("res: ", res)
           this.setState({ plotData: [...this.state.plotData, ...res] });
         }
-        // else {
-        //   this.setState({ missingData: [...this.state.missingData, ...data] }, () => {
-        //     console.log("missing: ", this.state.missingData)
-        //   })
-        // }
       }
       );
   }

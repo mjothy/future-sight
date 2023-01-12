@@ -53,8 +53,11 @@ export default class BlockFilterManager extends Component<any, any> {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.props.dashboard != prevProps.dashboard || prevProps.blockSelectedId !== this.props.blockSelectedId) {
+        if (this.props.currentSelectedBlock != prevProps.currentSelectedBlock || prevProps.blockSelectedId !== this.props.blockSelectedId) {
             this.updateDropdownData();
+        }
+        if (this.props.plotData.length != prevProps.plotData.length) {
+            this.missingData();
         }
     }
 
@@ -114,9 +117,6 @@ export default class BlockFilterManager extends Component<any, any> {
                 });
             });
         });
-
-        console.log("existDataRaws: ", existDataRaws)
-
         return existDataRaws;
     }
 
@@ -200,10 +200,15 @@ export default class BlockFilterManager extends Component<any, any> {
         return metaData;
     }
 
+    /**
+     * Update block select order after close of inputSelect
+     * @param option input label
+     * @param e TRUE if input select open and FALSE if closed
+     */
     onDropdownVisibleChange = (option, e) => {
         const dashboard = { ...this.props.dashboard };
         const config = this.props.currentBlock.config;
-        if (!e && config.metaData[option].length > 0) {
+        if (!e && config.metaData[option].length > 0 && !config.metaData.selectOrder.includes(option)) {
             // Update the order of selection
             config.metaData.selectOrder = Array.from(
                 new Set<string>([...config.metaData.selectOrder, option])
