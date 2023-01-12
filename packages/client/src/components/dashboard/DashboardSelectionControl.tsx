@@ -22,7 +22,7 @@ export interface DashboardSelectionControlProps
   filters: any;
   plotData: any[];
   blockData: (block: BlockModel) => any[];
-  getPlotData: (blocks: BlockModel[]) => void;
+  // getPlotData: (blocks: BlockModel[]) => void;
   updateFilterByDataFocus: (dashboard: DashboardModel, filtre: string) => void;
   filtreByDataFocus: any;
   optionsLabel: string[];

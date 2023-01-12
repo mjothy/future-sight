@@ -7,7 +7,7 @@ import { getBlock } from './utils/BlockDataUtils';
 export default class BlockFilterManager extends Component<any, any> {
     constructor(props) {
         super(props);
-        const state = {
+        this.state = {
             initialoptionsData: {
                 regions: [],
                 variables: [],
@@ -17,12 +17,7 @@ export default class BlockFilterManager extends Component<any, any> {
             /**
              * Data options in dropDown Inputs
              */
-            optionsData: {
-                regions: [],
-                variables: [],
-                scenarios: [],
-                models: [],
-            },
+            optionsData: { ...this.props.filtreByDataFocus },
 
             dataRaws: {
                 regions: [],
@@ -38,14 +33,6 @@ export default class BlockFilterManager extends Component<any, any> {
             }
         };
 
-        this.props.optionsLabel.forEach(option => {
-            this.props.firstFilterRaws.forEach(raw => {
-                state.initialoptionsData[option].push(raw[option.slice(0, -1)]);
-            })
-            state.initialoptionsData[option] = Array.from(new Set(state.initialoptionsData[option]));
-        });
-
-        this.state = state;
     }
 
     componentDidMount() {
@@ -124,7 +111,7 @@ export default class BlockFilterManager extends Component<any, any> {
      * Update options of drop down lists (filter)
      */
     filtreOptions = () => {
-        const optionsData = JSON.parse(JSON.stringify(this.state.initialoptionsData));
+        const optionsData = JSON.parse(JSON.stringify(this.props.filtreByDataFocus));
         let metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
         const options = this.props.optionsLabel;
         const currentBlock = this.props.currentBlock;
@@ -186,7 +173,7 @@ export default class BlockFilterManager extends Component<any, any> {
      * @returns meta data
      */
     getMetaDataIfControlled = () => {
-        const optionsData = JSON.parse(JSON.stringify(this.state.initialoptionsData));
+        const optionsData = JSON.parse(JSON.stringify(this.props.filtreByDataFocus));
         const metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
         const controlBlock = getBlock(this.props.dashboard.blocks, this.props.currentBlock.controlBlock);
         const masterMetaData = (controlBlock.config as ConfigurationModel).metaData;
