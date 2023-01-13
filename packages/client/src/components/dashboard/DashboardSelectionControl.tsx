@@ -109,7 +109,9 @@ export default class DashboardSelectionControl extends Component<
       if (this.state.blockSelectedId != '') {
         const currentSelectedBlock = { ...dashboard.blocks[this.state.blockSelectedId] };
         const currentDashboard = this.state.dashboard;
-        currentDashboard.blocks[this.state.blockSelectedId].config = { ...dashboard.blocks[this.state.blockSelectedId].config };
+        if (dashboard.blocks[this.state.blockSelectedId] != undefined) {
+          currentDashboard.blocks[this.state.blockSelectedId].config = { ...dashboard.blocks[this.state.blockSelectedId].config };
+        }
         currentDashboard.layout = dashboard.layout;
         this.setState({ dashboard: currentDashboard, currentSelectedBlock })
       } else {
