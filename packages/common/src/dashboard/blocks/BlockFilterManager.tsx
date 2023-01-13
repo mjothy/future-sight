@@ -12,7 +12,7 @@ export default class BlockFilterManager extends Component<any, any> {
             /**
              * Data options in dropDown Inputs
              */
-            optionsData: { ...this.props.filtreByDataFocus },
+            optionsData: { ...this.props.filters },
             missingData: {
                 regions: [],
                 variables: [],
@@ -47,7 +47,7 @@ export default class BlockFilterManager extends Component<any, any> {
 
 
         const selectedFilter = getSelectedFilter(this.props.dashboard.dataStructure);
-        filters[selectedFilter] = this.props.filtreByDataFocus[selectedFilter];
+        filters[selectedFilter] = this.props.dashboard.dataStructure[selectedFilter].selection;
 
         this.filterOptions(metaData, filters);
     };
@@ -120,13 +120,11 @@ export default class BlockFilterManager extends Component<any, any> {
      * @returns meta data
      */
     getMetaDataIfControlled = () => {
-        const optionsData = JSON.parse(JSON.stringify(this.props.filtreByDataFocus));
         const metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
         const controlBlock = getBlock(this.props.dashboard.blocks, this.props.currentBlock.controlBlock);
         const masterMetaData = (controlBlock.config as ConfigurationModel).metaData;
         Object.keys(masterMetaData.master).forEach((option) => {
             if (masterMetaData.master[option].isMaster) {
-                optionsData[option] = masterMetaData[option];
                 metaData[option] = masterMetaData[option];
             }
         });

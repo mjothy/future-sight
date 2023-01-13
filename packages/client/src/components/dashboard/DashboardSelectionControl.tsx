@@ -5,7 +5,6 @@ import {
   ComponentPropsWithDataManager,
   ConfigurationModel,
   DashboardModel,
-  getSelectedFilter,
   LayoutModel,
 } from '@future-sight/common';
 import { Component } from 'react';
@@ -22,8 +21,6 @@ export interface DashboardSelectionControlProps
   filters: any;
   plotData: any[];
   blockData: (block: BlockModel) => any[];
-  updateFilterByDataFocus: (dashboard: DashboardModel, filtre: string) => void;
-  filtreByDataFocus: any;
   optionsLabel: string[];
 }
 
@@ -65,13 +62,6 @@ export default class DashboardSelectionControl extends Component<
     return state;
   }
 
-  componentDidMount(): void {
-    if (this.state.dashboard != undefined) {
-      const selectedFilter = getSelectedFilter(this.state.dashboard.dataStructure);
-      this.props.updateFilterByDataFocus(this.state.dashboard, selectedFilter);
-    }
-  }
-
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevState.dashboard != this.state.dashboard || prevState.currentSelectedBlock != this.state.currentSelectedBlock) {
       setDraft(this.state.dashboard.id, this.state.dashboard);
@@ -98,12 +88,9 @@ export default class DashboardSelectionControl extends Component<
       // Update dataStructure (Data focus)
       const newDataStructure = dashboard.dataStructure;
       const toDeleteBlocks = blocksIdToDelete(Object.values(this.state.dashboard.blocks), newDataStructure);
-      const selectedFilter = getSelectedFilter(newDataStructure);
       const blockAndLayouts = this.deleteBlocks(Array.from(toDeleteBlocks));
       dashboard = { ...dashboard, ...blockAndLayouts }
-      this.setState({ dashboard }, () => {
-        this.props.updateFilterByDataFocus(this.state.dashboard, selectedFilter);
-      });
+      this.setState({ dashboard });
     } else {
       if (this.state.blockSelectedId != '') {
         const currentSelectedBlock = { ...dashboard.blocks[this.state.blockSelectedId] };

@@ -55,7 +55,7 @@ export default class DataBlockView extends Component<any, any> {
     if (configStyle.graphType === 'table') {
       visualizeData = this.prepareTableData(data);
     } else {
-      data.map((dataElement) => {
+      data?.map((dataElement) => {
         showData.push(this.preparePlotData(dataElement, configStyle));
       });
       visualizeData = showData;
@@ -77,9 +77,9 @@ export default class DataBlockView extends Component<any, any> {
       });
     }
     const values: any[] = [];
-    data.map((dataElement) => {
+    data?.map((dataElement) => {
       const obj = {};
-      dataElement.data.map((e) => {
+      dataElement.data?.map((e) => {
         obj[e.year] = e.value;
       });
       values.push({
@@ -151,7 +151,7 @@ export default class DataBlockView extends Component<any, any> {
     let textHover = '';
     const result: string[] = [];
 
-    dataElement.data.map((e) => {
+    dataElement.data?.map((e) => {
       textHover =
         dataElement.model +
         '/' +
@@ -175,7 +175,7 @@ export default class DataBlockView extends Component<any, any> {
    */
   getX = (data) => {
     const x: any[] = [];
-    data.data.map((d) => {
+    data.data?.map((d) => {
       if (d.value !== "") {
         x.push(d.year)
       }
@@ -190,7 +190,7 @@ export default class DataBlockView extends Component<any, any> {
    */
   getY = (data) => {
     const y: any[] = [];
-    data.data.map((d) => {
+    data.data?.map((d) => {
       if (d.value !== "") {
         y.push(d.value)
       }

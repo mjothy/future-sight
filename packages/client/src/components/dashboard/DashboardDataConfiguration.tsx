@@ -3,7 +3,6 @@ import {
   BlockModel,
   ComponentPropsWithDataManager,
   ConfigurationModel,
-  getBlock,
   ReadOnlyDashboard,
 } from '@future-sight/common';
 import { Component } from 'react';
@@ -37,12 +36,6 @@ class DashboardDataConfiguration extends Component<
         variables: {},
         scenarios: {},
         models: {},
-      },
-      filtreByDataFocus: {
-        regions: [],
-        variables: [],
-        scenarios: [],
-        models: [],
       },
       /**
        * Data (with timeseries from IASA API)
@@ -138,49 +131,11 @@ class DashboardDataConfiguration extends Component<
         if (res.length > 0) {
           console.log("res: ", res)
           this.setState({ plotData: [...this.state.plotData, ...res] });
+        } else {
+          this.setState({ plotData: [...this.state.plotData, ...data] });
         }
       }
       );
-  }
-
-  /**
-   * Set the first filtered data (By data focus)
-   * @param dashboard the current dashboard
-   * @param selectedFilter dashboard selected filter
-   */
-  updateFilterByDataFocus = (dashboard, selectedFilter) => {
-    if (this.state.isFetchData) {
-      const data = {
-        regions: [],
-        variables: [],
-        scenarios: [],
-        models: [],
-      }
-
-      if (selectedFilter === "" || dashboard.dataStructure[selectedFilter].selection.length == 0) {
-        for (const [key, valueDict] of Object.entries(this.state.filters)) {
-          data[key] = Object.keys(valueDict as { string: unknown })
-        }
-      }
-
-      else if (selectedFilter !== '') {
-        data[selectedFilter] = dashboard.dataStructure[selectedFilter].selection;
-        this.optionsLabel.forEach((option) => {
-          if (option !== selectedFilter) {
-            data[selectedFilter].forEach((filterValue) => {
-              data[option] = Array.from(
-                new Set([
-                  ...data[option],
-                  ...this.state.filters[selectedFilter][filterValue][option],
-                ])
-              );
-            });
-          }
-        });
-      }
-
-      this.setState({ filtreByDataFocus: data });
-    }
   }
 
   render() {
@@ -200,8 +155,6 @@ class DashboardDataConfiguration extends Component<
         filters={this.state.filters}
         plotData={this.state.plotData}
         blockData={this.blockData}
-        updateFilterByDataFocus={this.updateFilterByDataFocus}
-        filtreByDataFocus={this.state.filtreByDataFocus}
         optionsLabel={this.optionsLabel}
         {...this.props}
       />) || <div className="dashboard">
