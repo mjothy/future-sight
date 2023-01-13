@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import { Divider, Row, Tag } from 'antd';
 import SelectInput from '../utils/SelectInput';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { getUnselectedInputOptions } from '../utils/BlockDataUtils';
 
 /**
@@ -29,6 +29,17 @@ export default class DataBlockEditor extends Component<any, any> {
 
   };
 
+  getMessage = (missing) => {
+    let msg = '';
+    missing.forEach(value => {
+      msg = msg + value + ', ';
+    })
+    if (msg.length > 0) {
+      msg = "No data for: " + msg.slice(0, -2);
+    }
+    return <><WarningOutlined /> {msg}</>;
+  }
+
   selectDropDownInput = (option, selected) => {
     // In case the block is controlled
     const id = this.props.currentBlock.controlBlock;
@@ -47,7 +58,9 @@ export default class DataBlockEditor extends Component<any, any> {
       !isControlled && (
         <div className={selected ? 'transition' : ''}>
           <Row className="width-100 mt-16">
-            <h4>{option}</h4>
+            <h4>{option} &nbsp;</h4>
+            <label className='no-data'> {metaData.selectOrder.length == 4 && this.props.missingData[option].length > 0 && this.getMessage(this.props.missingData[option])}
+            </label>
             <SelectInput
               type={option}
               value={metaData[option]}
@@ -65,12 +78,15 @@ export default class DataBlockEditor extends Component<any, any> {
 
   controlledInputs = () => {
     const id = this.props.currentBlock.controlBlock;
+    const metaData = this.props.currentBlock.config.metaData;
     const controlBlock = this.props.dashboard.blocks[id].config.metaData;
     return Object.keys(controlBlock.master).map((key) => {
       if (controlBlock.master[key].isMaster) {
         return (
           <div className='mt-20'>
-            <strong>{key}: </strong> <br />
+            <h4>{key} &nbsp;<label className='no-data'> {metaData.selectOrder.length == 4 && this.props.missingData[key].length > 0 && this.getMessage(this.props.missingData[key])}
+            </label>
+            </h4>
             {controlBlock[key].length <= 0 ? <div>
 
               <p><ExclamationCircleOutlined /> No data selected</p>

@@ -76,15 +76,16 @@ export default class SetupView extends Component<any, any> {
   }
 
   render() {
-    let selectedFilter = getSelectedFilter(this.props.dashboard.dataStructure);
-    if (selectedFilter !== '') {
-      selectedFilter = ': ' + selectedFilter;
+    const selectedFilter = getSelectedFilter(this.props.dashboard.dataStructure);
+    let selectedFilterLabel = ""
+    if (selectedFilter !== '' && this.props.dashboard.dataStructure[selectedFilter].selection.length>0) {
+      selectedFilterLabel = ': ' + selectedFilter;
     }
     return (
       <>
         <div className="back-to-setup">
           <Button value="setup" onClick={this.show}>
-            <FilterTwoTone />Data focus {selectedFilter}
+            <FilterTwoTone />Data focus {selectedFilterLabel}
           </Button>
         </div>
         <Modal
