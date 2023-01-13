@@ -58,11 +58,7 @@ export default class BlockFilterManager extends Component<any, any> {
     };
 
     missingData = () => {
-        let metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
-
-        if (this.props.currentBlock.controlBlock !== '') {
-            metaData = this.getMetaDataIfControlled();
-        }
+        const metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
 
         if (metaData.selectOrder.length == 4) {
             const existDataRaws = this.getExistingRaws(metaData);
@@ -126,7 +122,9 @@ export default class BlockFilterManager extends Component<any, any> {
         if (metaData.selectOrder.length > 0) {
             // get possible options from filtered dataRaws
             options.forEach(option => {
-                optionsData[option] = Array.from(new Set(dataRaws[option].map(raw => raw[option.slice(0, -1)])))
+                const possible_options = Array.from(new Set(dataRaws[option].map(raw => raw[option.slice(0, -1)])))
+                if (possible_options.length > 0)
+                    optionsData[option] = possible_options;
             })
         }
         return { optionsData, dataRaws };

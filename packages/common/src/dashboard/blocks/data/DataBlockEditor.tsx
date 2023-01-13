@@ -81,23 +81,29 @@ export default class DataBlockEditor extends Component<any, any> {
 
   controlledInputs = () => {
     const id = this.props.currentBlock.controlBlock;
+    const metaData = this.props.currentBlock.config.metaData;
     const controlBlock = this.props.dashboard.blocks[id].config.metaData;
     return Object.keys(controlBlock.master).map((key) => {
       if (controlBlock.master[key].isMaster) {
         return (
-          <div className='mt-20'>
-            <strong>{key}: </strong> <br />
-            {controlBlock[key].length <= 0 ? <div>
+          <Form.Item
+            className="width-100 missing-data"
+            help={metaData.selectOrder.length == 4 && this.props.missingData[key].length > 0 ? this.getMessage(this.props.missingData[key]) : ''}
+          >
+            <div className='mt-20'>
+              <strong>{key}: </strong> <br />
+              {controlBlock[key].length <= 0 ? <div>
 
-              <p><ExclamationCircleOutlined /> No data selected</p>
-            </div> : controlBlock[key].map(element => {
-              let color = "default";
-              if (controlBlock.master[key].values.includes(element)) {
-                color = "blue";
-              }
-              return <Tag key={element} color={color}>{element}</Tag>
-            })}
-          </div>
+                <p><ExclamationCircleOutlined /> No data selected</p>
+              </div> : controlBlock[key].map(element => {
+                let color = "default";
+                if (controlBlock.master[key].values.includes(element)) {
+                  color = "blue";
+                }
+                return <Tag key={element} color={color}>{element}</Tag>
+              })}
+            </div>
+          </Form.Item >
         );
       }
     });

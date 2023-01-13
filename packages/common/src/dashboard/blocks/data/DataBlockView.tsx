@@ -1,8 +1,10 @@
 import type { ColumnsType } from 'antd/lib/table';
 import React, { Component } from 'react';
+import BlockModel from '../../../models/BlockModel';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
 import PlotlyUtils from '../../graphs/PlotlyUtils';
+import { getChildrens } from '../utils/BlockDataUtils';
 
 export default class DataBlockView extends Component<any, any> {
   constructor(props) {
@@ -14,9 +16,18 @@ export default class DataBlockView extends Component<any, any> {
   componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): void {
     if (this.props.currentSelectedBlock != null && this.props.currentSelectedBlock != undefined) {
       // Set state only for current selected block
-      if (this.props.currentSelectedBlock != prevProps.currentSelectedBlock && this.props.currentBlock.id == this.props.currentSelectedBlock.id) {
-        const { data, layout } = this.settingPlotData();
-        this.setState({ data, layout })
+      if (this.props.currentSelectedBlock != prevProps.currentSelectedBlock) { //Check if the current block changed
+        if (this.props.currentBlock.id == this.props.currentSelectedBlock.id) {
+          const { data, layout } = this.settingPlotData();
+          this.setState({ data, layout })
+        } else if (this.props.currentSelectedBlock.blockType === 'control') { // Change child blocks if the parrent change
+          const childrens = getChildrens(this.props.dashboard.blocks, this.props.currentSelectedBlock.id);
+          const id_childs: (string | undefined)[] = childrens.map((child: (BlockModel | any)) => child.id)
+          if (id_childs.includes(this.props.currentBlock.id)) {
+            const { data, layout } = this.settingPlotData();
+            this.setState({ data, layout })
+          }
+        }
 
       }
     } else if (this.props.dashboard != prevProps.dashboard || this.props.plotData.length != prevProps.plotData.length) { //if dashboard layout change, rerender all blocks
@@ -36,7 +47,7 @@ export default class DataBlockView extends Component<any, any> {
   settingPlotData = () => {
     const { currentBlock } = this.props;
     const data: any[] = this.props.blockData(currentBlock);
-    console.log("Run settingPlotData", currentBlock.blockType);
+    // console.log("Run settingPlotData", currentBlock.blockType);
     const showData: any[] = [];
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
