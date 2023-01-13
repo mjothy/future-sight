@@ -25,8 +25,5 @@ export default interface IDataManager {
 
   getOptions: () => string[];
 
-  // TODO set data type
-  fetchRaws: (data: any) => Promise<any>;
-
   fetchDataOptions: (data: any) => Promise<any>;
 }

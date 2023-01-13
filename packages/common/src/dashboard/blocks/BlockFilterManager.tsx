@@ -9,23 +9,10 @@ export default class BlockFilterManager extends Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {
-            initialoptionsData: {
-                regions: [],
-                variables: [],
-                scenarios: [],
-                models: [],
-            },
             /**
              * Data options in dropDown Inputs
              */
             optionsData: { ...this.props.filtreByDataFocus },
-
-            dataRaws: {
-                regions: [],
-                variables: [],
-                scenarios: [],
-                models: [],
-            },
             missingData: {
                 regions: [],
                 variables: [],
@@ -50,15 +37,9 @@ export default class BlockFilterManager extends Component<any, any> {
     }
 
     updateDropdownData = () => {
-        const filters = {
-            regions: [],
-            variables: [],
-            scenarios: [],
-            models: [],
-        };
+        const filters = {};
         let metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
         const currentBlock = this.props.currentBlock;
-
 
         if (currentBlock.controlBlock !== '') {
             metaData = this.getMetaDataIfControlled();
@@ -67,15 +48,27 @@ export default class BlockFilterManager extends Component<any, any> {
 
         const selectedFilter = getSelectedFilter(this.props.dashboard.dataStructure);
         filters[selectedFilter] = this.props.filtreByDataFocus[selectedFilter];
+
+        this.filterOptions(metaData, filters);
+    };
+
+    /**
+     * to update options in input select
+     * @param metaData selected data in block
+     * @param filters the first filter(by data focus)
+     */
+    filterOptions = (metaData, filters) => {
         this.props.dataManager.fetchDataOptions({ filters, metaData }).then(res => {
             this.setState({ optionsData: res }, () => {
                 this.props.checkIfSelectedInOptions(this.state.optionsData, this.props.currentBlock)
                 this.missingData();
             })
         }).catch(err => console.error("error fetch: ", err));
+    }
 
-    };
-
+    /**
+     * set data that is not present in the graph of the block
+     */
     missingData = () => {
         const metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
 

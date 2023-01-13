@@ -25,7 +25,6 @@ export interface DashboardSelectionControlProps
   updateFilterByDataFocus: (dashboard: DashboardModel, filtre: string) => void;
   filtreByDataFocus: any;
   optionsLabel: string[];
-  firstFilterRaws: any;
 }
 
 export default class DashboardSelectionControl extends Component<
