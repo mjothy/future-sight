@@ -1,7 +1,7 @@
 import { Component } from 'react';
-import { Alert, Divider, Form, Row, Tag } from 'antd';
+import { Divider, Row, Tag } from 'antd';
 import SelectInput from '../utils/SelectInput';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { getUnselectedInputOptions } from '../utils/BlockDataUtils';
 
 /**
@@ -37,7 +37,7 @@ export default class DataBlockEditor extends Component<any, any> {
     if (msg.length > 0) {
       msg = "No data for: " + msg.slice(0, -2);
     }
-    return msg;
+    return <><WarningOutlined /> {msg}</>;
   }
 
   selectDropDownInput = (option, selected) => {
@@ -58,21 +58,18 @@ export default class DataBlockEditor extends Component<any, any> {
       !isControlled && (
         <div className={selected ? 'transition' : ''}>
           <Row className="width-100 mt-16">
-            <h4>{option}</h4>
-            <Form.Item
-              className="width-100 missing-data"
-              help={metaData.selectOrder.length == 4 && this.props.missingData[option].length > 0 ? this.getMessage(this.props.missingData[option]) : ''}
-            >
-              <SelectInput
-                type={option}
-                value={metaData[option]}
-                options={this.props.optionsData[option]}
-                onChange={this.props.onChange}
-                isClear={selected}
-                onClear={this.clearClick}
-                onDropdownVisibleChange={this.props.onDropdownVisibleChange}
-              />
-            </Form.Item>
+            <h4>{option} &nbsp;</h4>
+            <label className='no-data'> {metaData.selectOrder.length == 4 && this.props.missingData[option].length > 0 && this.getMessage(this.props.missingData[option])}
+            </label>
+            <SelectInput
+              type={option}
+              value={metaData[option]}
+              options={this.props.optionsData[option]}
+              onChange={this.props.onChange}
+              isClear={selected}
+              onClear={this.clearClick}
+              onDropdownVisibleChange={this.props.onDropdownVisibleChange}
+            />
           </Row>
         </div>
       )
@@ -86,24 +83,21 @@ export default class DataBlockEditor extends Component<any, any> {
     return Object.keys(controlBlock.master).map((key) => {
       if (controlBlock.master[key].isMaster) {
         return (
-          <Form.Item
-            className="width-100 missing-data"
-            help={metaData.selectOrder.length == 4 && this.props.missingData[key].length > 0 ? this.getMessage(this.props.missingData[key]) : ''}
-          >
-            <div className='mt-20'>
-              <strong>{key}: </strong> <br />
-              {controlBlock[key].length <= 0 ? <div>
+          <div className='mt-20'>
+            <h4>{key} &nbsp;<label className='no-data'> {metaData.selectOrder.length == 4 && this.props.missingData[key].length > 0 && this.getMessage(this.props.missingData[key])}
+            </label>
+            </h4>
+            {controlBlock[key].length <= 0 ? <div>
 
-                <p><ExclamationCircleOutlined /> No data selected</p>
-              </div> : controlBlock[key].map(element => {
-                let color = "default";
-                if (controlBlock.master[key].values.includes(element)) {
-                  color = "blue";
-                }
-                return <Tag key={element} color={color}>{element}</Tag>
-              })}
-            </div>
-          </Form.Item >
+              <p><ExclamationCircleOutlined /> No data selected</p>
+            </div> : controlBlock[key].map(element => {
+              let color = "default";
+              if (controlBlock.master[key].values.includes(element)) {
+                color = "blue";
+              }
+              return <Tag key={element} color={color}>{element}</Tag>
+            })}
+          </div>
         );
       }
     });
