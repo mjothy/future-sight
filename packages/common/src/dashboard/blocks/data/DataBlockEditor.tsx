@@ -58,9 +58,9 @@ export default class DataBlockEditor extends Component<any, any> {
       !isControlled && (
         <div className={selected ? 'transition' : ''}>
           <Row className="width-100 mt-16">
-            <h4>{option} &nbsp;</h4>
-            <label className='no-data'> {metaData.selectOrder.length == 4 && this.props.missingData[option].length > 0 && this.getMessage(this.props.missingData[option])}
+            <h4>{option} &nbsp;<label className='no-data'> {metaData.selectOrder.length == 4 && this.props.missingData[option].length > 0 && this.getMessage(this.props.missingData[option])}
             </label>
+            </h4>
             <SelectInput
               type={option}
               value={metaData[option]}
