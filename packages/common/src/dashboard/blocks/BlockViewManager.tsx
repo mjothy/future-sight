@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import MapBlock from '../graphs/MapBlock';
 import ControlBlockView from './control/ControlBlockView';
 import DataBlockView from './data/DataBlockView';
 import TextBlockView from './text/TextBlockView';
@@ -30,6 +31,8 @@ export default class BlockViewManager extends Component<any, any> {
     }
   };
   render() {
-    return this.blockByType();
+    // return this.blockByType();
+    return <MapBlock width={this.props.width} height={this.props.height} />;
+
   }
 }

@@ -18,47 +18,66 @@ export default class ControlBlockEditor extends Component<any, any> {
   onCheckChange = (option, e) => {
 
     const dashboard = { ...this.props.dashboard };
-    const config = this.props.currentBlock.config;
+    const parentBlock = this.props.currentBlock;
 
     // update current block config (metadata)
-    config.metaData.master[option].isMaster = e.target.checked;
-    dashboard.blocks[this.props.currentBlock.id].config = { ...config };
-    config.metaData.master[option].values = [];
+    parentBlock.config.metaData.master[option].isMaster = e.target.checked;
+    this.props.optionsLabel.forEach(label => {
+      parentBlock.config.metaData.master[label].values = []; // clear selected data in control block view
+    })
 
-    // Update children
-    const childrens = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id);
-
-    if (childrens.length > 0 && e) {
-      childrens.map((child: BlockModel | any) => {
-        const config = child.config;
-        config.metaData.selectOrder = Array.from(new Set([...child.config.metaData.selectOrder, option]));
-        config.metaData[option] = [];
-        dashboard.blocks[child.id].config = { ...config };
-      });
+    if (!e.target.checked) {
+      parentBlock.config.metaData[option] = [];
+      parentBlock.config.metaData.selectOrder = parentBlock.config.metaData.selectOrder.filter(optionFilter => optionFilter !== option);
+    } else {
+      parentBlock.config.metaData.selectOrder.push(option)
     }
+
+    dashboard.blocks[this.props.currentBlock.id].config = { ...parentBlock.config };
+
+    // Update children (this function is mutable)
+    this.updateChildsBlocks(dashboard, parentBlock);
 
     this.props.updateDashboard(dashboard);
   };
 
+  updateChildsBlocks = (dashboard, parentBlock) => {
+    const childrens = getChildrens(dashboard.blocks, parentBlock.id);
+    if (childrens.length > 0) {
+      childrens.map((child: BlockModel | any) => {
+        const configChild = child.config;
+        configChild.metaData.selectOrder = parentBlock.config.metaData.selectOrder;
+        this.props.optionsLabel.forEach(option => {
+          configChild.metaData[option] = [];
+        })
+        dashboard.blocks[child.id].config = { ...configChild };
+      });
+    }
+    return dashboard;
+  }
+
   clearClick = (option, e) => {
 
     const dashboard = { ...this.props.dashboard };
-    const config = this.props.currentBlock.config;
+    const parentBlock = this.props.currentBlock;
 
     // update current block config (metadata)
-    config.metaData[option] = [];
-    config.metaData.master[option].values = [];
-    dashboard.blocks[this.props.currentBlock.id].config = { ...config };
+    parentBlock.config.metaData.master[option].isMaster = false;
+    this.props.optionsLabel.forEach(label => {
+      parentBlock.config.metaData.master[label].values = []; // clear selected data in control block view
+    })
 
-    const isMaster = config.metaData.master[option].isMaster;
-    if (isMaster) {
-      const childrens = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id)
-      childrens.forEach((child: BlockModel | any) => {
-        const configChild = child.config;
-        configChild.metaData[option] = [];
-        dashboard.blocks[child.id].config = { ...configChild };
-      })
+    if (!e.target.checked) {
+      parentBlock.config.metaData[option] = [];
+      parentBlock.config.metaData.selectOrder = parentBlock.config.metaData.selectOrder.filter(optionFilter => optionFilter !== option);
+    } else {
+      parentBlock.config.metaData.selectOrder.push(option)
     }
+
+    dashboard.blocks[this.props.currentBlock.id].config = { ...parentBlock.config };
+
+    // Update children (this function is mutable)
+    this.updateChildsBlocks(dashboard, parentBlock);
 
     this.props.updateDashboard(dashboard);
   };
@@ -103,7 +122,7 @@ export default class ControlBlockEditor extends Component<any, any> {
           <h4>{option}</h4>
         </Checkbox>
 
-        <SelectInput
+        {metaData.master[option].isMaster && <SelectInput
           type={option}
           value={metaData[option]}
           options={this.props.optionsData[option]}
@@ -111,7 +130,8 @@ export default class ControlBlockEditor extends Component<any, any> {
           isClear={true}
           onClear={this.clearClick}
           onDeselect={this.updateControlView}
-        />
+          onDropdownVisibleChange={this.props.onDropdownVisibleChange}
+        />}
       </div>
     );
   };

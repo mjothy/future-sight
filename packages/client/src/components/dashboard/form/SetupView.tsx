@@ -52,7 +52,9 @@ export default class SetupView extends Component<any, any> {
     const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
     dashboard.dataStructure = new DataStructureModel();
     const selectedFilter = getSelectedFilter(this.state.dataStructure);
-    dashboard.dataStructure[selectedFilter] = JSON.parse(JSON.stringify(this.state.dataStructure[selectedFilter]));
+    if (selectedFilter !== '') {
+      dashboard.dataStructure[selectedFilter] = JSON.parse(JSON.stringify(this.state.dataStructure[selectedFilter]));
+    }
 
     this.props.updateDashboard(dashboard);
 
@@ -76,15 +78,16 @@ export default class SetupView extends Component<any, any> {
   }
 
   render() {
-    let selectedFilter = getSelectedFilter(this.props.dashboard.dataStructure);
-    if (selectedFilter !== '') {
-      selectedFilter = ': ' + selectedFilter;
+    const selectedFilter = getSelectedFilter(this.props.dashboard.dataStructure);
+    let selectedFilterLabel = ""
+    if (selectedFilter !== '' && this.props.dashboard.dataStructure[selectedFilter].selection.length>0) {
+      selectedFilterLabel = ': ' + selectedFilter;
     }
     return (
       <>
         <div className="back-to-setup">
           <Button value="setup" onClick={this.show}>
-            <FilterTwoTone />Data focus {selectedFilter}
+            <FilterTwoTone />Data focus {selectedFilterLabel}
           </Button>
         </div>
         <Modal

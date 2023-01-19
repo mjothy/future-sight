@@ -5,7 +5,6 @@ import {
   ComponentPropsWithDataManager,
   ConfigurationModel,
   DashboardModel,
-  getSelectedFilter,
   LayoutModel,
 } from '@future-sight/common';
 import { Component } from 'react';
@@ -22,11 +21,7 @@ export interface DashboardSelectionControlProps
   filters: any;
   plotData: any[];
   blockData: (block: BlockModel) => any[];
-  getPlotData: (blocks: BlockModel[]) => void;
-  updateFilterByDataFocus: (dashboard: DashboardModel, filtre: string) => void;
-  filtreByDataFocus: any;
   optionsLabel: string[];
-  firstFilterRaws: any;
 }
 
 export default class DashboardSelectionControl extends Component<
@@ -46,6 +41,7 @@ export default class DashboardSelectionControl extends Component<
        * The selected block id
        */
       blockSelectedId: '',
+      currentSelectedBlock: null,
       isDraft: false,
     };
     const w_location = window.location.pathname;
@@ -66,17 +62,8 @@ export default class DashboardSelectionControl extends Component<
     return state;
   }
 
-  componentDidMount(): void {
-    if (this.state.dashboard != undefined) {
-      this.props.getPlotData(this.state.dashboard.blocks);
-      const selectedFilter = getSelectedFilter(this.state.dashboard.dataStructure);
-      this.props.updateFilterByDataFocus(this.state.dashboard, selectedFilter);
-    }
-  }
-
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevState.dashboard != this.state.dashboard) {
-      console.log("update dashboard")
+    if (prevState.dashboard != this.state.dashboard || prevState.currentSelectedBlock != this.state.currentSelectedBlock) {
       setDraft(this.state.dashboard.id, this.state.dashboard);
     }
   }
@@ -91,7 +78,8 @@ export default class DashboardSelectionControl extends Component<
   };
 
   updateSelectedBlock = (blockSelectedId: string) => {
-    this.setState({ blockSelectedId });
+    const currentSelectedBlock = this.state.dashboard.blocks[blockSelectedId];
+    this.setState({ blockSelectedId, currentSelectedBlock });
   };
 
   updateDashboard = (dashboard: DashboardModel) => {
@@ -100,15 +88,21 @@ export default class DashboardSelectionControl extends Component<
       // Update dataStructure (Data focus)
       const newDataStructure = dashboard.dataStructure;
       const toDeleteBlocks = blocksIdToDelete(Object.values(this.state.dashboard.blocks), newDataStructure);
-      const selectedFilter = getSelectedFilter(newDataStructure);
       const blockAndLayouts = this.deleteBlocks(Array.from(toDeleteBlocks));
-
       dashboard = { ...dashboard, ...blockAndLayouts }
-      this.setState({ dashboard }, () => {
-        this.props.updateFilterByDataFocus(this.state.dashboard, selectedFilter);
-      });
-    } else {
       this.setState({ dashboard });
+    } else {
+      if (this.state.blockSelectedId != '') {
+        const currentSelectedBlock = { ...dashboard.blocks[this.state.blockSelectedId] };
+        const currentDashboard = this.state.dashboard;
+        if (dashboard.blocks[this.state.blockSelectedId] != undefined) {
+          currentDashboard.blocks[this.state.blockSelectedId].config = { ...dashboard.blocks[this.state.blockSelectedId].config };
+        }
+        currentDashboard.layout = dashboard.layout;
+        this.setState({ dashboard: currentDashboard, currentSelectedBlock })
+      } else {
+        this.setState({ dashboard })
+      }
     }
   }
 
@@ -186,19 +180,24 @@ export default class DashboardSelectionControl extends Component<
   };
 
   /**
- * Check if data in selection (selected data) are present in Select options
- */
+  * Check if data in selection (selected data) are present in Select options
+  */
   checkIfSelectedInOptions = (optionsData, block: BlockModel) => {
     const optionsLabel = this.props.optionsLabel;
     const dashboard = { ...this.state.dashboard };
     const config = block.config as ConfigurationModel;
     let isDashboardUpdated = false;
+    const missingData = {}
     optionsLabel.forEach(option => {
+      // Check if selected data (metaData[option]) are in options of drop down list
       const dataInOptionsData = config.metaData[option].filter(data => optionsData[option].includes(data));
-
+      missingData[option] = config.metaData[option].filter(data => !optionsData[option].includes(data));
       if (dataInOptionsData.length < config.metaData[option].length) {
         isDashboardUpdated = true;
         config.metaData[option] = dataInOptionsData;
+        if (config.metaData[option].length === 0) {
+          config.metaData.selectOrder = config.metaData.selectOrder.filter(option1 => option1 !== option);
+        }
         dashboard.blocks[block.id as string].config = { ...config };
       }
     });
@@ -206,12 +205,28 @@ export default class DashboardSelectionControl extends Component<
     if (isDashboardUpdated) {
       this.updateDashboard(dashboard);
       notification.warning({
-        message: 'Data missing',
-        description: 'Some selected data are not available  in existing options (due to your latest modifications), block will be updated automatically ',
-        placement: 'top',
+        message: 'Data missing in selection box',
+        description: (<div dangerouslySetInnerHTML={{ __html: this.notifDesc(missingData) }}></div>),
+        placement: 'bottomRight',
       });
     }
+  }
 
+  notifDesc = (missingData) => {
+    console.log("missingData: ", missingData);
+    let notif = "Some selected data are not available in existing options: <br/>";
+    Object.keys(missingData).forEach(key => {
+      if (missingData[key].length > 0) {
+        let msg = '';
+        missingData[key].forEach(value => {
+          msg = msg + value + ', ';
+        })
+
+        notif = notif + key + ': ' + msg + '<br/>';
+      }
+    })
+
+    return notif;
   }
 
   render() {
@@ -233,6 +248,7 @@ export default class DashboardSelectionControl extends Component<
         deleteBlocks={this.deleteBlocks}
         checkIfSelectedInOptions={this.checkIfSelectedInOptions}
         isDraft={this.state.isDraft}
+        currentSelectedBlock={this.state.currentSelectedBlock}
         {...this.props}
       />
     );

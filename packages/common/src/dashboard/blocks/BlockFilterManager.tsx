@@ -3,6 +3,7 @@ import ConfigurationModel from '../../models/ConfigurationModel';
 import ControlBlockEditor from './control/ControlBlockEditor';
 import DataBlockEditor from './data/DataBlockEditor';
 import { getBlock } from './utils/BlockDataUtils';
+import { getSelectedFilter } from './utils/DashboardUtils';
 
 export default class BlockFilterManager extends Component<any, any> {
     constructor(props) {
@@ -11,20 +12,8 @@ export default class BlockFilterManager extends Component<any, any> {
             /**
              * Data options in dropDown Inputs
              */
-            initialoptionsData: {
-                regions: [],
-                variables: [],
-                scenarios: [],
-                models: [],
-            },
-            optionsData: {
-                regions: [],
-                variables: [],
-                scenarios: [],
-                models: [],
-            },
-
-            dataRaws: {
+            optionsData: { ...this.props.filters },
+            missingData: {
                 regions: [],
                 variables: [],
                 scenarios: [],
@@ -32,208 +21,135 @@ export default class BlockFilterManager extends Component<any, any> {
             }
         };
 
-        this.props.optionsLabel.map(option => {
-            // eslint-disable-next-line react/no-direct-mutation-state
-            this.state.optionsData[option] = (this.props.firstFilterRaws as Array<any>).map(raw => {
-                return raw[option.slice(0, -1)];
-            })
-        });
-
-        this.props.optionsLabel.forEach(option => {
-            // eslint-disable-next-line react/no-direct-mutation-state
-            this.state.optionsData[option] = Array.from(new Set(this.state.optionsData[option]));
-            this.state.initialoptionsData[option] = Array.from(new Set(this.state.optionsData[option]));
-        })
     }
-
-    // initialize = () =>{
-    //     this.props.optionsLabel.map(option => {
-    //         this.state.optionsData[option] = (this.props.firstFilterRaws as Array<any>).map(raw => {
-    //             return raw[option.slice(0, -1)];
-    //         })
-    //     });
-    // }
 
     componentDidMount() {
         this.updateDropdownData();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (prevProps.blockSelectedId !== this.props.blockSelectedId || this.props.dashboard != prevProps.dashboard) {
+        if (this.props.currentSelectedBlock != prevProps.currentSelectedBlock || prevProps.blockSelectedId !== this.props.blockSelectedId) {
             this.updateDropdownData();
+        }
+        if (this.props.plotData.length != prevProps.plotData.length) {
+            this.missingData();
         }
     }
 
     updateDropdownData = () => {
-        const selectedData = this.getSelectedData();
+        const filters = {};
+        let metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
+        const currentBlock = this.props.currentBlock;
 
-        console.log("selectedData (filter): ", selectedData);
-        const { optionsData, dataRaws } = this.filtreOptions(selectedData);
+        if (currentBlock.controlBlock !== '') {
+            metaData = this.getMetaDataIfControlled();
+        }
 
-        this.setState({ optionsData, dataRaws }, () => {
-            // this.props.checkIfSelectedInOptions(this.state.optionsData, this.state.currentBlockCopy);
-        })
+
+        const selectedFilter = getSelectedFilter(this.props.dashboard.dataStructure);
+        filters[selectedFilter] = this.props.dashboard.dataStructure[selectedFilter].selection;
+
+        this.filterOptions(metaData, filters);
     };
 
     /**
-     * Get all selected data in current block
-     * @returns return {regions: [], variables: [], .....}
+     * to update options in input select
+     * @param metaData selected data in block
+     * @param filters the first filter(by data focus)
      */
-    getSelectedData = () => {
-        const selectedData = {
-            regions: [],
-            variables: [],
-            scenarios: [],
-            models: [],
-        };
-        const metaData = this.props.currentBlock.config.metaData;
+    filterOptions = (metaData, filters) => {
+        this.props.dataManager.fetchDataOptions({ filters, metaData }).then(res => {
+            this.setState({ optionsData: res }, () => {
+                this.props.checkIfSelectedInOptions(this.state.optionsData, this.props.currentBlock)
+                this.missingData();
+            })
+        }).catch(err => console.error("error fetch: ", err));
+    }
+
+    /**
+     * set data that is not present in the graph of the block
+     */
+    missingData = () => {
+        const metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
+
+        if (metaData.selectOrder.length == 4) {
+            const existDataRaws = this.getExistingRaws(metaData);
+
+            const data = {
+                regions: [],
+                variables: [],
+                scenarios: [],
+                models: [],
+            }
+
+            this.props.optionsLabel.forEach(option => {
+                data[option] = Array.from(new Set(existDataRaws.map(raw => raw[option.slice(0, -1)])))
+                data[option] = metaData[option].filter(value => !data[option].includes(value))
+            })
+
+            this.setState({ missingData: data });
+        }
+    };
+
+    getExistingRaws = (metaData) => {
+        const existDataRaws: any[] = [];
+
+        metaData.models.forEach((model) => {
+            metaData.scenarios.forEach((scenario) => {
+                metaData.variables.forEach((variable) => {
+                    metaData.regions.forEach((region) => {
+                        const d = this.props.plotData.find(
+                            (e) =>
+                                e.model === model &&
+                                e.scenario === scenario &&
+                                e.variable === variable &&
+                                e.region === region
+                        );
+                        if (d) {
+                            if (d.data != undefined)
+                                existDataRaws.push({ model, scenario, variable, region });
+                        }
+                    });
+                });
+            });
+        });
+        return existDataRaws;
+    }
+
+    /**
+     * Get meta data of controlled options of current data block
+     * @returns meta data
+     */
+    getMetaDataIfControlled = () => {
+        const metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
         const controlBlock = getBlock(this.props.dashboard.blocks, this.props.currentBlock.controlBlock);
-        this.props.optionsLabel.forEach((option) => {
-            if (controlBlock.id === undefined) {
-                selectedData[option] = metaData[option];
-            } else {
-                // if block is controlled, we get selected data from the block master
-                const controlConfig = controlBlock.config as ConfigurationModel;
-                if (controlConfig.metaData.master[option].isMaster) {
-                    selectedData[option] = controlConfig.metaData[option];
-                } else {
-                    selectedData[option] = metaData[option];
-                }
+        const masterMetaData = (controlBlock.config as ConfigurationModel).metaData;
+        Object.keys(masterMetaData.master).forEach((option) => {
+            if (masterMetaData.master[option].isMaster) {
+                metaData[option] = masterMetaData[option];
             }
         });
-        return selectedData;
+
+        return metaData;
     }
 
     /**
-     * Update options of drop down lists (filter)
-     * @param selectedData selected data (block metaData)
+     * Update block select order after close of inputSelect
+     * @param option input label
+     * @param e TRUE if input select open and FALSE if closed
      */
-    filtreOptions = (selectedData) => {
-        const optionsData = {
-            regions: new Set<string>(),
-            variables: new Set<string>(),
-            scenarios: new Set<string>(),
-            models: new Set<string>(),
-        };
-        const optionsLabel = this.props.optionsLabel;
-        let uncontroledOptionsLabel = [...this.props.optionsLabel];
-        const filtreByDataFocus = this.props.filtreByDataFocus;
-        const globalFiltersJson = this.props.filters;
-
-        // set controlled options
-        const controlBlock = getBlock(this.props.dashboard.blocks, this.props.currentBlock.controlBlock);
-        if (controlBlock.id !== undefined) {
-            const controlConfig = controlBlock.config as ConfigurationModel;
-            uncontroledOptionsLabel = this.props.optionsLabel.filter(option => {
-                if (controlConfig.metaData.master[option].isMaster) {
-                    optionsData[option] = selectedData[option]
-                } else {
-                    return option;
-                }
-            });
+    onDropdownVisibleChange = (option, e) => {
+        const dashboard = { ...this.props.dashboard };
+        const config = this.props.currentBlock.config;
+        if (!e && config.metaData[option].length > 0 && !config.metaData.selectOrder.includes(option)) {
+            // Update the order of selection
+            config.metaData.selectOrder = Array.from(
+                new Set<string>([...config.metaData.selectOrder, option])
+            );
+            dashboard.blocks[this.props.currentBlock.id].config = { ...config };
+            this.props.updateDashboard(dashboard);
         }
-
-        // set uncontrolled options
-        uncontroledOptionsLabel.forEach((option) => {
-            filtreByDataFocus[option].forEach((optionValue) => {
-                let isExist = true;
-                optionsLabel.forEach((filterKey) => {
-                    if (option !== filterKey) {
-                        selectedData[filterKey].forEach((value) => {
-                            if (
-                                !globalFiltersJson[option][optionValue][filterKey].includes(value)
-                            ) {
-                                isExist = false;
-                            }
-                        });
-                    }
-                });
-
-                if (isExist) {
-                    optionsData[option].add(optionValue);
-                }
-            });
-        });
-
-        // const raws = this.filter();
-        // this.props.optionsLabel.map(option => {
-        //     optionsData[option] = raws.map(raw => {
-        //         return raw[option.slice(0, -1)];
-        //     })
-        // });
-
-        // optionsLabel.forEach((option) => {
-        //     optionsData[option] = Array.from(new Set(optionsData[option]));
-        // });
-
-        // console.log("optionsData: ", optionsData);
-
-        return this.filter();
     };
-
-    filter = () => {
-        let optionsData = { ...this.state.initialoptionsData };
-
-        const dataRaws = { ...this.state.dataRaws }
-
-        const metaData = this.props.currentBlock.config.metaData;
-        const options = this.props.optionsLabel;
-
-        // Update dataRaws
-        if (metaData.selectOrder.length == 1) {
-            const option = metaData.selectOrder[0];
-            dataRaws[option] = this.props.firstFilterRaws.filter(raw => metaData[option].includes(raw[option.slice(0, -1)]));
-        }
-        console.log("dataRaws avant: ", dataRaws);
-        // For each index(option label [model, scenario, ....] return the possible lines)
-        if (metaData.selectOrder.length > 0) {
-            const option_unselected = this.props.optionsLabel.filter(option => !metaData.selectOrder.includes(option))
-            option_unselected.forEach((option) => {
-                const current_option = option;
-                const prev_option = metaData.selectOrder[metaData.selectOrder.length - 1]; // last label selected (drop down)
-                dataRaws[current_option] = dataRaws[prev_option].filter(raw => metaData[prev_option].includes(raw[prev_option.slice(0, -1)]));
-            })
-        }
-
-        // Update optionsData
-        if (metaData.selectOrder.length <= 0) {
-            optionsData = this.state.optionsData;
-        } else {
-            // Update options based on selected data
-            this.props.optionsLabel.forEach(current_option => {
-                this.props.optionsLabel.forEach(prev_option => {
-                    if (current_option !== prev_option) {
-                        if (metaData[prev_option].length > 0) {
-                            const possible_options = new Set();
-                            optionsData[current_option].forEach(value => {
-                                let isExist = true;
-                                metaData[prev_option].map(selectedValue => {
-                                    if (!dataRaws[current_option].find(raw => raw[current_option.slice(0, -1)] === value && raw[prev_option.slice(0, -1)] === selectedValue)) {
-                                        isExist = false
-                                    }
-                                })
-                                if (isExist) {
-                                    possible_options.add(value);
-                                }
-                            })
-                            optionsData[current_option] = possible_options;
-                        }
-
-                    }
-                })
-            })
-        }
-
-        console.log("dataRaws apres: ", dataRaws);
-
-        options.forEach(option => {
-            optionsData[option] = Array.from(new Set(optionsData[option]));
-        })
-
-        console.log("optionsData: ", optionsData);
-        return { optionsData, dataRaws };
-    }
-
 
     onChange = (option, selectedData: string[]) => {
         const dashboard = { ...this.props.dashboard };
@@ -241,8 +157,26 @@ export default class BlockFilterManager extends Component<any, any> {
         // Update config (metaData)
         config.metaData[option] = selectedData;
         dashboard.blocks[this.props.currentBlock.id].config = { ...config };
+
+        if (this.props.currentBlock.blockType === 'control') {
+            dashboard.blocks[this.props.currentBlock.id].config.metaData.master[option].values = []; // clear selected data on control view
+            this.updateChildsBlocks(dashboard, this.props.currentBlock.id); //clear selected values of childs
+        }
         this.props.updateDashboard(dashboard)
     };
+
+    updateChildsBlocks = (dashboard, controlBlockId) => {
+        const configParent = this.props.dashboard.blocks[controlBlockId].config;
+
+        Object.values(dashboard.blocks).forEach((block: any) => {
+            if (block.controlBlock === this.props.currentBlock.id) {
+                block.config.metaData.selectOrder = configParent.metaData.selectOrder;
+                this.props.optionsLabel.forEach(option => {
+                    (block.config as ConfigurationModel).metaData[option] = [];
+                });
+            }
+        })
+    }
 
     render() {
         return this.props.currentBlock.blockType === 'data' ? (
@@ -250,12 +184,16 @@ export default class BlockFilterManager extends Component<any, any> {
                 {...this.props}
                 onChange={this.onChange}
                 optionsData={this.state.optionsData}
+                onDropdownVisibleChange={this.onDropdownVisibleChange}
+                missingData={this.state.missingData}
             />
         ) : (
             <ControlBlockEditor
                 {...this.props}
                 onChange={this.onChange}
                 optionsData={this.state.optionsData}
+                onDropdownVisibleChange={this.onDropdownVisibleChange}
+                missingData={this.state.missingData}
             />
         );
     }

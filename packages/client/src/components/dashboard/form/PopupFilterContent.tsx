@@ -32,7 +32,7 @@ export default class PopupFilterContent extends Component<any, any> {
     return <SelectInput
       type={type}
       value={this.props.dataStructure[type].selection}
-      options={Object.keys(this.props.filters[type])}
+      options={this.props.filters[type]}
       onChange={this.onChange}
     />
   }

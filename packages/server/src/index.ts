@@ -12,18 +12,12 @@ const DEV_REDIS_URL = 'redis://localhost:6379';
 const DEV_DATA_DIR = path.join(__dirname, "..", "..", "..", "data");
 
 const DEV_DATA_PATH = path.join(DEV_DATA_DIR, "data.json");
-const DEV_MODELS_PATH = path.join(DEV_DATA_DIR, "models.json");
-const DEV_SCENARIOS_PATH = path.join(DEV_DATA_DIR, "scenarios.json");
-const DEV_VARIABLES_PATH = path.join(DEV_DATA_DIR, "variables.json");
-const DEV_REGIONS_PATH = path.join(DEV_DATA_DIR, "regions.json");
+const DEV_DATA_UNION_PATH = path.join(DEV_DATA_DIR, "dataUnion.json");
 
 
 const PROD_DATA_DIR = path.join(__dirname, "data");
-const PROD_DATA_PATH = path.join(PROD_DATA_DIR, "data.json")
-const PROD_MODELS_PATH = path.join(PROD_DATA_DIR, "models.json");
-const PROD_SCENARIOS_PATH = path.join(PROD_DATA_DIR, "scenarios.json");
-const PROD_VARIABLES_PATH = path.join(PROD_DATA_DIR, "variables.json");
-const PROD_REGIONS_PATH = path.join(PROD_DATA_DIR, "regions.json");
+const PROD_DATA_PATH = path.join(PROD_DATA_DIR, "data.json");
+const PROD_DATA_UNION_PATH = path.join(PROD_DATA_DIR, "dataUnion.json");
 
 const isProd = process.env.NODE_ENV === 'production';
 // Environment parsing
@@ -35,13 +29,10 @@ const clientPath = isProd ? './public' : '../../../client/public';
 const redisUrl = process.env.REDIS ? process.env.REDIS : DEV_REDIS_URL;
 
 const dataPath = isProd ? PROD_DATA_PATH : DEV_DATA_PATH;
-const modelsPath = isProd ? PROD_MODELS_PATH : DEV_MODELS_PATH;
-const scenariosPath = isProd ? PROD_SCENARIOS_PATH : DEV_SCENARIOS_PATH;
-const variablesPath = isProd ? PROD_VARIABLES_PATH : DEV_VARIABLES_PATH;
-const regionsPath = isProd ? PROD_REGIONS_PATH : DEV_REGIONS_PATH;
+const dataUnionPath = isProd ? PROD_DATA_UNION_PATH : DEV_DATA_UNION_PATH;
 
 // data loading
-const dataProxy = new FSDataProxy(dataPath, modelsPath, scenariosPath, variablesPath, regionsPath);
+const dataProxy = new FSDataProxy(dataPath, dataUnionPath);
 
 // redis initialisation
 const redisClient = new RedisClient(redisUrl);

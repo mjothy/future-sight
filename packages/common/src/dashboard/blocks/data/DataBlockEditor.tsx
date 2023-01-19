@@ -1,26 +1,13 @@
 import { Component } from 'react';
 import { Divider, Row, Tag } from 'antd';
 import SelectInput from '../utils/SelectInput';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { getUnselectedInputOptions } from '../utils/BlockDataUtils';
 
 /**
  * The form in sidebar to add/edit dara block
  */
 export default class DataBlockEditor extends Component<any, any> {
-
-  onDropdownVisibleChange = (option, e) => {
-    const dashboard = { ...this.props.dashboard };
-    const config = this.props.currentBlock.config;
-    if (!e && config.metaData[option].length > 0) {
-      // Update the order of selection
-      config.metaData.selectOrder = Array.from(
-        new Set<string>([...config.metaData.selectOrder, option])
-      );
-      dashboard.blocks[this.props.currentBlock.id].config = { ...config };
-      this.props.updateDashboard(dashboard);
-    }
-  };
 
   clearClick = (option, e) => {
     const dashboard = { ...this.props.dashboard };
@@ -42,6 +29,17 @@ export default class DataBlockEditor extends Component<any, any> {
 
   };
 
+  getMessage = (missing) => {
+    let msg = '';
+    missing.forEach(value => {
+      msg = msg + value + ', ';
+    })
+    if (msg.length > 0) {
+      msg = "No data for: " + msg.slice(0, -2);
+    }
+    return <><WarningOutlined /> {msg}</>;
+  }
+
   selectDropDownInput = (option, selected) => {
     // In case the block is controlled
     const id = this.props.currentBlock.controlBlock;
@@ -60,7 +58,9 @@ export default class DataBlockEditor extends Component<any, any> {
       !isControlled && (
         <div className={selected ? 'transition' : ''}>
           <Row className="width-100 mt-16">
-            <h4>{option}</h4>
+            <h4>{option} &nbsp;<label className='no-data'> {metaData.selectOrder.length == 4 && this.props.missingData[option].length > 0 && this.getMessage(this.props.missingData[option])}
+            </label>
+            </h4>
             <SelectInput
               type={option}
               value={metaData[option]}
@@ -68,7 +68,7 @@ export default class DataBlockEditor extends Component<any, any> {
               onChange={this.props.onChange}
               isClear={selected}
               onClear={this.clearClick}
-              onDropdownVisibleChange={this.onDropdownVisibleChange}
+              onDropdownVisibleChange={this.props.onDropdownVisibleChange}
             />
           </Row>
         </div>
@@ -78,12 +78,15 @@ export default class DataBlockEditor extends Component<any, any> {
 
   controlledInputs = () => {
     const id = this.props.currentBlock.controlBlock;
+    const metaData = this.props.currentBlock.config.metaData;
     const controlBlock = this.props.dashboard.blocks[id].config.metaData;
     return Object.keys(controlBlock.master).map((key) => {
       if (controlBlock.master[key].isMaster) {
         return (
           <div className='mt-20'>
-            <strong>{key}: </strong> <br />
+            <h4>{key} &nbsp;<label className='no-data'> {metaData.selectOrder.length == 4 && this.props.missingData[key].length > 0 && this.getMessage(this.props.missingData[key])}
+            </label>
+            </h4>
             {controlBlock[key].length <= 0 ? <div>
 
               <p><ExclamationCircleOutlined /> No data selected</p>
