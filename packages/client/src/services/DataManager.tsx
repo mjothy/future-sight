@@ -5,7 +5,7 @@ export default class DataManager implements IDataManager {
     return '/api';
   }
 
-  fetchPlotData = (data: DataModel) => {
+  fetchPlotData = (data: DataModel[]) => {
     return fetch(`${this.getBaseUrl()}/plotData`, {
       method: 'POST',
       headers: {

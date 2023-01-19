@@ -6,7 +6,7 @@ import {
   ConfigurationModel,
   DashboardModel,
   getSelectedFilter,
-  LayoutModel,
+  LayoutModel, PlotDataModel,
 } from '@future-sight/common';
 import { Component } from 'react';
 import { RoutingProps } from '../app/Routing';
@@ -20,8 +20,8 @@ export interface DashboardSelectionControlProps
   RoutingProps {
   saveData: (id: string, image?: string) => Promise<any>;
   filters: any;
-  plotData: any[];
-  blockData: (block: BlockModel) => any[];
+  plotData: PlotDataModel[];
+  blockData: (block: BlockModel) => PlotDataModel[];
   getPlotData: (blocks: BlockModel[]) => void;
   updateFilterByDataFocus: (dashboard: DashboardModel, filtre: string) => void;
   filtreByDataFocus: any;

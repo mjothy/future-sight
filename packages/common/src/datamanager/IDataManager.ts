@@ -3,7 +3,7 @@ import DataModel from '../models/DataModel';
 export default interface IDataManager {
   getBaseUrl: () => string;
 
-  fetchPlotData: (data: DataModel) => Promise<any>;
+  fetchPlotData: (data: DataModel[]) => Promise<any>;
 
   fetchModels: () => Promise<any>;
 

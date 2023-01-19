@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
 import PlotlyUtils from '../../graphs/PlotlyUtils';
+import PlotDataModel from "../../../models/PlotDataModel";
 
 const indexToColor = {
   regions: {
@@ -87,7 +88,7 @@ export default class DataBlockView extends Component<any, any> {
    */
   settingPlotData = () => {
     const { currentBlock } = this.props;
-    const data: any[] = this.props.blockData(currentBlock);
+    const data: PlotDataModel[] = this.props.blockData(currentBlock);
     console.log("Run settingPlotData", currentBlock.blockType);
     const showData: any[] = [];
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
@@ -104,7 +105,7 @@ export default class DataBlockView extends Component<any, any> {
     return { data: visualizeData, layout: this.prepareLayout(data) }
   }
 
-  prepareTableData = (data) => {
+  prepareTableData = (data: PlotDataModel[]) => {
     const columns: ColumnsType<any> = [
       { title: 'model', dataIndex: 'model' },
       { title: 'scenario', dataIndex: 'scenario' },
@@ -135,7 +136,7 @@ export default class DataBlockView extends Component<any, any> {
     return { columns, values };
   }
 
-  getLegend = (dataElement, legend) => {
+  getLegend = (dataElement: PlotDataModel, legend) => {
     if (!legend) {
       return dataElement.region
         + " - " + dataElement.variable
@@ -160,7 +161,7 @@ export default class DataBlockView extends Component<any, any> {
   }
 
 
-  preparePlotData = (dataElement, configStyle: BlockStyleModel) => {
+  preparePlotData = (dataElement: PlotDataModel, configStyle: BlockStyleModel) => {
     let obj;
     const color = this.getColor(dataElement)
     switch (configStyle.graphType) {
@@ -193,7 +194,7 @@ export default class DataBlockView extends Component<any, any> {
     return obj;
   }
 
-  plotHoverText = (dataElement) => {
+  plotHoverText = (dataElement: PlotDataModel) => {
     let textHover = '';
     const result: string[] = [];
 
@@ -219,9 +220,9 @@ export default class DataBlockView extends Component<any, any> {
    * @param data The retreived data (from API)
    * @returns Axis x (array of values)
    */
-  getX = (data) => {
+  getX = (dataElement: PlotDataModel) => {
     const x: any[] = [];
-    data.data.map((d) => {
+    dataElement.data.map((d) => {
       if (d.value !== "") {
         x.push(d.year)
       }
@@ -234,9 +235,9 @@ export default class DataBlockView extends Component<any, any> {
    * @param data The retreived data (from API)
    * @returns Axis y (array of values)
    */
-  getY = (data) => {
+  getY = (dataElement: PlotDataModel) => {
     const y: any[] = [];
-    data.data.map((d) => {
+    dataElement.data.map((d) => {
       if (d.value !== "") {
         y.push(d.value)
       }
@@ -257,7 +258,7 @@ export default class DataBlockView extends Component<any, any> {
     }
   }
 
-  getYAxisLabel = (data) => {
+  getYAxisLabel = (data: PlotDataModel[]) => {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
     const labels = {}

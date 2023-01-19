@@ -2,7 +2,7 @@ import {
   BlockDataModel,
   BlockModel,
   ComponentPropsWithDataManager,
-  ConfigurationModel,
+  ConfigurationModel, DataModel,
   getBlock,
   ReadOnlyDashboard,
 } from '@future-sight/common';
@@ -174,7 +174,7 @@ class DashboardDataConfiguration extends Component<
     this.retreiveAllTimeSeriesData(data);
   };
 
-  retreiveAllTimeSeriesData = (data) => {
+  retreiveAllTimeSeriesData = (data: DataModel[]) => {
     this.props.dataManager.fetchPlotData(data)
       .then(res => {
         console.log("no data for", data);
