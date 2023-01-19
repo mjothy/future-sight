@@ -12,7 +12,7 @@ export default class FSDataProxy implements IDataProxy {
     private readonly regions: any;
 
 
-    constructor(dataPath: string, dataUnionPath: string, modelsPath: string, scenariosPath: string, variablesPath: string, regionsPath: string) {
+    constructor(dataPath: string, dataUnionPath: string) {
         const dataRaw = fs.readFileSync(dataPath);
         const dataUnionRaw = fs.readFileSync(dataUnionPath);
 

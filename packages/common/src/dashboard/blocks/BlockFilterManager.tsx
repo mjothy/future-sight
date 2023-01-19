@@ -106,7 +106,8 @@ export default class BlockFilterManager extends Component<any, any> {
                                 e.region === region
                         );
                         if (d) {
-                            existDataRaws.push({ model, scenario, variable, region });
+                            if (d.data != undefined)
+                                existDataRaws.push({ model, scenario, variable, region });
                         }
                     });
                 });
