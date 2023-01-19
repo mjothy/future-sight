@@ -1,44 +1,10 @@
 import type { ColumnsType } from 'antd/lib/table';
 import React, { Component } from 'react';
-import BlockModel from '../../../models/BlockModel';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
 import PlotlyUtils from '../../graphs/PlotlyUtils';
-import { getChildrens } from '../utils/BlockDataUtils';
 
 export default class DataBlockView extends Component<any, any> {
-  constructor(props) {
-    super(props);
-    const { data, layout } = this.settingPlotData();
-    this.state = { data, layout };
-  }
-
-  componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): void {
-    if (this.props.currentSelectedBlock != null && this.props.currentSelectedBlock != undefined) {
-      // Set state only for current selected block
-      if (this.props.currentSelectedBlock != prevProps.currentSelectedBlock) { //Check if the current block changed
-        if (this.props.currentBlock.id == this.props.currentSelectedBlock.id) {
-          const { data, layout } = this.settingPlotData();
-          this.setState({ data, layout })
-        } else if (this.props.currentSelectedBlock.blockType === 'control') { // Change child blocks if the parrent change
-          const childrens = getChildrens(this.props.dashboard.blocks, this.props.currentSelectedBlock.id);
-          const id_childs: (string | undefined)[] = childrens.map((child: (BlockModel | any)) => child.id)
-          if (id_childs.includes(this.props.currentBlock.id)) {
-            const { data, layout } = this.settingPlotData();
-            this.setState({ data, layout })
-          }
-        }
-
-      }
-    } else if (this.props.dashboard != prevProps.dashboard || this.props.plotData.length != prevProps.plotData.length) { //if dashboard layout change, rerender all blocks
-      const { data, layout } = this.settingPlotData();
-      this.setState({ data, layout })
-    }
-    if (this.props.plotData.length != prevProps.plotData.length) {
-      const { data, layout } = this.settingPlotData();
-      this.setState({ data, layout })
-    }
-  }
 
   /**
    * Preparing the fetched data to adapt plotly data OR antd table
@@ -47,7 +13,7 @@ export default class DataBlockView extends Component<any, any> {
   settingPlotData = () => {
     const { currentBlock } = this.props;
     const data: any[] = this.props.blockData(currentBlock);
-    // console.log("Run settingPlotData", currentBlock.blockType);
+    console.log("Run settingPlotData", currentBlock.blockType);
     const showData: any[] = [];
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
@@ -55,7 +21,7 @@ export default class DataBlockView extends Component<any, any> {
     if (configStyle.graphType === 'table') {
       visualizeData = this.prepareTableData(data);
     } else {
-      data?.map((dataElement) => {
+      data.map((dataElement) => {
         showData.push(this.preparePlotData(dataElement, configStyle));
       });
       visualizeData = showData;
@@ -77,9 +43,9 @@ export default class DataBlockView extends Component<any, any> {
       });
     }
     const values: any[] = [];
-    data?.map((dataElement) => {
+    data.map((dataElement) => {
       const obj = {};
-      dataElement.data?.map((e) => {
+      dataElement.data.map((e) => {
         obj[e.year] = e.value;
       });
       values.push({
@@ -97,9 +63,9 @@ export default class DataBlockView extends Component<any, any> {
   getLegend = (dataElement, legend) => {
     if (!legend) {
       return dataElement.region
-        + " - " + dataElement.variable
-        + " - " + dataElement.scenario
-        + " - " + dataElement.model
+          + " - " + dataElement.variable
+          + " - " + dataElement.scenario
+          + " - " + dataElement.model
     } else {
       const label: any[] = [];
       if (legend.Region && dataElement.region) {
@@ -151,17 +117,17 @@ export default class DataBlockView extends Component<any, any> {
     let textHover = '';
     const result: string[] = [];
 
-    dataElement.data?.map((e) => {
+    dataElement.data.map((e) => {
       textHover =
-        dataElement.model +
-        '/' +
-        dataElement.scenario +
-        '<br>' +
-        'region:' +
-        dataElement.region +
-        '<br>' +
-        'variable: ' +
-        dataElement.variable;
+          dataElement.model +
+          '/' +
+          dataElement.scenario +
+          '<br>' +
+          'region:' +
+          dataElement.region +
+          '<br>' +
+          'variable: ' +
+          dataElement.variable;
       result.push(textHover);
     });
 
@@ -175,7 +141,7 @@ export default class DataBlockView extends Component<any, any> {
    */
   getX = (data) => {
     const x: any[] = [];
-    data.data?.map((d) => {
+    data.data.map((d) => {
       if (d.value !== "") {
         x.push(d.year)
       }
@@ -190,7 +156,7 @@ export default class DataBlockView extends Component<any, any> {
    */
   getY = (data) => {
     const y: any[] = [];
-    data.data?.map((d) => {
+    data.data.map((d) => {
       if (d.value !== "") {
         y.push(d.value)
       }
@@ -241,6 +207,7 @@ export default class DataBlockView extends Component<any, any> {
   }
 
   render() {
-    return <PlotlyGraph {...this.props} data={this.state.data} layout={this.state.layout} />;
+    const { data, layout } = this.settingPlotData();
+    return <PlotlyGraph {...this.props} data={data} layout={layout} />;
   }
 }
