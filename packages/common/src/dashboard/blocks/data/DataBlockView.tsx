@@ -3,8 +3,38 @@ import React, { Component } from 'react';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
 import PlotlyUtils from '../../graphs/PlotlyUtils';
+import * as _ from 'lodash';
 
 export default class DataBlockView extends Component<any, any> {
+
+  shouldComponentUpdate(nextProps: Readonly<any>, nextState: Readonly<any>, nextContext: any): boolean {
+    let shouldUpdate = true;
+    const config1 = nextProps.currentBlock.config;
+    const config2 = this.props.currentBlock.config;
+    // Check configuration
+    if (this.props.width == nextProps.width && this.props.height == nextProps.height) {
+      if (_.isEqual(config1.metaData, config2.metaData) && _.isEqual(config1.configStyle, config2.configStyle)) {
+        shouldUpdate = false;
+      }
+    }
+
+    // Check updatede plotData (we need to check this because component render before fetch finish)
+    if (this.props.blockPlotData?.length != nextProps.blockPlotData?.length) {
+      shouldUpdate = true;
+    }
+
+    // if type is controlled control and control block updated -> update also child
+    if (nextProps.currentBlock.controlBlock !== '') {
+      const parrent_block_config1 = nextProps.dashboard.blocks[nextProps.currentBlock.controlBlock].config;
+      const parrent_block_config2 = this.props.dashboard.blocks[nextProps.currentBlock.controlBlock].config;
+      if (!_.isEqual(parrent_block_config1.metaData, parrent_block_config2.metaData)) {
+        shouldUpdate = true;
+      }
+
+    }
+
+    return shouldUpdate;
+  }
 
   /**
    * Preparing the fetched data to adapt plotly data OR antd table
@@ -13,7 +43,7 @@ export default class DataBlockView extends Component<any, any> {
   settingPlotData = () => {
     const { currentBlock } = this.props;
     const data: any[] = this.props.blockData(currentBlock);
-    console.log("Run settingPlotData", currentBlock.blockType);
+    console.log("Run settingPlotData", currentBlock.id);
     const showData: any[] = [];
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
@@ -21,7 +51,7 @@ export default class DataBlockView extends Component<any, any> {
     if (configStyle.graphType === 'table') {
       visualizeData = this.prepareTableData(data);
     } else {
-      data.map((dataElement) => {
+      data?.map((dataElement) => {
         showData.push(this.preparePlotData(dataElement, configStyle));
       });
       visualizeData = showData;
@@ -43,9 +73,9 @@ export default class DataBlockView extends Component<any, any> {
       });
     }
     const values: any[] = [];
-    data.map((dataElement) => {
+    data?.map((dataElement) => {
       const obj = {};
-      dataElement.data.map((e) => {
+      dataElement.data?.map((e) => {
         obj[e.year] = e.value;
       });
       values.push({
@@ -63,9 +93,9 @@ export default class DataBlockView extends Component<any, any> {
   getLegend = (dataElement, legend) => {
     if (!legend) {
       return dataElement.region
-          + " - " + dataElement.variable
-          + " - " + dataElement.scenario
-          + " - " + dataElement.model
+        + " - " + dataElement.variable
+        + " - " + dataElement.scenario
+        + " - " + dataElement.model
     } else {
       const label: any[] = [];
       if (legend.Region && dataElement.region) {
@@ -117,17 +147,17 @@ export default class DataBlockView extends Component<any, any> {
     let textHover = '';
     const result: string[] = [];
 
-    dataElement.data.map((e) => {
+    dataElement.data?.map((e) => {
       textHover =
-          dataElement.model +
-          '/' +
-          dataElement.scenario +
-          '<br>' +
-          'region:' +
-          dataElement.region +
-          '<br>' +
-          'variable: ' +
-          dataElement.variable;
+        dataElement.model +
+        '/' +
+        dataElement.scenario +
+        '<br>' +
+        'region:' +
+        dataElement.region +
+        '<br>' +
+        'variable: ' +
+        dataElement.variable;
       result.push(textHover);
     });
 
@@ -141,7 +171,7 @@ export default class DataBlockView extends Component<any, any> {
    */
   getX = (data) => {
     const x: any[] = [];
-    data.data.map((d) => {
+    data.data?.map((d) => {
       if (d.value !== "") {
         x.push(d.year)
       }
@@ -156,7 +186,7 @@ export default class DataBlockView extends Component<any, any> {
    */
   getY = (data) => {
     const y: any[] = [];
-    data.data.map((d) => {
+    data.data?.map((d) => {
       if (d.value !== "") {
         y.push(d.value)
       }

@@ -2,7 +2,7 @@ import ConfigurationModel from './ConfigurationModel';
 import TextConfigurationModel from './TextConfigurationModel';
 
 export default class BlockModel {
-  constructor(id?: string, blockType?: string) {
+  constructor(id = '', blockType?: string) {
     this.id = id;
     this.blockType = blockType;
     if (blockType === 'text') {
@@ -11,7 +11,7 @@ export default class BlockModel {
       this.config = new ConfigurationModel();
     }
   }
-  id: string | undefined;
+  id: string;
   blockType: string | undefined;
   config: ConfigurationModel | TextConfigurationModel;
   controlBlock = '';

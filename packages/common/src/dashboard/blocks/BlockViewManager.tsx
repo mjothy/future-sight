@@ -20,9 +20,11 @@ export default class BlockViewManager extends Component<any, any> {
 
     switch (blockType) {
       case 'text':
-        return <TextBlockView currentBlock= {this.props.currentBlock} />;
+        return <TextBlockView currentBlock={this.props.currentBlock} />;
       case 'data':
         return <DataBlockView {...{
+          dashboard: this.props.dashboard,
+          blockPlotData: this.props.plotData[this.props.currentBlock.id],
           currentBlock: this.props.currentBlock,
           blockData: this.props.blockData,
           width: this.props.width,
