@@ -10,4 +10,5 @@ export default interface PlotDataModel {
     scenario: string | any;
     variable: string | any;
     region: string | any;
+    color?: string | null;
 }

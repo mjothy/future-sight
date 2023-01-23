@@ -1,10 +1,10 @@
 import {
   BlockDataModel,
-  BlockModel,
+  BlockModel, ColorizerProvider,
   ComponentPropsWithDataManager,
   ConfigurationModel, DataModel,
   getBlock,
-  ReadOnlyDashboard,
+  ReadOnlyDashboard, Colorizer
 } from '@future-sight/common';
 import { Component } from 'react';
 import withDataManager from '../../services/withDataManager';
@@ -19,6 +19,8 @@ export interface DashboardDataConfigurationProps
   RoutingProps {
   readonly?: boolean;
 }
+
+const dataFilterKeys = ["model", "scenario", "variable", "region"]
 
 /**
  * To dispatch the data to all blocks of dashboard
@@ -227,7 +229,8 @@ class DashboardDataConfiguration extends Component<
 
   render() {
     const { readonly } = this.props;
-    return readonly ? (
+
+    const toRender = (readonly ? (
       <ReadOnlyDashboard
         shareButtonOnClickHandler={() => Utils.copyToClipboard()}
         embedButtonOnClickHandler={() => Utils.copyToClipboard(undefined, "&embedded")}
@@ -249,10 +252,15 @@ class DashboardDataConfiguration extends Component<
         firstFilterRaws={this.state.firstFilterRaws}
       />) || <div className="dashboard">
         <Spin className="centered" />
-      </div>
+      </div>)
+        // TODO handle error
+    )
 
-      // TODO handle error
-    );
+    return (
+        <ColorizerProvider colorizer={new Colorizer(dataFilterKeys, undefined, undefined, "region")}>
+          {toRender}
+        </ColorizerProvider>
+    )
   }
 }
 

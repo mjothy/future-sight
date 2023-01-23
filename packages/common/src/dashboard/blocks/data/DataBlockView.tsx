@@ -4,83 +4,10 @@ import BlockStyleModel from '../../../models/BlockStyleModel';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
 import PlotlyUtils from '../../graphs/PlotlyUtils';
 import PlotDataModel from "../../../models/PlotDataModel";
+import withColorizer from "../../../hoc/colorizer/withColorizer";
 
-const indexToColor = {
-  regions: {
-    "EU27": "black",
-  }
-}
 
-// Color palette from plotly and D3
-const colorPalette = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF',
-  '#FECB52', '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'];
-
-export default class DataBlockView extends Component<any, any> {
-
-  /**
-   * Get index used in this data block. Can be a filter or a combination of filter
-   * The order of the index depends on their order of appearance in the
-   *  constant filters or in the future FiltersDefinition
-   * @returns string index
-   */
-  getIndexKeys = () => {
-
-    const currentBlock = this.props.currentBlock
-    const filterKeys = Object.keys(this.props.filters)
-    let indexKeys
-
-    //Normal block
-    if (!currentBlock.controlBlock){
-      indexKeys = filterKeys.filter(
-          (filterKey)=> currentBlock.config.metaData[filterKey].length>1
-      )
-    } else { //Controlled block
-      const controlBlock = this.props.dashboard.blocks[currentBlock.controlBlock]
-      indexKeys = filterKeys.filter(
-          (filterKey) => {
-            if (controlBlock.config.metaData.master[filterKey].isMaster){
-              return controlBlock.config.metaData.master[filterKey].values.length>1
-            }
-            return currentBlock.config.metaData[filterKey].length>1
-          }
-      )
-    }
-
-    console.log("indexKeys", indexKeys)
-    return indexKeys
-  }
-
-  /**
-   * Get color of the graph curve
-   * @returns string index
-   */
-  getColor = (dataElement) => {
-    const indexKeys = this.getIndexKeys()
-
-    if(indexKeys.length==0) {
-      console.log("no index")
-      return null
-    }
-
-    const indexValue = indexKeys
-        .map((indexKey) => dataElement[indexKey?.slice(0, -1)]) //TODO do something better to get singular values
-        .join("-")
-    const indexKeysJoined = indexKeys.join("-")
-
-    if (!indexToColor[indexKeysJoined]){
-      indexToColor[indexKeysJoined]={}
-    }
-
-    if (!indexToColor[indexKeysJoined][indexValue]){
-      const colorIdx = Object.keys(indexToColor[indexKeysJoined]).length % colorPalette.length
-      indexToColor[indexKeysJoined][indexValue] = colorPalette[colorIdx]
-    }
-
-    const color = indexToColor[indexKeysJoined][indexValue]
-    console.log(color)
-    return color
-  }
-
+class DataBlockView extends Component<any, any> {
 
   /**
    * Preparing the fetched data to adapt plotly data OR antd table
@@ -97,7 +24,8 @@ export default class DataBlockView extends Component<any, any> {
     if (configStyle.graphType === 'table') {
       visualizeData = this.prepareTableData(data);
     } else {
-      data.map((dataElement) => {
+      const dataWithColor = this.props.colorizer.colorizeData(data)
+      dataWithColor.map((dataElement) => {
         showData.push(this.preparePlotData(dataElement, configStyle));
       });
       visualizeData = showData;
@@ -163,14 +91,13 @@ export default class DataBlockView extends Component<any, any> {
 
   preparePlotData = (dataElement: PlotDataModel, configStyle: BlockStyleModel) => {
     let obj;
-    const color = this.getColor(dataElement)
     switch (configStyle.graphType) {
       case 'area':
         obj = {
           type: 'scatter',
           fill: 'tozeroy',
           // fillcolor: "#FF0000"+"50",
-          fillcolor: color ? color+"50" : null,
+          fillcolor: dataElement.color ? dataElement.color+"50" : null,
           x: this.getX(dataElement),
           y: this.getY(dataElement),
           mode: "none",
@@ -187,7 +114,7 @@ export default class DataBlockView extends Component<any, any> {
           name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
-          marker: {color: color}
+          marker: {color: dataElement.color || null}
         };
     }
 
@@ -217,7 +144,7 @@ export default class DataBlockView extends Component<any, any> {
 
   /**
    * Extract the x axis from data
-   * @param data The retreived data (from API)
+   * @param dataElement The retreived data (from API)
    * @returns Axis x (array of values)
    */
   getX = (dataElement: PlotDataModel) => {
@@ -232,7 +159,7 @@ export default class DataBlockView extends Component<any, any> {
 
   /**
    * Extract the y axis from data
-   * @param data The retreived data (from API)
+   * @param dataElement The retreived data (from API)
    * @returns Axis y (array of values)
    */
   getY = (dataElement: PlotDataModel) => {
@@ -292,3 +219,5 @@ export default class DataBlockView extends Component<any, any> {
     return <PlotlyGraph {...this.props} data={data} layout={layout} />;
   }
 }
+
+export default withColorizer(DataBlockView)
