@@ -22,11 +22,7 @@ export interface DashboardSelectionControlProps
   filters: any;
   plotData: PlotDataModel[];
   blockData: (block: BlockModel) => PlotDataModel[];
-  getPlotData: (blocks: BlockModel[]) => void;
-  updateFilterByDataFocus: (dashboard: DashboardModel, filtre: string) => void;
-  filtreByDataFocus: any;
   optionsLabel: string[];
-  firstFilterRaws: any;
 }
 
 export default class DashboardSelectionControl extends Component<
@@ -46,6 +42,7 @@ export default class DashboardSelectionControl extends Component<
        * The selected block id
        */
       blockSelectedId: '',
+      currentSelectedBlock: null,
       isDraft: false,
     };
     const w_location = window.location.pathname;
@@ -66,17 +63,8 @@ export default class DashboardSelectionControl extends Component<
     return state;
   }
 
-  componentDidMount(): void {
-    if (this.state.dashboard != undefined) {
-      this.props.getPlotData(this.state.dashboard.blocks);
-      const selectedFilter = getSelectedFilter(this.state.dashboard.dataStructure);
-      this.props.updateFilterByDataFocus(this.state.dashboard, selectedFilter);
-    }
-  }
-
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevState.dashboard != this.state.dashboard) {
-      console.log("update dashboard")
+    if (prevState.dashboard != this.state.dashboard || prevState.currentSelectedBlock != this.state.currentSelectedBlock) {
       setDraft(this.state.dashboard.id, this.state.dashboard);
     }
   }
@@ -91,7 +79,8 @@ export default class DashboardSelectionControl extends Component<
   };
 
   updateSelectedBlock = (blockSelectedId: string) => {
-    this.setState({ blockSelectedId });
+    const currentSelectedBlock = this.state.dashboard.blocks[blockSelectedId];
+    this.setState({ blockSelectedId, currentSelectedBlock });
   };
 
   updateDashboard = (dashboard: DashboardModel) => {
@@ -100,14 +89,21 @@ export default class DashboardSelectionControl extends Component<
       // Update dataStructure (Data focus)
       const newDataStructure = dashboard.dataStructure;
       const toDeleteBlocks = blocksIdToDelete(Object.values(this.state.dashboard.blocks), newDataStructure);
-      const selectedFilter = getSelectedFilter(newDataStructure);
       const blockAndLayouts = this.deleteBlocks(Array.from(toDeleteBlocks));
       dashboard = { ...dashboard, ...blockAndLayouts }
-      this.setState({ dashboard }, () => {
-        this.props.updateFilterByDataFocus(this.state.dashboard, selectedFilter);
-      });
-    } else {
       this.setState({ dashboard });
+    } else {
+      if (this.state.blockSelectedId != '') {
+        const currentSelectedBlock = { ...dashboard.blocks[this.state.blockSelectedId] };
+        const currentDashboard = this.state.dashboard;
+        if (dashboard.blocks[this.state.blockSelectedId] != undefined) {
+          currentDashboard.blocks[this.state.blockSelectedId].config = { ...dashboard.blocks[this.state.blockSelectedId].config };
+        }
+        currentDashboard.layout = dashboard.layout;
+        this.setState({ dashboard: currentDashboard, currentSelectedBlock })
+      } else {
+        this.setState({ dashboard })
+      }
     }
   }
 
@@ -253,6 +249,7 @@ export default class DashboardSelectionControl extends Component<
         deleteBlocks={this.deleteBlocks}
         checkIfSelectedInOptions={this.checkIfSelectedInOptions}
         isDraft={this.state.isDraft}
+        currentSelectedBlock={this.state.currentSelectedBlock}
         {...this.props}
       />
     );

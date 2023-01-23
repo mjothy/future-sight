@@ -19,6 +19,7 @@ interface DashboardViewProps extends ComponentPropsWithDataManager, RoutingProps
   readonly?: boolean;
   updateDashboard: (dashboard: DashboardModel) => void;
   checkIfSelectedInOptions: (optionsData, block: BlockModel) => void;
+  currentSelectedBlock: BlockModel;
 }
 
 /**

@@ -15,6 +15,7 @@ class DataBlockView extends Component<any, any> {
    */
   settingPlotData = () => {
     const { currentBlock } = this.props;
+    // console.log("Run settingPlotData", currentBlock.blockType);
     const data: PlotDataModel[] = this.props.blockData(currentBlock);
     console.log("Run settingPlotData", currentBlock.blockType);
     const showData: any[] = [];
@@ -24,11 +25,13 @@ class DataBlockView extends Component<any, any> {
     if (configStyle.graphType === 'table') {
       visualizeData = this.prepareTableData(data);
     } else {
-      const dataWithColor = this.props.colorizer.colorizeData(data)
-      dataWithColor.map((dataElement) => {
-        showData.push(this.preparePlotData(dataElement, configStyle));
-      });
-      visualizeData = showData;
+      data?.map((dataElement) => {
+        const dataWithColor = this.props.colorizer.colorizeData(data)
+        dataWithColor.map((dataElement) => {
+          showData.push(this.preparePlotData(dataElement, configStyle));
+        });
+        visualizeData = showData;
+      }
     }
     return { data: visualizeData, layout: this.prepareLayout(data) }
   }
@@ -47,9 +50,9 @@ class DataBlockView extends Component<any, any> {
       });
     }
     const values: any[] = [];
-    data.map((dataElement) => {
+    data?.map((dataElement) => {
       const obj = {};
-      dataElement.data.map((e) => {
+      dataElement.data?.map((e) => {
         obj[e.year] = e.value;
       });
       values.push({
@@ -125,7 +128,7 @@ class DataBlockView extends Component<any, any> {
     let textHover = '';
     const result: string[] = [];
 
-    dataElement.data.map((e) => {
+    dataElement.data?.map((e) => {
       textHover =
         dataElement.model +
         '/' +
@@ -149,7 +152,7 @@ class DataBlockView extends Component<any, any> {
    */
   getX = (dataElement: PlotDataModel) => {
     const x: any[] = [];
-    dataElement.data.map((d) => {
+    dataElement.data?.map((d) => {
       if (d.value !== "") {
         x.push(d.year)
       }
@@ -164,7 +167,7 @@ class DataBlockView extends Component<any, any> {
    */
   getY = (dataElement: PlotDataModel) => {
     const y: any[] = [];
-    dataElement.data.map((d) => {
+    dataElement.data?.map((d) => {
       if (d.value !== "") {
         y.push(d.value)
       }

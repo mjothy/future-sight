@@ -52,7 +52,9 @@ export default class SetupView extends Component<any, any> {
     const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
     dashboard.dataStructure = new DataStructureModel();
     const selectedFilter = getSelectedFilter(this.state.dataStructure);
-    dashboard.dataStructure[selectedFilter] = JSON.parse(JSON.stringify(this.state.dataStructure[selectedFilter]));
+    if (selectedFilter !== '') {
+      dashboard.dataStructure[selectedFilter] = JSON.parse(JSON.stringify(this.state.dataStructure[selectedFilter]));
+    }
 
     this.props.updateDashboard(dashboard);
 

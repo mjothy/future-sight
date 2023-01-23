@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-extra-boolean-cast */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import {LinkOutlined, PicCenterOutlined} from '@ant-design/icons';
+import { LinkOutlined, PicCenterOutlined } from '@ant-design/icons';
 import { Button, PageHeader, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
@@ -26,6 +26,7 @@ interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
     embedButtonOnClickHandler: () => void;
     blockData: (block: BlockModel) => any[];
     optionsLabel: string[]
+    plotData: any[];
 }
 
 type LocationState = { dashboard: DashboardModel };
@@ -78,7 +79,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
     return (
         <div
             className="dashboard readonly"
-            style={{ height: (props.isEmbedded|| props.isFullscreen) ? '100%' : undefined }}
+            style={{ height: (props.isEmbedded || props.isFullscreen) ? '100%' : undefined }}
         >
             {dashboard && (
                 <PageHeader
@@ -103,7 +104,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                             key="embed"
                             type="default"
                             size="small"
-                            icon={<PicCenterOutlined/>}
+                            icon={<PicCenterOutlined />}
                             onClick={props.embedButtonOnClickHandler}
                         >
                             Embed
@@ -136,6 +137,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                         }}
                         readonly
                         blockData={props.blockData}
+                        plotData={props.plotData}
                         optionsLabel={props.optionsLabel}
                     />
                 )}

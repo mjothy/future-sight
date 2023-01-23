@@ -1,4 +1,4 @@
-import type {IDataManager, DataModel} from '@future-sight/common';
+import type { IDataManager, DataModel } from '@future-sight/common';
 
 export default class DataManager implements IDataManager {
   getBaseUrl() {
@@ -136,8 +136,8 @@ export default class DataManager implements IDataManager {
     return ["models", "scenarios", "variables", "regions"];
   };
 
-  fetchRaws = (data) => {
-    return fetch(`api/filter`, {
+  fetchDataOptions = (data) => {
+    return fetch(`api/filterOptions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -150,4 +150,5 @@ export default class DataManager implements IDataManager {
       })
       .catch(console.error);
   };
+
 }

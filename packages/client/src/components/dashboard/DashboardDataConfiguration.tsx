@@ -40,18 +40,12 @@ class DashboardDataConfiguration extends Component<
         scenarios: {},
         models: {},
       },
-      filtreByDataFocus: {
-        regions: [],
-        variables: [],
-        scenarios: [],
-        models: [],
-      },
       /**
        * Data (with timeseries from IASA API)
        */
       plotData: [],
+      missingData: [],
       isFetchData: false,
-      firstFilterRaws: []
     };
   }
 
@@ -134,97 +128,17 @@ class DashboardDataConfiguration extends Component<
     return [];
   };
 
-  /**
-   * If dashboard is draft, get first all the possible data to visualize
-   * This function called one time on draft dashboard rendered
-   */
-  getPlotData = (blocks: BlockModel[]) => {
-    const data: any[] = [];
-    Object.values(blocks).forEach((block: any) => {
-      const metaData: BlockDataModel = { ...block.config.metaData };
-
-      // get all possible data from controlled blocks
-      const controlBlock = getBlock(blocks, block.controlBlock);
-      if (controlBlock.id !== '') {
-        const config = controlBlock.config as ConfigurationModel;
-        this.optionsLabel.forEach(option => {
-          if (config.metaData.master[option].isMaster) {
-            metaData[option] = config.metaData[option];
-          }
-        })
-      }
-
-      // Check if the block type != text
-      if (
-        metaData !== undefined &&
-        metaData.models &&
-        metaData.scenarios &&
-        metaData.variables &&
-        metaData.regions
-      ) {
-        metaData.models.forEach((model) => {
-          metaData.scenarios.forEach((scenario) => {
-            metaData.variables.forEach((variable) => {
-              metaData.regions.forEach((region) => {
-                data.push({ model, scenario, variable, region });
-              });
-            });
-          });
-        });
-      }
-    });
-    this.retreiveAllTimeSeriesData(data);
-  };
-
-  retreiveAllTimeSeriesData = (data: DataModel[]) => {
+  retreiveAllTimeSeriesData = (data) => {
     this.props.dataManager.fetchPlotData(data)
       .then(res => {
-        console.log("no data for", data);
         if (res.length > 0) {
+          console.log("res: ", res)
           this.setState({ plotData: [...this.state.plotData, ...res] });
+        } else {
+          this.setState({ plotData: [...this.state.plotData, ...data] });
         }
       }
       );
-  }
-
-  /**
-   * Set the first filtered data (By data focus)
-   * @param dashboard the current dashboard
-   * @param selectedFilter dashboard selected filter
-   */
-  updateFilterByDataFocus = (dashboard, selectedFilter) => {
-    if (this.state.isFetchData){
-        const data = {...this.state.filtreByDataFocus}
-
-        if (selectedFilter === "" || dashboard.dataStructure[selectedFilter].selection === []){
-          for (const [key, valueDict] of Object.entries(this.state.filters)){
-            data[key]=Object.keys(valueDict as {string: unknown})
-          }
-        }
-
-        else if (selectedFilter !== '') {
-          data[selectedFilter] = dashboard.dataStructure[selectedFilter].selection;
-          this.optionsLabel.forEach((option) => {
-            if (option !== selectedFilter) {
-              data[selectedFilter].forEach((filterValue) => {
-                data[option] = Array.from(
-                  new Set([
-                    ...data[option],
-                    ...this.state.filters[selectedFilter][filterValue][option],
-                  ])
-                );
-              });
-            }
-          });
-        }
-
-        this.setState({ filtreByDataFocus: data });
-        const filters = {};
-        filters[selectedFilter] = data[selectedFilter];
-        this.props.dataManager.fetchRaws({ filters }).then(res => {
-        this.setState({ firstFilterRaws: res })
-        });
-    }
   }
 
   render() {
@@ -236,6 +150,7 @@ class DashboardDataConfiguration extends Component<
         embedButtonOnClickHandler={() => Utils.copyToClipboard(undefined, "&embedded")}
         blockData={this.blockData}
         optionsLabel={this.optionsLabel}
+        plotData={this.state.plotData}
         {...this.props}
       />
     ) : (
@@ -244,12 +159,8 @@ class DashboardDataConfiguration extends Component<
         filters={this.state.filters}
         plotData={this.state.plotData}
         blockData={this.blockData}
-        getPlotData={this.getPlotData}
-        updateFilterByDataFocus={this.updateFilterByDataFocus}
-        filtreByDataFocus={this.state.filtreByDataFocus}
         optionsLabel={this.optionsLabel}
         {...this.props}
-        firstFilterRaws={this.state.firstFilterRaws}
       />) || <div className="dashboard">
         <Spin className="centered" />
       </div>)
