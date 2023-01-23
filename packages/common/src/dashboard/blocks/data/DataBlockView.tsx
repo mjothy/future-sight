@@ -25,13 +25,11 @@ class DataBlockView extends Component<any, any> {
     if (configStyle.graphType === 'table') {
       visualizeData = this.prepareTableData(data);
     } else {
-      data?.map((dataElement) => {
-        const dataWithColor = this.props.colorizer.colorizeData(data)
-        dataWithColor.map((dataElement) => {
-          showData.push(this.preparePlotData(dataElement, configStyle));
-        });
-        visualizeData = showData;
-      }
+      const dataWithColor = this.props.colorizer.colorizeData(data)
+      dataWithColor.map((dataElement) => {
+        showData.push(this.preparePlotData(dataElement, configStyle));
+      });
+      visualizeData = showData;
     }
     return { data: visualizeData, layout: this.prepareLayout(data) }
   }

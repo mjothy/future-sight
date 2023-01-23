@@ -8,6 +8,8 @@ import DashboardModel from '../models/DashboardModel';
 import { Layout, notification } from "antd";
 const { Content } = Layout;
 import html2canvas from "html2canvas";
+import Colorizer from "../hoc/colorizer/colorizer";
+import withColorizer from "../hoc/colorizer/withColorizer";
 
 const DEFAULT_PREVIEW_WIDTH = 800;
 const DEFAULT_PREVIEW_HEIGHT = 450;
@@ -26,6 +28,7 @@ export interface DashboardProps extends ComponentPropsWithDataManager {
     isFullscreen?: boolean;
     readonly?: boolean;
     navigate: (any) => any;
+    colorizer: Colorizer
 }
 
 class Dashboard extends Component<DashboardProps, any> {
@@ -39,6 +42,7 @@ class Dashboard extends Component<DashboardProps, any> {
 
     componentDidMount() {
         window.scrollTo(0, 0);
+        this.props.colorizer.resetIndexToColor()
     }
 
     makeAndResizePreview = (dashboard) => {
@@ -138,4 +142,4 @@ class Dashboard extends Component<DashboardProps, any> {
     }
 }
 
-export default withNavigation(Dashboard)
+export default withColorizer(withNavigation(Dashboard))

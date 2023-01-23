@@ -93,4 +93,8 @@ export default class Colorizer {
             this.indexToColor[indexKey][indexValue] = this.colors[colorIdx]
         }
     }
+
+    resetIndexToColor = () => {
+        this.indexToColor = {}
+    }
 }
