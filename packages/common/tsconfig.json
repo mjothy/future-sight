@@ -6,7 +6,8 @@
     "jsx": "react-jsx",
     "rootDir": "src",
     "outDir": "build",
-    "declaration": true
+    "declaration": true,
+    "declarationMap": true
   },
   "include": ["src", "src/**/*.json"]
 }
