@@ -2,6 +2,7 @@ import type { ColumnsType } from 'antd/lib/table';
 import React, { Component } from 'react';
 import BlockModel from '../../../models/BlockModel';
 import BlockStyleModel from '../../../models/BlockStyleModel';
+import MapBlock from '../../graphs/MapBlock';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
 import PlotlyUtils from '../../graphs/PlotlyUtils';
 import { getChildrens } from '../utils/BlockDataUtils';
@@ -52,14 +53,20 @@ export default class DataBlockView extends Component<any, any> {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
     let visualizeData: any = [];
-    if (configStyle.graphType === 'table') {
-      visualizeData = this.prepareTableData(data);
-    } else {
-      data?.map((dataElement) => {
-        showData.push(this.preparePlotData(dataElement, configStyle));
-      });
-      visualizeData = showData;
+    switch (configStyle.graphType) {
+      case "table":
+        visualizeData = this.prepareTableData(data);
+        break;
+      case "map":
+        visualizeData = this.prepareMapData(data, this.props.currentBlock.config.metaData.regions);
+        break;
+      default:
+        data?.map((dataElement) => {
+          showData.push(this.preparePlotData(dataElement, configStyle));
+        });
+        visualizeData = showData;
     }
+
     return { data: visualizeData, layout: this.prepareLayout(data) }
   }
 
@@ -147,6 +154,14 @@ export default class DataBlockView extends Component<any, any> {
     return obj;
   }
 
+  prepareMapData = (data, regions) => {
+    return {
+      type: "choroplethmapbox",
+      data: data,
+      regions: regions
+    };
+  }
+
   plotHoverText = (dataElement) => {
     let textHover = '';
     const result: string[] = [];
@@ -200,6 +215,7 @@ export default class DataBlockView extends Component<any, any> {
 
   prepareLayout = (data) => {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
+
     return {
       YAxis: {
         title: {
@@ -207,6 +223,11 @@ export default class DataBlockView extends Component<any, any> {
         },
         rangemode: configStyle.YAxis.force0 ? "tozero" : "normal",
         automargin: true,
+        dragmode: "zoom",
+        mapbox: { style: "carto-positron", center: { lat: 38, lon: -90 }, zoom: 3 },
+        margin: { r: 0, t: 0, b: 0, l: 0 },
+        width: this.props.width,
+        height: this.props.height,
       }
     }
   }
@@ -241,6 +262,12 @@ export default class DataBlockView extends Component<any, any> {
   }
 
   render() {
-    return <PlotlyGraph {...this.props} data={this.state.data} layout={this.state.layout} />;
+    const graphType = this.props.currentBlock.config.configStyle.graphType;
+    if (graphType == 'map') {
+      return <MapBlock {...this.props} data={this.state.data} layout={this.state.layout} />
+
+    } else {
+      return <PlotlyGraph {...this.props} data={this.state.data} layout={this.state.layout} />
+    }
   }
 }

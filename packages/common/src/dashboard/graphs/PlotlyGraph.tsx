@@ -9,7 +9,7 @@ export default class PlotlyGraph extends Component<any, any> {
       hasTitle = this.props.currentBlock.config.configStyle.title.isVisible
     }
     return {
-      l: this.props.layout.YAxis.title ? 60 : 40,
+      l: this.props.currentBlock.config.configStyle.graphType == 'map' ? 10 : (this.props.layout.YAxis.title ? 60 : 40),
       r: 10,
       b: 30,
       t: hasTitle ? 25 : 5,
@@ -37,7 +37,10 @@ export default class PlotlyGraph extends Component<any, any> {
       font: {
         size: 10,
       },
-      yaxis: this.props.layout.YAxis
+      yaxis: this.props.layout.YAxis,
+      dragmode: "zoom",
+      mapbox: { style: "carto-positron", center: { lat: 38, lon: -90 }, zoom: 3 },
+      // margin: { r: 0, t: 0, b: 0, l: 0 },
     };
     if (currentBlock.config.configStyle.title.isVisible) {
       layout = {

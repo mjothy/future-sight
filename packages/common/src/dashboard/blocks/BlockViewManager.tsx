@@ -31,8 +31,8 @@ export default class BlockViewManager extends Component<any, any> {
     }
   };
   render() {
-    // return this.blockByType();
-    return <MapBlock width={this.props.width} height={this.props.height} />;
+    return this.blockByType();
+    // return <MapBlock width={this.props.width} height={this.props.height} />;
 
   }
 }

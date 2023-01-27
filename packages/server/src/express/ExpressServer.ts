@@ -2,11 +2,12 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import path, { join } from 'path';
-
 import RedisClient from '../redis/RedisClient';
 import IDataProxy from './IDataProxy';
+import fetch from 'node-fetch';
 
 const optionsLabel = ["models", "scenarios", "variables", "regions"];
+const COUNTRIES_GEOJSON_URL = "https://datahub.io/core/geo-countries/r/countries.geojson";
 
 export default class ExpressServer {
   private app: any;
@@ -238,7 +239,29 @@ export default class ExpressServer {
       })
 
       res.send(optionsData);
-    })
+    });
+
+    this.app.post(`/api/regionsMapping`, async (req, res) => {
+
+      const regions = req.body.regions;
+      console.log(regions)
+      // get countries names
+      const regions_with_countries = this.getRegionsMapping(regions);
+
+      try {
+        const countries_geojson = await fetch(COUNTRIES_GEOJSON_URL).then(res => res.json());
+        const features = countries_geojson.features;
+
+        // get geojson of regions
+        console.log("regions_with_countries: ", regions_with_countries);
+        // console.log("features: ", features)
+      } catch (e) {
+        console.error(e)
+      }
+      // get list of all resources:
+      res.send(this.dataProxy.getRegionsMapping());
+
+    });
 
     // Serve the HTML page
     this.app.get('*', (req: any, res: any) => {
@@ -296,4 +319,30 @@ export default class ExpressServer {
     }
     return dataRaws;
   }
+
+  /**
+   * Get the countries of regions
+   * @param regions 
+   * @returns  
+   */
+  getRegionsMapping = (regions) => {
+    const regionsMapping = this.dataProxy.getRegionsMapping();
+    const resultMapping = {};
+    regions.forEach(region => {
+      const regionExist = Object.keys(regionsMapping).find(regionMap => regionMap.trim().toLowerCase() == region.trim().toLowerCase())
+      if (regionExist != undefined) {
+        resultMapping[regionExist] = regionsMapping[regionExist]
+      }
+    });
+    return resultMapping;
+  }
+
+  getRegionGeoJson = (region) => {
+    const geojson = {};
+    return geojson;
+  }
+
+
 }
+
+

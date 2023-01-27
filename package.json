@@ -35,5 +35,8 @@
     "build-all": "yarn clean && yarn build && yarn workspace @future-sight/common build && yarn workspace @future-sight/client build && yarn copy",
     "serve": "node ./build/index.js",
     "generate": "ts-node ./scripts/IIASAToJson.ts"
+  },
+  "dependencies": {
+    "data.js": "^0.12.11"
   }
 }
