@@ -36,7 +36,5 @@
     "serve": "node ./build/index.js",
     "generate": "ts-node ./scripts/IIASAToJson.ts"
   },
-  "dependencies": {
-    "data.js": "^0.12.11"
-  }
+  "dependencies": {}
 }

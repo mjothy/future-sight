@@ -31,7 +31,6 @@
     "@uiw/react-md-editor": "^3.18.1",
     "antd": "^4.21.4",
     "html2canvas": "^1.4.1",
-    "maplibre-gl": "^2.4.0",
     "plotly.js": "^2.12.1",
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
