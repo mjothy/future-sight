@@ -11,12 +11,14 @@ export default class FSDataProxy implements IDataProxy {
     private readonly variables: any;
     private readonly regions: any;
     private readonly regionsMapping: any;
+    private readonly geojson: any;
 
 
-    constructor(dataPath: string, dataUnionPath: string, regionsMappingPath: string) {
+    constructor(dataPath: string, dataUnionPath: string, regionsMappingPath: string, countriesGeojsonPath: string) {
         const dataRaw = fs.readFileSync(dataPath);
         const dataUnionRaw = fs.readFileSync(dataUnionPath);
         const regionsMappingRaw = fs.readFileSync(regionsMappingPath);
+        const geojsonObj = fs.readFileSync(countriesGeojsonPath);
 
         this.data = JSON.parse(dataRaw.toString());
         this.dataUnion = JSON.parse(dataUnionRaw.toString());
@@ -25,6 +27,9 @@ export default class FSDataProxy implements IDataProxy {
         })
 
         this.regionsMapping = JSON.parse(regionsMappingRaw.toString());
+
+        this.geojson = JSON.parse(geojsonObj.toString());
+
     }
 
     getData(): any[] {
@@ -53,5 +58,9 @@ export default class FSDataProxy implements IDataProxy {
 
     getRegionsMapping() {
         return this.regionsMapping;
+    }
+
+    getCountriesGeojson() {
+        return this.geojson;
     }
 }

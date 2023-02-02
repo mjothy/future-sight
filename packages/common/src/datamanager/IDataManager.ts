@@ -27,5 +27,5 @@ export default interface IDataManager {
 
   fetchDataOptions: (data: any) => Promise<any>;
 
-  fetchRegionsMapping: (regions: string[]) => Promise<any>;
+  fetchRegionsGeojson: (regions: string[]) => Promise<any>;
 }

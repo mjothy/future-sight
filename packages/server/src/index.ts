@@ -14,11 +14,13 @@ const DEV_DATA_DIR = path.join(__dirname, "..", "..", "..", "data");
 const DEV_DATA_PATH = path.join(DEV_DATA_DIR, "data.json");
 const DEV_DATA_UNION_PATH = path.join(DEV_DATA_DIR, "dataUnion.json");
 const DEV_REGIONS_MAPPING_PATH = path.join(DEV_DATA_DIR, "regionsMapping.json");
+const DEV_COUNTRIES_GEOJSON_PATH = path.join(DEV_DATA_DIR, "countries.geojson");
 
 const PROD_DATA_DIR = path.join(__dirname, "data");
 const PROD_DATA_PATH = path.join(PROD_DATA_DIR, "data.json");
 const PROD_DATA_UNION_PATH = path.join(PROD_DATA_DIR, "dataUnion.json");
 const PROD_REGIONS_MAPPING_PATH = path.join(PROD_DATA_DIR, "regionsMapping.json");
+const PROD_COUNTRIES_GEOJSON_PATH = path.join(PROD_DATA_DIR, "countries.geojson");
 
 const isProd = process.env.NODE_ENV === 'production';
 // Environment parsing
@@ -32,9 +34,9 @@ const redisUrl = process.env.REDIS ? process.env.REDIS : DEV_REDIS_URL;
 const dataPath = isProd ? PROD_DATA_PATH : DEV_DATA_PATH;
 const dataUnionPath = isProd ? PROD_DATA_UNION_PATH : DEV_DATA_UNION_PATH;
 const regionsMappingPath = isProd ? PROD_REGIONS_MAPPING_PATH : DEV_REGIONS_MAPPING_PATH;
-
+const countriesGeojsonPath = isProd ? PROD_COUNTRIES_GEOJSON_PATH : DEV_COUNTRIES_GEOJSON_PATH;
 // data loading
-const dataProxy = new FSDataProxy(dataPath, dataUnionPath, regionsMappingPath);
+const dataProxy = new FSDataProxy(dataPath, dataUnionPath, regionsMappingPath, countriesGeojsonPath);
 
 // redis initialisation
 const redisClient = new RedisClient(redisUrl);
