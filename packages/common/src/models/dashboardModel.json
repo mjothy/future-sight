@@ -29,16 +29,21 @@
             "value": "Title",
             "isVisible": true
           },
-          "YAxis" : {
+          "YAxis": {
             "label": false,
             "unit": false,
             "force0": false
           },
-          "legend" : {
+          "legend": {
             "Model": false,
             "Scenario": false,
             "Region": false,
             "Variable": false
+          },
+          "stack": {
+            "isStack": false,
+            "isGroupBy": false,
+            "value": ""
           }
         },
         "metaData": {

@@ -16,4 +16,9 @@ export default class BlockStyleModel {
     value: 'Title',
     isVisible: true,
   };
+  stack = {
+    isStack: false,
+    isGroupBy: false,
+    value: ''
+  }
 }

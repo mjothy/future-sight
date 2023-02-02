@@ -1,6 +1,6 @@
-import {AreaChartOutlined, BarChartOutlined, LineChartOutlined, TableOutlined} from '@ant-design/icons';
-import {Col, Input, Row, Select, Checkbox} from 'antd';
-import {Component} from 'react';
+import { AreaChartOutlined, BarChartOutlined, ExclamationCircleOutlined, LineChartOutlined, TableOutlined } from '@ant-design/icons';
+import { Col, Input, Row, Select, Checkbox } from 'antd';
+import { Component } from 'react';
 
 const { Option } = Select;
 const ATTRIBUTES = {
@@ -19,10 +19,10 @@ const ATTRIBUTES = {
 }
 
 const plotTypes = [
-  {type: 'line', label: 'Line', icon: <LineChartOutlined/>},
-  {type: 'bar', label: 'Bar', icon: <BarChartOutlined />},
-  {type: 'area', label: 'Area', icon: <AreaChartOutlined />},
-  {type: 'table', label: 'Table', icon: <TableOutlined />},
+  { type: 'line', label: 'Line', icon: <LineChartOutlined /> },
+  { type: 'bar', label: 'Bar', icon: <BarChartOutlined /> },
+  { type: 'area', label: 'Area', icon: <AreaChartOutlined /> },
+  { type: 'table', label: 'Table', icon: <TableOutlined /> },
 ];
 
 export default class DataBlockVisualizationEditor extends Component<any, any> {
@@ -87,6 +87,27 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
+  onStackCheckChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.stack.isStack = e.target.checked;
+    if (!e.target.checked) {
+      configStyle.stack.isGroupBy = false;
+      configStyle.stack.value = null;
+    }
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onStackGroupByChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.stack.isGroupBy = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onStackValueChange = (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.stack.value = value;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
 
   updateBlockConfig = (configStyle) => {
     const dashboard = { ...this.props.dashboard };
@@ -138,6 +159,58 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             />
           </Col>
         </Row>
+
+        {configStyle.graphType == "area" &&
+          <>
+            <h3>Area</h3>
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onStackCheckChange}
+                  checked={configStyle.stack.isStack}
+                />
+              </Col>
+              <Col span={16} className={'checkbox-col-label'}>
+                <label>Stack</label>
+              </Col>
+            </Row>
+            <Row>
+              <Col offset={2} span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onStackGroupByChange}
+                  checked={configStyle.stack.isGroupBy}
+                  disabled={!configStyle.stack.isStack}
+                />
+              </Col>
+              <Col span={6} className={'checkbox-col-label'}>
+                <label>Group by ... </label>
+              </Col>
+              <Col span={9} className={'checkbox-col-label'}>
+                <Select
+                  placeholder="Select"
+                  value={configStyle.stack.value}
+                  onChange={this.onStackValueChange}
+                  notFoundContent={(
+                    <div>
+                      <ExclamationCircleOutlined />
+                      <p>Item not found.</p>
+                    </div>
+                  )}
+                  allowClear
+                  disabled={!configStyle.stack.isStack}
+                  dropdownMatchSelectWidth={false}
+                >
+                  {this.props.optionsLabel.map((value) => (
+                    <Option key={value} value={value}>
+                      {value}
+                    </Option>
+                  ))}
+                </Select>
+              </Col>
+            </Row>
+          </>
+        }
+
         <h3>Axis</h3>
         <Row>
           <Col span={2} className={'checkbox-col'}>
@@ -185,13 +258,13 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
           </Col>
         </Row>
         <Row>
-          <Col span={2}/>
+          <Col span={2} />
           <Col span={8}>
             <label>Legend info: </label>
           </Col>
         </Row>
         <Row>
-          <Col span={2}/>
+          <Col span={2} />
           <Col>
             <Checkbox.Group options={this.legendOptions()} value={defaultLegendOptions} onChange={this.onLegendContentChange} />
           </Col>

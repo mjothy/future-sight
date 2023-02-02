@@ -98,7 +98,7 @@ class DataBlockView extends Component<any, any> {
           type: 'scatter',
           fill: 'tozeroy',
           // fillcolor: "#FF0000"+"50",
-          fillcolor: dataElement.color ? dataElement.color+"50" : null,
+          fillcolor: dataElement.color ? dataElement.color + "50" : null,
           x: this.getX(dataElement),
           y: this.getY(dataElement),
           mode: "none",
@@ -106,6 +106,20 @@ class DataBlockView extends Component<any, any> {
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
         };
+
+        if (configStyle.stack.isStack) {
+          if (!configStyle.stack.isGroupBy) {
+            obj.stackgroup = "group"
+          } else {
+            const groupBy = configStyle.stack.value;
+            if (groupBy != null) {
+              obj.stackgroup = dataElement[groupBy.slice(0, -1)];
+            } else {
+              obj.stackgroup = "group"
+            }
+          }
+        }
+
         break;
       default:
         obj = {
@@ -115,7 +129,7 @@ class DataBlockView extends Component<any, any> {
           name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
-          marker: {color: dataElement.color || null}
+          marker: { color: dataElement.color || null }
         };
     }
 
