@@ -158,7 +158,8 @@ export default class DataBlockView extends Component<any, any> {
     return {
       type: "choroplethmapbox",
       data: data,
-      regions: regions
+      regions: regions,
+      values: []
     };
   }
 

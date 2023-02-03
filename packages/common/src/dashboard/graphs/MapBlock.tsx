@@ -8,8 +8,6 @@ import * as _ from "lodash";
 //     type
 // }
 export default class MapBlock extends Component<any, any> {
-
-
     constructor(props) {
         super(props)
         this.state = {
@@ -17,45 +15,40 @@ export default class MapBlock extends Component<any, any> {
         }
     }
 
-    async componentDidMount(): Promise<void> {
+    async componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): Promise<void> {
         const geoJsonData = await this.props.dataManager.fetchRegionsGeojson({ regions: this.props.data.regions });
         console.log("geoJsonData: ", geoJsonData)
         console.log("regions: ", this.props.data.regions)
         this.setState({ geoJsonData: geoJsonData })
     }
 
+    // shouldComponentUpdate(nextProps: Readonly<any>, nextState: Readonly<any>, nextContext: any): boolean {
+    //     if (_.isEqual(nextState.geoJsonData, this.state.geoJsonData)) {
+    //         return false;
+    //     }
+    //     return true;
+    // }
+
     render() {
-        const geojson: any = { type: "FeatureCollection", features: [] }
-        const dataGeo = JSON.parse(JSON.stringify(this.state.geoJsonData));
-        const data: any = []
-
+        const locations: string[] = []
         const z: number[] = [];
-        const n = 3;
-        const ids = new Set();
-        // Object.keys(dataGeo).forEach((regionKey: any) => {
-        //     if (dataGeo[regionKey].features.length > 0) {
-        //         dataGeo[regionKey].features.forEach(f => {
-        //             f["id"] = regionKey;
-        //         });
-        //         // geojson["features"].push(...dataGeo[regionKey]);
-        //         z.push(n);
-        //         // ids.add(regionKey);
+        // exemple 2020
+        const blockData = this.props.blockData(this.props.currentBlock);
+        console.log("blockData: ", blockData);
+        let unit = '';
 
-        //         data.push({
-        //             type: "choroplethmapbox",
-        //             // locationmode: 'geojson-id',
-        //             colorscale: [[0, 'rgb(255,255,255)'], [1, 'rgb(0,0,255)']],
-        //             locations: [regionKey],
-        //             z: [n],
-        //             geojson: dataGeo[regionKey],
-        //             showscale: false,
-        //             showlegend: true,
-        //             name: regionKey
-        //         })
-        //         n = n + 1;
+        blockData.forEach(regionData => {
+            const value_2020 = regionData.data?.filter(dataPoint => dataPoint.year == 2020);
+            if (value_2020 != null) {
+                z.push(value_2020[0].value);
+                locations.push(regionData['region']);
+            }
+            if (regionData.unit != null) {
+                unit = regionData.unit;
+            }
+        });
 
-        //     }
-        // })
+        const data: any = []
 
         let layout: any = {
             width: this.props.width,
@@ -81,13 +74,16 @@ export default class MapBlock extends Component<any, any> {
 
         data.push({
             type: "choroplethmapbox",
-            // locationmode: 'geojson-id',
-            colorscale: [[0, 'rgb(255,255,255)'], [1, 'rgb(0,0,255)']],
-            locations: this.props.currentBlock.config.metaData.regions,
-            z: [1, 2],
+            // locationmode: 'country names',
+            // colorscale: [[0, 'rgb(255,255,255)'], [1, 'rgb(0,0,255)']],
+            colorscale: "PuBu",
+            locations,
+            z,
             geojson: this.state.geoJsonData,
-            showscale: false,
-            showlegend: true,
+            showscale: true,
+            colorbar: {
+                title: "value (" + unit + ")"
+            }
         })
 
         console.log("data: ", data);

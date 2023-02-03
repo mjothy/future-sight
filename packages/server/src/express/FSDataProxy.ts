@@ -1,5 +1,6 @@
 import IDataProxy from "./IDataProxy";
 import * as fs from "fs";
+import RegionsGeoJson from "./RegionsGeoJson";
 
 const optionsLabel = ["models", "scenarios", "variables", "regions"];
 
@@ -10,15 +11,12 @@ export default class FSDataProxy implements IDataProxy {
     private readonly scenarios: any;
     private readonly variables: any;
     private readonly regions: any;
-    private readonly regionsMapping: any;
     private readonly geojson: any;
 
 
-    constructor(dataPath: string, dataUnionPath: string, regionsMappingPath: string, countriesGeojsonPath: string) {
+    constructor(dataPath: string, dataUnionPath: string, countriesGeojsonPath: string) {
         const dataRaw = fs.readFileSync(dataPath);
         const dataUnionRaw = fs.readFileSync(dataUnionPath);
-        const regionsMappingRaw = fs.readFileSync(regionsMappingPath);
-        const geojsonObj = fs.readFileSync(countriesGeojsonPath);
 
         this.data = JSON.parse(dataRaw.toString());
         this.dataUnion = JSON.parse(dataUnionRaw.toString());
@@ -26,10 +24,8 @@ export default class FSDataProxy implements IDataProxy {
             this[option] = Array.from(new Set(this.dataUnion.map(raw => raw[option.slice(0, -1)])))
         })
 
-        this.regionsMapping = JSON.parse(regionsMappingRaw.toString());
-
-        this.geojson = JSON.parse(geojsonObj.toString());
-
+        const rg = new RegionsGeoJson(countriesGeojsonPath);
+        this.geojson = rg.getRegionGeoJson();
     }
 
     getData(): any[] {
@@ -56,11 +52,18 @@ export default class FSDataProxy implements IDataProxy {
         return this.regions;
     }
 
-    getRegionsMapping() {
-        return this.regionsMapping;
-    }
-
-    getCountriesGeojson() {
-        return this.geojson;
+    getGeojson(regions: string[] = []) {
+        const geojsonResult: { type: string, features: any } = {
+            type: "FeatureCollection",
+            features: []
+        };
+        regions.forEach(region => {
+            const geojson = this.geojson[region.toLowerCase()]
+            if (geojson != null) {
+                geojson["id"] = region;
+                geojsonResult.features.push(geojson);
+            }
+        });
+        return geojsonResult;
     }
 }

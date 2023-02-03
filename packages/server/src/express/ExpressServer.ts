@@ -244,8 +244,7 @@ export default class ExpressServer {
 
     this.app.post(`/api/regionsGeojson`, async (req, res) => {
       const regions = req.body.regions;
-      const regionsGeoJsonObj = new RegionsGeoJson(regions, this.dataProxy);
-      const geojson = regionsGeoJsonObj.getRegionGeoJson();
+      const geojson = this.dataProxy.getGeojson(regions);
       res.send(geojson);
     });
 

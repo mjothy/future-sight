@@ -5,6 +5,5 @@ export default interface IDataProxy {
     getVariables: () => any;
     getScenarios: () => any;
     getRegions: () => any;
-    getRegionsMapping: () => any;
-    getCountriesGeojson: () => any;
+    getGeojson: (regions: string[]) => any;
 }
