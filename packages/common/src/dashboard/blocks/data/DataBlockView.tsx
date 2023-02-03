@@ -14,7 +14,7 @@ export default class DataBlockView extends Component<any, any> {
     const config2 = this.props.currentBlock.config;
     // Check configuration
     if (this.props.width == nextProps.width && this.props.height == nextProps.height) {
-      if (_.isEqual(config1.metaData, config2.metaData) && _.isEqual(config1.configStyle, config2.configStyle)) {
+      if (_.isEqual(config1, config2)) {
         shouldUpdate = false;
       }
     }
@@ -31,7 +31,6 @@ export default class DataBlockView extends Component<any, any> {
       if (!_.isEqual(parrent_block_config1.metaData, parrent_block_config2.metaData)) {
         shouldUpdate = true;
       }
-
     }
 
     return shouldUpdate;
@@ -155,7 +154,6 @@ export default class DataBlockView extends Component<any, any> {
       type: "choroplethmapbox",
       data: data,
       regions: regions,
-      values: []
     };
   }
 
@@ -258,12 +256,13 @@ export default class DataBlockView extends Component<any, any> {
   }
 
   render() {
+    const { data, layout } = this.settingPlotData();
     const graphType = this.props.currentBlock.config.configStyle.graphType;
     if (graphType == 'map') {
-      return <MapBlock {...this.props} data={this.state.data} layout={this.state.layout} />
+      return <MapBlock {...this.props} data={data} layout={layout} />
 
     } else {
-      return <PlotlyGraph {...this.props} data={this.state.data} layout={this.state.layout} />
+      return <PlotlyGraph {...this.props} data={data} layout={layout} />
     }
   }
 }

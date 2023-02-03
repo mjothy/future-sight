@@ -30,6 +30,7 @@ export default class BlockViewManager extends Component<any, any> {
           blockData: this.props.blockData,
           width: this.props.width,
           height: this.props.height,
+          dataManager: this.props.dataManager
         }} />;
       case 'control':
         return <ControlBlockView {...{
