@@ -43,8 +43,7 @@ class DashboardDataConfiguration extends Component<
       /**
        * Data (with timeseries from IASA API)
        */
-      plotData: [],
-      missingData: [],
+      plotData: {},
       isFetchData: false,
     };
   }
@@ -101,7 +100,7 @@ class DashboardDataConfiguration extends Component<
           metaData.scenarios.forEach((scenario) => {
             metaData.variables.forEach((variable) => {
               metaData.regions.forEach((region) => {
-                const d = this.state.plotData.find(
+                const d = this.state.plotData[block.id]?.find(
                   (e) =>
                     e.model === model &&
                     e.scenario === scenario &&
@@ -120,7 +119,7 @@ class DashboardDataConfiguration extends Component<
       }
 
       if (missingData.length > 0) {
-        this.retreiveAllTimeSeriesData(missingData);
+        this.retreiveAllTimeSeriesData(missingData, block.id);
       }
       return data;
     }
@@ -128,15 +127,22 @@ class DashboardDataConfiguration extends Component<
     return [];
   };
 
-  retreiveAllTimeSeriesData = (data) => {
+  retreiveAllTimeSeriesData = (data, blockId) => {
     this.props.dataManager.fetchPlotData(data)
       .then(res => {
+        const plotData = { ...this.state.plotData }
+        if (plotData[blockId] != undefined)
+          plotData[blockId] = [...plotData[blockId], ...res]
+        else
+          plotData[blockId] = [...res]
+
         if (res.length > 0) {
           console.log("res: ", res)
-          this.setState({ plotData: [...this.state.plotData, ...res] });
-        } else {
-          this.setState({ plotData: [...this.state.plotData, ...data] });
+          this.setState({ plotData });
         }
+        // else {
+        //   this.setState({ plotData });
+        // }
       }
       );
   }

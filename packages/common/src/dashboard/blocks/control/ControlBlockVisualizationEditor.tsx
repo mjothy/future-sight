@@ -8,7 +8,7 @@ export default class ControlBlockVisualizationEditor extends Component<any, any>
 
   constructor(props) {
     super(props);
-    this.configStyle = this.props.currentBlock.config.configStyle;
+    this.configStyle = JSON.parse(JSON.stringify(this.props.currentBlock.config.configStyle));
   }
 
   onTitleChange = (e) => {
@@ -22,14 +22,15 @@ export default class ControlBlockVisualizationEditor extends Component<any, any>
   };
 
   updateBlockConfig = (configStyle) => {
-    const dashboard = { ...this.props.dashboard };
-    const config = dashboard.blocks[this.props.currentBlock.id].config;
+    const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+    const config = JSON.parse(JSON.stringify(dashboard.blocks[this.props.currentBlock.id].config));
     dashboard.blocks[this.props.currentBlock.id].config = { ...config, ...configStyle };
+    console.log("configStyle UPDATE: ", configStyle)
     this.props.updateDashboard(dashboard)
   }
 
   render() {
-    this.configStyle = this.props.currentBlock.config.configStyle;
+    this.configStyle = JSON.parse(JSON.stringify(this.props.currentBlock.config.configStyle));
 
     return (
       <div>

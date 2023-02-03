@@ -3,14 +3,29 @@ import { Component } from 'react';
 import BlockModel from '../../../models/BlockModel';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 import { getChildrens } from '../utils/BlockDataUtils';
+import * as _ from 'lodash';
 
 const { Option } = Select;
 
 export default class ControlBlockView extends Component<any, any> {
 
+  shouldComponentUpdate(nextProps: Readonly<any>, nextState: Readonly<any>, nextContext: any): boolean {
+    let shouldUpdate = true;
+    const config1 = nextProps.currentBlock.config;
+    const config2 = this.props.currentBlock.config;
+    // Check configuration
+    if (this.props.width == nextProps.width && this.props.height == nextProps.height) {
+      if (_.isEqual(config1.metaData, config2.metaData) && _.isEqual(config1.configStyle, config2.configStyle)) {
+        shouldUpdate = false;
+      }
+    }
+
+    return shouldUpdate;
+  }
+
   onChange = (option, selectedData: string[]) => {
-    const dashboard = { ...this.props.dashboard };
-    const config = this.props.dashboard.blocks[this.props.currentBlock.id].config;
+    const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+    const config = dashboard.blocks[this.props.currentBlock.id].config;
 
     // update current block config (metadata)
     config.metaData.master[option].values = selectedData;

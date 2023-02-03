@@ -3,11 +3,40 @@ import React, { Component } from 'react';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
 import PlotlyUtils from '../../graphs/PlotlyUtils';
+import * as _ from 'lodash';
 import PlotDataModel from "../../../models/PlotDataModel";
 import withColorizer from "../../../hoc/colorizer/withColorizer";
 
-
 class DataBlockView extends Component<any, any> {
+
+  shouldComponentUpdate(nextProps: Readonly<any>, nextState: Readonly<any>, nextContext: any): boolean {
+    let shouldUpdate = true;
+    const config1 = nextProps.currentBlock.config;
+    const config2 = this.props.currentBlock.config;
+    // Check configuration
+    if (this.props.width == nextProps.width && this.props.height == nextProps.height) {
+      if (_.isEqual(config1.metaData, config2.metaData) && _.isEqual(config1.configStyle, config2.configStyle)) {
+        shouldUpdate = false;
+      }
+    }
+
+    // Check updatede plotData (we need to check this because component render before fetch finish)
+    if (this.props.blockPlotData?.length != nextProps.blockPlotData?.length) {
+      shouldUpdate = true;
+    }
+
+    // if type is controlled control and control block updated -> update also child
+    if (nextProps.currentBlock.controlBlock !== '') {
+      const parrent_block_config1 = nextProps.dashboard.blocks[nextProps.currentBlock.controlBlock].config;
+      const parrent_block_config2 = this.props.dashboard.blocks[nextProps.currentBlock.controlBlock].config;
+      if (!_.isEqual(parrent_block_config1.metaData, parrent_block_config2.metaData)) {
+        shouldUpdate = true;
+      }
+
+    }
+
+    return shouldUpdate;
+  }
 
   /**
    * Preparing the fetched data to adapt plotly data OR antd table
@@ -15,9 +44,8 @@ class DataBlockView extends Component<any, any> {
    */
   settingPlotData = () => {
     const { currentBlock } = this.props;
-    // console.log("Run settingPlotData", currentBlock.blockType);
-    const data: PlotDataModel[] = this.props.blockData(currentBlock);
-    console.log("Run settingPlotData", currentBlock.blockType);
+    const data: any[] = this.props.blockData(currentBlock);
+    console.log("Run settingPlotData", currentBlock.id);
     const showData: any[] = [];
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
@@ -26,7 +54,7 @@ class DataBlockView extends Component<any, any> {
       visualizeData = this.prepareTableData(data);
     } else {
       const dataWithColor = this.props.colorizer.colorizeData(data)
-      dataWithColor.map((dataElement) => {
+      dataWithColor?.map((dataElement) => {
         showData.push(this.preparePlotData(dataElement, configStyle));
       });
       visualizeData = showData;
@@ -98,7 +126,7 @@ class DataBlockView extends Component<any, any> {
           type: 'scatter',
           fill: 'tozeroy',
           // fillcolor: "#FF0000"+"50",
-          fillcolor: dataElement.color ? dataElement.color+"50" : null,
+          fillcolor: dataElement.color ? dataElement.color + "50" : null,
           x: this.getX(dataElement),
           y: this.getY(dataElement),
           mode: "none",
@@ -115,7 +143,7 @@ class DataBlockView extends Component<any, any> {
           name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
-          marker: {color: dataElement.color || null}
+          marker: { color: dataElement.color || null }
         };
     }
 

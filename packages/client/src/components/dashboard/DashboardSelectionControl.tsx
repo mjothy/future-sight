@@ -42,7 +42,6 @@ export default class DashboardSelectionControl extends Component<
        * The selected block id
        */
       blockSelectedId: '',
-      currentSelectedBlock: null,
       isDraft: false,
     };
     const w_location = window.location.pathname;
@@ -64,7 +63,7 @@ export default class DashboardSelectionControl extends Component<
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevState.dashboard != this.state.dashboard || prevState.currentSelectedBlock != this.state.currentSelectedBlock) {
+    if (prevState.dashboard != this.state.dashboard) {
       setDraft(this.state.dashboard.id, this.state.dashboard);
     }
   }
@@ -79,8 +78,7 @@ export default class DashboardSelectionControl extends Component<
   };
 
   updateSelectedBlock = (blockSelectedId: string) => {
-    const currentSelectedBlock = this.state.dashboard.blocks[blockSelectedId];
-    this.setState({ blockSelectedId, currentSelectedBlock });
+    this.setState({ blockSelectedId });
   };
 
   updateDashboard = (dashboard: DashboardModel) => {
@@ -93,17 +91,7 @@ export default class DashboardSelectionControl extends Component<
       dashboard = { ...dashboard, ...blockAndLayouts }
       this.setState({ dashboard });
     } else {
-      if (this.state.blockSelectedId != '') {
-        const currentSelectedBlock = { ...dashboard.blocks[this.state.blockSelectedId] };
-        const currentDashboard = this.state.dashboard;
-        if (dashboard.blocks[this.state.blockSelectedId] != undefined) {
-          currentDashboard.blocks[this.state.blockSelectedId].config = { ...dashboard.blocks[this.state.blockSelectedId].config };
-        }
-        currentDashboard.layout = dashboard.layout;
-        this.setState({ dashboard: currentDashboard, currentSelectedBlock })
-      } else {
-        this.setState({ dashboard })
-      }
+      this.setState({ dashboard })
     }
   }
 
@@ -214,7 +202,6 @@ export default class DashboardSelectionControl extends Component<
   }
 
   notifDesc = (missingData) => {
-    console.log("missingData: ", missingData);
     let notif = "Some selected data are not available in existing options: <br/>";
     Object.keys(missingData).forEach(key => {
       if (missingData[key].length > 0) {
@@ -249,7 +236,6 @@ export default class DashboardSelectionControl extends Component<
         deleteBlocks={this.deleteBlocks}
         checkIfSelectedInOptions={this.checkIfSelectedInOptions}
         isDraft={this.state.isDraft}
-        currentSelectedBlock={this.state.currentSelectedBlock}
         {...this.props}
       />
     );
