@@ -33,7 +33,6 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   onPlotTypeChange = (selectedType: string) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.graphType = selectedType;
-    console.log("type: ", selectedType);
     this.updateBlockConfig({ configStyle: configStyle })
   };
 
@@ -93,7 +92,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
 
 
   updateBlockConfig = (configStyle) => {
-    const dashboard = { ...this.props.dashboard };
+    const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
     const config = dashboard.blocks[this.props.currentBlock.id].config;
     dashboard.blocks[this.props.currentBlock.id].config = { ...config, ...configStyle };
     this.props.updateDashboard(dashboard)

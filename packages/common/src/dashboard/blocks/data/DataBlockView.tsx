@@ -1,44 +1,40 @@
 import type { ColumnsType } from 'antd/lib/table';
 import React, { Component } from 'react';
-import BlockModel from '../../../models/BlockModel';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 import MapBlock from '../../graphs/MapBlock';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
 import PlotlyUtils from '../../graphs/PlotlyUtils';
-import { getChildrens } from '../utils/BlockDataUtils';
+import * as _ from 'lodash';
 
 export default class DataBlockView extends Component<any, any> {
-  constructor(props) {
-    super(props);
-    const { data, layout } = this.settingPlotData();
-    this.state = { data, layout };
-  }
 
-  componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): void {
-    if (this.props.currentSelectedBlock != null && this.props.currentSelectedBlock != undefined) {
-      // Set state only for current selected block
-      if (this.props.currentSelectedBlock != prevProps.currentSelectedBlock) { //Check if the current block changed
-        if (this.props.currentBlock.id == this.props.currentSelectedBlock.id) {
-          const { data, layout } = this.settingPlotData();
-          this.setState({ data, layout })
-        } else if (this.props.currentSelectedBlock.blockType === 'control') { // Change child blocks if the parrent change
-          const childrens = getChildrens(this.props.dashboard.blocks, this.props.currentSelectedBlock.id);
-          const id_childs: (string | undefined)[] = childrens.map((child: (BlockModel | any)) => child.id)
-          if (id_childs.includes(this.props.currentBlock.id)) {
-            const { data, layout } = this.settingPlotData();
-            this.setState({ data, layout })
-          }
-        }
-
+  shouldComponentUpdate(nextProps: Readonly<any>, nextState: Readonly<any>, nextContext: any): boolean {
+    let shouldUpdate = true;
+    const config1 = nextProps.currentBlock.config;
+    const config2 = this.props.currentBlock.config;
+    // Check configuration
+    if (this.props.width == nextProps.width && this.props.height == nextProps.height) {
+      if (_.isEqual(config1.metaData, config2.metaData) && _.isEqual(config1.configStyle, config2.configStyle)) {
+        shouldUpdate = false;
       }
-    } else if (this.props.dashboard != prevProps.dashboard || this.props.plotData.length != prevProps.plotData.length) { //if dashboard layout change, rerender all blocks
-      const { data, layout } = this.settingPlotData();
-      this.setState({ data, layout })
     }
-    if (this.props.plotData.length != prevProps.plotData.length) {
-      const { data, layout } = this.settingPlotData();
-      this.setState({ data, layout })
+
+    // Check updatede plotData (we need to check this because component render before fetch finish)
+    if (this.props.blockPlotData?.length != nextProps.blockPlotData?.length) {
+      shouldUpdate = true;
     }
+
+    // if type is controlled control and control block updated -> update also child
+    if (nextProps.currentBlock.controlBlock !== '') {
+      const parrent_block_config1 = nextProps.dashboard.blocks[nextProps.currentBlock.controlBlock].config;
+      const parrent_block_config2 = this.props.dashboard.blocks[nextProps.currentBlock.controlBlock].config;
+      if (!_.isEqual(parrent_block_config1.metaData, parrent_block_config2.metaData)) {
+        shouldUpdate = true;
+      }
+
+    }
+
+    return shouldUpdate;
   }
 
   /**
@@ -48,7 +44,7 @@ export default class DataBlockView extends Component<any, any> {
   settingPlotData = () => {
     const { currentBlock } = this.props;
     const data: any[] = this.props.blockData(currentBlock);
-    // console.log("Run settingPlotData", currentBlock.blockType);
+    console.log("Run settingPlotData", currentBlock.id);
     const showData: any[] = [];
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
@@ -216,7 +212,6 @@ export default class DataBlockView extends Component<any, any> {
 
   prepareLayout = (data) => {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
-
     return {
       YAxis: {
         title: {
