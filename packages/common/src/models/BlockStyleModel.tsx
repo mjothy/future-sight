@@ -16,4 +16,9 @@ export default class BlockStyleModel {
     value: 'Title',
     isVisible: true,
   };
+  XAxis = {
+    customrange: false,
+    left: null,
+    right: null
+  }
 }

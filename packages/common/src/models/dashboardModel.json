@@ -34,6 +34,11 @@
             "unit": false,
             "force0": false
           },
+          "XAxis" : {
+            "customrange": false,
+            "left": null,
+            "right": null
+          },
           "legend" : {
             "Model": false,
             "Scenario": false,

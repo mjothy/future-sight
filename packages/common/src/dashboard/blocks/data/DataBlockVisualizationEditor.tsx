@@ -1,6 +1,6 @@
-import { AreaChartOutlined, BarChartOutlined, LineChartOutlined, TableOutlined } from '@ant-design/icons';
-import { Col, Input, Row, Select, Checkbox } from 'antd';
-import { Component } from 'react';
+import {AreaChartOutlined, BarChartOutlined, LineChartOutlined, TableOutlined} from '@ant-design/icons';
+import {Checkbox, Col, Input, InputNumber, Row, Select} from 'antd';
+import {Component} from 'react';
 
 const { Option } = Select;
 const ATTRIBUTES = {
@@ -19,10 +19,10 @@ const ATTRIBUTES = {
 }
 
 const plotTypes = [
-  { type: 'line', label: 'Line', icon: <LineChartOutlined /> },
-  { type: 'bar', label: 'Bar', icon: <BarChartOutlined /> },
-  { type: 'area', label: 'Area', icon: <AreaChartOutlined /> },
-  { type: 'table', label: 'Table', icon: <TableOutlined /> },
+  {type: 'line', label: 'Line', icon: <LineChartOutlined/>},
+  {type: 'bar', label: 'Bar', icon: <BarChartOutlined />},
+  {type: 'area', label: 'Area', icon: <AreaChartOutlined />},
+  {type: 'table', label: 'Table', icon: <TableOutlined />},
 ];
 
 export default class DataBlockVisualizationEditor extends Component<any, any> {
@@ -48,6 +48,24 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   onLegendChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.showLegend = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  };
+
+  onCustomrangeChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.XAxis.customrange = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  };
+
+  onXRangeLeftChange = (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.XAxis.left = value;
+    this.updateBlockConfig({ configStyle: configStyle })
+  };
+
+  onXRangeRightChange = (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.XAxis.right = value;
     this.updateBlockConfig({ configStyle: configStyle })
   };
 
@@ -172,6 +190,38 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             <label>Show Y Axis unit</label>
           </Col>
         </Row>
+        <Row className="mb-10">
+          <Col span={2} className={'checkbox-col'}>
+            <Checkbox
+                onChange={this.onCustomrangeChange}
+                defaultChecked={configStyle.XAxis.customrange}
+            />
+          </Col>
+          <Col span={16} className={'checkbox-col-label'}>
+            <label>Custom X axis range</label>
+          </Col>
+        </Row>
+        <Row className="mb-10">
+          <Col span={2}/>
+          <Col>
+            <InputNumber
+                className="width-100 mr-5"
+                placeholder="Left"
+                onChange={this.onXRangeLeftChange}
+                defaultValue={configStyle.XAxis.left}
+                disabled={!configStyle.XAxis.customrange}
+            />
+          </Col>
+          <Col className="ml-20">
+            <InputNumber
+                className="width-100 mr-5"
+                placeholder="Right"
+                onChange={this.onXRangeRightChange}
+                defaultValue={configStyle.XAxis.right}
+                disabled={!configStyle.XAxis.customrange}
+            />
+          </Col>
+        </Row>
         <h3>Legend</h3>
         <Row>
           <Col span={2} className={'checkbox-col'}>
@@ -185,13 +235,13 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
           </Col>
         </Row>
         <Row>
-          <Col span={2} />
+          <Col span={2}/>
           <Col span={8}>
             <label>Legend info: </label>
           </Col>
         </Row>
         <Row>
-          <Col span={2} />
+          <Col span={2}/>
           <Col>
             <Checkbox.Group options={this.legendOptions()} value={defaultLegendOptions} onChange={this.onLegendContentChange} />
           </Col>
