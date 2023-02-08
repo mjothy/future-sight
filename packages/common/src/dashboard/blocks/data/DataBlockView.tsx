@@ -43,7 +43,7 @@ class DataBlockView extends Component<any, any> {
    * @returns
    */
   settingPlotData = () => {
-    const { currentBlock } = this.props;
+    const {currentBlock} = this.props;
     const data: any[] = this.props.blockData(currentBlock);
     console.log("Run settingPlotData", currentBlock.id);
     const showData: any[] = [];
@@ -52,6 +52,8 @@ class DataBlockView extends Component<any, any> {
     let visualizeData: any = [];
     if (configStyle.graphType === 'table') {
       visualizeData = this.prepareTableData(data);
+    } else if (configStyle.graphType === 'pie'){
+      visualizeData = this.preparePieData(data);
     } else {
       const dataWithColor = this.props.colorizer.colorizeData(data)
       dataWithColor?.map((dataElement) => {
@@ -60,6 +62,46 @@ class DataBlockView extends Component<any, any> {
       visualizeData = showData;
     }
     return { data: visualizeData, layout: this.prepareLayout(data) }
+  }
+
+  preparePieData = (data: PlotDataModel[]) => {
+    if (data.length==0) {
+      return []
+    }
+
+    const stackBy = "region"
+    const otherIndex = []
+    // const otherIndex = ["variable"]
+    let pieData
+
+    // Get data by year
+    const pieDataPerYear = {}
+    if (otherIndex.length===0){
+      for (const dataElement of data){
+        for (const datapoint of dataElement.data){
+          if (pieDataPerYear[datapoint.year]){
+            pieDataPerYear[datapoint.year].values.push(datapoint.value)
+            pieDataPerYear[datapoint.year].labels.push(dataElement[stackBy])
+          } else {
+            pieDataPerYear[datapoint.year] = {
+              values: [datapoint.value],
+              labels: [dataElement[stackBy]]
+            }
+          }
+        }
+      }
+      // Create default pie data object
+      pieData = [{
+        type: 'pie',
+        values: Object.values(pieDataPerYear)[0].values,
+        labels: Object.values(pieDataPerYear)[0].labels,
+        hoverinfo: 'label',
+        hole: .4,
+      }]
+    }
+    // TODO else multiIndex create multiple pie chart
+
+    return pieData
   }
 
   prepareTableData = (data: PlotDataModel[]) => {

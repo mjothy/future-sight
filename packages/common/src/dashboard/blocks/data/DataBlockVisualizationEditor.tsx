@@ -1,4 +1,10 @@
-import {AreaChartOutlined, BarChartOutlined, LineChartOutlined, TableOutlined} from '@ant-design/icons';
+import {
+  AreaChartOutlined,
+  BarChartOutlined,
+  LineChartOutlined,
+  PieChartOutlined,
+  TableOutlined
+} from '@ant-design/icons';
 import {Checkbox, Col, Input, InputNumber, Row, Select} from 'antd';
 import {Component} from 'react';
 
@@ -22,6 +28,7 @@ const plotTypes = [
   {type: 'line', label: 'Line', icon: <LineChartOutlined/>},
   {type: 'bar', label: 'Bar', icon: <BarChartOutlined />},
   {type: 'area', label: 'Area', icon: <AreaChartOutlined />},
+  {type: 'pie', label: 'Pie', icon: <PieChartOutlined />},
   {type: 'table', label: 'Table', icon: <TableOutlined />},
 ];
 
