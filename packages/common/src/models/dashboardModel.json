@@ -29,17 +29,35 @@
             "value": "Title",
             "isVisible": true
           },
-          "YAxis" : {
+          "subtitle": {
+            "models": {
+              "isCustom": false,
+              "value": ""
+            },
+            "scenarios": {
+              "isCustom": false,
+              "value": ""
+            },
+            "regions": {
+              "isCustom": false,
+              "value": ""
+            },
+            "variables": {
+              "isCustom": false,
+              "value": ""
+            }
+          },
+          "YAxis": {
             "label": false,
             "unit": false,
             "force0": false
           },
-          "XAxis" : {
+          "XAxis": {
             "customrange": false,
             "left": null,
             "right": null
           },
-          "legend" : {
+          "legend": {
             "Model": false,
             "Scenario": false,
             "Region": false,

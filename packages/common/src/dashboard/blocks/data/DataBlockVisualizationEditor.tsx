@@ -203,18 +203,18 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         </Row>
         <Row className="mb-10">
           <Col span={2}/>
-          <Col>
+          <Col span={8}>
             <InputNumber
-                className="width-100 mr-5"
+                className="width-100"
                 placeholder="Left"
                 onChange={this.onXRangeLeftChange}
                 defaultValue={configStyle.XAxis.left}
                 disabled={!configStyle.XAxis.customrange}
             />
           </Col>
-          <Col className="ml-20">
+          <Col span={8} className="ml-20">
             <InputNumber
-                className="width-100 mr-5"
+                className="width-100"
                 placeholder="Right"
                 onChange={this.onXRangeRightChange}
                 defaultValue={configStyle.XAxis.right}

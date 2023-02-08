@@ -16,6 +16,24 @@ export default class BlockStyleModel {
     value: 'Title',
     isVisible: true,
   };
+  subtitle = {
+    models: {
+      isCustom: false,
+      value: ""
+    },
+    scenarios:{
+      isCustom: false,
+      value: ""
+    },
+    regions:{
+      isCustom: false,
+      value: ""
+    },
+    variables:{
+      isCustom: false,
+      value: ""
+    }
+  };
   XAxis = {
     customrange: false,
     left: null,
