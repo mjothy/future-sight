@@ -8,6 +8,17 @@ export default class PlotlyGraph extends Component<any, any> {
     if (this.props.currentBlock !== undefined) {
       hasTitle = this.props.currentBlock.config.configStyle.title.isVisible
     }
+
+    if(this.props.currentBlock.config.configStyle.graphType === "pie"){
+      return {
+        l: 10,
+        r: 10,
+        b: 30,
+        t: hasTitle ? 25 : 5,
+        pad: 4,
+      }
+    }
+
     return {
       l: this.props.layout.YAxis.title ? 60 : 40,
       r: 10,
@@ -15,6 +26,7 @@ export default class PlotlyGraph extends Component<any, any> {
       t: hasTitle ? 25 : 5,
       pad: 4,
     }
+
   }
 
   render() {
@@ -37,7 +49,8 @@ export default class PlotlyGraph extends Component<any, any> {
       font: {
         size: 10,
       },
-      yaxis: this.props.layout.YAxis
+      yaxis: this.props.layout.YAxis,
+      grid: this.props.layout.grid
     };
     if (currentBlock.config.configStyle.title.isVisible) {
       layout = {

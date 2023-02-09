@@ -61,7 +61,7 @@ class DataBlockView extends Component<any, any> {
       });
       visualizeData = showData;
     }
-    return { data: visualizeData, layout: this.prepareLayout(data) }
+    return { data: visualizeData, layout: this.prepareLayout(data, visualizeData) }
   }
 
   preparePieData = (data: PlotDataModel[]) => {
@@ -70,14 +70,45 @@ class DataBlockView extends Component<any, any> {
     }
 
     const stackBy = "region"
-    const otherIndex = []
-    // const otherIndex = ["variable"]
-    let pieData
+    // const otherIndex = []
+    const otherIndex = ["variable"]
+    const pieData: Record<string, unknown>[] = []
 
     // Get data by year
-    const pieDataPerYear = {}
     if (otherIndex.length===0){
+      const pieDataPerYear = {}
       for (const dataElement of data){
+        for (const datapoint of dataElement.data){
+          if (!pieDataPerYear[datapoint.year]){
+            pieDataPerYear[datapoint.year] = {values: [], labels: []}
+          }
+          pieDataPerYear[datapoint.year].values.push(datapoint.value)
+          pieDataPerYear[datapoint.year].labels.push(dataElement[stackBy])
+        }
+      }
+      pieData.push({
+        type: 'pie',
+        values: Object.values(pieDataPerYear)[0].values,
+        labels: Object.values(pieDataPerYear)[0].labels,
+        hoverinfo: 'label',
+        hole: .4,
+      })
+    }
+    else {
+      const pieDataPerIndexValue = {}
+
+      for (const dataElement of data){
+
+        // Define new pieChart if new indexValue introduced
+        const indexValue = otherIndex.length>1
+            ? otherIndex.reduce((acc, current_idx) => acc+"__"+dataElement[current_idx], "")
+            : dataElement[otherIndex[0]]
+        if (!pieDataPerIndexValue[indexValue]){
+          pieDataPerIndexValue[indexValue]={}
+        }
+
+        // Add data per year
+        const pieDataPerYear = pieDataPerIndexValue[indexValue]
         for (const datapoint of dataElement.data){
           if (pieDataPerYear[datapoint.year]){
             pieDataPerYear[datapoint.year].values.push(datapoint.value)
@@ -90,17 +121,21 @@ class DataBlockView extends Component<any, any> {
           }
         }
       }
-      // Create default pie data object
-      pieData = [{
-        type: 'pie',
-        values: Object.values(pieDataPerYear)[0].values,
-        labels: Object.values(pieDataPerYear)[0].labels,
-        hoverinfo: 'label',
-        hole: .4,
-      }]
-    }
-    // TODO else multiIndex create multiple pie chart
 
+      let chartCount = 0
+      for (const [idx, dataPerYear] of Object.entries(pieDataPerIndexValue)){
+        pieData.push({
+          type: 'pie',
+          name: idx,
+          values: Object.values(dataPerYear)[0].values,
+          labels: Object.values(dataPerYear)[0].labels,
+          hoverinfo: 'label',
+          hole: .4,
+          domain:{column: chartCount}
+        })
+        chartCount+=1
+      }
+    }
     return pieData
   }
 
@@ -243,9 +278,10 @@ class DataBlockView extends Component<any, any> {
     return y;
   };
 
-  prepareLayout = (data) => {
+  prepareLayout = (data, visualizationData) => {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
-    return {
+
+    const layout = {
       YAxis: {
         title: {
           text: PlotlyUtils.getLabel(this.getYAxisLabel(data), this.props.height, "ytitle"),
@@ -254,6 +290,12 @@ class DataBlockView extends Component<any, any> {
         automargin: true,
       }
     }
+
+    if (configStyle.graphType === "pie"){
+      layout["grid"] = {rows: 1, columns: visualizationData.length}
+    }
+
+    return layout
   }
 
   getYAxisLabel = (data: PlotDataModel[]) => {
