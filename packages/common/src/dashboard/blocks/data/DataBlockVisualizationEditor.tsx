@@ -64,6 +64,12 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     this.updateBlockConfig({ configStyle: configStyle })
   };
 
+  onStackValueChange = (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.stack.value = value;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
   onXRangeLeftChange = (value) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.XAxis.left = value;
@@ -148,7 +154,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             </Select>
           </Col>
         </Row>
-        <Row>
+        <Row className="mb-10">
           <Col span={2} className={'checkbox-col'}>
             <Checkbox
               onChange={this.onTitleVisibilityChange}
@@ -163,6 +169,32 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             />
           </Col>
         </Row>
+
+        {configStyle.graphType === "pie" &&
+            <>
+              <h3>Pie slices</h3>
+              <Row className="mb-10">
+                <Col span={2}/>
+                <Col span={16}>
+                  <Select
+                      className="width-100"
+                      placeholder={"Select a slice category"}
+                      defaultValue={configStyle.stack.value || null}
+                      onChange={this.onStackValueChange}
+                      status= {configStyle.stack.value ? undefined : "error"}
+                  >
+                    {this.props.optionsLabel.map((value) => (
+                        <Option key={value} value={value}>
+                          {value}
+                        </Option>
+                    ))}
+                  </Select>
+                </Col>
+              </Row>
+
+            </>
+        }
+
         <h3>Axis</h3>
         <Row>
           <Col span={2} className={'checkbox-col'}>

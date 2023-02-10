@@ -1,6 +1,7 @@
 import defaultColorizer from "./defaultColorizer"
 import IndexToColorModel from "../../models/IndexToColorModel";
 import PlotDataModel from "../../models/PlotDataModel";
+import PlotlyUtils from "../../dashboard/graphs/PlotlyUtils";
 
 export default class Colorizer {
     constructor(
@@ -20,7 +21,7 @@ export default class Colorizer {
             return data
         }
 
-        let indexKeys = this.getIndexKeys(data, this.dataFilterKeys)
+        let indexKeys = PlotlyUtils.getIndexKeys(data, this.dataFilterKeys)
         if (indexKeys.length === 0) {
             indexKeys = [this.defaultIndex]
         }
@@ -33,31 +34,6 @@ export default class Colorizer {
         })
     }
 
-    /**
-     * Get index used in this data block. Can be a filter or a combination of filter
-     * @returns string[]
-     */
-    private getIndexKeys = (data: PlotDataModel[], filterKeys) => {
-        if (data.length === 0) {return []}
-
-        const filtersValues = {}
-        for (const dataElement of data) {
-            for (const key of filterKeys) {
-                if (filtersValues[key]) {
-                    filtersValues[key].add(dataElement[key])
-                } else {
-                    filtersValues[key] = new Set([dataElement[key]])
-                }
-            }
-        }
-
-        const indexKeys =  filterKeys.filter(
-            (key) => filtersValues[key].size > 1
-        )
-
-        // console.log("index keys", data, indexKeys)
-        return indexKeys
-    }
 
     /**
      * Get color of the graph curve

@@ -69,9 +69,14 @@ class DataBlockView extends Component<any, any> {
       return []
     }
 
-    const stackBy = "region"
-    // const otherIndex = []
-    const otherIndex = ["variable"]
+    const stackIndex = this.props.currentBlock.config.configStyle.stack.value.slice(0, -1)
+
+    const otherIndex = PlotlyUtils.getIndexKeys(data)
+        .filter((index) => index!==stackIndex)
+
+    //TODO stack:{value: stackIndex}
+    console.log(stackIndex, otherIndex)
+
     const pieData: Record<string, unknown>[] = []
 
     // Get data by year
@@ -83,7 +88,7 @@ class DataBlockView extends Component<any, any> {
             pieDataPerYear[datapoint.year] = {values: [], labels: []}
           }
           pieDataPerYear[datapoint.year].values.push(datapoint.value)
-          pieDataPerYear[datapoint.year].labels.push(dataElement[stackBy])
+          pieDataPerYear[datapoint.year].labels.push(dataElement[stackIndex])
         }
       }
       pieData.push({
@@ -112,11 +117,11 @@ class DataBlockView extends Component<any, any> {
         for (const datapoint of dataElement.data){
           if (pieDataPerYear[datapoint.year]){
             pieDataPerYear[datapoint.year].values.push(datapoint.value)
-            pieDataPerYear[datapoint.year].labels.push(dataElement[stackBy])
+            pieDataPerYear[datapoint.year].labels.push(dataElement[stackIndex])
           } else {
             pieDataPerYear[datapoint.year] = {
               values: [datapoint.value],
-              labels: [dataElement[stackBy]]
+              labels: [dataElement[stackIndex]]
             }
           }
         }

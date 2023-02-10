@@ -62,6 +62,11 @@
             "Scenario": false,
             "Region": false,
             "Variable": false
+          },
+          "stack": {
+            "isStack": false,
+            "isGroupBy": false,
+            "value": ""
           }
         },
         "metaData": {

@@ -1,7 +1,31 @@
+import PlotDataModel from "../../models/PlotDataModel";
 
 const DEFAULT_FONT_SIZE = 10;
 
 export default class PlotlyUtils {
+
+    /**
+     * Get index used in this data array. Can be one filterKey or a combination of filterKeys
+     * @returns filterKey[]
+     */
+    static getIndexKeys = (data: PlotDataModel[], filterKeys=["model", "scenario", "variable", "region"]) => {
+        if (data.length === 0) {return []}
+
+        const filtersValues = {}
+        for (const dataElement of data) {
+            for (const key of filterKeys) {
+                if (filtersValues[key]) {
+                    filtersValues[key].add(dataElement[key])
+                } else {
+                    filtersValues[key] = new Set([dataElement[key]])
+                }
+            }
+        }
+
+        return filterKeys.filter(
+            (key) => filtersValues[key].size > 1
+        )
+    }
 
     static getLabel = (str, size, element) => {
         if (str != undefined) {
