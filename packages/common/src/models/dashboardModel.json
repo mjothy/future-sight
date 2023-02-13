@@ -55,7 +55,8 @@
           "XAxis": {
             "customrange": false,
             "left": null,
-            "right": null
+            "right": null,
+            "default": null
           },
           "legend": {
             "Model": false,

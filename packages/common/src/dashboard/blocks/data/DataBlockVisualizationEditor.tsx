@@ -7,6 +7,7 @@ import {
 } from '@ant-design/icons';
 import {Checkbox, Col, Input, InputNumber, Row, Select} from 'antd';
 import {Component} from 'react';
+import PieVisualizationEditor from "./graphType/PieVisualizationEditor";
 
 const { Option } = Select;
 const ATTRIBUTES = {
@@ -171,28 +172,13 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         </Row>
 
         {configStyle.graphType === "pie" &&
-            <>
-              <h3>Pie slices</h3>
-              <Row className="mb-10">
-                <Col span={2}/>
-                <Col span={16}>
-                  <Select
-                      className="width-100"
-                      placeholder={"Select a slice category"}
-                      defaultValue={configStyle.stack.value || null}
-                      onChange={this.onStackValueChange}
-                      status= {configStyle.stack.value ? undefined : "error"}
-                  >
-                    {this.props.optionsLabel.map((value) => (
-                        <Option key={value} value={value}>
-                          {value}
-                        </Option>
-                    ))}
-                  </Select>
-                </Col>
-              </Row>
-
-            </>
+            <PieVisualizationEditor
+                optionsLabel={this.props.optionsLabel}
+                onStackValueChange={this.onStackValueChange}
+                updateBlockConfig = {this.updateBlockConfig}
+                blockData = {this.props.blockData}
+                currentBlock = {this.props.currentBlock}
+            />
         }
 
         <h3>Axis</h3>

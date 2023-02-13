@@ -7,6 +7,10 @@ import * as _ from 'lodash';
 import PlotDataModel from "../../../models/PlotDataModel";
 import withColorizer from "../../../hoc/colorizer/withColorizer";
 
+interface PieDataPerYearModel {
+  [year: string]: { values: string[], labels: string[] }
+}
+
 class DataBlockView extends Component<any, any> {
 
   shouldComponentUpdate(nextProps: Readonly<any>, nextState: Readonly<any>, nextContext: any): boolean {
@@ -81,7 +85,8 @@ class DataBlockView extends Component<any, any> {
 
     // Get data by year
     if (otherIndex.length===0){
-      const pieDataPerYear = {}
+      const pieDataPerYear: PieDataPerYearModel = {}
+
       for (const dataElement of data){
         for (const datapoint of dataElement.data){
           if (!pieDataPerYear[datapoint.year]){
@@ -91,16 +96,19 @@ class DataBlockView extends Component<any, any> {
           pieDataPerYear[datapoint.year].labels.push(dataElement[stackIndex])
         }
       }
+
+      const selectedYear = this.props.currentBlock.config.configStyle.XAxis.default
+      const selectedData = selectedYear ? pieDataPerYear[selectedYear] : Object.values(pieDataPerYear)[0]
       pieData.push({
         type: 'pie',
-        values: Object.values(pieDataPerYear)[0].values,
-        labels: Object.values(pieDataPerYear)[0].labels,
+        values: selectedData.values,
+        labels: selectedData.labels,
         hoverinfo: 'label',
         hole: .4,
       })
     }
     else {
-      const pieDataPerIndexValue = {}
+      const pieDataPerIndexValue: {[index: string]: PieDataPerYearModel} = {}
 
       for (const dataElement of data){
 
@@ -128,12 +136,14 @@ class DataBlockView extends Component<any, any> {
       }
 
       let chartCount = 0
-      for (const [idx, dataPerYear] of Object.entries(pieDataPerIndexValue)){
+      for (const [idx, pieDataPerYear] of Object.entries(pieDataPerIndexValue)){
+        const selectedYear = this.props.currentBlock.config.configStyle.XAxis.default
+        const selectedData = selectedYear ? pieDataPerYear[selectedYear] : Object.values(pieDataPerYear)[0]
         pieData.push({
           type: 'pie',
           name: idx,
-          values: Object.values(dataPerYear)[0].values,
-          labels: Object.values(dataPerYear)[0].labels,
+          values: selectedData.values,
+          labels: selectedData.labels,
           hoverinfo: 'label',
           hole: .4,
           domain:{column: chartCount}

@@ -5,6 +5,18 @@ const DEFAULT_FONT_SIZE = 10;
 export default class PlotlyUtils {
 
     /**
+     * Get all years used in this data array. can be non
+     * @returns year[]
+     */
+    static getYears = (dataArray: PlotDataModel[]) => {
+        let concatYear:string[] = [];
+        for (const dataElement of dataArray) {
+            concatYear = [...concatYear, ...dataElement.data.map((element)=>element.year)]
+        }
+        return [...new Set(concatYear)]
+    }
+
+    /**
      * Get index used in this data array. Can be one filterKey or a combination of filterKeys
      * @returns filterKey[]
      */

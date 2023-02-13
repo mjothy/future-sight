@@ -37,7 +37,8 @@ export default class BlockStyleModel {
   XAxis = {
     customrange: false,
     left: null,
-    right: null
+    right: null,
+    default: null
   };
   stack = {
     isStack: false,
