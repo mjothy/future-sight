@@ -103,7 +103,7 @@ class DataBlockView extends Component<any, any> {
         type: 'pie',
         values: selectedData.values,
         labels: selectedData.labels,
-        hoverinfo: 'label',
+        hoverinfo: 'label+value',
         hole: .4,
       })
     }
@@ -114,8 +114,14 @@ class DataBlockView extends Component<any, any> {
 
         // Define new pieChart if new indexValue introduced
         const indexValue = otherIndex.length>1
-            ? otherIndex.reduce((acc, current_idx) => acc+"__"+dataElement[current_idx], "")
+            ? otherIndex.reduce((acc, filterType, idx, arr) => {
+              if (idx===arr.length-1){
+                return acc + dataElement[filterType]
+              }
+              return acc + dataElement[filterType] + " - "
+            }, "")
             : dataElement[otherIndex[0]]
+
         if (!pieDataPerIndexValue[indexValue]){
           pieDataPerIndexValue[indexValue]={}
         }
@@ -144,7 +150,7 @@ class DataBlockView extends Component<any, any> {
           name: idx,
           values: selectedData.values,
           labels: selectedData.labels,
-          hoverinfo: 'label',
+          hoverinfo: 'label+value',
           hole: .4,
           domain:{column: chartCount}
         })
@@ -308,6 +314,22 @@ class DataBlockView extends Component<any, any> {
 
     if (configStyle.graphType === "pie"){
       layout["grid"] = {rows: 1, columns: visualizationData.length}
+      if(visualizationData.length>1){
+        const annotations: unknown[] = []
+        for (let i = 0; i < visualizationData.length; i++) {
+          annotations.push(
+              {
+                showarrow: false,
+                text: visualizationData[i].name,
+                xref: "paper",
+                xanchor: "center",
+                x: (2*i + 1) / (2*visualizationData.length),
+                y: -0.1
+              }
+          )
+        }
+        layout["annotations"] = annotations
+      }
     }
 
     return layout
