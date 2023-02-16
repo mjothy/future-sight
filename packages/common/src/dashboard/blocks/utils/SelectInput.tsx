@@ -19,8 +19,6 @@ interface SelectOptionProps {
 
 export default class SelectInput extends Component<SelectOptionProps, any> {
     render() {
-        console.log("options: ", this.props.options);
-
         return (
             <Input.Group compact>
                 <Select

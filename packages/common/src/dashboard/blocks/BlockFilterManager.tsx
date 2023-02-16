@@ -28,10 +28,10 @@ export default class BlockFilterManager extends Component<any, any> {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.props.currentSelectedBlock != prevProps.currentSelectedBlock || prevProps.blockSelectedId !== this.props.blockSelectedId) {
+        if (this.props.dashboard != prevProps.dashboard || prevProps.blockSelectedId !== this.props.blockSelectedId) {
             this.updateDropdownData();
         }
-        if (this.props.plotData.length != prevProps.plotData.length) {
+        if (this.props.plotData[this.props.currentBlock.id]?.length != prevProps.plotData[this.props.currentBlock.id]?.length) {
             this.missingData();
         }
     }
@@ -73,7 +73,7 @@ export default class BlockFilterManager extends Component<any, any> {
         const metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
 
         if (metaData.selectOrder.length == 4) {
-            const existDataRaws = this.getExistingRaws(metaData);
+            const existDataRaws = this.getExistingRaws(metaData, this.props.currentBlock.id);
 
             const data = {
                 regions: [],
@@ -91,14 +91,14 @@ export default class BlockFilterManager extends Component<any, any> {
         }
     };
 
-    getExistingRaws = (metaData) => {
+    getExistingRaws = (metaData, blockId) => {
         const existDataRaws: any[] = [];
 
         metaData.models.forEach((model) => {
             metaData.scenarios.forEach((scenario) => {
                 metaData.variables.forEach((variable) => {
                     metaData.regions.forEach((region) => {
-                        const d = this.props.plotData.find(
+                        const d = this.props.plotData[blockId]?.find(
                             (e) =>
                                 e.model === model &&
                                 e.scenario === scenario &&
@@ -139,8 +139,8 @@ export default class BlockFilterManager extends Component<any, any> {
      * @param e TRUE if input select open and FALSE if closed
      */
     onDropdownVisibleChange = (option, e) => {
-        const dashboard = { ...this.props.dashboard };
-        const config = this.props.currentBlock.config;
+        const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+        const config = JSON.parse(JSON.stringify(this.props.currentBlock.config));
         if (!e && config.metaData[option].length > 0 && !config.metaData.selectOrder.includes(option)) {
             // Update the order of selection
             config.metaData.selectOrder = Array.from(
@@ -152,8 +152,8 @@ export default class BlockFilterManager extends Component<any, any> {
     };
 
     onChange = (option, selectedData: string[]) => {
-        const dashboard = { ...this.props.dashboard };
-        const config = this.props.currentBlock.config;
+        const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+        const config = JSON.parse(JSON.stringify(this.props.currentBlock.config));
         // Update config (metaData)
         config.metaData[option] = selectedData;
         dashboard.blocks[this.props.currentBlock.id].config = { ...config };

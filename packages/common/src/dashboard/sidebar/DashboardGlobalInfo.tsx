@@ -75,8 +75,8 @@ export default class DashboardGlobalInfo extends Component<any, any> {
       this.props.updateDashboard({ ...this.props.dashboard, userData: this.state.userDataTemp });
       this.props.closeGlobalInfoModal();
       this.props.onOk
-          ? this.props.onOk()
-          : this.openNotificationWithIcon('success', 'Update dashboard', 'Dashboard information updated successfully')
+        ? this.props.onOk()
+        : this.openNotificationWithIcon('success', 'Update dashboard', 'Dashboard information updated successfully')
     } catch (e) {
       this.openNotificationWithIcon('error', 'Update dashboard', 'Error occured')
     }
@@ -99,11 +99,11 @@ export default class DashboardGlobalInfo extends Component<any, any> {
     const { inputVisible, inputValue } = this.state;
     return (
       <Modal title={this.props.title
-          ? this.props.title
-          : "Dashboard information"}
-             visible={this.props.isShowGlobalInfo}
-             onOk={this.handleOk}
-             onCancel={this.handleCancel}>
+        ? this.props.title
+        : "Dashboard information"}
+        visible={this.props.isShowGlobalInfo}
+        onOk={this.handleOk}
+        onCancel={this.handleCancel}>
 
         {this.props.message && <p className='mb-20'>{this.props.message}</p>}
 
