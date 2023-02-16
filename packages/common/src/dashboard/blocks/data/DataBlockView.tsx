@@ -54,17 +54,20 @@ class DataBlockView extends Component<any, any> {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
     let visualizeData: any = [];
-    if (configStyle.graphType === 'table') {
-      visualizeData = this.prepareTableData(data);
-    } else if (configStyle.graphType === 'pie'){
-      visualizeData = this.preparePieData(data);
-    } else {
-      const dataWithColor = this.props.colorizer.colorizeData(data)
-      dataWithColor?.map((dataElement) => {
-        showData.push(this.preparePlotData(dataElement, configStyle));
-      });
-      visualizeData = showData;
+    switch (configStyle.graphType) {
+      case "table":
+        visualizeData = this.prepareTableData(data);
+        break;
+      case "pie":
+        visualizeData = this.preparePieData(data);
+        break;
+      default:
+        data?.map((dataElement) => {
+          showData.push(this.preparePlotData(dataElement, configStyle));
+        });
+        visualizeData = showData;
     }
+
     return { data: visualizeData, layout: this.prepareLayout(data, visualizeData) }
   }
 
@@ -142,9 +145,30 @@ class DataBlockView extends Component<any, any> {
       }
 
       let chartCount = 0
+      const chartTotal = Object.keys(pieDataPerIndexValue).length
       for (const [idx, pieDataPerYear] of Object.entries(pieDataPerIndexValue)){
         const selectedYear = this.props.currentBlock.config.configStyle.XAxis.default
         const selectedData = selectedYear ? pieDataPerYear[selectedYear] : Object.values(pieDataPerYear)[0]
+        const blockRatio = this.props.width/this.props.height
+        let grid = {}
+        if (blockRatio<=0.6){
+          grid = {
+            row: chartCount,
+            column: 0
+          }
+        } else if (blockRatio>=1.9) {
+          grid = {
+            row: 0,
+            column: chartCount
+          }
+        } else {
+          const blockColumns = Math.ceil(Math.sqrt(chartTotal))
+          grid = {
+            row: Math.floor(chartCount/blockColumns),
+            column: chartCount%blockColumns
+          }
+        }
+
         pieData.push({
           type: 'pie',
           name: idx,
@@ -152,7 +176,7 @@ class DataBlockView extends Component<any, any> {
           labels: selectedData.labels,
           hoverinfo: 'label+value',
           hole: .4,
-          domain:{column: chartCount}
+          domain: grid
         })
         chartCount+=1
       }
@@ -214,7 +238,6 @@ class DataBlockView extends Component<any, any> {
       return label.join(' - ')
     }
   }
-
 
   preparePlotData = (dataElement: PlotDataModel, configStyle: BlockStyleModel) => {
     let obj;
@@ -312,23 +335,59 @@ class DataBlockView extends Component<any, any> {
       }
     }
 
-    if (configStyle.graphType === "pie"){
-      layout["grid"] = {rows: 1, columns: visualizationData.length}
-      if(visualizationData.length>1){
-        const annotations: unknown[] = []
-        for (let i = 0; i < visualizationData.length; i++) {
-          annotations.push(
-              {
-                showarrow: false,
-                text: visualizationData[i].name,
-                xref: "paper",
-                xanchor: "center",
-                x: (2*i + 1) / (2*visualizationData.length),
-                y: -0.1
-              }
-          )
-        }
-        layout["annotations"] = annotations
+    if (configStyle.graphType === "pie" && visualizationData.length>1){
+[].map
+      // Define grid
+      const blockRatio = this.props.width/this.props.height
+      if (blockRatio <= 0.6){
+        layout["grid"] = {rows: visualizationData.length, columns: 1}
+        layout["annotations"] = visualizationData.map((value, index, arr) => {
+          return {
+            showarrow: false,
+            text: value.name,
+            xref: "paper",
+            xanchor: "left",
+            yref: "paper",
+            yanchor: arr.length === (index+1) ? "top" : "middle",
+            x: 0.5,
+            y: (visualizationData.length - (index+1)) / visualizationData.length
+          }
+        })
+      } else if (blockRatio>=1.9){
+        layout["grid"] = {rows: 1, columns: visualizationData.length}
+        layout["annotations"] = visualizationData.map((value, index) => {
+          return {
+            showarrow: false,
+            text: value.name,
+            xref: "paper",
+            xanchor: "center",
+            yref: "paper",
+            yanchor: "top",
+            x: (2 * index + 1) / (2 * visualizationData.length),
+            y: 0
+          }
+        })
+      } else {
+        const blockColumns = Math.ceil(Math.sqrt(visualizationData.length))
+        const blockRows = Math.ceil(Math.sqrt(visualizationData.length/blockColumns))
+        layout["grid"] = {
+          rows: blockRows,
+          columns: blockColumns}
+        layout["annotations"] = visualizationData.map((value, index, arr) => {
+          const x_idx = index%blockColumns
+          const y_idx = Math.floor(index/blockColumns)
+          return {
+            showarrow: false,
+            text: value.name,
+            xref: "paper",
+            xanchor: "center",
+            yref: "paper",
+            yanchor:  blockRows === (y_idx+1) ? "top" : "middle",
+            x: (2 * x_idx + 1) / (2 * blockColumns),
+            y: (blockRows - (y_idx+1)) / blockRows
+          }
+        })
+
       }
     }
 
