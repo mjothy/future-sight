@@ -90,10 +90,6 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   onStackCheckChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.stack.isStack = e.target.checked;
-    if (!e.target.checked) {
-      configStyle.stack.isGroupBy = false;
-      configStyle.stack.value = null;
-    }
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
@@ -117,6 +113,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   }
   render() {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const metaData = this.props.currentBlock.config.metaData;
     const legend = this.props.currentBlock.config.configStyle.legend;
     const defaultLegendOptions: any[] = [];
     for (const key of Object.keys(legend)) {
@@ -170,25 +167,13 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                   checked={configStyle.stack.isStack}
                 />
               </Col>
-              <Col span={16} className={'checkbox-col-label'}>
-                <label>Stack</label>
-              </Col>
-            </Row>
-            <Row>
-              <Col offset={2} span={2} className={'checkbox-col'}>
-                <Checkbox
-                  onChange={this.onStackGroupByChange}
-                  checked={configStyle.stack.isGroupBy}
-                  disabled={!configStyle.stack.isStack}
-                />
-              </Col>
               <Col span={6} className={'checkbox-col-label'}>
-                <label>Group by ... </label>
+                <label>Stack by ... </label>
               </Col>
               <Col span={9} className={'checkbox-col-label'}>
                 <Select
                   placeholder="Select"
-                  value={configStyle.stack.value}
+                  defaultValue={metaData[configStyle.stack.value].length > 1 ? configStyle.stack.value : null}
                   onChange={this.onStackValueChange}
                   notFoundContent={(
                     <div>
@@ -200,11 +185,14 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                   disabled={!configStyle.stack.isStack}
                   dropdownMatchSelectWidth={false}
                 >
-                  {this.props.optionsLabel.map((value) => (
-                    <Option key={value} value={value}>
-                      {value}
-                    </Option>
-                  ))}
+                  {this.props.optionsLabel.map((value) => {
+                    if (metaData[value].length > 1) return (
+                      <Option key={value} value={value}>
+                        {value}
+                      </Option>
+                    )
+                  }
+                  )}
                 </Select>
               </Col>
             </Row>

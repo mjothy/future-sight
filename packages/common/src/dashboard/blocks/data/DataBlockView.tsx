@@ -6,7 +6,7 @@ import PlotlyUtils from '../../graphs/PlotlyUtils';
 import * as _ from 'lodash';
 import PlotDataModel from "../../../models/PlotDataModel";
 import withColorizer from "../../../hoc/colorizer/withColorizer";
-import { isComplexity } from '../utils/StackGraphs';
+import { stackGroups } from '../utils/StackGraphs';
 
 class DataBlockView extends Component<any, any> {
 
@@ -54,11 +54,13 @@ class DataBlockView extends Component<any, any> {
     if (configStyle.graphType === 'table') {
       visualizeData = this.prepareTableData(data);
     } else if (configStyle.graphType === 'area') {
-      // Check the complexity and form stack groups
-      isComplexity(currentBlock.config.metaData);
+      let stacks = null;
+      if (configStyle.stack.isStack) {
+        stacks = stackGroups(currentBlock.config.metaData, configStyle.stack.value);
+      }
       const dataWithColor = this.props.colorizer.colorizeData(data)
       dataWithColor.map((dataElement) => {
-        showData.push(this.preparePlotData(dataElement, configStyle));
+        showData.push(this.preparePlotData(dataElement, configStyle, stacks));
       });
       visualizeData = showData;
     } else {
@@ -127,7 +129,7 @@ class DataBlockView extends Component<any, any> {
   }
 
 
-  preparePlotData = (dataElement: PlotDataModel, configStyle: BlockStyleModel) => {
+  preparePlotData = (dataElement: PlotDataModel, configStyle: BlockStyleModel, stack?: null) => {
     let obj;
     switch (configStyle.graphType) {
       case 'area':
@@ -143,19 +145,14 @@ class DataBlockView extends Component<any, any> {
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
         };
-
-        if (configStyle.stack.isStack) {
-          // filter groups and return stack group
-          if (!configStyle.stack.isGroupBy) {
-            obj.stackgroup = "group"
-          } else {
-            const groupBy = configStyle.stack.value;
-            if (groupBy != null) {
-              obj.stackgroup = dataElement[groupBy.slice(0, -1)];
-            } else {
-              obj.stackgroup = "group"
+        if (configStyle.stack.isStack && stack != null) {
+          Object.entries(stack).forEach(([key, val]: any) => {
+            const isExist = val.find(raw => dataElement.model == raw["models"] && dataElement.variable == raw["variables"]
+              && dataElement.region == raw["regions"] && dataElement.scenario == raw["scenarios"])
+            if (isExist) {
+              obj.stackgroup = key;
             }
-          }
+          });
         }
 
         break;

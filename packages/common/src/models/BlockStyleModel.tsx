@@ -18,7 +18,6 @@ export default class BlockStyleModel {
   };
   stack = {
     isStack: false,
-    isGroupBy: false,
     value: ''
   }
 }
