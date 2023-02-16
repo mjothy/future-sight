@@ -5,6 +5,7 @@ import PlotlyGraph from '../../graphs/PlotlyGraph';
 import PlotlyUtils from '../../graphs/PlotlyUtils';
 import PlotDataModel from "../../../models/PlotDataModel";
 import withColorizer from "../../../hoc/colorizer/withColorizer";
+import { isComplexity } from '../utils/StackGraphs';
 
 
 class DataBlockView extends Component<any, any> {
@@ -24,6 +25,14 @@ class DataBlockView extends Component<any, any> {
     let visualizeData: any = [];
     if (configStyle.graphType === 'table') {
       visualizeData = this.prepareTableData(data);
+    } else if (configStyle.graphType === 'area') {
+      // Check the complexity and form stack groups
+      isComplexity(currentBlock.config.metaData);
+      const dataWithColor = this.props.colorizer.colorizeData(data)
+      dataWithColor.map((dataElement) => {
+        showData.push(this.preparePlotData(dataElement, configStyle));
+      });
+      visualizeData = showData;
     } else {
       const dataWithColor = this.props.colorizer.colorizeData(data)
       dataWithColor.map((dataElement) => {
@@ -108,6 +117,7 @@ class DataBlockView extends Component<any, any> {
         };
 
         if (configStyle.stack.isStack) {
+          // filter groups and return stack group
           if (!configStyle.stack.isGroupBy) {
             obj.stackgroup = "group"
           } else {
