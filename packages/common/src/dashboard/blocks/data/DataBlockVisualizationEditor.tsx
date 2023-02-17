@@ -173,7 +173,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
               <Col span={9} className={'checkbox-col-label'}>
                 <Select
                   placeholder="Select"
-                  defaultValue={metaData[configStyle.stack.value].length > 1 ? configStyle.stack.value : null}
+                  defaultValue={metaData[configStyle.stack.value]?.length > 1 ? configStyle.stack.value : null}
                   onChange={this.onStackValueChange}
                   notFoundContent={(
                     <div>

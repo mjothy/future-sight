@@ -1,17 +1,12 @@
 
 const keys = ["models", "scenarios", "variables", "regions"];
 
-// function isComplexity(metaData) {
-//     let nb_complecity = 0;
-//     keys.forEach(key => {
-//         if (metaData[key].length > 1) {
-//             nb_complecity = nb_complecity + 1;
-//         }
-//     })
-
-//     return nb_complecity > 1;
-// }
-
+/**
+ * Generating combinations from n arrays with m elements in JavaScript
+ * Source: https://www.tutorialspoint.com/generating-combinations-from-n-arrays-with-m-elements-in-javascript
+ * @param array 
+ * @returns array of all possible combinaison
+ */
 function combineAll(array) {
     const res: any = [];
     const max = array.length - 1;
@@ -29,10 +24,16 @@ function combineAll(array) {
     return res;
 }
 
+/**
+ * 
+ * @param metaData the block selected data
+ * @param stackBy the stack by option
+ * @returns stacks group [[{},{}], [{},{},{}]]
+ */
 export function stackGroups(metaData, stackBy) {
     const stacks: any = []
 
-    if (stackBy != undefined) {
+    if (stackBy != undefined && stackBy != "") {
         const arr: any = [];
         const keysWithoutStack = keys.filter(key => key != stackBy);
         keysWithoutStack.forEach(key => {

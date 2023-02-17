@@ -53,20 +53,14 @@ class DataBlockView extends Component<any, any> {
     let visualizeData: any = [];
     if (configStyle.graphType === 'table') {
       visualizeData = this.prepareTableData(data);
-    } else if (configStyle.graphType === 'area') {
+    } else {
       let stacks = null;
-      if (configStyle.stack.isStack) {
+      if (configStyle.stack.isStack && configStyle.graphType === 'area') {
         stacks = stackGroups(currentBlock.config.metaData, configStyle.stack.value);
       }
       const dataWithColor = this.props.colorizer.colorizeData(data)
-      dataWithColor.map((dataElement) => {
-        showData.push(this.preparePlotData(dataElement, configStyle, stacks));
-      });
-      visualizeData = showData;
-    } else {
-      const dataWithColor = this.props.colorizer.colorizeData(data)
       dataWithColor?.map((dataElement) => {
-        showData.push(this.preparePlotData(dataElement, configStyle));
+        showData.push(this.preparePlotData(dataElement, configStyle, stacks));
       });
       visualizeData = showData;
     }
