@@ -234,7 +234,10 @@ class DashboardConfigView extends Component<any, any> {
                                 </Space>
                             )}
                             <BlockViewManager
+                                //TODO delete ...this.props
+                                //timeseries
                                 {...this.props}
+                                // timeseriesData = {this.props.blockData(blocks[layout.i])}
                                 currentBlock={blocks[layout.i]}
                                 width={
                                     this.state.graphsSize[layout.i]

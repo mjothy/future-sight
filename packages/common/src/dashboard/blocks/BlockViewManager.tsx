@@ -24,9 +24,11 @@ export default class BlockViewManager extends Component<any, any> {
         return <TextBlockView currentBlock={this.props.currentBlock} />;
       case 'data':
         return <DataBlockView {...{
+          // delete Dahsboard
           dashboard: this.props.dashboard,
-          blockPlotData: this.props.plotData[this.props.currentBlock.id],
           currentBlock: this.props.currentBlock,
+          // TODO keep only one
+          blockPlotData: this.props.plotData[this.props.currentBlock.id],//timeseriesData
           blockData: this.props.blockData,
           width: this.props.width,
           height: this.props.height,
@@ -39,6 +41,7 @@ export default class BlockViewManager extends Component<any, any> {
           optionsLabel: this.props.optionsLabel,
           updateDashboard: this.props.updateDashboard
         }} />;
+      // MapControlView
       default:
         return <p>Error !</p>;
     }

@@ -81,6 +81,7 @@ class DashboardDataConfiguration extends Component<
    */
   blockData = (block: BlockModel) => {
 
+    // TODO add control
     if (block.blockType !== "text") {
       const config: ConfigurationModel | any = block.config;
       const metaData: BlockDataModel = config.metaData;
