@@ -55,7 +55,7 @@ export default class Colorizer {
             (key) => filtersValues[key].size > 1
         )
 
-        console.log("index keys", data, indexKeys)
+        // console.log("index keys", data, indexKeys)
         return indexKeys
     }
 
@@ -66,7 +66,7 @@ export default class Colorizer {
     private getColor = (dataElement: PlotDataModel, indexKeys: string[]) => {
 
         if(indexKeys.length==0) {
-            console.log("no index")
+            // console.log("no index")
             return null
         }
 

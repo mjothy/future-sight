@@ -52,16 +52,18 @@ export default class ControlBlockView extends Component<any, any> {
 
   selectDropDown = (option) => {
     const metaData = this.props.currentBlock.config.metaData;
+    const optionLabel = this.props.currentBlock.config.configStyle.subtitle[option].isCustom ?
+        this.props.currentBlock.config.configStyle.subtitle[option].value :
+        option
     return (
-      <Row className="mb-10">
+      <Row className="mb-10" key={option}>
         <Col span={6}>
-          <h4>{option}: </h4>
+          <h4>{optionLabel}: </h4>
         </Col>
         <Col span={18}>
           <Select
             mode="multiple"
             className="width-100"
-            placeholder={option}
             value={metaData.master[option].values}
             onChange={(e) => this.onChange(option, e)}
             dropdownMatchSelectWidth={false}

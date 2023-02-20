@@ -29,10 +29,33 @@
             "value": "Title",
             "isVisible": true
           },
+          "subtitle": {
+            "models": {
+              "isCustom": false,
+              "value": ""
+            },
+            "scenarios": {
+              "isCustom": false,
+              "value": ""
+            },
+            "regions": {
+              "isCustom": false,
+              "value": ""
+            },
+            "variables": {
+              "isCustom": false,
+              "value": ""
+            }
+          },
           "YAxis": {
             "label": false,
             "unit": false,
             "force0": false
+          },
+          "XAxis": {
+            "customrange": false,
+            "left": null,
+            "right": null
           },
           "legend": {
             "Model": false,

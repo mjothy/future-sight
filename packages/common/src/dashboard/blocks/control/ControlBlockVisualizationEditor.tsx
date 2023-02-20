@@ -21,12 +21,49 @@ export default class ControlBlockVisualizationEditor extends Component<any, any>
     this.updateBlockConfig({ configStyle: this.configStyle })
   };
 
+  onChangeCustomSubtitle = (filterType, e) => {
+    this.configStyle.subtitle[filterType].value = e.target.value;
+    this.updateBlockConfig({ configStyle: this.configStyle })
+  };
+
+  onCheckCustomSubtitle = (filterType, e) => {
+    this.configStyle.subtitle[filterType].isCustom = e.target.checked;
+    this.updateBlockConfig({ configStyle: this.configStyle })
+  };
+
   updateBlockConfig = (configStyle) => {
     const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
     const config = JSON.parse(JSON.stringify(dashboard.blocks[this.props.currentBlock.id].config));
     dashboard.blocks[this.props.currentBlock.id].config = { ...config, ...configStyle };
-    console.log("configStyle UPDATE: ", configStyle)
     this.props.updateDashboard(dashboard)
+  }
+
+  getInputSubtitle = (filterType) => {
+    return (
+        <div key={"subtitle_" + filterType}>
+          <Row>
+            <Col span={2} className={'checkbox-col'}>
+              <Checkbox
+                  onChange={(e)=>this.onCheckCustomSubtitle(filterType, e)}
+                  checked={this.configStyle.subtitle[filterType].isCustom}
+              />
+            </Col>
+            <Col span={16} className={'checkbox-col-label'}>
+              <label>{filterType.charAt(0).toUpperCase() + filterType.slice(1)}</label>
+            </Col>
+          </Row>
+          <Row className="mb-10">
+            <Col span={2}/>
+            <Col span={16}>
+              <Input
+                  defaultValue={this.configStyle.subtitle[filterType].value}
+                  onChange={(e)=>this.onChangeCustomSubtitle(filterType, e)}
+                  disabled={!this.configStyle.subtitle[filterType].isCustom}
+              />
+            </Col>
+          </Row>
+        </div>
+    )
   }
 
   render() {
@@ -34,6 +71,7 @@ export default class ControlBlockVisualizationEditor extends Component<any, any>
 
     return (
       <div>
+        <h3>Title</h3>
         <Row className="mb-10">
           <Col span={2} className={'checkbox-col'}>
             <Checkbox
@@ -49,6 +87,11 @@ export default class ControlBlockVisualizationEditor extends Component<any, any>
             />
           </Col>
         </Row>
+
+        <h3>Custom labels</h3>
+        {Object.keys(this.configStyle.subtitle).map((filterType) => {
+          return this.getInputSubtitle(filterType)
+        })}
       </div>
     );
   }

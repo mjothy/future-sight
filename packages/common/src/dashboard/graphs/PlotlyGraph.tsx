@@ -45,6 +45,14 @@ export default class PlotlyGraph extends Component<any, any> {
         title: currentBlock.config.configStyle.title.value,
       };
     }
+    if (currentBlock.config.configStyle.XAxis.customrange) {
+      layout = {
+        ...layout,
+        xaxis: {
+          range: [currentBlock.config.configStyle.XAxis.left, currentBlock.config.configStyle.XAxis.right]
+        }
+      };
+    }
 
     return currentBlock.config.configStyle.graphType === 'table' && this.props.data.values.length > 0 ? (
       <Table
