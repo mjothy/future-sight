@@ -140,6 +140,8 @@ class DataBlockView extends Component<any, any> {
           hovertext: this.plotHoverText(dataElement),
         };
         if (configStyle.stack.isStack && stack != null) {
+          // Add the current element to a stack (if it exist in stagGroups)
+          // stack is array contains possible stacks [[{},{}], [{},{}]]
           Object.entries(stack).forEach(([key, val]: any) => {
             const isExist = val.find(raw => dataElement.model == raw["models"] && dataElement.variable == raw["variables"]
               && dataElement.region == raw["regions"] && dataElement.scenario == raw["scenarios"])

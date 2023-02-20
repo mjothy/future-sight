@@ -41,7 +41,6 @@ export function stackGroups(metaData, stackBy) {
         })
         const allPossibleCombinaison = combineAll(arr);
         allPossibleCombinaison.forEach(raw => {
-            // 
             const obj = {}
             for (let i = 0; i < keysWithoutStack.length; i++) {
                 obj[keysWithoutStack[i]] = raw[i];
@@ -54,7 +53,6 @@ export function stackGroups(metaData, stackBy) {
             })
             stacks.push([...arrInStack])
         });
-        console.log("arr: ", stacks);
     }
     return stacks;
 }
