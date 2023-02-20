@@ -3,7 +3,8 @@ import Plot from 'react-plotly.js';
 import * as _ from 'lodash';
 import { Col, Row, Select } from 'antd';
 import { Option } from 'antd/lib/mentions';
-
+import bbox from "@turf/bbox"
+import geoViewport from "@mapbox/geo-viewport";
 // interface Layer {
 //     source;
 //     type
@@ -19,6 +20,8 @@ export default class MapBlock extends Component<any, any> {
                 scenario: null,
                 variable: null,
             },
+            center: { lon: -74, lat: 43 },
+            zoom: 3,
         };
     }
 
@@ -26,10 +29,17 @@ export default class MapBlock extends Component<any, any> {
         const geoJsonData = await this.props.dataManager.fetchRegionsGeojson({
             regions: this.props.data.regions,
         });
-        this.setState({
+        const state: any = {
             geoJsonData: geoJsonData,
             blockData: this.props.blockData(this.props.currentBlock),
-        });
+        };
+
+        const obj = this.setMapProperities(geoJsonData);
+        if (obj != null) {
+            state.center = obj.center;
+            state.zoom = obj.zoom;
+        }
+        this.setState({ ...state });
     }
 
     async componentDidUpdate(
@@ -53,31 +63,31 @@ export default class MapBlock extends Component<any, any> {
         }
     }
 
-    shouldComponentUpdate(
-        nextProps: Readonly<any>,
-        nextState: Readonly<any>,
-        nextContext: any
-    ): boolean {
-        if (
-            !_.isEqual(nextState.geoJsonData, this.state.geoJsonData) ||
-            !_.isEqual(nextProps.currentBlock.config, this.props.currentBlock.config)
-        ) {
-            return true;
-        }
+    // shouldComponentUpdate(
+    //     nextProps: Readonly<any>,
+    //     nextState: Readonly<any>,
+    //     nextContext: any
+    // ): boolean {
+    //     if (
+    //         !_.isEqual(nextState.geoJsonData, this.state.geoJsonData) ||
+    //         !_.isEqual(nextProps.currentBlock.config, this.props.currentBlock.config)
+    //     ) {
+    //         return true;
+    //     }
 
-        if (
-            this.props.width != nextProps.width ||
-            this.props.height != nextProps.height
-        ) {
-            return true;
-        }
+    //     if (
+    //         this.props.width != nextProps.width ||
+    //         this.props.height != nextProps.height
+    //     ) {
+    //         return true;
+    //     }
 
-        if (!_.isEqual(nextState.visualData, this.state.visualData)) {
-            return true;
-        }
+    //     if (!_.isEqual(nextState.visualData, this.state.visualData)) {
+    //         return true;
+    //     }
 
-        return false;
-    }
+    //     return false;
+    // }
 
     onChange = (option, selectedData) => {
         const visualData = { ...this.state.visualData };
@@ -157,6 +167,37 @@ export default class MapBlock extends Component<any, any> {
         return options;
     };
 
+    handleDoubleClick = () => {
+        console.log("on double clicked")
+        const obj = this.setMapProperities(this.state.geoJsonData);
+        if (obj != null) {
+            this.setState({ center: obj.center, zoom: obj.zoom })
+        }
+    }
+
+    setMapProperities = (geoJsonData) => {
+        if (geoJsonData.features != undefined) {
+            let center: any = { lon: -74, lat: 43 };
+            let zoom = 3;
+            const bbox1 = bbox(geoJsonData);
+            const center_coor = {};
+            const center_zoom = geoViewport.viewport(bbox1, [this.props.width, this.props.height - 250]);
+            center_coor["lon"] = center_zoom.center[0];
+            center_coor["lat"] = center_zoom.center[1];
+            center = center_coor;
+            zoom = center_zoom.zoom;
+            console.log("center: ", center);
+            console.log("zoom: ", zoom);
+            this.setState({
+                center, zoom
+            })
+
+            return { center, zoom }
+        }
+
+        return null;
+    }
+
     render() {
         const meteData = this.props.currentBlock.config.metaData;
         // Prepare Layout
@@ -166,12 +207,11 @@ export default class MapBlock extends Component<any, any> {
             font: {
                 size: 10,
             },
-            dragmode: 'zoom',
+            // dragmode: 'zoom',
             mapbox: {
                 style: 'carto-positron',
-                // center: { lat: 52, lon: 10 },
-                // zoom: 3,
-                fitbounds: "geojson"
+                center: this.state.center,
+                zoom: this.state.zoom
             },
             margin: { r: 0, t: 30, b: 20, l: 0 },
         };
@@ -189,7 +229,9 @@ export default class MapBlock extends Component<any, any> {
         };
         return (
             <div style={{ height: this.props.height, width: this.props.width }}>
-                <Plot data={this.getMapData()} layout={layout} config={config} />
+                <Plot data={this.getMapData()} layout={layout} config={config}
+                    onDoubleClick={this.handleDoubleClick}
+                />
                 <Row
                     justify="start"
                     className={'ml-20'}

@@ -28,6 +28,8 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
+    "@mapbox/geo-viewport": "^0.5.0",
+    "@turf/turf": "^6.5.0",
     "@uiw/react-md-editor": "^3.18.1",
     "antd": "^4.21.4",
     "html2canvas": "^1.4.1",
