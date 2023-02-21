@@ -9,7 +9,7 @@ import withColorizer from "../../../hoc/colorizer/withColorizer";
 import { stackGroups } from '../utils/StackGraphs';
 
 interface PieDataPerYearModel {
-  [year: string]: { values: string[], labels: string[] }
+  [year: string]: { values: string[], labels: string[]}
 }
 
 class DataBlockView extends Component<any, any> {
@@ -57,13 +57,15 @@ class DataBlockView extends Component<any, any> {
 
     let visualizeData: any = [];
     switch (configStyle.graphType) {
-      case "table":
+      case "table": {
         visualizeData = this.prepareTableData(data);
         break;
-      case "pie":
+      }
+      case "pie":{
         visualizeData = this.preparePieData(data);
         break;
-      default:
+      }
+      default: {
         let stacks = null;
         if (configStyle.stack.isStack && configStyle.graphType === 'area') {
           stacks = stackGroups(currentBlock.config.metaData, configStyle.stack.value);
@@ -73,6 +75,7 @@ class DataBlockView extends Component<any, any> {
           showData.push(this.preparePlotData(dataElement, configStyle, stacks));
         });
         visualizeData = showData;
+      }
     }
 
     return { data: visualizeData, layout: this.prepareLayout(data, visualizeData) }
@@ -83,21 +86,21 @@ class DataBlockView extends Component<any, any> {
       return []
     }
 
-    const stackIndex = this.props.currentBlock.config.configStyle.stack.value.slice(0, -1)
-
+    const configStyle = this.props.currentBlock.config.configStyle
+    const stackIndex = configStyle.stack.value.slice(0, -1)
     const otherIndex = PlotlyUtils.getIndexKeys(data)
         .filter((index) => index!==stackIndex)
 
-    //TODO stack:{value: stackIndex}
-    console.log(stackIndex, otherIndex)
+    const dataWithColor = this.props.colorizer.colorizeData(data, stackIndex)
 
     const pieData: Record<string, unknown>[] = []
 
     // Get data by year
     if (otherIndex.length===0){
       const pieDataPerYear: PieDataPerYearModel = {}
-
-      for (const dataElement of data){
+      const colors: string[] = []
+      for (const dataElement of dataWithColor){
+        colors.push(dataElement.color)
         for (const datapoint of dataElement.data){
           if (!pieDataPerYear[datapoint.year]){
             pieDataPerYear[datapoint.year] = {values: [], labels: []}
@@ -113,14 +116,21 @@ class DataBlockView extends Component<any, any> {
         type: 'pie',
         values: selectedData.values,
         labels: selectedData.labels,
-        hoverinfo: 'label+value',
-        hole: .4,
+        marker: {
+          colors: colors
+        },
+        hovertemplate: `%{label} <br> %{value:.2f} ${dataWithColor[0].unit}`,
+        texttemplate: configStyle.pie.showPercent ? null : `%{value:.4s}`,
+        // hoverinfo: `label+value`,
+        hole: configStyle.pie.isDonut? .4 : null,
       })
     }
     else {
       const pieDataPerIndexValue: {[index: string]: PieDataPerYearModel} = {}
+      const colors: string[] = []
 
-      for (const dataElement of data){
+      for (const dataElement of dataWithColor){
+        colors.push(dataElement.color)
 
         // Define new pieChart if new indexValue introduced
         const indexValue = otherIndex.length>1
@@ -139,15 +149,11 @@ class DataBlockView extends Component<any, any> {
         // Add data per year
         const pieDataPerYear = pieDataPerIndexValue[indexValue]
         for (const datapoint of dataElement.data){
-          if (pieDataPerYear[datapoint.year]){
-            pieDataPerYear[datapoint.year].values.push(datapoint.value)
-            pieDataPerYear[datapoint.year].labels.push(dataElement[stackIndex])
-          } else {
-            pieDataPerYear[datapoint.year] = {
-              values: [datapoint.value],
-              labels: [dataElement[stackIndex]]
-            }
+          if (!pieDataPerYear[datapoint.year]){
+            pieDataPerYear[datapoint.year] = {values: [], labels: []}
           }
+          pieDataPerYear[datapoint.year].values.push(datapoint.value)
+          pieDataPerYear[datapoint.year].labels.push(dataElement[stackIndex])
         }
       }
 
@@ -181,8 +187,12 @@ class DataBlockView extends Component<any, any> {
           name: idx,
           values: selectedData.values,
           labels: selectedData.labels,
-          hoverinfo: 'label+value',
-          hole: .4,
+          marker: {
+            colors: colors
+          },
+          hovertemplate: `%{label} <br> %{value:.2f} ${dataWithColor[0].unit} <extra>${idx}</extra>`,
+          texttemplate: configStyle.pie.showPercent ? null : `%{value:.4s}`,
+          hole: configStyle.pie.isDonut? .4 : null,
           domain: grid
         })
         chartCount+=1
@@ -336,7 +346,6 @@ class DataBlockView extends Component<any, any> {
    * @param dataElement The retrieved data (from API)
    * @returns {x: x_array, y: y_array}
    */
-
   getXY = (dataElement: PlotDataModel) => {
     const x: any[] = [];
     const y: any[] = []
@@ -368,12 +377,12 @@ class DataBlockView extends Component<any, any> {
       const blockRatio = this.props.width/this.props.height
       if (blockRatio <= 0.6){
         layout["grid"] = {rows: visualizationData.length, columns: 1}
-        layout["annotations"] = visualizationData.map((value, index, arr) => {
+        layout["annotations"] = configStyle.pie.showSubtitle && visualizationData.map((value, index, arr) => {
           return {
             showarrow: false,
             text: value.name,
             xref: "paper",
-            xanchor: "left",
+            xanchor: "center",
             yref: "paper",
             yanchor: arr.length === (index+1) ? "top" : "middle",
             x: 0.5,
@@ -382,7 +391,7 @@ class DataBlockView extends Component<any, any> {
         })
       } else if (blockRatio>=1.9){
         layout["grid"] = {rows: 1, columns: visualizationData.length}
-        layout["annotations"] = visualizationData.map((value, index) => {
+        layout["annotations"] = configStyle.pie.showSubtitle && visualizationData.map((value, index) => {
           return {
             showarrow: false,
             text: value.name,
@@ -400,7 +409,7 @@ class DataBlockView extends Component<any, any> {
         layout["grid"] = {
           rows: blockRows,
           columns: blockColumns}
-        layout["annotations"] = visualizationData.map((value, index, arr) => {
+        layout["annotations"] = configStyle.pie.showSubtitle && visualizationData.map((value, index, arr) => {
           const x_idx = index%blockColumns
           const y_idx = Math.floor(index/blockColumns)
           return {
@@ -414,7 +423,6 @@ class DataBlockView extends Component<any, any> {
             y: (blockRows - (y_idx+1)) / blockRows
           }
         })
-
       }
     }
 

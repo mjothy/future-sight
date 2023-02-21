@@ -16,10 +16,6 @@ export default class BlockStyleModel {
     value: 'Title',
     isVisible: true,
   };
-  stack = {
-    isStack: false,
-    value: ''
-  }
   subtitle = {
     models: {
       isCustom: false,
@@ -49,4 +45,10 @@ export default class BlockStyleModel {
     isGroupBy: false,
     value: ''
   };
+  pie = {
+    isDonut: false,
+    showPercent: true,
+    showSubtitle: true
+
+  }
 }

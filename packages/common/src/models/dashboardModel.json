@@ -68,6 +68,11 @@
             "isStack": false,
             "isGroupBy": false,
             "value": ""
+          },
+          "pie": {
+            "isDonut": false,
+            "showPercent": true,
+            "showSubtitle": true
           }
         },
         "metaData": {

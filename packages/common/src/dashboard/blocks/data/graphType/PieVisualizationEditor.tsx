@@ -1,4 +1,4 @@
-import {Col, Row, Select} from 'antd';
+import {Checkbox, Col, Row, Select} from 'antd';
 import {Component} from 'react';
 import PlotlyUtils from "../../../graphs/PlotlyUtils";
 
@@ -16,6 +16,23 @@ export default class PieVisualizationEditor extends Component<any, any> {
         this.props.updateBlockConfig({ configStyle: configStyle })
     };
 
+    onIsDonutChecked = (e) => {
+        const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+        configStyle.pie.isDonut = e.target.checked;
+        this.props.updateBlockConfig({ configStyle: configStyle })
+    };
+
+    onShowPercentChecked = (e) => {
+        const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+        configStyle.pie.showPercent = e.target.checked;
+        this.props.updateBlockConfig({ configStyle: configStyle })
+    };
+
+    onShowSubtitleChecked = (e) => {
+        const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+        configStyle.pie.showSubtitle = e.target.checked;
+        this.props.updateBlockConfig({ configStyle: configStyle })
+    };
 
     render() {
         const configStyle = structuredClone(this.props.currentBlock.config.configStyle)
@@ -26,7 +43,7 @@ export default class PieVisualizationEditor extends Component<any, any> {
                 <Row style={{marginBottom: 2}}>
                     <Col span={2}></Col>
                     <Col span={16}>
-                        Slices categories:
+                        Stack by:
                     </Col>
                 </Row>
                 <Row className="mb-10">
@@ -48,7 +65,6 @@ export default class PieVisualizationEditor extends Component<any, any> {
                     </Col>
                 </Row>
 
-                {/*TODO choose default year to be used on the pie chart*/}
                 <Row style={{marginBottom: 2}}>
                     <Col span={2}>
                     </Col>
@@ -74,6 +90,44 @@ export default class PieVisualizationEditor extends Component<any, any> {
                         </Select>
                     </Col>
                 </Row>
+
+
+                <Row>
+                    <Col span={2} className={'checkbox-col'}>
+                        <Checkbox
+                            onChange={this.onIsDonutChecked}
+                            checked={configStyle.pie.isDonut}
+                        />
+                    </Col>
+                    <Col span={16} className={'checkbox-col-label'}>
+                        <label>Use donut chart</label>
+                    </Col>
+                </Row>
+
+                <Row>
+                    <Col span={2} className={'checkbox-col'}>
+                        <Checkbox
+                            onChange={this.onShowPercentChecked}
+                            checked={configStyle.pie.showPercent}
+                        />
+                    </Col>
+                    <Col span={16} className={'checkbox-col-label'}>
+                        <label>Use percent</label>
+                    </Col>
+                </Row>
+
+                <Row>
+                    <Col span={2} className={'checkbox-col'}>
+                        <Checkbox
+                            onChange={this.onShowSubtitleChecked}
+                            checked={configStyle.pie.showSubtitle}
+                        />
+                    </Col>
+                    <Col span={16} className={'checkbox-col-label'}>
+                        <label>Show subtitles</label>
+                    </Col>
+                </Row>
+
             </>
         )
     }
