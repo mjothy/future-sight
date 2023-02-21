@@ -4,7 +4,7 @@ import BlockModel from '../../../models/BlockModel';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 import { getChildrens } from '../utils/BlockDataUtils';
 import * as _ from 'lodash';
-
+require('./ControlBlockView.css')
 const { Option } = Select;
 
 export default class ControlBlockView extends Component<any, any> {
@@ -56,26 +56,41 @@ export default class ControlBlockView extends Component<any, any> {
         this.props.currentBlock.config.configStyle.subtitle[option].value :
         option
     return (
-      <Row className="mb-10" key={option}>
-        <Col span={6}>
-          <h4>{optionLabel}: </h4>
-        </Col>
-        <Col span={18}>
+        <div className="control-block-row" key={option}>
+          <h4 className="control-block-subtitle"> {optionLabel}: </h4>
           <Select
-            mode="multiple"
-            className="width-100"
-            value={metaData.master[option].values}
-            onChange={(e) => this.onChange(option, e)}
-            dropdownMatchSelectWidth={false}
-          >
+              mode="multiple"
+              className="control-block-select"
+              value={metaData.master[option].values}
+              onChange={(e) => this.onChange(option, e)}
+              dropdownMatchSelectWidth={false}>
             {metaData[option].map((element) => (
-              <Option key={element} value={element}>
-                {element}
-              </Option>
+                <Option key={element} value={element}>
+                  {element}
+                </Option>
             ))}
           </Select>
-        </Col>
-      </Row>
+        </div>
+      // <Row className="mb-10" key={option}>
+      //   <Col span={6}>
+      //     <h4>{optionLabel}: </h4>
+      //   </Col>
+      //   <Col span={18}>
+      //     <Select
+      //       mode="multiple"
+      //       className="width-100"
+      //       value={metaData.master[option].values}
+      //       onChange={(e) => this.onChange(option, e)}
+      //       dropdownMatchSelectWidth={false}
+      //     >
+      //       {metaData[option].map((element) => (
+      //         <Option key={element} value={element}>
+      //           {element}
+      //         </Option>
+      //       ))}
+      //     </Select>
+      //   </Col>
+      // </Row>
     );
   };
 
@@ -85,7 +100,7 @@ export default class ControlBlockView extends Component<any, any> {
     const configStyle: BlockStyleModel =
       this.props.currentBlock.config.configStyle;
     return (
-      <div className={'width-100 height-100'}
+      <div className={'width-100 height-100 control-block-container'}
         style={{ overflowY: "auto", paddingRight: "10px", paddingLeft: "10px", paddingTop: "6px" }}>
         {configStyle.title.isVisible ? (
           <Row>
