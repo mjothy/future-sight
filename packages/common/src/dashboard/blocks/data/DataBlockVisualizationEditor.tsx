@@ -3,6 +3,7 @@ import {
   BarChartOutlined,
   LineChartOutlined,
   PieChartOutlined,
+  ExclamationCircleOutlined,
   TableOutlined
 } from '@ant-design/icons';
 import {Checkbox, Col, Input, InputNumber, Row, Select} from 'antd';
@@ -59,17 +60,11 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     this.updateBlockConfig({ configStyle: configStyle })
   };
 
-  onCustomrangeChange = (e) => {
+  onCustomRangeChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
-    configStyle.XAxis.customrange = e.target.checked;
+    configStyle.XAxis.useCustomRange = e.target.checked;
     this.updateBlockConfig({ configStyle: configStyle })
   };
-
-  onStackValueChange = (value) => {
-    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
-    configStyle.stack.value = value;
-    this.updateBlockConfig({ configStyle: configStyle })
-  }
 
   onXRangeLeftChange = (value) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
@@ -119,6 +114,23 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
+  onStackCheckChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.stack.isStack = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onStackGroupByChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.stack.isGroupBy = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onStackValueChange = (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.stack.value = value;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
 
   updateBlockConfig = (configStyle) => {
     const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
@@ -128,6 +140,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   }
   render() {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const metaData = this.props.currentBlock.config.metaData;
     const legend = this.props.currentBlock.config.configStyle.legend;
     const defaultLegendOptions: any[] = [];
     for (const key of Object.keys(legend)) {
@@ -181,6 +194,49 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             />
         }
 
+
+        {configStyle.graphType == "area" &&
+          <>
+            <h3>Area</h3>
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onStackCheckChange}
+                  checked={configStyle.stack.isStack}
+                />
+              </Col>
+              <Col span={6} className={'checkbox-col-label'}>
+                <label>Stack by ... </label>
+              </Col>
+              <Col span={9} className={'checkbox-col-label'}>
+                <Select
+                  placeholder="Select"
+                  defaultValue={metaData[configStyle.stack.value]?.length > 1 ? configStyle.stack.value : null}
+                  onChange={this.onStackValueChange}
+                  notFoundContent={(
+                    <div>
+                      <ExclamationCircleOutlined />
+                      <p>Item not found.</p>
+                    </div>
+                  )}
+                  allowClear
+                  disabled={!configStyle.stack.isStack}
+                  dropdownMatchSelectWidth={false}
+                >
+                  {this.props.optionsLabel.map((value) => {
+                    if (metaData[value].length > 1) return (
+                      <Option key={value} value={value}>
+                        {value}
+                      </Option>
+                    )
+                  }
+                  )}
+                </Select>
+              </Col>
+            </Row>
+          </>
+        }
+
         <h3>Axis</h3>
         <Row>
           <Col span={2} className={'checkbox-col'}>
@@ -218,8 +274,8 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         <Row className="mb-10">
           <Col span={2} className={'checkbox-col'}>
             <Checkbox
-                onChange={this.onCustomrangeChange}
-                defaultChecked={configStyle.XAxis.customrange}
+                onChange={this.onCustomRangeChange}
+                defaultChecked={configStyle.XAxis.useCustomRange}
             />
           </Col>
           <Col span={16} className={'checkbox-col-label'}>
@@ -234,7 +290,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                 placeholder="Left"
                 onChange={this.onXRangeLeftChange}
                 defaultValue={configStyle.XAxis.left}
-                disabled={!configStyle.XAxis.customrange}
+                disabled={!configStyle.XAxis.useCustomRange}
             />
           </Col>
           <Col span={8} className="ml-20">
@@ -243,7 +299,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                 placeholder="Right"
                 onChange={this.onXRangeRightChange}
                 defaultValue={configStyle.XAxis.right}
-                disabled={!configStyle.XAxis.customrange}
+                disabled={!configStyle.XAxis.useCustomRange}
             />
           </Col>
         </Row>

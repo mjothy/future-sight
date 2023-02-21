@@ -16,6 +16,10 @@ export default class BlockStyleModel {
     value: 'Title',
     isVisible: true,
   };
+  stack = {
+    isStack: false,
+    value: ''
+  }
   subtitle = {
     models: {
       isCustom: false,
@@ -35,7 +39,7 @@ export default class BlockStyleModel {
     }
   };
   XAxis = {
-    customrange: false,
+    useCustomRange: false,
     left: null,
     right: null,
     default: null

@@ -6,6 +6,7 @@ import PlotlyUtils from '../../graphs/PlotlyUtils';
 import * as _ from 'lodash';
 import PlotDataModel from "../../../models/PlotDataModel";
 import withColorizer from "../../../hoc/colorizer/withColorizer";
+import { stackGroups } from '../utils/StackGraphs';
 
 interface PieDataPerYearModel {
   [year: string]: { values: string[], labels: string[] }
@@ -47,11 +48,12 @@ class DataBlockView extends Component<any, any> {
    * @returns
    */
   settingPlotData = () => {
-    const {currentBlock} = this.props;
-    const data: any[] = this.props.blockData(currentBlock);
+    const { currentBlock } = this.props;
+    const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
+    let data: PlotDataModel[] = this.props.blockData(currentBlock);
+    data = this.filterByCustomXRange(data)
     console.log("Run settingPlotData", currentBlock.id);
     const showData: any[] = [];
-    const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
     let visualizeData: any = [];
     switch (configStyle.graphType) {
@@ -62,8 +64,13 @@ class DataBlockView extends Component<any, any> {
         visualizeData = this.preparePieData(data);
         break;
       default:
-        data?.map((dataElement) => {
-          showData.push(this.preparePlotData(dataElement, configStyle));
+        let stacks = null;
+        if (configStyle.stack.isStack && configStyle.graphType === 'area') {
+          stacks = stackGroups(currentBlock.config.metaData, configStyle.stack.value);
+        }
+        const dataWithColor = this.props.colorizer.colorizeData(data)
+        dataWithColor?.map((dataElement) => {
+          showData.push(this.preparePlotData(dataElement, configStyle, stacks));
         });
         visualizeData = showData;
     }
@@ -184,6 +191,25 @@ class DataBlockView extends Component<any, any> {
     return pieData
   }
 
+  filterByCustomXRange = (plotData: PlotDataModel[]) => {
+    const XAxisConfig = this.props.currentBlock.config.configStyle.XAxis
+    const data = JSON.parse(JSON.stringify(plotData))
+
+    if(!XAxisConfig.useCustomRange || !XAxisConfig.left || !XAxisConfig.right){
+      return data
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      const dataElement = data[i]
+      const dataPoints = [...dataElement.data]
+      dataElement.data = dataPoints.filter(
+          (dataPoint) =>
+              XAxisConfig.left <= dataPoint.year &&
+              dataPoint.year<=XAxisConfig.right)
+    }
+    return data
+  }
+
   prepareTableData = (data: PlotDataModel[]) => {
     const columns: ColumnsType<any> = [
       { title: 'model', dataIndex: 'model' },
@@ -239,8 +265,9 @@ class DataBlockView extends Component<any, any> {
     }
   }
 
-  preparePlotData = (dataElement: PlotDataModel, configStyle: BlockStyleModel) => {
+  preparePlotData = (dataElement: PlotDataModel, configStyle: BlockStyleModel, stack?: null) => {
     let obj;
+    const xyDict = this.getXY(dataElement);
     switch (configStyle.graphType) {
       case 'area':
         obj = {
@@ -248,19 +275,31 @@ class DataBlockView extends Component<any, any> {
           fill: 'tozeroy',
           // fillcolor: "#FF0000"+"50",
           fillcolor: dataElement.color ? dataElement.color + "50" : null,
-          x: this.getX(dataElement),
-          y: this.getY(dataElement),
+          x: xyDict.x,
+          y: xyDict.y,
           mode: "none",
           name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
         };
+        if (configStyle.stack.isStack && stack != null) {
+          // Add the current element to a stack (if it exist in stagGroups)
+          // stack is array contains possible stacks [[{},{}], [{},{}]]
+          Object.entries(stack).forEach(([key, val]: any) => {
+            const isExist = val.find(raw => dataElement.model == raw["models"] && dataElement.variable == raw["variables"]
+              && dataElement.region == raw["regions"] && dataElement.scenario == raw["scenarios"])
+            if (isExist) {
+              obj.stackgroup = key;
+            }
+          });
+        }
+
         break;
       default:
         obj = {
           type: configStyle.graphType,
-          x: this.getX(dataElement),
-          y: this.getY(dataElement),
+          x: xyDict.x,
+          y: xyDict.y,
           name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
@@ -293,33 +332,21 @@ class DataBlockView extends Component<any, any> {
   };
 
   /**
-   * Extract the x axis from data
-   * @param dataElement The retreived data (from API)
-   * @returns Axis x (array of values)
+   * Extract the x and y axis from data
+   * @param dataElement The retrieved data (from API)
+   * @returns {x: x_array, y: y_array}
    */
-  getX = (dataElement: PlotDataModel) => {
+
+  getXY = (dataElement: PlotDataModel) => {
     const x: any[] = [];
+    const y: any[] = []
     dataElement.data?.map((d) => {
       if (d.value !== "") {
         x.push(d.year)
-      }
-    });
-    return x;
-  };
-
-  /**
-   * Extract the y axis from data
-   * @param dataElement The retreived data (from API)
-   * @returns Axis y (array of values)
-   */
-  getY = (dataElement: PlotDataModel) => {
-    const y: any[] = [];
-    dataElement.data?.map((d) => {
-      if (d.value !== "") {
         y.push(d.value)
       }
     });
-    return y;
+    return {x,y};
   };
 
   prepareLayout = (data, visualizationData) => {
@@ -336,7 +363,7 @@ class DataBlockView extends Component<any, any> {
     }
 
     if (configStyle.graphType === "pie" && visualizationData.length>1){
-[].map
+
       // Define grid
       const blockRatio = this.props.width/this.props.height
       if (blockRatio <= 0.6){
