@@ -11,7 +11,16 @@ export default class MapBlock extends Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {
+            visibleGeoJson: {
+                geoJsonOfVisibleData: {
+                    type: "FeatureCollection",
+                    features: []
+                }
+            },
             geoJsonData: {},
+            /**
+             * data with timeseries on current block
+             */
             blockData: this.props.blockData(this.props.currentBlock),
             visualData: {
                 model: null,
@@ -20,6 +29,11 @@ export default class MapBlock extends Component<any, any> {
             },
             center: { lon: -74, lat: 43 },
             zoom: 3,
+            data: [{
+                type: 'choroplethmapbox',
+                colorscale: "PuBu",
+                geojson: {}
+            }]
         };
     }
 
@@ -27,11 +41,14 @@ export default class MapBlock extends Component<any, any> {
         const geoJsonData = await this.props.dataManager.fetchRegionsGeojson({
             regions: this.props.data.regions,
         });
+        const blockData = this.props.blockData(this.props.currentBlock);
+        const { data, visibleGeoJson } = this.getMapData(geoJsonData, blockData, 2020);
         const state: any = {
-            geoJsonData: geoJsonData,
-            blockData: this.props.blockData(this.props.currentBlock),
+            geoJsonData,
+            blockData,
+            data,
+            visibleGeoJson
         };
-
         const obj = this.setMapProperities(geoJsonData);
         if (obj != null) {
             state.center = obj.center;
@@ -41,47 +58,21 @@ export default class MapBlock extends Component<any, any> {
     }
 
     async componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): Promise<void> {
-        if (
-            !_.isEqual(
-                prevProps.currentBlock.config.metaData,
-                this.props.currentBlock.config.metaData
-            )
-        ) {
+        if (!_.isEqual(prevProps.currentBlock.config.metaData, this.props.currentBlock.config.metaData)
+            || !_.isEqual(prevState.visualData, this.state.visualData)) {
             const geoJsonData = await this.props.dataManager.fetchRegionsGeojson({
                 regions: this.props.data.regions,
             });
+            const blockData = this.props.blockData(this.props.currentBlock);
+            const { data, visibleGeoJson } = this.getMapData(geoJsonData, blockData, 2020);
             this.setState({
-                geoJsonData: geoJsonData,
-                blockData: this.props.blockData(this.props.currentBlock),
+                geoJsonData,
+                blockData,
+                data,
+                visibleGeoJson
             });
         }
     }
-
-    // shouldComponentUpdate(
-    //     nextProps: Readonly<any>,
-    //     nextState: Readonly<any>,
-    //     nextContext: any
-    // ): boolean {
-    //     if (
-    //         !_.isEqual(nextState.geoJsonData, this.state.geoJsonData) ||
-    //         !_.isEqual(nextProps.currentBlock.config, this.props.currentBlock.config)
-    //     ) {
-    //         return true;
-    //     }
-
-    //     if (
-    //         this.props.width != nextProps.width ||
-    //         this.props.height != nextProps.height
-    //     ) {
-    //         return true;
-    //     }
-
-    //     if (!_.isEqual(nextState.visualData, this.state.visualData)) {
-    //         return true;
-    //     }
-
-    //     return false;
-    // }
 
     onChange = (option, selectedData) => {
         const visualData = { ...this.state.visualData };
@@ -89,18 +80,32 @@ export default class MapBlock extends Component<any, any> {
         this.setState({ visualData });
     };
 
-    getMapData = (year = 2020) => {
+    /**
+     * 
+     * @param year the selected year in slidebar
+     * @returns data
+     */
+    getMapData = (geoJsonData, blockData, year = 2020) => {
         const locations: string[] = [];
         const z: number[] = [];
         let unit = '';
         const options = this.getOptionsSelected();
-        let extractArg = [];
-
+        let extractArg: any = [];
 
         if (options.length <= 0) {
-            extractArg = this.state.blockData;
+            // Select the first data
+            if (blockData.length > 0) {
+                const firstElement = blockData[0];
+                extractArg.push(firstElement);
+                unit = firstElement.unit;
+                blockData.forEach(raw => {
+                    if (raw["region"] != firstElement["region"] && raw["model"] == firstElement["model"] && raw["scenario"] == firstElement["scenario"] && raw["variable"] == firstElement["variable"]) {
+                        extractArg.push(raw);
+                    }
+                })
+            }
         } else {
-            let possibleData = JSON.parse(JSON.stringify(this.state.blockData));
+            let possibleData = JSON.parse(JSON.stringify(blockData));
             options.forEach((key) => {
                 extractArg = possibleData.filter(
                     (d) => d[key] == this.state.visualData[key]
@@ -108,8 +113,9 @@ export default class MapBlock extends Component<any, any> {
                 possibleData = extractArg;
             });
         }
-
+        console.log("extractArg: ", extractArg);
         extractArg.forEach((regionData: any) => {
+            console.log("regionData: ", regionData);
             const value_2020 = regionData.data?.find(
                 (dataPoint) => dataPoint.year == year
             );
@@ -117,19 +123,20 @@ export default class MapBlock extends Component<any, any> {
                 z.push(Number(Number(value_2020.value)?.toFixed(2)));
                 locations.push(regionData['region']);
             }
-            if (regionData.unit != null) {
+            if (unit != null && regionData.unit != null) {
                 unit = regionData.unit;
             }
         });
 
         // Prepare Data
+        const visibleGeoJson = this.getGeoJsonOfVisibleRegions(geoJsonData, extractArg);
         const data: any = [];
         data.push({
             type: 'choroplethmapbox',
             colorscale: "PuBu",
             locations,
             z,
-            geojson: this.state.geoJsonData,
+            geojson: { ...visibleGeoJson },
             showscale: true,
             colorbar: {
                 title: {
@@ -139,10 +146,14 @@ export default class MapBlock extends Component<any, any> {
             },
             hoverinfo: "location+z",
         });
-
-        return data;
+        return { data, visibleGeoJson };
     };
 
+    /**
+     * get options of selected data in inputs in the map
+     * Exemple: if user selecte 2 models [model1, model2], select box will be shown in the map to select only one value
+     * @returns 
+     */
     getOptionsSelected = () => {
         const options: string[] = [];
         Object.keys(this.state.visualData).forEach((key) => {
@@ -153,8 +164,21 @@ export default class MapBlock extends Component<any, any> {
         return options;
     };
 
+    getGeoJsonOfVisibleRegions = (geoJsonData, visibleData) => {
+        // update geoJson
+        const visibleRegions = visibleData.map(raw => { if (raw.data != null) return raw["region"].toLowerCase() })
+        console.log("visibleRegions: ", visibleRegions);
+        const featuresVisibleRegions = geoJsonData.features?.filter(feature => visibleRegions.includes(feature.properties["ADMIN"].toLowerCase()))
+        const visibleGeoJson = {
+            type: "FeatureCollection",
+            features: featuresVisibleRegions
+        };
+
+        return visibleGeoJson;
+    }
+
     zoomToFeatures = () => {
-        const obj = this.setMapProperities(this.state.geoJsonData);
+        const obj = this.setMapProperities(this.state.visibleGeoJson);
         if (obj != null) {
             this.setState({ center: obj.center, zoom: obj.zoom })
         }
@@ -166,14 +190,11 @@ export default class MapBlock extends Component<any, any> {
             let zoom = 3;
             const bbox1 = bbox(geoJsonData);
             const center_coor = {};
-            const center_zoom = geoViewport.viewport(bbox1, [this.props.width, this.props.height]);
+            const center_zoom = geoViewport.viewport(bbox1, [this.props.width, this.props.height - 50]);
             center_coor["lon"] = center_zoom.center[0];
             center_coor["lat"] = center_zoom.center[1];
             center = center_coor;
             zoom = center_zoom.zoom;
-            console.log("center: ", center);
-            console.log("zoom: ", zoom);
-
             return { center, zoom: zoom - 1 }
         }
 
@@ -190,14 +211,13 @@ export default class MapBlock extends Component<any, any> {
 
     render() {
         const meteData = this.props.currentBlock.config.metaData;
-        // Prepare Layout
+
         const layout: any = {
             width: this.props.width,
-            height: this.props.height,
+            height: this.props.height - 50,
             font: {
                 size: 10,
             },
-            // dragmode: 'zoom',
             mapbox: {
                 style: 'carto-positron',
                 center: this.state.center,
@@ -209,113 +229,111 @@ export default class MapBlock extends Component<any, any> {
         };
 
         // Prepare Config
+        //TODO add hide/show colorbar to config
         const config = {
             displayModeBar: false, // this is the line that hides the bar.
             editable: false,
         };
         return (
-            <div style={{ height: '100%', width: '100%' }}>
-                <div>
-                    <Plot data={this.getMapData()} layout={layout} config={config}
-                        onDoubleClick={this.zoomToFeatures}
-                    />
-                </div>
-                <div
-                    style={{ marginTop: -this.props.height + 'px', marginLeft: '5px' }}
-                >
-                    <Row
-                        justify="start"
-                    >
-                        {meteData.models?.length > 1 && (
-                            <Col span={4}
-                            >
-                                {' '}
-                                <Select
-                                    allowClear
-                                    value={this.state.visualData['model']}
-                                    className="width-90"
-                                    dropdownMatchSelectWidth={false}
-                                    size="small"
-                                    placeholder="models"
-                                    onChange={(selectedData) =>
-                                        this.onChange('model', selectedData)
-                                    }
+            <div>
+
+                <div style={{ height: this.props.height - 50, width: this.props.width }}>
+                    <div>
+                        <Plot data={this.state.data} layout={layout} config={config}
+                            onDoubleClick={this.zoomToFeatures}
+                        />
+                    </div>
+                    <div style={{ marginTop: -(this.props.height - 50) + 'px', marginLeft: '5px' }}>
+                        <Row justify="start" >
+                            {meteData.models?.length > 1 && (
+                                <Col span={4}
                                 >
-                                    {meteData.models?.map((value: string) => (
-                                        <Option key={value} value={value}>
-                                            {value}
-                                        </Option>
-                                    ))}
-                                </Select>
-                            </Col>
-                        )}
+                                    <Tooltip placement="rightTop" title={"Model"}>
+                                        <Select
+                                            allowClear
+                                            value={this.state.visualData['model']}
+                                            className="width-90"
+                                            dropdownMatchSelectWidth={false}
+                                            size="small"
+                                            placeholder="models"
+                                            onChange={(selectedData) =>
+                                                this.onChange('model', selectedData)
+                                            }
+                                        >
+                                            {meteData.models?.map((value: string) => (
+                                                <Option key={value} value={value}>
+                                                    {value}
+                                                </Option>
+                                            ))}
+                                        </Select>
+                                    </Tooltip>
+                                </Col>
+                            )}
 
-                        {meteData.scenarios?.length > 1 && (
-                            <Col span={4}>
-                                {' '}
-                                <Select
-                                    allowClear
-                                    value={this.state.visualData['scenario']}
-                                    className="width-90"
-                                    dropdownMatchSelectWidth={false}
-                                    size="small"
-                                    placeholder="scenarios"
-                                    onChange={(selectedData) =>
-                                        this.onChange('scenario', selectedData)
-                                    }
-                                >
-                                    {meteData.scenarios?.map((value: string) => (
-                                        <Option key={value} value={value}>
-                                            {value}
-                                        </Option>
-                                    ))}
-                                </Select>
-                            </Col>
-                        )}
+                            {meteData.scenarios?.length > 1 && (
+                                <Col span={4}>
+                                    {' '}
+                                    <Select
+                                        allowClear
+                                        value={this.state.visualData['scenario']}
+                                        className="width-90"
+                                        dropdownMatchSelectWidth={false}
+                                        size="small"
+                                        placeholder="scenarios"
+                                        onChange={(selectedData) =>
+                                            this.onChange('scenario', selectedData)
+                                        }
+                                    >
+                                        {meteData.scenarios?.map((value: string) => (
+                                            <Option key={value} value={value}>
+                                                {value}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                </Col>
+                            )}
 
-                        {meteData.variables?.length > 1 && (
-                            <Col span={4}>
-                                <Select
-                                    allowClear
-                                    value={this.state.visualData['variable']}
-                                    className="width-90"
-                                    dropdownMatchSelectWidth={false}
-                                    size="small"
-                                    placeholder="variables"
-                                    onChange={(selectedData) =>
-                                        this.onChange('variable', selectedData)
-                                    }
-                                >
-                                    {meteData.variables?.map((value: string) => (
-                                        <Option key={value} value={value}>
-                                            {value}
-                                        </Option>
-                                    ))}
-                                </Select>
-                            </Col>
-                        )}
-                    </Row>
-                </div>
+                            {meteData.variables?.length > 1 && (
+                                <Col span={4}>
+                                    <Select
+                                        allowClear
+                                        value={this.state.visualData['variable']}
+                                        className="width-90"
+                                        dropdownMatchSelectWidth={false}
+                                        size="small"
+                                        placeholder="variables"
+                                        onChange={(selectedData) =>
+                                            this.onChange('variable', selectedData)
+                                        }
+                                    >
+                                        {meteData.variables?.map((value: string) => (
+                                            <Option key={value} value={value}>
+                                                {value}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                </Col>
+                            )}
+                        </Row>
+                    </div>
 
-                <div style={{ marginLeft: '5px' }}
-                >
-                    {/* <Row justify='center'>
-                        <Col span={12}>
-                            
-                        </Col>
+                    <div style={{ marginLeft: '5px' }}>
+                        <Tooltip placement="rightTop" title={"zoom in"}>
+                            <Button className='mt-2' icon={<PlusOutlined />} size={"small"} onClick={this.zoomIn} /><br />
+                        </Tooltip>
+                        <Tooltip placement="rightTop" title={"zoom out"}>
+                            <Button className='mt-2' icon={<MinusOutlined />} size={"small"} onClick={this.zoomOut} /> <br />
+                        </Tooltip>
+                        <Tooltip placement="rightTop" title={"zoom to features"}>
+                            <Button className='mt-2' icon={<FullscreenExitOutlined />} size={"small"} onClick={this.zoomToFeatures} />
+                        </Tooltip>
+                    </div>
 
-                    </Row> */}
-                    <Tooltip placement="rightTop" title={"zoom in"}>
-                        <Button className='mt-2' icon={<PlusOutlined />} size={"small"} onClick={this.zoomIn} /><br />
-                    </Tooltip>
-                    <Tooltip placement="rightTop" title={"zoom out"}>
-                        <Button className='mt-2' icon={<MinusOutlined />} size={"small"} onClick={this.zoomOut} /> <br />
-                    </Tooltip>
-                    <Tooltip placement="rightTop" title={"zoom to features"}>
-                        <Button className='mt-2' icon={<FullscreenExitOutlined />} size={"small"} onClick={this.zoomToFeatures} />
-                    </Tooltip>
                 </div>
 
+                <div style={{ height: 50, width: this.props.width }}>
+                    Slider
+                </div>
             </div>
         );
     }
