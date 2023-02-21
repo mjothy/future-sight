@@ -53,7 +53,7 @@
             "force0": false
           },
           "XAxis": {
-            "customrange": false,
+            "useCustomRange": false,
             "left": null,
             "right": null
           },

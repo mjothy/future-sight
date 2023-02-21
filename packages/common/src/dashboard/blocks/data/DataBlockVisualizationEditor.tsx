@@ -51,9 +51,9 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     this.updateBlockConfig({ configStyle: configStyle })
   };
 
-  onCustomrangeChange = (e) => {
+  onCustomRangeChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
-    configStyle.XAxis.customrange = e.target.checked;
+    configStyle.XAxis.useCustomRange = e.target.checked;
     this.updateBlockConfig({ configStyle: configStyle })
   };
 
@@ -254,8 +254,8 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         <Row className="mb-10">
           <Col span={2} className={'checkbox-col'}>
             <Checkbox
-                onChange={this.onCustomrangeChange}
-                defaultChecked={configStyle.XAxis.customrange}
+                onChange={this.onCustomRangeChange}
+                defaultChecked={configStyle.XAxis.useCustomRange}
             />
           </Col>
           <Col span={16} className={'checkbox-col-label'}>
@@ -270,7 +270,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                 placeholder="Left"
                 onChange={this.onXRangeLeftChange}
                 defaultValue={configStyle.XAxis.left}
-                disabled={!configStyle.XAxis.customrange}
+                disabled={!configStyle.XAxis.useCustomRange}
             />
           </Col>
           <Col span={8} className="ml-20">
@@ -279,7 +279,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                 placeholder="Right"
                 onChange={this.onXRangeRightChange}
                 defaultValue={configStyle.XAxis.right}
-                disabled={!configStyle.XAxis.customrange}
+                disabled={!configStyle.XAxis.useCustomRange}
             />
           </Col>
         </Row>

@@ -45,10 +45,11 @@ class DataBlockView extends Component<any, any> {
    */
   settingPlotData = () => {
     const { currentBlock } = this.props;
-    const data: any[] = this.props.blockData(currentBlock);
+    const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
+    let data: PlotDataModel[] = this.props.blockData(currentBlock);
+    data = this.filterByCustomXRange(data)
     console.log("Run settingPlotData", currentBlock.id);
     const showData: any[] = [];
-    const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
     let visualizeData: any = [];
     if (configStyle.graphType === 'table') {
@@ -65,6 +66,25 @@ class DataBlockView extends Component<any, any> {
       visualizeData = showData;
     }
     return { data: visualizeData, layout: this.prepareLayout(data) }
+  }
+
+  filterByCustomXRange = (plotData: PlotDataModel[]) => {
+    const XAxisConfig = this.props.currentBlock.config.configStyle.XAxis
+    const data = JSON.parse(JSON.stringify(plotData))
+
+    if(!XAxisConfig.useCustomRange || !XAxisConfig.left || !XAxisConfig.right){
+      return data
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      const dataElement = data[i]
+      const dataPoints = [...dataElement.data]
+      dataElement.data = dataPoints.filter(
+          (dataPoint) =>
+              XAxisConfig.left <= dataPoint.year &&
+              dataPoint.year<=XAxisConfig.right)
+    }
+    return data
   }
 
   prepareTableData = (data: PlotDataModel[]) => {
@@ -125,6 +145,7 @@ class DataBlockView extends Component<any, any> {
 
   preparePlotData = (dataElement: PlotDataModel, configStyle: BlockStyleModel, stack?: null) => {
     let obj;
+    const xyDict = this.getXY(dataElement);
     switch (configStyle.graphType) {
       case 'area':
         obj = {
@@ -132,8 +153,8 @@ class DataBlockView extends Component<any, any> {
           fill: 'tozeroy',
           // fillcolor: "#FF0000"+"50",
           fillcolor: dataElement.color ? dataElement.color + "50" : null,
-          x: this.getX(dataElement),
-          y: this.getY(dataElement),
+          x: xyDict.x,
+          y: xyDict.y,
           mode: "none",
           name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
@@ -155,8 +176,8 @@ class DataBlockView extends Component<any, any> {
       default:
         obj = {
           type: configStyle.graphType,
-          x: this.getX(dataElement),
-          y: this.getY(dataElement),
+          x: xyDict.x,
+          y: xyDict.y,
           name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
@@ -189,33 +210,21 @@ class DataBlockView extends Component<any, any> {
   };
 
   /**
-   * Extract the x axis from data
-   * @param dataElement The retreived data (from API)
-   * @returns Axis x (array of values)
+   * Extract the x and y axis from data
+   * @param dataElement The retrieved data (from API)
+   * @returns {x: x_array, y: y_array}
    */
-  getX = (dataElement: PlotDataModel) => {
+
+  getXY = (dataElement: PlotDataModel) => {
     const x: any[] = [];
+    const y: any[] = []
     dataElement.data?.map((d) => {
       if (d.value !== "") {
         x.push(d.year)
-      }
-    });
-    return x;
-  };
-
-  /**
-   * Extract the y axis from data
-   * @param dataElement The retreived data (from API)
-   * @returns Axis y (array of values)
-   */
-  getY = (dataElement: PlotDataModel) => {
-    const y: any[] = [];
-    dataElement.data?.map((d) => {
-      if (d.value !== "") {
         y.push(d.value)
       }
     });
-    return y;
+    return {x,y};
   };
 
   prepareLayout = (data) => {

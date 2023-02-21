@@ -39,7 +39,7 @@ export default class BlockStyleModel {
     }
   };
   XAxis = {
-    customrange: false,
+    useCustomRange: false,
     left: null,
     right: null
   }
