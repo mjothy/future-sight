@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import Plot from 'react-plotly.js';
 import * as _ from 'lodash';
-import { Col, Row, Select } from 'antd';
+import { Button, Col, Row, Select, Tooltip } from 'antd';
 import { Option } from 'antd/lib/mentions';
 import bbox from "@turf/bbox"
 import geoViewport from "@mapbox/geo-viewport";
-// interface Layer {
-//     source;
-//     type
-// }
+import { FullscreenExitOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
+
 export default class MapBlock extends Component<any, any> {
     constructor(props) {
         super(props);
@@ -42,11 +40,7 @@ export default class MapBlock extends Component<any, any> {
         this.setState({ ...state });
     }
 
-    async componentDidUpdate(
-        prevProps: Readonly<any>,
-        prevState: Readonly<any>,
-        snapshot?: any
-    ): Promise<void> {
+    async componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): Promise<void> {
         if (
             !_.isEqual(
                 prevProps.currentBlock.config.metaData,
@@ -132,27 +126,19 @@ export default class MapBlock extends Component<any, any> {
         const data: any = [];
         data.push({
             type: 'choroplethmapbox',
-            // colorscale: [
-            //     [0, 'rgba(255,255,255,0.7)'],
-            //     [1, 'rgba(0,0,255,0.7)'],
-            // ],
             colorscale: "PuBu",
-            // colorscale: [
-            //     [0, "rgba(255, 0, 0, 0.5)"],
-            //     [0.5, "rgba(255, 255, 0, 0.5)"],
-            //     [1, "rgba(0, 255, 0, 0.5)"]
-            // ],
             locations,
             z,
             geojson: this.state.geoJsonData,
             showscale: true,
             colorbar: {
-                title: 'value (' + unit + ')',
+                title: {
+                    text: 'value (' + unit + ')',
+                    side: "right"
+                }
             },
-            // fitbounds: "geojson"
             hoverinfo: "location+z",
         });
-        console.log('data: ', data);
 
         return data;
     };
@@ -167,8 +153,7 @@ export default class MapBlock extends Component<any, any> {
         return options;
     };
 
-    handleDoubleClick = () => {
-        console.log("on double clicked")
+    zoomToFeatures = () => {
         const obj = this.setMapProperities(this.state.geoJsonData);
         if (obj != null) {
             this.setState({ center: obj.center, zoom: obj.zoom })
@@ -181,29 +166,34 @@ export default class MapBlock extends Component<any, any> {
             let zoom = 3;
             const bbox1 = bbox(geoJsonData);
             const center_coor = {};
-            const center_zoom = geoViewport.viewport(bbox1, [this.props.width, this.props.height - 250]);
+            const center_zoom = geoViewport.viewport(bbox1, [this.props.width, this.props.height]);
             center_coor["lon"] = center_zoom.center[0];
             center_coor["lat"] = center_zoom.center[1];
             center = center_coor;
             zoom = center_zoom.zoom;
             console.log("center: ", center);
             console.log("zoom: ", zoom);
-            this.setState({
-                center, zoom
-            })
 
-            return { center, zoom }
+            return { center, zoom: zoom - 1 }
         }
 
         return null;
     }
 
+    zoomOut = () => {
+        this.setState({ zoom: this.state.zoom - 1 });
+    }
+
+    zoomIn = () => {
+        this.setState({ zoom: this.state.zoom + 1 });
+    }
+
     render() {
         const meteData = this.props.currentBlock.config.metaData;
         // Prepare Layout
-        let layout: any = {
+        const layout: any = {
             width: this.props.width,
-            height: this.props.height - 50,
+            height: this.props.height,
             font: {
                 size: 10,
             },
@@ -213,98 +203,119 @@ export default class MapBlock extends Component<any, any> {
                 center: this.state.center,
                 zoom: this.state.zoom
             },
-            margin: { r: 0, t: 30, b: 20, l: 0 },
+            margin: { r: 0, t: 0, b: 0, l: 0 },
+            // margin: { r: 0, t: this.props.currentBlock.config.configStyle.title.isVisible ? 30 : 0, b: 0, l: 0 },
+            // title: this.props.currentBlock.config.configStyle.title.isVisible ? this.props.currentBlock.config.configStyle.title.value : "Title"
         };
-        if (this.props.currentBlock.config.configStyle.title.isVisible) {
-            layout = {
-                ...layout,
-                title: this.props.currentBlock.config.configStyle.title.value,
-            };
-        }
+
         // Prepare Config
         const config = {
             displayModeBar: false, // this is the line that hides the bar.
             editable: false,
-            showTitle: false,
         };
         return (
-            <div style={{ height: this.props.height, width: this.props.width }}>
-                <Plot data={this.getMapData()} layout={layout} config={config}
-                    onDoubleClick={this.handleDoubleClick}
-                />
-                <Row
-                    justify="start"
-                    className={'ml-20'}
-                    style={{ height: '30px', fontSize: '7px' }}
+            <div style={{ height: '100%', width: '100%' }}>
+                <div>
+                    <Plot data={this.getMapData()} layout={layout} config={config}
+                        onDoubleClick={this.zoomToFeatures}
+                    />
+                </div>
+                <div
+                    style={{ marginTop: -this.props.height + 'px', marginLeft: '5px' }}
                 >
-                    {meteData.models?.length > 1 && (
-                        <Col span={7}>
-                            {' '}
-                            <Select
-                                allowClear
-                                value={this.state.visualData['model']}
-                                className="width-90"
-                                dropdownMatchSelectWidth={false}
-                                size="small"
-                                placeholder="models"
-                                onChange={(selectedData) =>
-                                    this.onChange('model', selectedData)
-                                }
+                    <Row
+                        justify="start"
+                    >
+                        {meteData.models?.length > 1 && (
+                            <Col span={4}
                             >
-                                {meteData.models?.map((value: string) => (
-                                    <Option key={value} value={value}>
-                                        {value}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </Col>
-                    )}
+                                {' '}
+                                <Select
+                                    allowClear
+                                    value={this.state.visualData['model']}
+                                    className="width-90"
+                                    dropdownMatchSelectWidth={false}
+                                    size="small"
+                                    placeholder="models"
+                                    onChange={(selectedData) =>
+                                        this.onChange('model', selectedData)
+                                    }
+                                >
+                                    {meteData.models?.map((value: string) => (
+                                        <Option key={value} value={value}>
+                                            {value}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Col>
+                        )}
 
-                    {meteData.scenarios?.length > 1 && (
-                        <Col span={7}>
-                            {' '}
-                            <Select
-                                allowClear
-                                value={this.state.visualData['scenario']}
-                                className="width-90"
-                                dropdownMatchSelectWidth={false}
-                                size="small"
-                                placeholder="scenarios"
-                                onChange={(selectedData) =>
-                                    this.onChange('scenario', selectedData)
-                                }
-                            >
-                                {meteData.scenarios?.map((value: string) => (
-                                    <Option key={value} value={value}>
-                                        {value}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </Col>
-                    )}
+                        {meteData.scenarios?.length > 1 && (
+                            <Col span={4}>
+                                {' '}
+                                <Select
+                                    allowClear
+                                    value={this.state.visualData['scenario']}
+                                    className="width-90"
+                                    dropdownMatchSelectWidth={false}
+                                    size="small"
+                                    placeholder="scenarios"
+                                    onChange={(selectedData) =>
+                                        this.onChange('scenario', selectedData)
+                                    }
+                                >
+                                    {meteData.scenarios?.map((value: string) => (
+                                        <Option key={value} value={value}>
+                                            {value}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Col>
+                        )}
 
-                    {meteData.variables?.length > 1 && (
-                        <Col span={7}>
-                            <Select
-                                allowClear
-                                value={this.state.visualData['variable']}
-                                className="width-90"
-                                dropdownMatchSelectWidth={false}
-                                size="small"
-                                placeholder="variables"
-                                onChange={(selectedData) =>
-                                    this.onChange('variable', selectedData)
-                                }
-                            >
-                                {meteData.variables?.map((value: string) => (
-                                    <Option key={value} value={value}>
-                                        {value}
-                                    </Option>
-                                ))}
-                            </Select>
+                        {meteData.variables?.length > 1 && (
+                            <Col span={4}>
+                                <Select
+                                    allowClear
+                                    value={this.state.visualData['variable']}
+                                    className="width-90"
+                                    dropdownMatchSelectWidth={false}
+                                    size="small"
+                                    placeholder="variables"
+                                    onChange={(selectedData) =>
+                                        this.onChange('variable', selectedData)
+                                    }
+                                >
+                                    {meteData.variables?.map((value: string) => (
+                                        <Option key={value} value={value}>
+                                            {value}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Col>
+                        )}
+                    </Row>
+                </div>
+
+                <div style={{ marginLeft: '5px' }}
+                >
+                    {/* <Row justify='center'>
+                        <Col span={12}>
+                            
                         </Col>
-                    )}
-                </Row>
+
+                    </Row> */}
+                    <Tooltip placement="rightTop" title={"zoom in"}>
+                        <Button className='mt-2' icon={<PlusOutlined />} size={"small"} onClick={this.zoomIn} /><br />
+                    </Tooltip>
+                    <Tooltip placement="rightTop" title={"zoom out"}>
+                        <Button className='mt-2' icon={<MinusOutlined />} size={"small"} onClick={this.zoomOut} /> <br />
+                    </Tooltip>
+                    <Tooltip placement="rightTop" title={"zoom to features"}>
+                        <Button className='mt-2' icon={<FullscreenExitOutlined />} size={"small"} onClick={this.zoomToFeatures} />
+                    </Tooltip>
+                </div>
+
             </div>
         );
     }
