@@ -1,4 +1,4 @@
-import { AreaChartOutlined, BarChartOutlined, HeatMapOutlined, LineChartOutlined, TableOutlined } from '@ant-design/icons';
+import { AreaChartOutlined, BarChartOutlined, EnvironmentOutlined, LineChartOutlined, TableOutlined } from '@ant-design/icons';
 import { Col, Input, Row, Select, Checkbox } from 'antd';
 import { Component } from 'react';
 
@@ -24,7 +24,7 @@ const plotTypes = [
   { type: 'area', label: 'Area', icon: <AreaChartOutlined /> },
   { type: 'table', label: 'Table', icon: <TableOutlined /> },
   // TODO find better icon for map
-  { type: 'map', label: 'Map', icon: <HeatMapOutlined /> },
+  { type: 'map', label: 'Map', icon: <EnvironmentOutlined /> },
 
 ];
 
