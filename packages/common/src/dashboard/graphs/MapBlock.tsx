@@ -127,6 +127,9 @@ export default class MapBlock extends Component<any, any> {
                     text: 'value (' + unit + ')',
                     side: "right"
                 },
+                len: 0.90,
+                thickness: 10,
+                // xanchor: "right", x: 1,
                 // lenmode: "pixels",
                 // len: this.props.height - 80
             },
@@ -346,13 +349,13 @@ export default class MapBlock extends Component<any, any> {
                     </div>
 
                     <div style={{ marginLeft: '5px' }}>
-                        <Tooltip placement="top" title={"zoom in"}>
+                        <Tooltip placement="right" title={"zoom in"}>
                             <Button className='mt-2' icon={<PlusOutlined />} size={"small"} onClick={this.zoomIn} /><br />
                         </Tooltip>
-                        <Tooltip placement="top" title={"zoom out"}>
+                        <Tooltip placement="right" title={"zoom out"}>
                             <Button className='mt-2' icon={<MinusOutlined />} size={"small"} onClick={this.zoomOut} /> <br />
                         </Tooltip>
-                        <Tooltip placement="top" title={"zoom to features"}>
+                        <Tooltip placement="right" title={"zoom to features"}>
                             <Button className='mt-2' icon={<FullscreenExitOutlined />} size={"small"} onClick={this.zoomToFeatures} />
                         </Tooltip>
                     </div>
