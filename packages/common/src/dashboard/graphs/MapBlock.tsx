@@ -38,7 +38,7 @@ export default class MapBlock extends Component<any, any> {
     }
 
     async componentDidMount(): Promise<void> {
-        const geoJsonData = await this.props.dataManager.fetchRegionsGeojson({
+        const geoJsonData = await this.props.fetchRegionsGeojson({
             regions: this.props.data.regions,
         });
         const blockData = this.props.blockData(this.props.currentBlock);
@@ -60,7 +60,7 @@ export default class MapBlock extends Component<any, any> {
     async componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): Promise<void> {
         if (!_.isEqual(prevProps.currentBlock.config.metaData, this.props.currentBlock.config.metaData)
             || !_.isEqual(prevState.visualData, this.state.visualData)) {
-            const geoJsonData = await this.props.dataManager.fetchRegionsGeojson({
+            const geoJsonData = await this.props.fetchRegionsGeojson({
                 regions: this.props.data.regions,
             });
             const blockData = this.props.blockData(this.props.currentBlock);
@@ -127,7 +127,7 @@ export default class MapBlock extends Component<any, any> {
                     text: 'value (' + unit + ')',
                     side: "right"
                 },
-                len: 0.90,
+                len: 0.95,
                 thickness: 10,
                 // xanchor: "right", x: 1,
                 // lenmode: "pixels",

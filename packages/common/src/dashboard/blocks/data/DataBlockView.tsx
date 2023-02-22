@@ -259,7 +259,7 @@ export default class DataBlockView extends Component<any, any> {
     const { data, layout } = this.settingPlotData();
     const graphType = this.props.currentBlock.config.configStyle.graphType;
     if (graphType == 'map') {
-      return <MapBlock {...this.props} data={data} layout={layout} />
+      return <MapBlock {...this.props} data={data} layout={layout} fetchRegionsGeojson={this.props.dataManager.fetchRegionsGeojson} />
 
     } else {
       return <PlotlyGraph {...this.props} data={data} layout={layout} />

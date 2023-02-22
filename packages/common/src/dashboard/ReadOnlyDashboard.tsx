@@ -7,7 +7,6 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
 import BlockModel from '../models/BlockModel';
-import ConfigurationModel from '../models/ConfigurationModel';
 import DashboardModel from '../models/DashboardModel';
 import DashboardConfigView from './DashboardConfigView';
 
@@ -139,6 +138,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                         blockData={props.blockData}
                         plotData={props.plotData}
                         optionsLabel={props.optionsLabel}
+                        dataManager={props.dataManager} // TODO in readonly of map, we need only fetchRegionsGeojson
                     />
                 )}
             </div>
