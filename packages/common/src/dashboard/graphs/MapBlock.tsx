@@ -98,9 +98,10 @@ export default class MapBlock extends Component<any, any> {
                 );
             });
         }
+        console.log("debug possibleDataInMap: ", possibleDataInMap);
         const { extractData, unit } = this.getFirstData(possibleDataInMap);
 
-        console.log("extractArg: ", extractData);
+        console.log("debug extractArg: ", extractData);
         extractData.forEach((regionData: any) => {
             const value_2020 = regionData.data?.find(
                 (dataPoint) => dataPoint.year == year
@@ -158,15 +159,17 @@ export default class MapBlock extends Component<any, any> {
     getFirstData = (blockData) => {
         const extractData: any = [];
         let unit = null;
-        const firstElement = blockData[0]; // first raw of one region
-        extractData.push(firstElement);
-        unit = firstElement.unit;
-        // get other raws whith same data but region different
-        blockData.forEach(raw => {
-            if (raw["region"] != firstElement["region"] && raw["model"] == firstElement["model"] && raw["scenario"] == firstElement["scenario"] && raw["variable"] == firstElement["variable"]) {
-                extractData.push(raw);
-            }
-        })
+        if (blockData.length > 0) {
+            const firstElement = blockData[0]; // first raw of one region
+            extractData.push(firstElement);
+            unit = firstElement.unit;
+            // get other raws whith same data but region different
+            blockData.forEach(raw => {
+                if (raw["region"] != firstElement["region"] && raw["model"] == firstElement["model"] && raw["scenario"] == firstElement["scenario"] && raw["variable"] == firstElement["variable"]) {
+                    extractData.push(raw);
+                }
+            })
+        }
         return { extractData, unit }
     }
 
@@ -270,7 +273,7 @@ export default class MapBlock extends Component<any, any> {
                             {meteData.models?.length > 1 && (
                                 <Col span={4}
                                 >
-                                    <Tooltip placement="rightTop" title={"Model"}>
+                                    <Tooltip placement="top" title={"Model"}>
                                         <Select
                                             allowClear
                                             value={this.state.visualData['model']}
@@ -294,59 +297,62 @@ export default class MapBlock extends Component<any, any> {
 
                             {meteData.scenarios?.length > 1 && (
                                 <Col span={4}>
-                                    {' '}
-                                    <Select
-                                        allowClear
-                                        value={this.state.visualData['scenario']}
-                                        className="width-90"
-                                        dropdownMatchSelectWidth={false}
-                                        size="small"
-                                        placeholder="scenarios"
-                                        onChange={(selectedData) =>
-                                            this.onChange('scenario', selectedData)
-                                        }
-                                    >
-                                        {meteData.scenarios?.map((value: string) => (
-                                            <Option key={value} value={value}>
-                                                {value}
-                                            </Option>
-                                        ))}
-                                    </Select>
+                                    <Tooltip placement="top" title={"Scenario"}>
+                                        <Select
+                                            allowClear
+                                            value={this.state.visualData['scenario']}
+                                            className="width-90"
+                                            dropdownMatchSelectWidth={false}
+                                            size="small"
+                                            placeholder="scenarios"
+                                            onChange={(selectedData) =>
+                                                this.onChange('scenario', selectedData)
+                                            }
+                                        >
+                                            {meteData.scenarios?.map((value: string) => (
+                                                <Option key={value} value={value}>
+                                                    {value}
+                                                </Option>
+                                            ))}
+                                        </Select>
+                                    </Tooltip>
                                 </Col>
                             )}
 
                             {meteData.variables?.length > 1 && (
                                 <Col span={4}>
-                                    <Select
-                                        allowClear
-                                        value={this.state.visualData['variable']}
-                                        className="width-90"
-                                        dropdownMatchSelectWidth={false}
-                                        size="small"
-                                        placeholder="variables"
-                                        onChange={(selectedData) =>
-                                            this.onChange('variable', selectedData)
-                                        }
-                                    >
-                                        {meteData.variables?.map((value: string) => (
-                                            <Option key={value} value={value}>
-                                                {value}
-                                            </Option>
-                                        ))}
-                                    </Select>
+                                    <Tooltip placement="top" title={"Variable"}>
+                                        <Select
+                                            allowClear
+                                            value={this.state.visualData['variable']}
+                                            className="width-90"
+                                            dropdownMatchSelectWidth={false}
+                                            size="small"
+                                            placeholder="variables"
+                                            onChange={(selectedData) =>
+                                                this.onChange('variable', selectedData)
+                                            }
+                                        >
+                                            {meteData.variables?.map((value: string) => (
+                                                <Option key={value} value={value}>
+                                                    {value}
+                                                </Option>
+                                            ))}
+                                        </Select>
+                                    </Tooltip>
                                 </Col>
                             )}
                         </Row>
                     </div>
 
                     <div style={{ marginLeft: '5px' }}>
-                        <Tooltip placement="rightTop" title={"zoom in"}>
+                        <Tooltip placement="top" title={"zoom in"}>
                             <Button className='mt-2' icon={<PlusOutlined />} size={"small"} onClick={this.zoomIn} /><br />
                         </Tooltip>
-                        <Tooltip placement="rightTop" title={"zoom out"}>
+                        <Tooltip placement="top" title={"zoom out"}>
                             <Button className='mt-2' icon={<MinusOutlined />} size={"small"} onClick={this.zoomOut} /> <br />
                         </Tooltip>
-                        <Tooltip placement="rightTop" title={"zoom to features"}>
+                        <Tooltip placement="top" title={"zoom to features"}>
                             <Button className='mt-2' icon={<FullscreenExitOutlined />} size={"small"} onClick={this.zoomToFeatures} />
                         </Tooltip>
                     </div>
