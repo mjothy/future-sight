@@ -53,12 +53,21 @@ export default class PlotlyGraph extends Component<any, any> {
       grid: {...this.props.layout.grid},
       annotations: {...this.props.layout.annotations}
     };
+
     if (currentBlock.config.configStyle.title.isVisible) {
       layout = {
         ...layout,
         title: currentBlock.config.configStyle.title.value,
       };
     }
+
+    if (this.props.slidersLayout) {
+      layout = {
+        sliders: this.props.slidersLayout,
+        ...layout
+      }
+    }
+
 
     return currentBlock.config.configStyle.graphType === 'table' && this.props.data.values.length > 0 ? (
       <Table
@@ -76,6 +85,7 @@ export default class PlotlyGraph extends Component<any, any> {
         data={this.props.data}
         layout={layout}
         config={config}
+        frames={this.props.frames}
       />
     );
   }

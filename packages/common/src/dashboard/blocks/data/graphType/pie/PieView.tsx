@@ -13,7 +13,7 @@ class PieView extends Component<any, any> {
 
   preparePieData = (data: PlotDataModel[]) => {
     if (data.length==0) {
-      return []
+      return {defaultPlotlyData: []}
     }
 
     const configStyle = this.props.currentBlock.config.configStyle
@@ -23,7 +23,7 @@ class PieView extends Component<any, any> {
 
     const dataWithColor = this.props.colorizer.colorizeData(data, stackIndex)
 
-    const pieData: Record<string, unknown>[] = []
+    const plotlyData: Record<string, unknown>[] = []
 
     // Get data by year
     if (otherIndex.length===0){
@@ -42,7 +42,7 @@ class PieView extends Component<any, any> {
 
       const selectedYear = this.props.currentBlock.config.configStyle.XAxis.default
       const selectedData = selectedYear ? pieDataPerYear[selectedYear] : Object.values(pieDataPerYear)[0]
-      pieData.push({
+      plotlyData.push({
         type: 'pie',
         values: selectedData.values,
         labels: selectedData.labels,
@@ -54,6 +54,10 @@ class PieView extends Component<any, any> {
         // hoverinfo: `label+value`,
         hole: configStyle.pie.isDonut? .4 : null,
       })
+      return {
+        defaultPlotlyData: plotlyData,
+        pieDataPerYearList: [pieDataPerYear]
+      }
     }
     else {
       const pieDataPerIndexValue: {[index: string]: PieDataPerYearModel} = {}
@@ -62,7 +66,6 @@ class PieView extends Component<any, any> {
       for (const dataElement of dataWithColor){
         colors.push(dataElement.color)
 
-        // Define new pieChart if new indexValue introduced
         const indexValue = otherIndex.length>1
             ? otherIndex.reduce((acc, filterType, idx, arr) => {
               if (idx===arr.length-1){
@@ -72,6 +75,7 @@ class PieView extends Component<any, any> {
             }, "")
             : dataElement[otherIndex[0]]
 
+        // Define new pieChart if new indexValue introduced
         if (!pieDataPerIndexValue[indexValue]){
           pieDataPerIndexValue[indexValue]={}
         }
@@ -112,7 +116,7 @@ class PieView extends Component<any, any> {
           }
         }
 
-        pieData.push({
+        plotlyData.push({
           type: 'pie',
           name: idx,
           values: selectedData.values,
@@ -127,17 +131,20 @@ class PieView extends Component<any, any> {
         })
         chartCount+=1
       }
+
+      return {
+        defaultPlotlyData: plotlyData,
+        pieDataPerYearList: Object.values(pieDataPerIndexValue),
+      }
     }
-    return pieData
   }
 
-  preparePieLayout = (data, plotlyData) => {
+  preparePieLayout = (plotlyData) => {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
     const layout = {}
 
+    // Define grid and subtitles
     if (plotlyData.length>1){
-
-      // Define grid
       const blockRatio = this.props.width/this.props.height
       if (blockRatio <= 0.6){
         layout["grid"] = {rows: plotlyData.length, columns: 1}
@@ -193,10 +200,61 @@ class PieView extends Component<any, any> {
     return layout
   }
 
+  getSlidersConfig = (rawData: PlotDataModel[], preparedPieData, layout) => {
+    const frames: any[] = []
+    const sliderSteps: any[] = []
+    const years = PlotlyUtils.getYears(rawData)
+
+    for (const year of years){
+
+      // Frame
+      const frameData = preparedPieData.pieDataPerYearList.map((pieDataPerYear) => pieDataPerYear[year])
+      frames.push({
+        name: year,
+        data: frameData,
+        layout: {annotations: layout.annotations}
+      })
+
+      // Slider step
+      const sliderStep = {
+        label: year,
+        method: 'animate',
+        args: [[year], {
+          mode: 'immediate',
+          transition: {duration: 300},
+          frame: {duration: 300, redraw: true}
+        }]
+      }
+      sliderSteps.push(sliderStep)
+    }
+
+    const defaultYear = this.props.currentBlock.config.configStyle.XAxis.default
+    const defaultYearIndex = defaultYear ? years.findIndex((year)=> year === defaultYear) : 0
+    const slidersLayout= [{
+      active: defaultYearIndex,
+      pad: {t: 60},
+      x: 0.05,
+      len: 0.95,
+      currentvalue: {
+        xanchor: 'right',
+        prefix: 'year: ',
+        font: {
+          color: '#888',
+          size: 20
+        }
+      },
+      steps: sliderSteps
+    }]
+
+    return {frames, slidersLayout}
+  }
+
+
   render() {
-    const plotlyData = this.preparePieData(this.props.data);
-    const layout = this.preparePieLayout(this.props.data, plotlyData);
-    return <PlotlyGraph {...this.props} data={plotlyData} layout={layout} />;
+    const preparedPieData = this.preparePieData(this.props.data);
+    const layout = this.preparePieLayout(preparedPieData.defaultPlotlyData);
+    const {frames, slidersLayout} = this.getSlidersConfig(this.props.data, preparedPieData, layout)
+    return <PlotlyGraph {...this.props} data={preparedPieData.defaultPlotlyData} layout={layout} frames={frames} slidersLayout={slidersLayout}/>;
   }
 }
 
