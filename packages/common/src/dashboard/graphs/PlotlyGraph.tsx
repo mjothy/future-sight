@@ -51,7 +51,7 @@ export default class PlotlyGraph extends Component<any, any> {
       },
       yaxis: {...this.props.layout.YAxis},
       grid: {...this.props.layout.grid},
-      annotations: {...this.props.layout.annotations}
+      annotations: this.props.layout.annotations
     };
 
     if (currentBlock.config.configStyle.title.isVisible) {

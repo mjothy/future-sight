@@ -211,8 +211,7 @@ class PieView extends Component<any, any> {
       const frameData = preparedPieData.pieDataPerYearList.map((pieDataPerYear) => pieDataPerYear[year])
       frames.push({
         name: year,
-        data: frameData,
-        layout: {annotations: layout.annotations}
+        data: frameData
       })
 
       // Slider step
