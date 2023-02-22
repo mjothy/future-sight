@@ -118,7 +118,8 @@ class Dashboard extends Component<DashboardProps, any> {
                 <div className="no-sidebar-margin" />
                 <Content className={"dashboard-content-wrapper"}>
                     <div className="dashboard-content">
-                        <DashboardConfigView {...this.props} readonly={this.state.readonly} />
+                        <DashboardConfigView {...this.props} readonly={this.state.readonly} fetchRegionsGeojson={this.props.dataManager.fetchRegionsGeojson}
+                        />
                     </div>
                 </Content>
                 <div className="no-sidebar-margin" />

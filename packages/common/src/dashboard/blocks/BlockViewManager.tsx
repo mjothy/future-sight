@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
-import MapBlock from '../graphs/MapBlock';
 import ControlBlockView from './control/ControlBlockView';
 import DataBlockView from './data/DataBlockView';
 import TextBlockView from './text/TextBlockView';
-
-
 
 /**
  * Render the view of block in Grid Layout
@@ -24,15 +21,11 @@ export default class BlockViewManager extends Component<any, any> {
         return <TextBlockView currentBlock={this.props.currentBlock} />;
       case 'data':
         return <DataBlockView {...{
-          // delete Dahsboard
-          dashboard: this.props.dashboard,
           currentBlock: this.props.currentBlock,
-          // TODO keep only one
-          blockPlotData: this.props.plotData[this.props.currentBlock.id],//timeseriesData
-          blockData: this.props.blockData,
+          timeseriesData: this.props.timeseriesData,
           width: this.props.width,
           height: this.props.height,
-          dataManager: this.props.dataManager
+          fetchRegionsGeojson: this.props.fetchRegionsGeojson
         }} />;
       case 'control':
         return <ControlBlockView {...{
@@ -48,7 +41,5 @@ export default class BlockViewManager extends Component<any, any> {
   };
   render() {
     return this.blockByType();
-    // return <MapBlock width={this.props.width} height={this.props.height} />;
-
   }
 }

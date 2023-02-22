@@ -12,6 +12,7 @@ export default class DataBlockView extends Component<any, any> {
     let shouldUpdate = true;
     const config1 = nextProps.currentBlock.config;
     const config2 = this.props.currentBlock.config;
+
     // Check configuration
     if (this.props.width == nextProps.width && this.props.height == nextProps.height) {
       if (_.isEqual(config1, config2)) {
@@ -20,17 +21,8 @@ export default class DataBlockView extends Component<any, any> {
     }
 
     // Check updatede plotData (we need to check this because component render before fetch finish)
-    if (this.props.blockPlotData?.length != nextProps.blockPlotData?.length) {
+    if (this.props.timeseriesData?.length != nextProps.timeseriesData?.length) {
       shouldUpdate = true;
-    }
-
-    // if type is controlled control and control block updated -> update also child
-    if (nextProps.currentBlock.controlBlock !== '') {
-      const parrent_block_config1 = nextProps.dashboard.blocks[nextProps.currentBlock.controlBlock].config;
-      const parrent_block_config2 = this.props.dashboard.blocks[nextProps.currentBlock.controlBlock].config;
-      if (!_.isEqual(parrent_block_config1.metaData, parrent_block_config2.metaData)) {
-        shouldUpdate = true;
-      }
     }
 
     return shouldUpdate;
@@ -42,7 +34,7 @@ export default class DataBlockView extends Component<any, any> {
    */
   settingPlotData = () => {
     const { currentBlock } = this.props;
-    const data: any[] = this.props.blockData(currentBlock);
+    const data: any[] = this.props.timeseriesData;
     console.log("Run settingPlotData", currentBlock.id);
     const showData: any[] = [];
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
@@ -259,7 +251,7 @@ export default class DataBlockView extends Component<any, any> {
     const { data, layout } = this.settingPlotData();
     const graphType = this.props.currentBlock.config.configStyle.graphType;
     if (graphType == 'map') {
-      return <MapBlock {...this.props} data={data} layout={layout} fetchRegionsGeojson={this.props.dataManager.fetchRegionsGeojson} />
+      return <MapBlock {...this.props} data={data} layout={layout} />
 
     } else {
       return <PlotlyGraph {...this.props} data={data} layout={layout} />

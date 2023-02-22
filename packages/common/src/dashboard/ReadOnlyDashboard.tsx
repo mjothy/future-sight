@@ -127,7 +127,6 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                 {dashboard && (
                     <DashboardConfigView
                         dashboard={dashboard}
-                        getData={() => { }}
                         updateSelectedBlock={(blockSelectedId: string) => {
                         }}
                         blockSelectedId={undefined}
@@ -136,9 +135,8 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                         }}
                         readonly
                         blockData={props.blockData}
-                        plotData={props.plotData}
                         optionsLabel={props.optionsLabel}
-                        dataManager={props.dataManager} // TODO in readonly of map, we need only fetchRegionsGeojson
+                        fetchRegionsGeojson={props.dataManager.fetchRegionsGeojson}
                     />
                 )}
             </div>

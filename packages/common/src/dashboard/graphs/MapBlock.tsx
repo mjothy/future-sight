@@ -21,13 +21,12 @@ export default class MapBlock extends Component<any, any> {
             /**
              * data with timeseries on current block
              */
-            blockData: this.props.blockData(this.props.currentBlock),
             visualData: {
                 model: null,
                 scenario: null,
                 variable: null,
             },
-            center: { lon: -74, lat: 43 },
+            center: { lon: 0.17, lat: 43.05 },
             zoom: 3,
             data: [{
                 type: 'choroplethmapbox',
@@ -41,11 +40,9 @@ export default class MapBlock extends Component<any, any> {
         const geoJsonData = await this.props.fetchRegionsGeojson({
             regions: this.props.data.regions,
         });
-        const blockData = this.props.blockData(this.props.currentBlock);
-        const { data, visibleGeoJson } = this.getMapData(geoJsonData, blockData, 2020);
+        const { data, visibleGeoJson } = this.getMapData(geoJsonData, 2020);
         const state: any = {
             geoJsonData,
-            blockData,
             data,
             visibleGeoJson
         };
@@ -59,15 +56,14 @@ export default class MapBlock extends Component<any, any> {
 
     async componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): Promise<void> {
         if (!_.isEqual(prevProps.currentBlock.config.metaData, this.props.currentBlock.config.metaData)
-            || !_.isEqual(prevState.visualData, this.state.visualData)) {
+            || !_.isEqual(prevState.visualData, this.state.visualData)
+            || this.props.timeseriesData?.length != prevProps.timeseriesData?.length) {
             const geoJsonData = await this.props.fetchRegionsGeojson({
                 regions: this.props.data.regions,
             });
-            const blockData = this.props.blockData(this.props.currentBlock);
-            const { data, visibleGeoJson } = this.getMapData(geoJsonData, blockData, 2020);
+            const { data, visibleGeoJson } = this.getMapData(geoJsonData, 2020);
             this.setState({
                 geoJsonData,
-                blockData,
                 data,
                 visibleGeoJson
             });
@@ -85,21 +81,21 @@ export default class MapBlock extends Component<any, any> {
      * @param year the selected year in slidebar
      * @returns data
      */
-    getMapData = (geoJsonData, blockData, year = 2020) => {
+    getMapData = (geoJsonData, year = 2020) => {
         const locations: string[] = [];
         const z: number[] = [];
         const options = this.getOptionsSelected();
-        let possibleDataInMap = JSON.parse(JSON.stringify(blockData));
+        let mapDataTimeseries = JSON.parse(JSON.stringify(this.props.timeseriesData));
 
         if (options.length > 0) {
             options.forEach((key) => {
-                possibleDataInMap = possibleDataInMap.filter(
+                mapDataTimeseries = mapDataTimeseries.filter(
                     (d) => d[key] == this.state.visualData[key]
                 );
             });
         }
-        console.log("debug possibleDataInMap: ", possibleDataInMap);
-        const { extractData, unit } = this.getFirstData(possibleDataInMap);
+        console.log("debug mapDataTimeseries: ", mapDataTimeseries);
+        const { extractData, unit } = this.getFirstData(mapDataTimeseries);
 
         console.log("debug extractArg: ", extractData);
         extractData.forEach((regionData: any) => {
@@ -156,18 +152,18 @@ export default class MapBlock extends Component<any, any> {
     /**
      * When possible data possible to be presented in the map, return only the first raws with different region
      * and same {model, scenario, variable}
-     * @param blockData 
+     * @param mapDataTimeseries data when timederies != null
      * @returns extractData(data to visualized) and unit
      */
-    getFirstData = (blockData) => {
+    getFirstData = (mapDataTimeseries) => {
         const extractData: any = [];
         let unit = null;
-        if (blockData.length > 0) {
-            const firstElement = blockData[0]; // first raw of one region
+        if (mapDataTimeseries.length > 0) {
+            const firstElement = mapDataTimeseries[0]; // first raw of one region
             extractData.push(firstElement);
             unit = firstElement.unit;
             // get other raws whith same data but region different
-            blockData.forEach(raw => {
+            mapDataTimeseries.forEach(raw => {
                 if (raw["region"] != firstElement["region"] && raw["model"] == firstElement["model"] && raw["scenario"] == firstElement["scenario"] && raw["variable"] == firstElement["variable"]) {
                     extractData.push(raw);
                 }
@@ -210,7 +206,7 @@ export default class MapBlock extends Component<any, any> {
      */
     setMapProperities = (geoJsonData) => {
         if (geoJsonData.features != undefined) {
-            let center: any = { lon: -74, lat: 43 };
+            let center: any = { lon: 0.17, lat: 43.05 };
             let zoom = 3;
             const bbox1 = bbox(geoJsonData);
             const center_coor = {};
@@ -254,6 +250,7 @@ export default class MapBlock extends Component<any, any> {
             // margin: { r: 0, t: 0, b: 0, l: 0 },
             margin: { r: 0, t: this.props.currentBlock.config.configStyle.title.isVisible ? 30 : 0, b: 0, l: 0 },
             title: this.props.currentBlock.config.configStyle.title.isVisible ? this.props.currentBlock.config.configStyle.title.value : "Title"
+
         };
 
         // Prepare Config
