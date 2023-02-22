@@ -1,6 +1,6 @@
 import {Checkbox, Col, Row, Select} from 'antd';
 import {Component} from 'react';
-import PlotlyUtils from "../../../graphs/PlotlyUtils";
+import PlotlyUtils from "../../../../graphs/PlotlyUtils";
 
 const {Option} = Select;
 

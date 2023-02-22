@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons';
 import {Checkbox, Col, Input, InputNumber, Row, Select} from 'antd';
 import {Component} from 'react';
-import PieVisualizationEditor from "./graphType/PieVisualizationEditor";
+import PieVisualizationEditor from "./graphType/pie/PieVisualizationEditor";
 
 const { Option } = Select;
 const ATTRIBUTES = {

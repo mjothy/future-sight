@@ -49,6 +49,5 @@ export default class BlockStyleModel {
     isDonut: false,
     showPercent: true,
     showSubtitle: true
-
   }
 }
