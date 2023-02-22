@@ -61,7 +61,7 @@ export default class PlotlyGraph extends Component<any, any> {
       };
     }
 
-    if (this.props.slidersLayout) {
+    if (this.props.slidersLayout && currentBlock.config.configStyle.XAxis.useSlider) {
       layout = {
         sliders: this.props.slidersLayout,
         ...layout

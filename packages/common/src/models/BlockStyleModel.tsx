@@ -38,7 +38,8 @@ export default class BlockStyleModel {
     useCustomRange: false,
     left: null,
     right: null,
-    default: null
+    default: null,
+    useSlider: false,
   };
   stack = {
     isStack: false,

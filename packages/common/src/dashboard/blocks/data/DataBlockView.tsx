@@ -287,7 +287,7 @@ class DataBlockView extends Component<any, any> {
     switch (this.props.currentBlock.config.configStyle.graphType) {
       case "pie":{
         return <PieView
-            data={rawData}
+            rawData={rawData}
             currentBlock={this.props.currentBlock}
             width={this.props.width}
             height={this.props.height}

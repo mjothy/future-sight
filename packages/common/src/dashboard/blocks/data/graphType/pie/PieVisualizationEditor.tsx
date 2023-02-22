@@ -16,6 +16,12 @@ export default class PieVisualizationEditor extends Component<any, any> {
         this.props.updateBlockConfig({ configStyle: configStyle })
     };
 
+    onUseSliderChecked = (e) => {
+        const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+        configStyle.XAxis.useSlider = e.target.checked;
+        this.props.updateBlockConfig({ configStyle: configStyle })
+    };
+
     onIsDonutChecked = (e) => {
         const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
         configStyle.pie.isDonut = e.target.checked;
@@ -90,6 +96,20 @@ export default class PieVisualizationEditor extends Component<any, any> {
                         </Select>
                     </Col>
                 </Row>
+
+
+                <Row>
+                    <Col span={2} className={'checkbox-col'}>
+                        <Checkbox
+                            onChange={this.onUseSliderChecked}
+                            checked={configStyle.XAxis.useSlider}
+                        />
+                    </Col>
+                    <Col span={16} className={'checkbox-col-label'}>
+                        <label>Use slider</label>
+                    </Col>
+                </Row>
+
 
 
                 <Row>

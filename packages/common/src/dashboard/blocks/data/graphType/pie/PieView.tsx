@@ -251,9 +251,10 @@ class PieView extends Component<any, any> {
 
 
   render() {
-    const preparedPieData = this.preparePieData(this.props.data);
+    const preparedPieData = this.preparePieData(this.props.rawData);
     const layout = this.preparePieLayout(preparedPieData.defaultPlotlyData);
-    const {frames, slidersLayout} = this.getSlidersConfig(this.props.data, preparedPieData, layout)
+    const {frames, slidersLayout} = this.getSlidersConfig(this.props.rawData, preparedPieData, layout)
+
     return <PlotlyGraph {...this.props} data={preparedPieData.defaultPlotlyData} layout={layout} frames={frames} slidersLayout={slidersLayout}/>;
   }
 }

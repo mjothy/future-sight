@@ -56,7 +56,8 @@
             "useCustomRange": false,
             "left": null,
             "right": null,
-            "default": null
+            "default": null,
+            "useSlider": false
           },
           "legend": {
             "Model": false,
