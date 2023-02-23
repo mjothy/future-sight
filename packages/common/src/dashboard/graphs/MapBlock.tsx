@@ -47,46 +47,48 @@ export default class MapBlock extends Component<any, any> {
         // if ((frames as any).lenght > 0) {
         //     data = frames[0].data
         // }
-        const { data, visibleGeoJson } = this.getMapData(geoJsonData, 2020);
+        // // const { data, visibleGeoJson } = this.getMapData(geoJsonData, 2020);
 
-        const state: any = {
-            geoJsonData,
-            frames,
-            // sliderConfig,
-            data: data,
-            visibleGeoJson
-        };
-        const obj = this.setMapProperities(geoJsonData);
-        if (obj != null) {
-            state.center = obj.center;
-            state.zoom = obj.zoom;
-        }
-        this.setState({ ...state });
+        // const state: any = {
+        //     geoJsonData,
+        //     frames,
+        //     sliderConfig,
+        //     data: data,
+        //     // visibleGeoJson
+        // };
+        // const obj = this.setMapProperities(geoJsonData);
+        // if (obj != null) {
+        //     state.center = obj.center;
+        //     state.zoom = obj.zoom;
+        // }
+        // this.setState({ ...state });
+        this.setState({ geoJsonData })
     }
 
-    async componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): Promise<void> {
-        if (!_.isEqual(prevProps.currentBlock.config.metaData, this.props.currentBlock.config.metaData)
-            || !_.isEqual(prevState.visualData, this.state.visualData)
-            || this.props.timeseriesData?.length != prevProps.timeseriesData?.length) {
-            const geoJsonData = await this.props.fetchRegionsGeojson({
-                regions: this.props.currentBlock.config.metaData.regions,
-            });
-            // const [frames, sliderConfig] = this.getSliderConfigs()
-            // const data: any = [];
-            // Object.values(frames)?.map(raw => {
-            //     data.push(...raw.data)
-            // })
-            const { data, visibleGeoJson } = this.getMapData(geoJsonData, 2020);
-            this.setState({
-                geoJsonData,
-                frames,
-                // sliderConfig,
-                data: data,
-                // data: frames[this.state.sliderConfig.active].data,
-                visibleGeoJson
-            });
-        }
-    }
+    // async componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): Promise<void> {
+    //     if (!_.isEqual(prevProps.currentBlock.config.metaData, this.props.currentBlock.config.metaData)
+    //         || !_.isEqual(prevState.visualData, this.state.visualData)
+    //         || this.props.timeseriesData?.length != prevProps.timeseriesData?.length) {
+    //         const geoJsonData = await this.props.fetchRegionsGeojson({
+    //             regions: this.props.currentBlock.config.metaData.regions,
+    //         });
+    //         const [frames, sliderConfig] = this.getSliderConfigs()
+    //         const data: any = [];
+    //         Object.values(frames)?.map(raw => {
+    //             data.push(...raw.data)
+    //         })
+    //         // const { data, visibleGeoJson } = this.getMapData(geoJsonData, 2020);
+    //         this.setState({
+    //             geoJsonData,
+    //             frames,
+    //             sliderConfig,
+    //             // data: data,
+    //             data: frames[this.state.sliderConfig.active].data,
+    //             // visibleGeoJson
+    //         });
+    //     }
+
+    // }
 
     // Add slider START
     // TODO https://plotly.com/javascript/sliders/
@@ -107,6 +109,8 @@ export default class MapBlock extends Component<any, any> {
 
     getSliderConfigs = () => {
         const frames: any[] = []
+        const data: any[] = []
+
         const sliderSteps: any[] = []
         const uniq_x = this.getOrderedUniqueX()
 
@@ -117,6 +121,7 @@ export default class MapBlock extends Component<any, any> {
                 name: year,
             }
             frames.push(frame)
+            data.push(frame.data)
             console.log("frames x: ", frames);
             // Slider step
             const sliderStep = {
@@ -150,15 +155,13 @@ export default class MapBlock extends Component<any, any> {
         }
 
         if (frames.length < 0) {
-            frames.push({
+            data.push({
                 type: 'choroplethmapbox',
                 colorscale: "PuBu",
                 geojson: {}
             })
         }
-
-        console.log("frames, sliderConfig: ", frames, '/ ', sliderConfig)
-        return [frames, sliderConfig]
+        return [frames, data, sliderConfig]
     }
     // Add slider FIN
 
@@ -352,9 +355,10 @@ export default class MapBlock extends Component<any, any> {
      * @returns {zoom, center}
      */
     setMapProperities = (geoJsonData) => {
+        let center: any = { lon: 0.17, lat: 43.05 };
+        let zoom = 3;
         if (geoJsonData?.features != undefined) {
-            let center: any = { lon: 0.17, lat: 43.05 };
-            let zoom = 3;
+
             const bbox1 = bbox(geoJsonData);
             const center_coor = {};
             const center_zoom = geoViewport.viewport(bbox1, [this.props.width, this.props.height]);
@@ -362,10 +366,8 @@ export default class MapBlock extends Component<any, any> {
             center_coor["lat"] = center_zoom.center[1];
             center = center_coor;
             zoom = center_zoom.zoom;
-            return { center, zoom: zoom - 1 }
         }
-
-        return null;
+        return { center, zoom: zoom - 1 }
     }
 
     zoomOut = () => {
@@ -376,13 +378,31 @@ export default class MapBlock extends Component<any, any> {
         this.setState({ zoom: this.state.zoom + 1 });
     }
 
-    render() {
-        const meteData = this.props.currentBlock.config.metaData;
-        let height = this.props.height;
-        if (this.props.currentBlock.config.configStyle.title.isVisible) {
-            height = height - 30;
+    getMapDataTimeSeries = () => {
+        const options = this.getOptionsSelected();
+        let mapDataTimeseries = JSON.parse(JSON.stringify(this.props.timeseriesData));
+
+        if (options.length > 0) {
+            options.forEach((key) => {
+                mapDataTimeseries = mapDataTimeseries.filter(
+                    (d) => d[key] == this.state.visualData[key]
+                );
+            });
         }
 
+        return mapDataTimeseries;
+    }
+    getVisibleGeoJson = (geoJsonData) => {
+        const mapDataTimeseries = this.getMapDataTimeSeries();
+        const { extractData, unit } = this.getFirstData(mapDataTimeseries);
+        // Prepare Data
+        const visibleGeoJson = this.getGeoJsonOfVisibleRegions(geoJsonData, extractData);
+        return visibleGeoJson;
+    }
+
+    getLayout = () => {
+        const visibleGeoJson = this.getVisibleGeoJson(this.state.geoJsonData);
+        const obj: any = this.setMapProperities(visibleGeoJson);
         const layout: any = {
             width: this.props.width,
             height: this.props.height,
@@ -391,15 +411,25 @@ export default class MapBlock extends Component<any, any> {
             },
             mapbox: {
                 style: 'carto-positron',
-                center: this.state.center,
-                zoom: this.state.zoom
+                center: obj.center,
+                zoom: obj.zoom
             },
             // margin: { r: 0, t: 0, b: 0, l: 0 },
             margin: { r: 0, t: this.props.currentBlock.config.configStyle.title.isVisible ? 30 : 0, b: 0, l: 0 },
             title: this.props.currentBlock.config.configStyle.title.isVisible ? this.props.currentBlock.config.configStyle.title.value : "Title"
-
         };
+        return layout;
+    }
 
+    render() {
+        const meteData = this.props.currentBlock.config.metaData;
+        let height = this.props.height;
+        if (this.props.currentBlock.config.configStyle.title.isVisible) {
+            height = height - 30;
+        }
+
+        const layout: any = this.getLayout();
+        const [frames, data, sliderConfig] = this.getSliderConfigs()
         // Prepare Config
         //TODO add hide/show colorbar to config
         const config = {
@@ -408,16 +438,20 @@ export default class MapBlock extends Component<any, any> {
         };
 
         // SLIDER
-        layout["sliders"] = [this.state.sliderConfig]
+        console.log("config: ", sliderConfig);
+        layout["sliders"] = [sliderConfig]
+
+        console.log("debug frames: ", frames);
+        console.log("debug layout: ", layout);
 
         return (
             <div>
 
                 <div style={{ height: this.props.height, width: this.props.width }}>
                     <div>
-                        <Plot data={this.state.data} layout={layout} config={config}
+                        <Plot data={data} layout={layout} config={config}
                             onDoubleClick={this.zoomToFeatures}
-                        // frames={this.state.frames}
+                            frames={frames}
                         />
                     </div>
                     <div style={{ marginTop: -(height) + 'px', marginLeft: '5px' }}>
