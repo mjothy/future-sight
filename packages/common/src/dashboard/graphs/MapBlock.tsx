@@ -63,6 +63,10 @@ export default class MapBlock extends Component<any, any> {
         this.setState({ geoJsonData })
     }
 
+    componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): void {
+        console.log("component update.");
+    }
+
     // async componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): Promise<void> {
     //     if (!_.isEqual(prevProps.currentBlock.config.metaData, this.props.currentBlock.config.metaData)
     //         || !_.isEqual(prevState.visualData, this.state.visualData)
@@ -107,7 +111,6 @@ export default class MapBlock extends Component<any, any> {
 
     getSliderConfigs = () => {
         const frames: any[] = []
-        const data: any[] = []
 
         const sliderSteps: any[] = []
         const uniq_x = this.getOrderedUniqueX()
@@ -126,14 +129,13 @@ export default class MapBlock extends Component<any, any> {
                 method: 'animate',
                 args: [[year], {
                     mode: 'immediate',
-                    frame: { redraw: false, duration: 0 },
+                    frame: { redraw: true, duration: 0 },
                     transition: { duration: 0 }
                 }]
             }
             sliderSteps.push(sliderStep)
         }
 
-        const defaultYearIndex = 2020;
         const sliderConfig = {
             active: 0,
             pad: { t: 5, b: 5 },
@@ -150,7 +152,16 @@ export default class MapBlock extends Component<any, any> {
             // By default, animate commands are bound to the most recently animated frame:
             steps: sliderSteps
         }
-        return [frames, sliderConfig]
+
+        let data: any = [{
+            type: 'choroplethmapbox',
+            colorscale: "PuBu",
+            geojson: {},
+        }]
+        if (frames.length > 0) {
+            data = frames[0].data;
+        }
+        return [frames, data, sliderConfig]
     }
     // Add slider FIN
 
@@ -418,7 +429,7 @@ export default class MapBlock extends Component<any, any> {
         }
 
         const layout: any = this.getLayout();
-        const [frames, sliderConfig] = this.getSliderConfigs()
+        const [frames, data, sliderConfig] = this.getSliderConfigs()
         // Prepare Config
         //TODO add hide/show colorbar to config
         const config = {
@@ -437,7 +448,7 @@ export default class MapBlock extends Component<any, any> {
 
                 <div style={{ height: this.props.height, width: this.props.width }}>
                     <div>
-                        <Plot data={this.state.data} layout={layout} config={config}
+                        <Plot data={data} layout={layout} config={config}
                             onDoubleClick={this.zoomToFeatures}
                             frames={frames}
                         />
