@@ -118,7 +118,7 @@ class DataBlockView extends Component<any, any> {
       case 'area':
         obj = {
           type: 'scatter',
-          fill: 'tozeroy',
+          fill: 'tonexty',
           // fillcolor: "#FF0000"+"50",
           fillcolor: dataElement.color ? dataElement.color + "50" : null,
           x: xyDict.x,

@@ -10,9 +10,9 @@ export default class PlotlyUtils {
      * @returns year[]
      */
     static getYears = (dataArray: PlotDataModel[]) => {
-        let concatYear:string[] = [];
+        let concatYear: string[] = [];
         for (const dataElement of dataArray) {
-            concatYear = [...concatYear, ...dataElement.data.map((element)=>element.year)]
+            concatYear = [...concatYear, ...dataElement.data.map((element) => element.year)]
         }
         return [...new Set(concatYear)]
     }
@@ -21,8 +21,8 @@ export default class PlotlyUtils {
      * Get index used in this data array. Can be one filterKey or a combination of filterKeys
      * @returns filterKey[]
      */
-    static getIndexKeys = (data: PlotDataModel[], filterKeys=["model", "scenario", "variable", "region"]) => {
-        if (data.length === 0) {return []}
+    static getIndexKeys = (data: PlotDataModel[], filterKeys = ["model", "scenario", "variable", "region"]) => {
+        if (data.length === 0) { return [] }
 
         const filtersValues = {}
         for (const dataElement of data) {
@@ -78,10 +78,10 @@ export default class PlotlyUtils {
     }
 
     static filterByCustomXRange = (plotData: PlotDataModel[], configStyle: BlockStyleModel) => {
-        const XAxisConfig = configStyle.XAxis
+        const XAxisConfig: any = configStyle.XAxis
         const data = JSON.parse(JSON.stringify(plotData))
 
-        if(!XAxisConfig.useCustomRange || !XAxisConfig.left || !XAxisConfig.right){
+        if (!XAxisConfig.useCustomRange || !XAxisConfig.left || !XAxisConfig.right) {
             return data
         }
 
@@ -91,7 +91,7 @@ export default class PlotlyUtils {
             dataElement.data = dataPoints.filter(
                 (dataPoint) =>
                     XAxisConfig.left <= dataPoint.year &&
-                    dataPoint.year<=XAxisConfig.right)
+                    dataPoint.year <= XAxisConfig.right)
         }
         return data
     }
