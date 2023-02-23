@@ -43,26 +43,7 @@ class DataBlockView extends Component<any, any> {
 
   getPlotData = () => {
     let data: PlotDataModel[] = this.props.blockData(this.props.currentBlock);
-    data = this.filterByCustomXRange(data)
-    return data
-  }
-
-  filterByCustomXRange = (plotData: PlotDataModel[]) => {
-    const XAxisConfig = this.props.currentBlock.config.configStyle.XAxis
-    const data = JSON.parse(JSON.stringify(plotData))
-
-    if(!XAxisConfig.useCustomRange || !XAxisConfig.left || !XAxisConfig.right){
-      return data
-    }
-
-    for (let i = 0; i < data.length; i++) {
-      const dataElement = data[i]
-      const dataPoints = [...dataElement.data]
-      dataElement.data = dataPoints.filter(
-          (dataPoint) =>
-              XAxisConfig.left <= dataPoint.year &&
-              dataPoint.year<=XAxisConfig.right)
-    }
+    data = PlotlyUtils.filterByCustomXRange(data, this.props.currentBlock.config.configStyle)
     return data
   }
 

@@ -1,4 +1,5 @@
 import PlotDataModel from "../../models/PlotDataModel";
+import BlockStyleModel from "../../models/BlockStyleModel";
 
 const DEFAULT_FONT_SIZE = 10;
 
@@ -75,4 +76,24 @@ export default class PlotlyUtils {
         }
         return str;
     }
+
+    static filterByCustomXRange = (plotData: PlotDataModel[], configStyle: BlockStyleModel) => {
+        const XAxisConfig = configStyle.XAxis
+        const data = JSON.parse(JSON.stringify(plotData))
+
+        if(!XAxisConfig.useCustomRange || !XAxisConfig.left || !XAxisConfig.right){
+            return data
+        }
+
+        for (let i = 0; i < data.length; i++) {
+            const dataElement = data[i]
+            const dataPoints = [...dataElement.data]
+            dataElement.data = dataPoints.filter(
+                (dataPoint) =>
+                    XAxisConfig.left <= dataPoint.year &&
+                    dataPoint.year<=XAxisConfig.right)
+        }
+        return data
+    }
+
 }

@@ -1,6 +1,7 @@
 import {Checkbox, Col, Row, Select} from 'antd';
 import {Component} from 'react';
 import PlotlyUtils from "../../../../graphs/PlotlyUtils";
+import PlotDataModel from "../../../../../models/PlotDataModel";
 
 const {Option} = Select;
 
@@ -8,6 +9,11 @@ export default class PieVisualizationEditor extends Component<any, any> {
 
     constructor(props) {
         super(props);
+    }
+
+    getAvailableYears = (blockData: PlotDataModel[]) => {
+        const data = PlotlyUtils.filterByCustomXRange(blockData, this.props.currentBlock.config.configStyle)
+        return PlotlyUtils.getYears(data)
     }
 
     onDefaultYearChange = (selectedYear: string) => {
@@ -86,9 +92,9 @@ export default class PieVisualizationEditor extends Component<any, any> {
                             placeholder={"Select a default year"}
                             defaultValue={configStyle.XAxis.default || null}
                             onChange={this.onDefaultYearChange}
-                            status={configStyle.XAxis.default ? undefined : "error"}
+                            status={this.getAvailableYears(blockData).includes(configStyle.XAxis.default) ? undefined : "error"}
                         >
-                            {PlotlyUtils.getYears(blockData).map((value) => (
+                            {this.getAvailableYears(blockData).map((value) => (
                                 <Option key={value} value={value}>
                                     {value}
                                 </Option>

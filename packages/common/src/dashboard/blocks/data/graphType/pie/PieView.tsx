@@ -44,8 +44,8 @@ class PieView extends Component<any, any> {
       const selectedData = selectedYear ? pieDataPerYear[selectedYear] : Object.values(pieDataPerYear)[0]
       plotlyData.push({
         type: 'pie',
-        values: selectedData.values,
-        labels: selectedData.labels,
+        values: selectedData?.values || [],
+        labels: selectedData?.labels || [],
         marker: {
           colors: colors
         },
@@ -61,10 +61,9 @@ class PieView extends Component<any, any> {
     }
     else {
       const pieDataPerIndexValue: {[index: string]: PieDataPerYearModel} = {}
-      const colors: string[] = []
+      const colorsPerIndexValue: {[index:string]:string[]} = {}
 
       for (const dataElement of dataWithColor){
-        colors.push(dataElement.color)
 
         const indexValue = otherIndex.length>1
             ? otherIndex.reduce((acc, filterType, idx, arr) => {
@@ -76,9 +75,13 @@ class PieView extends Component<any, any> {
             : dataElement[otherIndex[0]]
 
         // Define new pieChart if new indexValue introduced
-        if (!pieDataPerIndexValue[indexValue]){
-          pieDataPerIndexValue[indexValue]={}
+        if (!pieDataPerIndexValue[indexValue]) {
+          pieDataPerIndexValue[indexValue] = {}
+          colorsPerIndexValue[indexValue] = []
         }
+
+        // Add color to index
+        colorsPerIndexValue[indexValue].push(dataElement.color)
 
         // Add data per year
         const pieDataPerYear = pieDataPerIndexValue[indexValue]
@@ -119,10 +122,10 @@ class PieView extends Component<any, any> {
         plotlyData.push({
           type: 'pie',
           name: idx,
-          values: selectedData.values,
-          labels: selectedData.labels,
+          values: selectedData?.values || [],
+          labels: selectedData?.labels || [],
           marker: {
-            colors: colors
+            colors: colorsPerIndexValue[idx]
           },
           hovertemplate: `%{label} <br> %{value:.2f} ${dataWithColor[0].unit} <extra>${idx}</extra>`,
           texttemplate: configStyle.pie.showPercent ? null : `%{value:.4s}`,

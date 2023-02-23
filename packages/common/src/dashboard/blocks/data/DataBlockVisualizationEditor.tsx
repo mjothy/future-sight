@@ -238,39 +238,42 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         }
 
         <h3>Axis</h3>
-        <Row>
-          <Col span={2} className={'checkbox-col'}>
-            <Checkbox
-              onChange={this.onYAxisForceChange}
-              checked={configStyle.YAxis.force0}
-            />
-          </Col>
-          <Col span={16} className={'checkbox-col-label'}>
-            <label>Range of Y axis to 0</label>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={2} className={'checkbox-col'}>
-            <Checkbox
-              onChange={this.onYAxisLabelChange}
-              checked={configStyle.YAxis.label}
-            />
-          </Col>
-          <Col span={16} className={'checkbox-col-label'}>
-            <label>Show Y Axis label</label>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={2} className={'checkbox-col'}>
-            <Checkbox
-              onChange={this.onYAxisUnitChange}
-              checked={configStyle.YAxis.unit}
-            />
-          </Col>
-          <Col span={16} className={'checkbox-col-label'}>
-            <label>Show Y Axis unit</label>
-          </Col>
-        </Row>
+        {configStyle.graphType !== "pie" &&
+            <>
+              <Row>
+                <Col span={2} className={'checkbox-col'}>
+                  <Checkbox
+                    onChange={this.onYAxisForceChange}
+                    checked={configStyle.YAxis.force0}
+                  />
+                </Col>
+                <Col span={16} className={'checkbox-col-label'}>
+                  <label>Range of Y axis to 0</label>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={2} className={'checkbox-col'}>
+                  <Checkbox
+                    onChange={this.onYAxisLabelChange}
+                    checked={configStyle.YAxis.label}
+                  />
+                </Col>
+                <Col span={16} className={'checkbox-col-label'}>
+                  <label>Show Y Axis label</label>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={2} className={'checkbox-col'}>
+                  <Checkbox
+                    onChange={this.onYAxisUnitChange}
+                    checked={configStyle.YAxis.unit}
+                  />
+                </Col>
+                <Col span={16} className={'checkbox-col-label'}>
+                  <label>Show Y Axis unit</label>
+                </Col>
+              </Row>
+            </>}
         <Row className="mb-10">
           <Col span={2} className={'checkbox-col'}>
             <Checkbox
@@ -303,30 +306,34 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             />
           </Col>
         </Row>
-        <h3>Legend</h3>
-        <Row>
-          <Col span={2} className={'checkbox-col'}>
-            <Checkbox
-              onChange={this.onLegendChange}
-              checked={configStyle.showLegend}
-            />
-          </Col>
-          <Col span={16} className={'checkbox-col-label'}>
-            <label>Show legend</label>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={2}/>
-          <Col span={8}>
-            <label>Legend info: </label>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={2}/>
-          <Col>
-            <Checkbox.Group options={this.legendOptions()} value={defaultLegendOptions} onChange={this.onLegendContentChange} />
-          </Col>
-        </Row>
+
+        {configStyle.graphType !== "pie" &&
+            <>
+              <h3>Legend</h3>
+              <Row>
+                <Col span={2} className={'checkbox-col'}>
+                  <Checkbox
+                    onChange={this.onLegendChange}
+                    checked={configStyle.showLegend}
+                  />
+                </Col>
+                <Col span={16} className={'checkbox-col-label'}>
+                  <label>Show legend</label>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={2}/>
+                <Col span={8}>
+                  <label>Legend info: </label>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={2}/>
+                <Col>
+                  <Checkbox.Group options={this.legendOptions()} value={defaultLegendOptions} onChange={this.onLegendContentChange} />
+                </Col>
+              </Row>
+          </>}
       </div>
     );
   }
