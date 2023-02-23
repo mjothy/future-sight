@@ -31,10 +31,8 @@ export default class MapBlock extends Component<any, any> {
             data: [{
                 type: 'choroplethmapbox',
                 colorscale: "PuBu",
-                geojson: {}
-            }],
-            frames: [],
-            sliderConfig: [],
+                geojson: {},
+            }]
         };
     }
 
@@ -121,7 +119,6 @@ export default class MapBlock extends Component<any, any> {
                 name: year,
             }
             frames.push(frame)
-            data.push(frame.data)
             console.log("frames x: ", frames);
             // Slider step
             const sliderStep = {
@@ -153,15 +150,7 @@ export default class MapBlock extends Component<any, any> {
             // By default, animate commands are bound to the most recently animated frame:
             steps: sliderSteps
         }
-
-        if (frames.length < 0) {
-            data.push({
-                type: 'choroplethmapbox',
-                colorscale: "PuBu",
-                geojson: {}
-            })
-        }
-        return [frames, data, sliderConfig]
+        return [frames, sliderConfig]
     }
     // Add slider FIN
 
@@ -429,7 +418,7 @@ export default class MapBlock extends Component<any, any> {
         }
 
         const layout: any = this.getLayout();
-        const [frames, data, sliderConfig] = this.getSliderConfigs()
+        const [frames, sliderConfig] = this.getSliderConfigs()
         // Prepare Config
         //TODO add hide/show colorbar to config
         const config = {
@@ -438,9 +427,8 @@ export default class MapBlock extends Component<any, any> {
         };
 
         // SLIDER
-        console.log("config: ", sliderConfig);
         layout["sliders"] = [sliderConfig]
-
+        console.log("config: ", sliderConfig);
         console.log("debug frames: ", frames);
         console.log("debug layout: ", layout);
 
@@ -449,7 +437,7 @@ export default class MapBlock extends Component<any, any> {
 
                 <div style={{ height: this.props.height, width: this.props.width }}>
                     <div>
-                        <Plot data={data} layout={layout} config={config}
+                        <Plot data={this.state.data} layout={layout} config={config}
                             onDoubleClick={this.zoomToFeatures}
                             frames={frames}
                         />
