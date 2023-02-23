@@ -134,7 +134,7 @@ class DataBlockView extends Component<any, any> {
           fillcolor: dataElement.color ? dataElement.color + "50" : null,
           x: this.getX(dataElement),
           y: this.getY(dataElement),
-          mode: "none",
+          mode: "lines",
           name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
