@@ -32,18 +32,28 @@ export default class MapBlock extends Component<any, any> {
                 type: 'choroplethmapbox',
                 colorscale: "PuBu",
                 geojson: {}
-            }]
+            }],
+            frames: [],
+            sliderConfig: [],
         };
     }
 
     async componentDidMount(): Promise<void> {
         const geoJsonData = await this.props.fetchRegionsGeojson({
-            regions: this.props.data.regions,
+            regions: this.props.currentBlock.config.metaData.regions,
         });
+        // const [frames, sliderConfig] = this.getSliderConfigs()
+        // let data = this.state.data;
+        // if ((frames as any).lenght > 0) {
+        //     data = frames[0].data
+        // }
         const { data, visibleGeoJson } = this.getMapData(geoJsonData, 2020);
+
         const state: any = {
             geoJsonData,
-            data,
+            frames,
+            // sliderConfig,
+            data: data,
             visibleGeoJson
         };
         const obj = this.setMapProperities(geoJsonData);
@@ -59,16 +69,98 @@ export default class MapBlock extends Component<any, any> {
             || !_.isEqual(prevState.visualData, this.state.visualData)
             || this.props.timeseriesData?.length != prevProps.timeseriesData?.length) {
             const geoJsonData = await this.props.fetchRegionsGeojson({
-                regions: this.props.data.regions,
+                regions: this.props.currentBlock.config.metaData.regions,
             });
+            // const [frames, sliderConfig] = this.getSliderConfigs()
+            // const data: any = [];
+            // Object.values(frames)?.map(raw => {
+            //     data.push(...raw.data)
+            // })
             const { data, visibleGeoJson } = this.getMapData(geoJsonData, 2020);
             this.setState({
                 geoJsonData,
-                data,
+                frames,
+                // sliderConfig,
+                data: data,
+                // data: frames[this.state.sliderConfig.active].data,
                 visibleGeoJson
             });
         }
     }
+
+    // Add slider START
+    // TODO https://plotly.com/javascript/sliders/
+    // https://plotly.com/javascript/gapminder-example/
+
+    getOrderedUniqueX = () => {
+        const concat_x: any[] = []
+        for (const dataElement of this.props.data) {
+            concat_x.push(...dataElement.x)
+        }
+        return [...new Set(concat_x)].sort((a, b) => a - b)
+    }
+
+    filterDataByX = (dataElement, x) => {
+        const idx = (dataElement.x.filter((element) => Number(element) <= x)).length
+        return dataElement.y.slice(0, idx)
+    }
+
+    getSliderConfigs = () => {
+        const frames: any[] = []
+        const sliderSteps: any[] = []
+        const uniq_x = this.getOrderedUniqueX()
+
+        for (const year of uniq_x) {
+            // Frame
+            const frame: any = {
+                data: this.getData(this.state.geoJsonData, year),
+                name: year,
+            }
+            frames.push(frame)
+            console.log("frames x: ", frames);
+            // Slider step
+            const sliderStep = {
+                label: year,
+                method: 'animate',
+                args: [[year], {
+                    mode: 'immediate',
+                    frame: { redraw: false, duration: 0 },
+                    transition: { duration: 0 }
+                }]
+            }
+            sliderSteps.push(sliderStep)
+        }
+
+        const defaultYearIndex = 2020;
+        const sliderConfig = {
+            active: 0,
+            pad: { t: 5, b: 5 },
+            x: 0.05,
+            len: 0.95,
+            currentvalue: {
+                xanchor: 'right',
+                prefix: 'year: ',
+                font: {
+                    color: '#888',
+                    size: 20
+                }
+            },
+            // By default, animate commands are bound to the most recently animated frame:
+            steps: sliderSteps
+        }
+
+        if (frames.length < 0) {
+            frames.push({
+                type: 'choroplethmapbox',
+                colorscale: "PuBu",
+                geojson: {}
+            })
+        }
+
+        console.log("frames, sliderConfig: ", frames, '/ ', sliderConfig)
+        return [frames, sliderConfig]
+    }
+    // Add slider FIN
 
     onChange = (option, selectedData) => {
         const visualData = { ...this.state.visualData };
@@ -134,6 +226,58 @@ export default class MapBlock extends Component<any, any> {
         return { data, visibleGeoJson };
     };
 
+    getData = (geoJsonData, year = 2020) => {
+        const locations: string[] = [];
+        const z: number[] = [];
+        const options = this.getOptionsSelected();
+        let mapDataTimeseries = JSON.parse(JSON.stringify(this.props.timeseriesData));
+
+        if (options.length > 0) {
+            options.forEach((key) => {
+                mapDataTimeseries = mapDataTimeseries.filter(
+                    (d) => d[key] == this.state.visualData[key]
+                );
+            });
+        }
+        console.log("debug mapDataTimeseries: ", mapDataTimeseries);
+        const { extractData, unit } = this.getFirstData(mapDataTimeseries);
+
+        console.log("debug extractArg: ", extractData);
+        extractData.forEach((regionData: any) => {
+            const value_2020 = regionData.data?.find(
+                (dataPoint) => dataPoint.year == year
+            );
+            if (value_2020 != null) {
+                z.push(Number(Number(value_2020.value)?.toFixed(2)));
+                locations.push(regionData['region']);
+            }
+        });
+
+        // Prepare Data
+        const visibleGeoJson = this.getGeoJsonOfVisibleRegions(geoJsonData, extractData);
+        const data: any = [];
+        data.push({
+            type: 'choroplethmapbox',
+            colorscale: "PuBu",
+            locations,
+            z,
+            geojson: { ...visibleGeoJson },
+            showscale: true,
+            colorbar: {
+                title: {
+                    text: 'value (' + unit + ')',
+                    side: "right"
+                },
+                len: 0.95,
+                thickness: 10,
+                // xanchor: "right", x: 1,
+                // lenmode: "pixels",
+                // len: this.props.height - 80
+            },
+            hoverinfo: "location+z",
+        });
+        return data;
+    };
     /**
      * get options of selected data in inputs in the map
      * Exemple: if user selecte 2 models [model1, model2], select box will be shown in the map to select only one value
@@ -180,7 +324,10 @@ export default class MapBlock extends Component<any, any> {
      */
     getGeoJsonOfVisibleRegions = (geoJsonData, extractedData) => {
         const visibleRegions = extractedData.map(raw => { if (raw.data != null) return raw["region"].toLowerCase() })
-        const featuresVisibleRegions = geoJsonData.features?.filter(feature => visibleRegions.includes(feature.properties["ADMIN"].toLowerCase()))
+        let featuresVisibleRegions = [];
+        if (geoJsonData != null) {
+            featuresVisibleRegions = geoJsonData.features?.filter(feature => visibleRegions.includes(feature.properties["ADMIN"].toLowerCase()))
+        }
         const visibleGeoJson = {
             type: "FeatureCollection",
             features: featuresVisibleRegions
@@ -205,12 +352,12 @@ export default class MapBlock extends Component<any, any> {
      * @returns {zoom, center}
      */
     setMapProperities = (geoJsonData) => {
-        if (geoJsonData.features != undefined) {
+        if (geoJsonData?.features != undefined) {
             let center: any = { lon: 0.17, lat: 43.05 };
             let zoom = 3;
             const bbox1 = bbox(geoJsonData);
             const center_coor = {};
-            const center_zoom = geoViewport.viewport(bbox1, [this.props.width, this.props.height - 50]);
+            const center_zoom = geoViewport.viewport(bbox1, [this.props.width, this.props.height]);
             center_coor["lon"] = center_zoom.center[0];
             center_coor["lat"] = center_zoom.center[1];
             center = center_coor;
@@ -231,14 +378,14 @@ export default class MapBlock extends Component<any, any> {
 
     render() {
         const meteData = this.props.currentBlock.config.metaData;
-        let height = this.props.height - 50;
+        let height = this.props.height;
         if (this.props.currentBlock.config.configStyle.title.isVisible) {
             height = height - 30;
         }
 
         const layout: any = {
             width: this.props.width,
-            height: this.props.height - 50,
+            height: this.props.height,
             font: {
                 size: 10,
             },
@@ -259,13 +406,18 @@ export default class MapBlock extends Component<any, any> {
             displayModeBar: false, // this is the line that hides the bar.
             editable: false,
         };
+
+        // SLIDER
+        layout["sliders"] = [this.state.sliderConfig]
+
         return (
             <div>
 
-                <div style={{ height: this.props.height - 50, width: this.props.width }}>
+                <div style={{ height: this.props.height, width: this.props.width }}>
                     <div>
                         <Plot data={this.state.data} layout={layout} config={config}
                             onDoubleClick={this.zoomToFeatures}
+                        // frames={this.state.frames}
                         />
                     </div>
                     <div style={{ marginTop: -(height) + 'px', marginLeft: '5px' }}>
@@ -357,10 +509,6 @@ export default class MapBlock extends Component<any, any> {
                         </Tooltip>
                     </div>
 
-                </div>
-
-                <div style={{ height: 50, width: this.props.width }}>
-                    Slider
                 </div>
             </div>
         );

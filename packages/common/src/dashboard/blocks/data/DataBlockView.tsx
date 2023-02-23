@@ -44,9 +44,6 @@ export default class DataBlockView extends Component<any, any> {
       case "table":
         visualizeData = this.prepareTableData(data);
         break;
-      case "map":
-        visualizeData = this.prepareMapData(data, this.props.currentBlock.config.metaData.regions);
-        break;
       default:
         data?.map((dataElement) => {
           showData.push(this.preparePlotData(dataElement, configStyle));
@@ -139,14 +136,6 @@ export default class DataBlockView extends Component<any, any> {
     }
 
     return obj;
-  }
-
-  prepareMapData = (data, regions) => {
-    return {
-      type: "choroplethmapbox",
-      data: data,
-      regions: regions,
-    };
   }
 
   plotHoverText = (dataElement) => {
