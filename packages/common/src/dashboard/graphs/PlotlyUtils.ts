@@ -81,7 +81,7 @@ export default class PlotlyUtils {
         const XAxisConfig: any = configStyle.XAxis
         const data = JSON.parse(JSON.stringify(plotData))
 
-        if (!XAxisConfig.useCustomRange || !XAxisConfig.left || !XAxisConfig.right) {
+        if (!XAxisConfig || !XAxisConfig.useCustomRange || !XAxisConfig.left || !XAxisConfig.right) {
             return data
         }
 
