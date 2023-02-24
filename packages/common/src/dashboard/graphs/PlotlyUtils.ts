@@ -90,10 +90,9 @@ export default class PlotlyUtils {
             const dataPoints = [...dataElement.data]
             dataElement.data = dataPoints.filter(
                 (dataPoint) =>
-                    XAxisConfig.left <= dataPoint.year &&
-                    dataPoint.year<=XAxisConfig.right)
+                    (XAxisConfig.left||0) <= dataPoint.year &&
+                    dataPoint.year<= (XAxisConfig.right||0))
         }
         return data
     }
-
 }

@@ -1,5 +1,5 @@
-.preview-container {
-  height: 22px;
+.draft-preview{
+  width: 192px;
 }
 
 .draft-preview > .ant-card-actions > li > span:hover {
@@ -8,8 +8,4 @@
 
 .draft-preview .ant-card-body{
   padding: 10px;
-}
-
-.draft-preview .ant-card-meta-detail {
-  overflow: unset;
 }

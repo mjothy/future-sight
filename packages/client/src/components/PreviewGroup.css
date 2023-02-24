@@ -1,7 +1,3 @@
 .preview-group .ant-card-body {
   padding: 10px !important;
 }
-
-.preview-group .ant-card-meta-detail {
-  overflow: unset;
-}
