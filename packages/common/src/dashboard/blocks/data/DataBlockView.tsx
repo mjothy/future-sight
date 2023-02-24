@@ -65,7 +65,7 @@ class DataBlockView extends Component<any, any> {
       }
       default: {
         let stacks = null;
-        if (configStyle.stack.isStack && configStyle.graphType === 'area') {
+        if (configStyle.stack && configStyle.stack.isStack && configStyle.graphType === 'area') {
           stacks = stackGroups(currentBlock.config.metaData, configStyle.stack.value);
         }
         const dataWithColor = this.props.colorizer.colorizeData(data)
