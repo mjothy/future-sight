@@ -2,6 +2,16 @@
   object-fit: cover;
 }
 
+.preview-card{
+  width: 192px;
+}
+
+.preview-card .ant-card-meta-title {
+  overflow: auto;
+  text-overflow: unset;
+}
+
 .preview-container {
-  height: 22px;
+  display: flex;
+  overflow: auto;
 }

@@ -61,6 +61,7 @@ class Preview extends React.Component<any, any> {
 
         return (
             <Card
+                className={"preview-card"}
                 cover={
                     <Image
                         width={192}
