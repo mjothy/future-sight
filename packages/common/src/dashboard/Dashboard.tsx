@@ -8,6 +8,7 @@ import DashboardModel from '../models/DashboardModel';
 import { Layout, notification } from "antd";
 const { Content } = Layout;
 import html2canvas from "html2canvas";
+import GetGeoJsonContextProvider from '../services/GetGeoJsonContextProvider';
 
 const DEFAULT_PREVIEW_WIDTH = 800;
 const DEFAULT_PREVIEW_HEIGHT = 450;
@@ -118,8 +119,9 @@ class Dashboard extends Component<DashboardProps, any> {
                 <div className="no-sidebar-margin" />
                 <Content className={"dashboard-content-wrapper"}>
                     <div className="dashboard-content">
-                        <DashboardConfigView {...this.props} readonly={this.state.readonly} fetchRegionsGeojson={this.props.dataManager.fetchRegionsGeojson}
-                        />
+                        <GetGeoJsonContextProvider getGeoJson={this.props.dataManager.fetchRegionsGeojson}>
+                            <DashboardConfigView {...this.props} readonly={this.state.readonly} />
+                        </GetGeoJsonContextProvider>
                     </div>
                 </Content>
                 <div className="no-sidebar-margin" />

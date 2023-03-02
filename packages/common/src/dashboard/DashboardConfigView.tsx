@@ -246,7 +246,6 @@ class DashboardConfigView extends Component<any, any> {
                                         ? this.state.graphsSize[layout.i].height
                                         : this.height
                                 }
-                                fetchRegionsGeojson={this.props.fetchRegionsGeojson}
                                 dashboard={this.props.dashboard}
                                 optionsLabel={this.props.optionsLabel}
                                 updateDashboard={this.props.updateDashboard}

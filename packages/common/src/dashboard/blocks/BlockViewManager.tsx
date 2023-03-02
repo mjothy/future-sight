@@ -25,7 +25,6 @@ export default class BlockViewManager extends Component<any, any> {
           timeseriesData: this.props.timeseriesData,
           width: this.props.width,
           height: this.props.height,
-          fetchRegionsGeojson: this.props.fetchRegionsGeojson
         }} />;
       case 'control':
         return <ControlBlockView {...{

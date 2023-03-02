@@ -6,8 +6,9 @@ import { Option } from 'antd/lib/mentions';
 import bbox from "@turf/bbox"
 import geoViewport from "@mapbox/geo-viewport";
 import { FullscreenExitOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
+import withGetGeoJson from '../../services/withGetGeoJson';
 
-export default class MapBlock extends Component<any, any> {
+class MapBlock extends Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {
@@ -37,7 +38,7 @@ export default class MapBlock extends Component<any, any> {
     }
 
     async componentDidMount(): Promise<void> {
-        const geoJsonData = await this.props.fetchRegionsGeojson({
+        const geoJsonData = await this.props.getGeoJson({
             regions: this.props.currentBlock.config.metaData.regions,
         });
         const visibleGeoJson = this.getVisibleGeoJson(geoJsonData);
@@ -47,7 +48,7 @@ export default class MapBlock extends Component<any, any> {
 
     async componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): Promise<void> {
         if (!_.isEqual(prevProps.currentBlock.config.metaData, this.props.currentBlock.config.metaData)) {
-            const geoJsonData = await this.props.fetchRegionsGeojson({
+            const geoJsonData = await this.props.getGeoJson({
                 regions: this.props.currentBlock.config.metaData.regions,
             });
             const visibleGeoJson = this.getVisibleGeoJson(geoJsonData);
@@ -448,3 +449,5 @@ export default class MapBlock extends Component<any, any> {
         );
     }
 }
+
+export default withGetGeoJson(MapBlock)
