@@ -28,7 +28,9 @@ const plotTypes = [
 
 ];
 
-const colorscales = ["PuBu", "Viridis", "Cividis", "Blues", "Greens"]
+const colorscales = ["Default", "Viridis", "Cividis", "Blues", "Greens"]
+
+const colorbarTitle = ['variable', 'unit'];
 
 export default class DataBlockVisualizationEditor extends Component<any, any> {
 
@@ -101,7 +103,6 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   }
 
   onColorbarChange = (e) => {
-    console.log("onColorbarChange: ", e)
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.colorbar.isShow = e.target.checked;
     this.updateBlockConfig({ configStyle: configStyle })
@@ -110,6 +111,18 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   onColorChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.colorbar.color = e.target.value;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onColorbarTitleChange = (checkedValues) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.colorbar.title = {
+      variable: false,
+      unit: false
+    }
+    for (const value of checkedValues) {
+      configStyle.colorbar.title[value] = true;
+    }
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
@@ -264,7 +277,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
               </Col>
             </Row>
             <Row>
-              <Col span={2} />
+              <Col span={1} />
               <Col span={8}>
                 <label>Colors: </label>
               </Col>
@@ -273,6 +286,18 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
               <Col span={2} />
               <Col>
                 <Radio.Group options={colorscales} value={configStyle.colorbar.color} onChange={this.onColorChange} />
+              </Col>
+            </Row>
+            <Row>
+              <Col span={1} />
+              <Col span={8}>
+                <label>Title: </label>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={2} />
+              <Col>
+                <Checkbox.Group options={colorbarTitle} value={Object.keys(configStyle.colorbar.title).filter(k => configStyle.colorbar.title[k])} onChange={this.onColorbarTitleChange} />
               </Col>
             </Row>
           </>}

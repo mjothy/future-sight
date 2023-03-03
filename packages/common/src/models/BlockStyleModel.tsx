@@ -18,7 +18,11 @@ export default class BlockStyleModel {
   };
   colorbar = {
     isShow: true,
-    color: "PuBu",
-    reverse: false
+    color: "Default",
+    reverse: false,
+    title: {
+      variable: false,
+      unit: true
+    }
   }
 }

@@ -7,6 +7,7 @@ import bbox from "@turf/bbox"
 import geoViewport from "@mapbox/geo-viewport";
 import { FullscreenExitOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import withGetGeoJson from '../../services/withGetGeoJson';
+import PlotlyUtils from './PlotlyUtils';
 
 class MapBlock extends Component<any, any> {
     constructor(props) {
@@ -98,7 +99,6 @@ class MapBlock extends Component<any, any> {
                 name: year,
             }
             frames.push(frame)
-            console.log("frames x: ", frames);
             // Slider step
             const sliderStep = {
                 label: year,
@@ -167,35 +167,42 @@ class MapBlock extends Component<any, any> {
      * @returns data
      */
     getMapData = (geoJsonData, year = 2020) => {
-        const { extractData, unit } = this.getFirstData(); // TODO filter to keep only locations in visible geoJson
-        const { locations, z } = this.getMapConfig(extractData, year);
-        const configStyle = this.props.currentBlock.config.configStyle;
-
-        // Prepare Data
-        const visibleGeoJson = this.getGeoJsonForRegionWithData(geoJsonData, extractData);
-
+        const extractData = this.getFirstData(); // TODO filter to keep only locations in visible geoJson
         const data: any = [];
-        data.push({
-            type: 'choroplethmapbox',
-            colorscale: configStyle.colorbar.color,
-            locations,
-            z,
-            geojson: { ...visibleGeoJson },
-            showscale: configStyle.colorbar.isShow,
-            reversescale: configStyle.colorbar.reverse,
-            colorbar: {
-                title: {
-                    text: 'value (' + unit + ')',
-                    side: "right"
+        let obj: any = {
+            type: 'choroplethmapbox'
+        }
+        if (extractData.length > 0) {
+            const { locations, z } = this.getMapConfig(extractData, year);
+            const configStyle = this.props.currentBlock.config.configStyle;
+
+            // Prepare Data
+            const visibleGeoJson = this.getGeoJsonForRegionWithData(geoJsonData, extractData);
+
+            obj = {
+                ...obj,
+                type: 'choroplethmapbox',
+                colorscale: configStyle.colorbar.color,
+                locations,
+                z,
+                geojson: { ...visibleGeoJson },
+                showscale: configStyle.colorbar.isShow,
+                reversescale: configStyle.colorbar.reverse,
+                colorbar: {
+                    title: {
+                        text: this.getColorbarTitle(configStyle.colorbar.title, extractData[0].variable, extractData[0].unit),
+                        side: "right"
+                    },
+                    len: 0.95,
+                    thickness: 10,
+                    // xanchor: "right", x: 1,
+                    // lenmode: "pixels",
+                    // len: this.props.height - 80
                 },
-                len: 0.95,
-                thickness: 10,
-                // xanchor: "right", x: 1,
-                // lenmode: "pixels",
-                // len: this.props.height - 80
-            },
-            hoverinfo: "location+z",
-        });
+                hoverinfo: "location+z",
+            };
+        }
+        data.push(obj);
         return data;
     };
 
@@ -216,6 +223,22 @@ class MapBlock extends Component<any, any> {
         return { locations, z }
     }
 
+    getColorbarTitle = (config, variable, unit) => {
+        let text = '';
+        if (config.variable && config.unit) {
+            text = variable + '<br>' + unit;
+        } else {
+            if (config.variable) {
+                text = text + variable;
+            } else if (config.unit) {
+                text = text + unit
+            }
+        }
+
+        text = PlotlyUtils.getLabel(text, this.props.height, "cbtitle") as string;
+        return text;
+    }
+
     /**
      * When possible data possible to be presented in the map, return only the first raws for different regions
      * and same {model, scenario, variable}
@@ -234,13 +257,10 @@ class MapBlock extends Component<any, any> {
         }
 
         const extractData: any = [];
-        let unit = null;
 
         if (mapDataTimeseries.length > 0) {
             const firstElement = mapDataTimeseries[0]; // first raw of one region
             extractData.push(firstElement);
-
-            unit = firstElement.unit;
             // get other raws whith same data but different regions
             mapDataTimeseries.forEach(raw => {
                 if (raw["region"] != firstElement["region"] && raw["model"] == firstElement["model"] && raw["scenario"] == firstElement["scenario"] && raw["variable"] == firstElement["variable"]) {
@@ -248,7 +268,7 @@ class MapBlock extends Component<any, any> {
                 }
             })
         }
-        return { extractData, unit }
+        return extractData;
     }
 
     /**
@@ -332,7 +352,7 @@ class MapBlock extends Component<any, any> {
      * @returns geojson 
      */
     getVisibleGeoJson = (geoJsonData) => {
-        const { extractData } = this.getFirstData();
+        const extractData = this.getFirstData();
         const visibleGeoJson = this.getGeoJsonForRegionWithData(geoJsonData, extractData);
         return visibleGeoJson;
     }

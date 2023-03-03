@@ -43,7 +43,11 @@
           "colorbar": {
             "isShow": true,
             "color": "PuBu",
-            "reverse": false
+            "reverse": false,
+            "title": {
+              "variable": false,
+              "unit": true
+            }
           }
         },
         "metaData": {
