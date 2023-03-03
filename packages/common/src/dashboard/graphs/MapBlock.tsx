@@ -169,6 +169,7 @@ class MapBlock extends Component<any, any> {
     getMapData = (geoJsonData, year = 2020) => {
         const { extractData, unit } = this.getFirstData(); // TODO filter to keep only locations in visible geoJson
         const { locations, z } = this.getMapConfig(extractData, year);
+        const configStyle = this.props.currentBlock.config.configStyle;
 
         // Prepare Data
         const visibleGeoJson = this.getGeoJsonForRegionWithData(geoJsonData, extractData);
@@ -176,11 +177,12 @@ class MapBlock extends Component<any, any> {
         const data: any = [];
         data.push({
             type: 'choroplethmapbox',
-            colorscale: "PuBu",
+            colorscale: configStyle.colorbar.color,
             locations,
             z,
             geojson: { ...visibleGeoJson },
-            showscale: true,
+            showscale: configStyle.colorbar.isShow,
+            reversescale: configStyle.colorbar.reverse,
             colorbar: {
                 title: {
                     text: 'value (' + unit + ')',

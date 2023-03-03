@@ -16,4 +16,9 @@ export default class BlockStyleModel {
     value: 'Title',
     isVisible: true,
   };
+  colorbar = {
+    isShow: true,
+    color: "PuBu",
+    reverse: false
+  }
 }
