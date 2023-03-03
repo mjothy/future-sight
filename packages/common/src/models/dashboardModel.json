@@ -42,7 +42,7 @@
           },
           "colorbar": {
             "isShow": true,
-            "color": "PuBu",
+            "color": "Reds",
             "reverse": false,
             "title": {
               "variable": false,
