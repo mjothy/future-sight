@@ -28,7 +28,7 @@ const plotTypes = [
 
 ];
 
-const colorscales = ["Reds", "Blues", "Greens", "Viridis", "Cividis"]
+const colorscales = ["Reds", "Blues", "Greens", "Viridis", "Cividis", "Greys"]
 
 const colorbarTitle = ['variable', 'unit'];
 

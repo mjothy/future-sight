@@ -199,7 +199,8 @@ class MapBlock extends Component<any, any> {
                     // lenmode: "pixels",
                     // len: this.props.height - 80
                 },
-                hoverinfo: "location+z",
+                hovertext: "model: " + extractData[0].model + "<br>" + "scenario: " + extractData[0].scenario,
+                hoverinfo: "location+z+text",
             };
         }
         data.push(obj);
