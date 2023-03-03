@@ -4,7 +4,7 @@ import {
   ComponentPropsWithDataManager,
   ConfigurationModel, DataModel,
   getBlock,
-  ReadOnlyDashboard, Colorizer
+  ReadOnlyDashboard, Colorizer, PlotDataModel
 } from '@future-sight/common';
 import { Component } from 'react';
 import withDataManager from '../../services/withDataManager';
@@ -82,13 +82,13 @@ class DashboardDataConfiguration extends Component<
    * @param block the block
    * @returns the fetched data from API with timeseries
    */
-  blockData = (block: BlockModel) => {
+  blockData = (block: BlockModel): PlotDataModel[] => {
 
     if (block.blockType !== "text") {
       const config: ConfigurationModel | any = block.config;
       const metaData: BlockDataModel = config.metaData;
-      const data: any[] = [];
-      const missingData: any[] = [];
+      const data: PlotDataModel[] = [];
+      const missingData: DataModel[] = [];
 
       if (
         metaData.models &&

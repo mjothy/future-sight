@@ -10,7 +10,8 @@ export default class BlockStyleModel {
     Model: false,
     Scenario: false,
     Region: false,
-    Variable: false
+    Variable: false,
+    Version: false
   };
   title = {
     value: 'Title',
@@ -30,6 +31,10 @@ export default class BlockStyleModel {
       value: ""
     },
     variables:{
+      isCustom: false,
+      value: ""
+    },
+    versions:{
       isCustom: false,
       value: ""
     }

@@ -6,6 +6,8 @@ export default class BlockDataModel {
   scenarios: string[] = [];
   regions: string[] = [];
   variables: string[] = [];
+  versions: versionModel = {};
+  useVersion = false;
 
   /**
    * Selection order
@@ -32,6 +34,16 @@ export default class BlockDataModel {
       isMaster: false,
       values: [],
     },
+    versions: {
+      isMaster: false,
+      values: [],
+    },
   };
+}
 
+
+export interface versionModel{
+  [model: string]: {
+    [scenario: string]: string[]
+  }
 }

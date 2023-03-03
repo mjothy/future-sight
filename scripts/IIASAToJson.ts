@@ -1,7 +1,8 @@
 import * as fs from "fs";
 import * as csv from "csv";
 import * as path from "path";
-import { JsonStreamStringify } from 'json-stream-stringify';
+import {JsonStreamStringify} from 'json-stream-stringify';
+
 
 function generateParser(json: object[], dataUnion: object[], models: any, scenarios: any, variables: any, regions: any, id: string) {
     const parser = csv.parse({
@@ -12,10 +13,10 @@ function generateParser(json: object[], dataUnion: object[], models: any, scenar
     parser.on('readable', function () {
         let record;
         while ((record = parser.read()) !== null) {
-            const { Model, Scenario, Region, Variable, Unit, ...data } = record;
+            const {Model, Scenario, Version, Region, Variable, Unit, is_default, ...data} = record;
             const dataParsed: any[] = [];
             for (const key in data) {
-                dataParsed.push({ "year": key, "value": data[key] });
+                dataParsed.push({"year": key, "value": data[key]});
             }
 
             // // Set models.json
@@ -74,17 +75,21 @@ function generateParser(json: object[], dataUnion: object[], models: any, scenar
             json.push({
                 "model": Model,
                 "scenario": Scenario,
+                "version": Version,
                 "region": Region,
+                "is_default": is_default,
                 "variable": Variable,
                 "unit": Unit,
-                "data": dataParsed
+                "data": dataParsed,
             });
 
             dataUnion.push({
                 "model": Model,
                 "scenario": Scenario,
-                "region": Region,
                 "variable": Variable,
+                "region": Region,
+                "version": Version,
+                "is_default": is_default,
             })
         }
     });
@@ -92,11 +97,12 @@ function generateParser(json: object[], dataUnion: object[], models: any, scenar
     parser.on('error', function (err) {
         console.error(err.message);
     });
-    parser.on('close', () => {
+    parser.on('end', () => {
         console.log("done", id)
     })
     return parser;
 }
+
 function parseAndWrite(json: object[], dataUnion: object[], models: any, scenarios: any, variables: any, regions: any, dirPath: string, files: string[], i: number, resolve: (json: object[], dataUnion: object[], models: any, scenarios: any, variables: any, regions: any) => void) {
     const file = files[i];
     console.log("checking ", file)
@@ -120,15 +126,15 @@ const variables: any = {}
 const regions: any = {}
 
 
-
-const jsonFilePath = path.join(__dirname, "../data/out/data1.json");
+const jsonFilePath = path.join(__dirname, "../data/out/data.json");
 const dataUnionFilePath = path.join(__dirname, "../data/out/dataUnion.json");
 const modelsFilePath = path.join(__dirname, "../data/out/models.json");
 const scenariosFilePath = path.join(__dirname, "../data/out/scenarios.json");
 const variablesFilePath = path.join(__dirname, "../data/out/variables.json");
 const regionsFilePath = path.join(__dirname, "../data/out/regions.json");
 
-const csvFilePath = "D:/tmp/data/";
+// const csvFilePath = "D:/tmp/data/"; // Used only a fraction of the dataset, files too big to be used directly on RAM
+const csvFilePath = "D:/projet/ecemf/data/data_raw/with_version_sample";
 
 const all: Promise<any>[] = []
 const files = fs.readdirSync(csvFilePath);
@@ -165,15 +171,15 @@ parseAndWrite(json, dataUnion, models, scenarios, variables, regions, csvFilePat
     //     console.log("done writing models")
     // })
 
-    fs.writeFileSync(jsonFilePath, JSON.stringify(json))
-    fs.writeFileSync(dataUnionFilePath, JSON.stringify(dataUnion))
+    // const streamJson = new JsonStreamStringify(json);
+    // const fileStream = fs.createWriteStream(jsonFilePath);
+    // streamJson.pipe(fileStream).on("finish", () => {
+    //     console.log("done writing data")
+    // })
 
+    fs.writeFileSync(jsonFilePath, JSON.stringify(json))
     console.log("done writing data")
-    /*
-    const streamJson = new JsonStreamStringify(json);
-    const fileStream =  fs.createWriteStream(jsonFilePath);
-    streamJson.pipe(fileStream).on("finish", () => {
-        console.log("done writing data")
-    })
-    */
+
+    fs.writeFileSync(dataUnionFilePath, JSON.stringify(dataUnion))
+    console.log("done writing dataUnion")
 })

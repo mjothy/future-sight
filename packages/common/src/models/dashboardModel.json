@@ -45,6 +45,10 @@
             "variables": {
               "isCustom": false,
               "value": ""
+            },
+            "versions": {
+              "isCustom": false,
+              "value": ""
             }
           },
           "YAxis": {
@@ -63,7 +67,8 @@
             "Model": false,
             "Scenario": false,
             "Region": false,
-            "Variable": false
+            "Variable": false,
+            "Version": false
           },
           "stack": {
             "isStack": false,
@@ -81,6 +86,8 @@
           "scenarios": [],
           "regions": [],
           "variables": [],
+          "versions": {},
+          "useVersion": false,
           "selectOrder": [],
           "master": {
             "models": {
@@ -96,6 +103,10 @@
               "values": []
             },
             "variables": {
+              "isMaster": false,
+              "values": []
+            },
+            "versions": {
               "isMaster": false,
               "values": []
             }

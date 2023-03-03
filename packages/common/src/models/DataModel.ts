@@ -3,4 +3,5 @@ export default interface DataModel {
   scenario: string;
   region: string;
   variable: string;
+  version?: string;
 }

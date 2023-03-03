@@ -6,5 +6,6 @@ export default class DataStructureModel {
     variables: FilterModel = new FilterModel();
     scenarios: FilterModel = new FilterModel();
     models: FilterModel = new FilterModel();
+    versions: FilterModel = new FilterModel();
 
 }

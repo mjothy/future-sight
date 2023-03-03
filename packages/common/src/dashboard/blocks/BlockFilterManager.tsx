@@ -4,6 +4,7 @@ import ControlBlockEditor from './control/ControlBlockEditor';
 import DataBlockEditor from './data/DataBlockEditor';
 import { getBlock } from './utils/BlockDataUtils';
 import { getSelectedFilter } from './utils/DashboardUtils';
+import BlockDataModel from "../../models/BlockDataModel";
 
 export default class BlockFilterManager extends Component<any, any> {
     constructor(props) {
@@ -38,7 +39,7 @@ export default class BlockFilterManager extends Component<any, any> {
 
     updateDropdownData = () => {
         const filters = {};
-        let metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
+        let metaData: BlockDataModel = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
         const currentBlock = this.props.currentBlock;
 
         if (currentBlock.controlBlock !== '') {
@@ -57,7 +58,7 @@ export default class BlockFilterManager extends Component<any, any> {
      * @param metaData selected data in block
      * @param filters the first filter(by data focus)
      */
-    filterOptions = (metaData, filters) => {
+    filterOptions = (metaData: BlockDataModel, filters) => {
         this.props.dataManager.fetchDataOptions({ filters, metaData }).then(res => {
             this.setState({ optionsData: res }, () => {
                 this.props.checkIfSelectedInOptions(this.state.optionsData, this.props.currentBlock)

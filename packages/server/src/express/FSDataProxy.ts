@@ -1,5 +1,6 @@
 import IDataProxy from "./IDataProxy";
 import * as fs from "fs";
+import {parser} from 'stream-json/Parser';
 
 const optionsLabel = ["models", "scenarios", "variables", "regions"];
 
@@ -16,6 +17,11 @@ export default class FSDataProxy implements IDataProxy {
         const dataRaw = fs.readFileSync(dataPath);
         const dataUnionRaw = fs.readFileSync(dataUnionPath);
 
+        // this.data=[]
+        // const dataPipeline = fs.createReadStream(dataPath).pipe(parser());
+        // dataPipeline.on('data', dataElement => this.data.push(dataElement));
+        // dataPipeline.on('end', () => console.log(`data parsed`));
+        //
         this.data = JSON.parse(dataRaw.toString());
         this.dataUnion = JSON.parse(dataUnionRaw.toString());
         optionsLabel.forEach(option => {

@@ -6,7 +6,7 @@ import path, { join } from 'path';
 import RedisClient from '../redis/RedisClient';
 import IDataProxy from './IDataProxy';
 
-const optionsLabel = ["models", "scenarios", "variables", "regions"];
+const optionsLabel = ["models", "scenarios", "variables", "regions", "versions"];
 
 export default class ExpressServer {
   private app: any;
@@ -64,14 +64,25 @@ export default class ExpressServer {
       const body = req.body;
       const response: any[] = [];
       for (const reqData of body) {
-        const elements = this.dataProxy.getData().filter(
-          (e) => e.model === reqData.model && e.scenario === reqData.scenario && e.variable === reqData.variable && e.region === reqData.region
-        );
+        let elements = this.dataProxy.getData()
+        if (reqData.version){
+          elements = elements.filter(
+              (e) => e.model === reqData.model && e.scenario === reqData.scenario && e.variable === reqData.variable && e.region === reqData.region && e.version === reqData.version
+          );
+        } else {
+          elements = elements.filter(
+            (e) => e.model === reqData.model && e.scenario === reqData.scenario && e.variable === reqData.variable && e.region === reqData.region && e.is_default === "True"
+          );
+        }
         if (elements) {
           response.push(...elements);
         }
       }
       res.status(200).send(response);
+    });
+
+    this.app.get('/api/all_data', (req, res) => {
+      res.send(this.dataProxy.getDataUnion()[0]);
     });
 
     this.app.get('/api/models', (req, res) => {
@@ -89,6 +100,7 @@ export default class ExpressServer {
     this.app.get(`/api/regions`, (req, res) => {
       res.send(this.dataProxy.getRegions());
     });
+
     const appendDashboardIdToIndexList = async (id: string, indexListKey: string, value: string) => {
       // Initialize the key if it does not exist
       const valueTransform = value.replace(/ /g, '%');
@@ -228,6 +240,7 @@ export default class ExpressServer {
       const dataRaws = this.getRaws(metaData, firstFilterRaws);
 
       optionsLabel.forEach(option => {
+        if (option == "versions") return;
         let possible_options: any[] = [];
         if (dataRaws[option].length > 0) {
           possible_options = Array.from(new Set(dataRaws[option].map(raw => raw[option.slice(0, -1)])))
@@ -236,6 +249,16 @@ export default class ExpressServer {
         }
         optionsData[option] = possible_options;
       })
+
+      if (["models", "scenarios"].every(i => metaData.selectOrder.includes(i))){
+        const version_dict = {};
+        for (const raw of dataRaws.versions) {
+          !(raw["model"] in version_dict) && (version_dict[raw.model]={});
+          !(raw["scenario"] in version_dict[raw["model"]]) && (version_dict[raw["model"]][raw["scenario"]] = []);
+          !(version_dict[raw.model][raw.scenario].includes(raw.version)) && (version_dict[raw.model][raw.scenario].push(raw.version));
+        }
+        optionsData["versions"] = version_dict;
+      }
 
       res.send(optionsData);
     })
@@ -263,11 +286,12 @@ export default class ExpressServer {
    */
   getRaws = (metaData, firstFilterRaws) => {
 
-    const dataRaws = {
+    const dataRaws:{[index: string]: any[]} = {
       regions: [],
       variables: [],
       scenarios: [],
       models: [],
+      versions: []
     };
 
     if (metaData.selectOrder.length > 0) {
@@ -282,18 +306,33 @@ export default class ExpressServer {
       for (let i = 1; i < option_selected.length; i++) {
         const current_option = metaData.selectOrder[i];
         const prev_option = metaData.selectOrder[i - 1];
-        dataRaws[current_option] = dataRaws[prev_option].filter(raw => metaData[prev_option].includes(raw[prev_option.slice(0, -1)]));
+        dataRaws[current_option] = (prev_option == "versions")
+            ? this.filterRawByVersions(dataRaws, metaData)
+            : dataRaws[prev_option].filter(raw => metaData[prev_option].includes(raw[prev_option.slice(0, -1)]));
       }
 
       // set possible raws for unselected inputs
       if (option_unselected.length > 0) {
         const prev_option = metaData.selectOrder[metaData.selectOrder.length - 1];// last label selected (drop down)
-        const possible_raws = dataRaws[prev_option].filter(raw => metaData[prev_option].includes(raw[prev_option.slice(0, -1)]));
+        const possible_raws = (prev_option == "versions")
+            ? this.filterRawByVersions(dataRaws, metaData)
+            : dataRaws[prev_option].filter(raw => metaData[prev_option].includes(raw[prev_option.slice(0, -1)]));
         option_unselected.forEach((option) => {
           dataRaws[option] = possible_raws;
         })
       }
     }
     return dataRaws;
+  }
+
+  filterRawByVersions(dataRaws, metaData) {
+    const selectedVersions = metaData.versions
+    return dataRaws.versions.filter(raw => {
+      if(!!selectedVersions[raw.model] && !!selectedVersions[raw.model][raw.scenario]){
+        return selectedVersions[raw.model][raw.scenario].includes(raw.version)
+      } else {
+        return true
+      }
+    });
   }
 }
