@@ -51,9 +51,24 @@ class MapBlock extends Component<any, any> {
             const geoJsonData = await this.props.getGeoJson({
                 regions: this.props.currentBlock.config.metaData.regions,
             });
-            const visibleGeoJson = this.getVisibleGeoJson(geoJsonData);
+
+            this.setState({
+                geoJsonData,
+                visualData: {
+                    model: null,
+                    scenario: null,
+                    variable: null,
+                },
+            })
+        }
+
+        if (this.state.geoJsonData != prevState.geoJsonData) {
+            const visibleGeoJson = this.getVisibleGeoJson(this.state.geoJsonData);
             const obj: any = this.getMapProperities(visibleGeoJson);
-            this.setState({ geoJsonData, zoom: obj.zoom, center: obj.center })
+            this.setState({
+                zoom: obj.zoom,
+                center: obj.center,
+            })
         }
     }
 
