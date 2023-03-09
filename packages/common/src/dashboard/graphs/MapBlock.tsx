@@ -13,12 +13,6 @@ class MapBlock extends Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {
-            visibleGeoJson: {
-                geoJsonOfVisibleData: {
-                    type: "FeatureCollection",
-                    features: []
-                }
-            },
             geoJsonData: {},
             /**
              * data with timeseries on current block
@@ -29,12 +23,7 @@ class MapBlock extends Component<any, any> {
                 variable: null,
             },
             center: { lon: 0.17, lat: 43.05 },
-            zoom: 3,
-            data: [{
-                type: 'choroplethmapbox',
-                colorscale: "PuBu",
-                geojson: {},
-            }]
+            zoom: 3
         };
     }
 
