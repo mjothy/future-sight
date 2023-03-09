@@ -36,6 +36,7 @@
     "plotly.js": "^2.12.1",
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
+    "react-colorscales": "^0.7.3",
     "react-grid-layout": "^1.3.4",
     "react-plotly.js": "^2.5.1",
     "react-router-dom": "^6.3.0",

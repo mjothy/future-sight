@@ -18,7 +18,7 @@ export default class BlockStyleModel {
   };
   colorbar = {
     isShow: true,
-    color: "Reds",
+    colorscale: ["#fafa6e", "#9cdf7c", "#4abd8c", "#00968e", "#106e7c", "#2a4858"],
     reverse: false,
     title: {
       variable: false,

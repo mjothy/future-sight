@@ -167,11 +167,12 @@ class MapBlock extends Component<any, any> {
 
             // Prepare Data
             const visibleGeoJson = this.getGeoJsonForRegionWithData(geoJsonData, extractData);
-
+            const plotlyColorscale = configStyle.colorbar.colorscale.map((x, i) => { return [i / (configStyle.colorbar.colorscale.length - 1), x] });
+            console.log("plotlyColorscale: ", plotlyColorscale);
             obj = {
                 ...obj,
                 type: 'choroplethmapbox',
-                colorscale: configStyle.colorbar.color,
+                colorscale: plotlyColorscale,
                 locations,
                 z,
                 geojson: { ...visibleGeoJson },
@@ -187,6 +188,9 @@ class MapBlock extends Component<any, any> {
                     // xanchor: "right", x: 1,
                     // lenmode: "pixels",
                     // len: this.props.height - 80
+                },
+                marker: {
+                    colorscale: plotlyColorscale
                 },
                 hovertext: "model: " + extractData[0].model + "<br>" + "scenario: " + extractData[0].scenario,
                 hoverinfo: "location+z+text",

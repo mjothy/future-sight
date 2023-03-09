@@ -6,6 +6,7 @@ import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithData
 import { useNavigate } from 'react-router-dom'
 import DashboardModel from '../models/DashboardModel';
 import { Layout, notification } from "antd";
+import '../style.css';
 const { Content } = Layout;
 import html2canvas from "html2canvas";
 import GetGeoJsonContextProvider from '../services/GetGeoJsonContextProvider';

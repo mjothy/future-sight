@@ -1,0 +1,10 @@
+
+/* Color Picker css */
+.colorscaleDescription{
+  display: none;
+}
+
+.colorscalePickerContainer{
+  max-height: 250px;
+  padding-bottom: 20px;
+}

@@ -1,6 +1,9 @@
 import { AreaChartOutlined, BarChartOutlined, EnvironmentOutlined, LineChartOutlined, TableOutlined } from '@ant-design/icons';
 import { Col, Input, Row, Select, Checkbox, Radio } from 'antd';
 import { Component } from 'react';
+import { Colorscale } from 'react-colorscales';
+import ColorscalePicker from 'react-colorscales';
+
 
 const { Option } = Select;
 const ATTRIBUTES = {
@@ -23,16 +26,19 @@ const plotTypes = [
   { type: 'bar', label: 'Bar', icon: <BarChartOutlined /> },
   { type: 'area', label: 'Area', icon: <AreaChartOutlined /> },
   { type: 'table', label: 'Table', icon: <TableOutlined /> },
-  // TODO find better icon for map
   { type: 'map', label: 'Map', icon: <EnvironmentOutlined /> },
 
 ];
 
-const colorscales = ["Reds", "Blues", "Greens", "Viridis", "Cividis", "Greys"]
-
 const colorbarTitle = ['variable', 'unit'];
 
 export default class DataBlockVisualizationEditor extends Component<any, any> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showColorscalePicker: false
+    }
+  }
 
   onPlotTypeChange = (selectedType: string) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
@@ -108,12 +114,6 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
-  onColorChange = (e) => {
-    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
-    configStyle.colorbar.color = e.target.value;
-    this.updateBlockConfig({ configStyle: configStyle })
-  }
-
   onColorbarTitleChange = (checkedValues) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.colorbar.title = {
@@ -141,6 +141,16 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     return block_type == "map";
   }
 
+  onColorsChange = colorscale => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.colorbar.colorscale = colorscale;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  toggleColorscalePicker = () => {
+    this.setState({ showColorscalePicker: !this.state.showColorscalePicker });
+  }
+
   render() {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     const legend = this.props.currentBlock.config.configStyle.legend;
@@ -150,6 +160,12 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         defaultLegendOptions.push(key);
       }
     }
+
+    const toggleButtonStyle = { cursor: 'pointer' };
+    if (this.state.showColorscalePicker) {
+      toggleButtonStyle["borderColor"] = '#A2B1C6';
+    }
+
     return (
       <div>
         <h3>General</h3>
@@ -283,15 +299,37 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
               </Col>
             </Row>
             <Row>
-              <Col span={2} />
-              <Col>
-                <Radio.Group options={colorscales} value={configStyle.colorbar.color} onChange={this.onColorChange} />
+              <Col span={20}>
+                {/* -- START -- Color scale picker */}
+                <div
+                  onClick={this.toggleColorscalePicker}
+                  className='toggleButton'
+                  style={toggleButtonStyle}
+                >
+                  <Colorscale
+                    colorscale={configStyle.colorbar.colorscale}
+                    onClick={() => {
+                      // 
+                    }}
+                  />
+                  Toggle Colorscale Picker
+                </div>
+                {this.state.showColorscalePicker &&
+                  <ColorscalePicker
+                    onChange={this.onColorsChange}
+                    colorscale={configStyle.colorbar.colorscale}
+                    nSwatches={configStyle.colorbar.colorscale.length}
+                    disableSwatchControls
+                  />
+                }
+                {/* -- END -- Color scale picker */}
+
               </Col>
             </Row>
             <Row>
               <Col span={1} />
               <Col span={8}>
-                <label>Title: </label>
+                <label>Label: </label>
               </Col>
             </Row>
             <Row>
