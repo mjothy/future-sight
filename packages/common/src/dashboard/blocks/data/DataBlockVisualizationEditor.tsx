@@ -1,8 +1,7 @@
 import { AreaChartOutlined, BarChartOutlined, EnvironmentOutlined, LineChartOutlined, TableOutlined } from '@ant-design/icons';
-import { Col, Input, Row, Select, Checkbox, Radio } from 'antd';
+import { Col, Input, Row, Select, Checkbox } from 'antd';
 import { Component } from 'react';
-import { Colorscale } from 'react-colorscales';
-import ColorscalePicker from 'react-colorscales';
+import ColorscalePicker from '../utils/ColorscalePicker';
 
 
 const { Option } = Select;
@@ -33,12 +32,6 @@ const plotTypes = [
 const colorbarTitle = ['variable', 'unit'];
 
 export default class DataBlockVisualizationEditor extends Component<any, any> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      showColorscalePicker: false
-    }
-  }
 
   onPlotTypeChange = (selectedType: string) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
@@ -147,10 +140,6 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
-  toggleColorscalePicker = () => {
-    this.setState({ showColorscalePicker: !this.state.showColorscalePicker });
-  }
-
   render() {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     const legend = this.props.currentBlock.config.configStyle.legend;
@@ -159,11 +148,6 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
       if (legend[key]) {
         defaultLegendOptions.push(key);
       }
-    }
-
-    const toggleButtonStyle = { cursor: 'pointer' };
-    if (this.state.showColorscalePicker) {
-      toggleButtonStyle["borderColor"] = '#A2B1C6';
     }
 
     return (
@@ -300,30 +284,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             </Row>
             <Row>
               <Col span={20}>
-                {/* -- START -- Color scale picker */}
-                <div
-                  onClick={this.toggleColorscalePicker}
-                  className='toggleButton'
-                  style={toggleButtonStyle}
-                >
-                  <Colorscale
-                    colorscale={configStyle.colorbar.colorscale}
-                    onClick={() => {
-                      // 
-                    }}
-                  />
-                  Toggle Colorscale Picker
-                </div>
-                {this.state.showColorscalePicker &&
-                  <ColorscalePicker
-                    onChange={this.onColorsChange}
-                    colorscale={configStyle.colorbar.colorscale}
-                    nSwatches={configStyle.colorbar.colorscale.length}
-                    disableSwatchControls
-                  />
-                }
-                {/* -- END -- Color scale picker */}
-
+                <ColorscalePicker currentBlock={this.props.currentBlock} onColorsChange={this.onColorsChange} />
               </Col>
             </Row>
             <Row>
