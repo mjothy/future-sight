@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import { Colorscale } from 'react-colorscales';
 import ColorscalePicker from 'react-colorscales';
+import { COLOR_PICKER_CONSTANTS } from 'react-colorscales';
 
+COLOR_PICKER_CONSTANTS.COLORSCALE_TYPES = ["sequential", "divergent", "categorical"];
 
 export default class ColorscalePicker extends Component<any, any> {
 
