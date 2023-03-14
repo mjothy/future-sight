@@ -23,7 +23,8 @@ class MapBlock extends Component<any, any> {
                 variable: null,
             },
             center: { lon: 0.17, lat: 43.05 },
-            zoom: 3
+            zoom: 3,
+            sliderActive: 0
         };
     }
 
@@ -102,7 +103,7 @@ class MapBlock extends Component<any, any> {
         }
 
         const sliderConfig = {
-            active: 0,
+            active: this.state.sliderActive,
             pad: { t: 3, b: 8 },
             x: 0.02,
             // len: 0.5,
@@ -168,7 +169,6 @@ class MapBlock extends Component<any, any> {
             // Prepare Data
             const visibleGeoJson = this.getGeoJsonForRegionWithData(geoJsonData, extractData);
             const plotlyColorscale = configStyle.colorbar.colorscale.map((x, i) => { return [i / (configStyle.colorbar.colorscale.length - 1), x] });
-            console.log("plotlyColorscale: ", plotlyColorscale);
             obj = {
                 ...obj,
                 type: 'choroplethmapbox',
@@ -357,6 +357,13 @@ class MapBlock extends Component<any, any> {
         this.setState({ visualData });
     };
 
+    onSliderChange = (e) => {
+        const active = e.slider.active;
+        if (typeof active === 'number' && !isNaN(active)) {
+            this.setState({ sliderActive: e.slider.active })
+        }
+    }
+
     render() {
         const meteData = this.props.currentBlock.config.metaData;
         let height = this.props.height;
@@ -367,7 +374,6 @@ class MapBlock extends Component<any, any> {
         const layout: any = this.getMapLayout();
         const [frames, data, sliderConfig] = this.getSliderConfigs()
         // Prepare Config
-        //TODO add hide/show colorbar to config
         const config = {
             displayModeBar: false, // this is the line that hides the bar.
             editable: false,
@@ -384,6 +390,7 @@ class MapBlock extends Component<any, any> {
                         <Plot data={data} layout={layout} config={config}
                             onDoubleClick={this.zoomToFeatures}
                             frames={frames}
+                            onSliderChange={this.onSliderChange}
                         />
                     </div>
                     <div style={{ marginTop: -(height) + 'px', marginLeft: '5px' }}>
