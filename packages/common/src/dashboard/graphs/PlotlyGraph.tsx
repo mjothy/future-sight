@@ -9,7 +9,7 @@ export default class PlotlyGraph extends Component<any, any> {
       hasTitle = this.props.currentBlock.config.configStyle.title.isVisible
     }
 
-    if(this.props.currentBlock.config.configStyle.graphType === "pie"){
+    if (this.props.currentBlock.config.configStyle.graphType === "pie") {
       return {
         l: 10,
         r: 10,
@@ -49,8 +49,8 @@ export default class PlotlyGraph extends Component<any, any> {
       font: {
         size: 10,
       },
-      yaxis: {...this.props.layout.YAxis},
-      grid: {...this.props.layout.grid},
+      yaxis: { ...this.props.layout.YAxis },
+      grid: { ...this.props.layout.grid },
       annotations: this.props.layout.annotations
     };
 
@@ -86,6 +86,7 @@ export default class PlotlyGraph extends Component<any, any> {
         layout={layout}
         config={config}
         frames={this.props.frames}
+        onSliderChange={this.props.onSliderChange}
       />
     );
   }
