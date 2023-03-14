@@ -125,14 +125,15 @@ class MapBlock extends Component<any, any> {
             geojson: {},
         }];
 
-        if (frames.length > 0) {
-            data = frames[0].data;
+        if (frames.length > this.state.sliderActive) {
+            data = frames[this.state.sliderActive].data;
         }
 
         return [frames, data, sliderConfig]
     }
 
     getMapLayout = () => {
+        const zoom_diff = this.state.zoom > 1 ? 1.15 : 0;
         const layout: any = {
             width: this.props.width,
             height: this.props.height,
@@ -142,8 +143,9 @@ class MapBlock extends Component<any, any> {
             mapbox: {
                 style: 'carto-positron',
                 center: this.state.center,
-                zoom: this.state.zoom
+                zoom: this.state.zoom - zoom_diff
             },
+            transition: { duration: 1000 },
             // margin: { r: 0, t: 0, b: 0, l: 0 },
             margin: { r: 0, t: this.props.currentBlock.config.configStyle.title.isVisible ? 30 : 0, b: 0, l: 0 },
             title: this.props.currentBlock.config.configStyle.title.isVisible ? this.props.currentBlock.config.configStyle.title.value : "Title"
@@ -329,15 +331,15 @@ class MapBlock extends Component<any, any> {
             center = center_coor;
             zoom = center_zoom.zoom;
         }
-        return { center, zoom: zoom - 1 }
+        return { center, zoom }
     }
 
     zoomOut = () => {
-        this.setState({ zoom: this.state.zoom - 0.5 });
+        this.setState({ zoom: this.state.zoom - 0.15 });
     }
 
     zoomIn = () => {
-        this.setState({ zoom: this.state.zoom + 0.5 });
+        this.setState({ zoom: this.state.zoom + 0.15 });
     }
 
     /**
@@ -364,6 +366,15 @@ class MapBlock extends Component<any, any> {
         }
     }
 
+    onRelayout = (e) => {
+        console.log("e:", e)
+        if (e.mapbox != null) {
+            const center = e.mapbox.center;
+            const zoom = e.mapbox.zoom;
+            this.setState({ center, zoom })
+        }
+    }
+
     render() {
         const meteData = this.props.currentBlock.config.metaData;
         let height = this.props.height;
@@ -382,6 +393,7 @@ class MapBlock extends Component<any, any> {
         // SLIDER
         layout["sliders"] = [sliderConfig]
 
+        console.log("layout: ", layout);
         return (
             <div>
 
@@ -391,6 +403,7 @@ class MapBlock extends Component<any, any> {
                             onDoubleClick={this.zoomToFeatures}
                             frames={frames}
                             onSliderChange={this.onSliderChange}
+                            onRelayout={this.onRelayout}
                         />
                     </div>
                     <div style={{ marginTop: -(height) + 'px', marginLeft: '5px' }}>
