@@ -104,9 +104,7 @@ class MapBlock extends Component<any, any> {
 
         const sliderConfig = {
             active: this.state.sliderActive,
-            pad: { t: 3, b: 8 },
-            x: 0.02,
-            // len: 0.5,
+            pad: { t: 3, b: 8, r: 5, l: 5 },
             currentvalue: {
                 xanchor: 'right',
                 prefix: 'year: ',
@@ -116,7 +114,9 @@ class MapBlock extends Component<any, any> {
                     pad: 0
                 }
             },
-            steps: sliderSteps
+            steps: sliderSteps,
+            len: this.props.width,
+            lenmode: "pixels"
         }
 
         let data: any = [{
