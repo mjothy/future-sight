@@ -9,11 +9,17 @@ import { FullscreenExitOutlined, MinusOutlined, PlusOutlined } from '@ant-design
 import withGetGeoJson from '../../services/withGetGeoJson';
 import PlotlyUtils from './PlotlyUtils';
 
+interface MapProperties {
+    center: { lon: number, lat: number };
+    zoom: number
+}
+
 class MapBlock extends Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {
             geoJsonData: {},
+            visibleRegions: [],
             /**
              * data with timeseries on current block
              */
@@ -32,9 +38,16 @@ class MapBlock extends Component<any, any> {
         const geoJsonData = await this.props.getGeoJson({
             regions: this.props.currentBlock.config.metaData.regions,
         });
-        const visibleGeoJson = this.getVisibleGeoJson(geoJsonData);
-        const obj: any = this.getMapProperities(visibleGeoJson);
-        this.setState({ geoJsonData, zoom: obj.zoom, center: obj.center })
+        const visibleGeoJson = this.getVisibleGeojson(geoJsonData);
+        const visibleRegions = this.getVisibleRegions(visibleGeoJson);
+        const obj: MapProperties = this.getMapProperities(visibleGeoJson);
+        this.setState({
+            geoJsonData: visibleGeoJson,
+            visibleRegions,
+            zoom: obj.zoom,
+            center: obj.center,
+
+        })
     }
 
     async componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): Promise<void> {
@@ -42,9 +55,11 @@ class MapBlock extends Component<any, any> {
             const geoJsonData = await this.props.getGeoJson({
                 regions: this.props.currentBlock.config.metaData.regions,
             });
-
+            const visibleGeoJson = this.getVisibleGeojson(geoJsonData);
+            const visibleRegions = this.getVisibleRegions(visibleGeoJson);
             this.setState({
-                geoJsonData,
+                geoJsonData: visibleGeoJson,
+                visibleRegions,
                 visualData: {
                     model: null,
                     scenario: null,
@@ -54,8 +69,7 @@ class MapBlock extends Component<any, any> {
         }
 
         if (this.state.geoJsonData != prevState.geoJsonData) {
-            const visibleGeoJson = this.getVisibleGeoJson(this.state.geoJsonData);
-            const obj: any = this.getMapProperities(visibleGeoJson);
+            const obj: MapProperties = this.getMapProperities(this.state.geoJsonData);
             this.setState({
                 zoom: obj.zoom,
                 center: obj.center,
@@ -85,7 +99,7 @@ class MapBlock extends Component<any, any> {
         for (const year of uniq_x) {
             // Frame
             const frame: any = {
-                data: this.getMapData(this.state.geoJsonData, year),
+                data: this.getMapData(year),
                 name: year,
             }
             frames.push(frame)
@@ -158,8 +172,8 @@ class MapBlock extends Component<any, any> {
      * @param year the selected year in slidebar
      * @returns data
      */
-    getMapData = (geoJsonData, year = 2020) => {
-        const extractData = this.getFirstData(); // TODO filter to keep only locations in visible geoJson
+    getMapData = (year = 2020) => {
+        const extractData = this.getFirstData();
         const data: any = [];
         let obj: any = {
             type: 'choroplethmapbox'
@@ -169,7 +183,6 @@ class MapBlock extends Component<any, any> {
             const configStyle = this.props.currentBlock.config.configStyle;
 
             // Prepare Data
-            const visibleGeoJson = this.getGeoJsonForRegionWithData(geoJsonData, extractData);
             const plotlyColorscale = configStyle.colorbar.colorscale.map((x, i) => { return [i / (configStyle.colorbar.colorscale.length - 1), x] });
             obj = {
                 ...obj,
@@ -177,7 +190,7 @@ class MapBlock extends Component<any, any> {
                 colorscale: plotlyColorscale,
                 locations,
                 z,
-                geojson: { ...visibleGeoJson },
+                geojson: this.state.geoJsonData,
                 showscale: configStyle.colorbar.isShow,
                 reversescale: configStyle.colorbar.reverse,
                 colorbar: {
@@ -202,6 +215,12 @@ class MapBlock extends Component<any, any> {
         return data;
     };
 
+    /**
+     * Get map locations and z (colorbar data)
+     * @param data Visible data layer
+     * @param year Selected year in slider
+     * @returns 
+     */
     getMapConfig = (data, year) => {
         const locations: string[] = [];
         const z: number[] = [];
@@ -236,13 +255,14 @@ class MapBlock extends Component<any, any> {
     }
 
     /**
-     * When possible data possible to be presented in the map, return only the first raws for different regions
-     * and same {model, scenario, variable}
+     * When different layers of data is possible to be presented in the map, 
+     * return only the first {model, scenario, variable} for different regions
      * @returns extractData(data to visualized) and unit
      */
     getFirstData = () => {
         const options = this.getOptionsSelected();
         let mapDataTimeseries = JSON.parse(JSON.stringify(this.props.timeseriesData));
+        mapDataTimeseries = mapDataTimeseries.filter(element => element.data != null)
 
         if (options.length > 0) {
             options.forEach((key) => {
@@ -257,18 +277,21 @@ class MapBlock extends Component<any, any> {
         if (mapDataTimeseries.length > 0) {
             const firstElement = mapDataTimeseries[0]; // first raw of one region
             extractData.push(firstElement);
-            // get other raws whith same data but different regions
-            mapDataTimeseries.forEach(raw => {
-                if (raw["region"] != firstElement["region"] && raw["model"] == firstElement["model"] && raw["scenario"] == firstElement["scenario"] && raw["variable"] == firstElement["variable"]) {
-                    extractData.push(raw);
+            // Get other raws whith same {model, scenario, variable} but different region
+            this.state.visibleRegions.forEach(region => {
+                if (region != firstElement["region"].toLowerCase()) {
+                    const data_element = mapDataTimeseries.find(raw => raw["region"].toLowerCase() == region && raw["model"] == firstElement["model"] && raw["scenario"] == firstElement["scenario"] && raw["variable"] == firstElement["variable"]);
+                    if (data_element) {
+                        extractData.push(data_element);
+                    }
                 }
-            })
+            });
         }
         return extractData;
     }
 
     /**
-     * get options of selected data in inputs in the map
+     * Get options of selected data in inputs in the map
      * Exemple: if user selecte 2 models [model1, model2], select box will be shown in the map to select only one value
      * @returns 
      */
@@ -283,17 +306,15 @@ class MapBlock extends Component<any, any> {
     };
 
     /**
-     * get geoJson of regions where data exist (to update the zoom and center properely after)
-     * @param geoJsonData geojson of all selected regions in block
-     * @param extractedData data that is represented in the map (one data with timeseries for each region)
+     * Get geoJson of regions where data exist (to update the zoom and center properely after)
      * @returns geoJson of regions where data exist
      */
-    getGeoJsonForRegionWithData = (geoJsonData, extractedData) => {
-        const visibleRegions = extractedData.map(raw => { if (raw.data != null) return raw["region"].toLowerCase() })
+    getVisibleGeojson = (geoJsonData) => {
+        let mapDataTimeseries = JSON.parse(JSON.stringify(this.props.timeseriesData));
+        mapDataTimeseries = mapDataTimeseries.filter(element => element.data != null)
+        const regions_mapData = mapDataTimeseries.map(raw => raw['region'].toLowerCase());
         let featuresVisibleRegions = [];
-        if (geoJsonData != null) {
-            featuresVisibleRegions = geoJsonData.features?.filter(feature => visibleRegions.includes(feature.properties["ADMIN"].toLowerCase()))
-        }
+        featuresVisibleRegions = geoJsonData.features?.filter(feature => regions_mapData.includes(feature.properties["ADMIN"].toLowerCase()))
         const visibleGeoJson = {
             type: "FeatureCollection",
             features: featuresVisibleRegions
@@ -302,12 +323,15 @@ class MapBlock extends Component<any, any> {
         return visibleGeoJson;
     }
 
+    getVisibleRegions = (visibleGeoJson) => {
+        return visibleGeoJson != null ? visibleGeoJson.features.map((feature: any) => feature?.id.toLowerCase()) : [];
+    }
+
     /**
      * Zoom on represented regions
      */
     zoomToFeatures = () => {
-        const visibleGeoJson = this.getVisibleGeoJson(this.state.geoJsonData);
-        const obj: any = this.getMapProperities(visibleGeoJson);
+        const obj: MapProperties = this.getMapProperities(this.state.geoJsonData);
         if (obj != null) {
             this.setState({ center: obj.center, zoom: obj.zoom })
         }
@@ -319,16 +343,14 @@ class MapBlock extends Component<any, any> {
      * @returns {zoom, center}
      */
     getMapProperities = (geoJsonData) => {
-        let center: any = { lon: 0.17, lat: 43.05 };
+        const center: { lon: number, lat: number } = { lon: 0.17, lat: 43.05 };
         let zoom = 3;
         if (geoJsonData?.features != undefined) {
 
             const bbox1 = bbox(geoJsonData);
-            const center_coor = {};
             const center_zoom = geoViewport.viewport(bbox1, [this.props.width, this.props.height - 10]);
-            center_coor["lon"] = center_zoom.center[0];
-            center_coor["lat"] = center_zoom.center[1];
-            center = center_coor;
+            center["lon"] = center_zoom.center[0];
+            center["lat"] = center_zoom.center[1];
             zoom = center_zoom.zoom;
         }
         return { center, zoom }
@@ -340,17 +362,6 @@ class MapBlock extends Component<any, any> {
 
     zoomIn = () => {
         this.setState({ zoom: this.state.zoom + 0.15 });
-    }
-
-    /**
-     * Get filtered geoJson for regions where data exist
-     * @param geoJsonData all fetched geojson
-     * @returns geojson 
-     */
-    getVisibleGeoJson = (geoJsonData) => {
-        const extractData = this.getFirstData();
-        const visibleGeoJson = this.getGeoJsonForRegionWithData(geoJsonData, extractData);
-        return visibleGeoJson;
     }
 
     onChange = (option, selectedData) => {
@@ -367,7 +378,6 @@ class MapBlock extends Component<any, any> {
     }
 
     onRelayout = (e) => {
-        console.log("e:", e)
         if (e.mapbox != null) {
             const center = e.mapbox.center;
             const zoom = e.mapbox.zoom;
@@ -393,7 +403,6 @@ class MapBlock extends Component<any, any> {
         // SLIDER
         layout["sliders"] = [sliderConfig]
 
-        console.log("layout: ", layout);
         return (
             <div>
 
