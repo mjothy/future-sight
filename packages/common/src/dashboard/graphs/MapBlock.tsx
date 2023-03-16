@@ -120,13 +120,7 @@ class MapBlock extends Component<any, any> {
             active: this.state.sliderActive,
             pad: { t: 3, b: 8, r: 5, l: 5 },
             currentvalue: {
-                xanchor: 'right',
-                prefix: 'year: ',
-                font: {
-                    color: '#888',
-                    size: 12,
-                    pad: 0
-                }
+                visible: false
             },
             steps: sliderSteps,
             len: this.props.width,
