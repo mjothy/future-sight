@@ -234,7 +234,7 @@ class DashboardConfigView extends Component<any, any> {
                                 </Space>
                             )}
                             <BlockViewManager
-                                {...this.props}
+                                timeseriesData={this.props.blockData(blocks[layout.i])}
                                 currentBlock={blocks[layout.i]}
                                 width={
                                     this.state.graphsSize[layout.i]
@@ -246,6 +246,9 @@ class DashboardConfigView extends Component<any, any> {
                                         ? this.state.graphsSize[layout.i].height
                                         : this.height
                                 }
+                                dashboard={this.props.dashboard}
+                                optionsLabel={this.props.optionsLabel}
+                                updateDashboard={this.props.updateDashboard}
                             />
                         </div>
                     </div>

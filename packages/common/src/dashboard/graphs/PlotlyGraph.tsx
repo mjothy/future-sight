@@ -20,13 +20,12 @@ export default class PlotlyGraph extends Component<any, any> {
     }
 
     return {
-      l: this.props.layout.YAxis.title ? 60 : 40,
+      l: this.props.currentBlock.config.configStyle.graphType == 'map' ? 10 : (this.props.layout.YAxis.title ? 60 : 40),
       r: 10,
       b: 30,
       t: hasTitle ? 25 : 5,
       pad: 4,
     }
-
   }
 
   render() {
@@ -51,7 +50,9 @@ export default class PlotlyGraph extends Component<any, any> {
       },
       yaxis: { ...this.props.layout.YAxis },
       grid: { ...this.props.layout.grid },
-      annotations: this.props.layout.annotations
+      annotations: this.props.layout.annotations,
+      dragmode: "zoom",
+      mapbox: { style: "carto-positron", center: { lat: 38, lon: -90 }, zoom: 3 },
     };
 
     if (currentBlock.config.configStyle.title.isVisible) {

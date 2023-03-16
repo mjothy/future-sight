@@ -151,4 +151,19 @@ export default class DataManager implements IDataManager {
       .catch(console.error);
   };
 
+
+  fetchRegionsGeojson = (regions: string[]) => {
+    return fetch(`api/regionsGeojson`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(regions),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        return data;
+      })
+      .catch(console.error);
+  };
 }

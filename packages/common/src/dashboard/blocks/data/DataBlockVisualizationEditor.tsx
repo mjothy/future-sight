@@ -1,14 +1,12 @@
-import {
-  AreaChartOutlined,
-  BarChartOutlined,
-  LineChartOutlined,
-  PieChartOutlined,
-  ExclamationCircleOutlined,
-  TableOutlined
-} from '@ant-design/icons';
-import {Checkbox, Col, Input, InputNumber, Row, Select} from 'antd';
-import {Component} from 'react';
+import { Component } from 'react';
 import PieVisualizationEditor from "./graphType/pie/PieVisualizationEditor";
+import {
+  AreaChartOutlined, BarChartOutlined, EnvironmentOutlined, LineChartOutlined, TableOutlined, PieChartOutlined,
+  ExclamationCircleOutlined
+} from '@ant-design/icons';
+import { Col, Input, Row, Select, Checkbox, InputNumber } from 'antd';
+import ColorscalePicker from '../utils/ColorscalePicker';
+
 
 const { Option } = Select;
 const ATTRIBUTES = {
@@ -27,12 +25,15 @@ const ATTRIBUTES = {
 }
 
 const plotTypes = [
-  {type: 'line', label: 'Line', icon: <LineChartOutlined/>},
-  {type: 'bar', label: 'Bar', icon: <BarChartOutlined />},
-  {type: 'area', label: 'Area', icon: <AreaChartOutlined />},
-  {type: 'pie', label: 'Pie', icon: <PieChartOutlined />},
-  {type: 'table', label: 'Table', icon: <TableOutlined />},
+  { type: 'line', label: 'Line', icon: <LineChartOutlined /> },
+  { type: 'bar', label: 'Bar', icon: <BarChartOutlined /> },
+  { type: 'area', label: 'Area', icon: <AreaChartOutlined /> },
+  { type: 'pie', label: 'Pie', icon: <PieChartOutlined /> },
+  { type: 'table', label: 'Table', icon: <TableOutlined /> },
+  { type: 'map', label: 'Map', icon: <EnvironmentOutlined /> },
 ];
+
+const colorbarTitle = ['variable', 'unit'];
 
 export default class DataBlockVisualizationEditor extends Component<any, any> {
 
@@ -138,6 +139,46 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     dashboard.blocks[this.props.currentBlock.id].config = { ...config, ...configStyle };
     this.props.updateDashboard(dashboard)
   }
+
+  onColorbarChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.colorbar.isShow = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onColorbarTitleChange = (checkedValues) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.colorbar.title = {
+      variable: false,
+      unit: false
+    }
+    for (const value of checkedValues) {
+      configStyle.colorbar.title[value] = true;
+    }
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onReverse = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.colorbar.reverse = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  isShowGraphConfig = (block_type) => {
+    return block_type != "map" && block_type != "table";
+  }
+
+
+  isMap = (block_type) => {
+    return block_type == "map";
+  }
+
+  onColorsChange = colorscale => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.colorbar.colorscale = colorscale;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
   render() {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     const metaData = this.props.currentBlock.config.metaData;
@@ -148,6 +189,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         defaultLegendOptions.push(key);
       }
     }
+
     return (
       <div>
         <h3>General</h3>
@@ -185,13 +227,13 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         </Row>
 
         {configStyle.graphType === "pie" &&
-            <PieVisualizationEditor
-                optionsLabel={this.props.optionsLabel}
-                onStackValueChange={this.onStackValueChange}
-                updateBlockConfig = {this.updateBlockConfig}
-                blockData = {this.props.blockData}
-                currentBlock = {this.props.currentBlock}
-            />
+          <PieVisualizationEditor
+            optionsLabel={this.props.optionsLabel}
+            onStackValueChange={this.onStackValueChange}
+            updateBlockConfig={this.updateBlockConfig}
+            blockData={this.props.blockData}
+            currentBlock={this.props.currentBlock}
+          />
         }
 
 
@@ -238,47 +280,47 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         }
 
         <h3>Axis</h3>
-        {configStyle.graphType !== "pie" &&
-            <>
-              <Row>
-                <Col span={2} className={'checkbox-col'}>
-                  <Checkbox
-                    onChange={this.onYAxisForceChange}
-                    checked={configStyle.YAxis.force0}
-                  />
-                </Col>
-                <Col span={16} className={'checkbox-col-label'}>
-                  <label>Range of Y axis to 0</label>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={2} className={'checkbox-col'}>
-                  <Checkbox
-                    onChange={this.onYAxisLabelChange}
-                    checked={configStyle.YAxis.label}
-                  />
-                </Col>
-                <Col span={16} className={'checkbox-col-label'}>
-                  <label>Show Y Axis label</label>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={2} className={'checkbox-col'}>
-                  <Checkbox
-                    onChange={this.onYAxisUnitChange}
-                    checked={configStyle.YAxis.unit}
-                  />
-                </Col>
-                <Col span={16} className={'checkbox-col-label'}>
-                  <label>Show Y Axis unit</label>
-                </Col>
-              </Row>
-            </>}
+        {this.isShowGraphConfig(configStyle.graphType) &&
+          <>
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onYAxisForceChange}
+                  checked={configStyle.YAxis.force0}
+                />
+              </Col>
+              <Col span={16} className={'checkbox-col-label'}>
+                <label>Range of Y axis to 0</label>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onYAxisLabelChange}
+                  checked={configStyle.YAxis.label}
+                />
+              </Col>
+              <Col span={16} className={'checkbox-col-label'}>
+                <label>Show Y Axis label</label>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onYAxisUnitChange}
+                  checked={configStyle.YAxis.unit}
+                />
+              </Col>
+              <Col span={16} className={'checkbox-col-label'}>
+                <label>Show Y Axis unit</label>
+              </Col>
+            </Row>
+          </>}
         <Row className="mb-10">
           <Col span={2} className={'checkbox-col'}>
             <Checkbox
-                onChange={this.onCustomRangeChange}
-                defaultChecked={configStyle.XAxis.useCustomRange}
+              onChange={this.onCustomRangeChange}
+              defaultChecked={configStyle.XAxis.useCustomRange}
             />
           </Col>
           <Col span={16} className={'checkbox-col-label'}>
@@ -286,53 +328,102 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
           </Col>
         </Row>
         <Row className="mb-10">
-          <Col span={2}/>
+          <Col span={2} />
           <Col span={8}>
             <InputNumber
-                className="width-100"
-                placeholder="Left"
-                onChange={this.onXRangeLeftChange}
-                defaultValue={configStyle.XAxis.left}
-                disabled={!configStyle.XAxis.useCustomRange}
+              className="width-100"
+              placeholder="Left"
+              onChange={this.onXRangeLeftChange}
+              defaultValue={configStyle.XAxis.left}
+              disabled={!configStyle.XAxis.useCustomRange}
             />
           </Col>
           <Col span={8} className="ml-20">
             <InputNumber
-                className="width-100"
-                placeholder="Right"
-                onChange={this.onXRangeRightChange}
-                defaultValue={configStyle.XAxis.right}
-                disabled={!configStyle.XAxis.useCustomRange}
+              className="width-100"
+              placeholder="Right"
+              onChange={this.onXRangeRightChange}
+              defaultValue={configStyle.XAxis.right}
+              disabled={!configStyle.XAxis.useCustomRange}
             />
           </Col>
         </Row>
 
-        {configStyle.graphType !== "pie" &&
-            <>
-              <h3>Legend</h3>
-              <Row>
-                <Col span={2} className={'checkbox-col'}>
-                  <Checkbox
-                    onChange={this.onLegendChange}
-                    checked={configStyle.showLegend}
-                  />
-                </Col>
-                <Col span={16} className={'checkbox-col-label'}>
-                  <label>Show legend</label>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={2}/>
-                <Col span={8}>
-                  <label>Legend info: </label>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={2}/>
-                <Col>
-                  <Checkbox.Group options={this.legendOptions()} value={defaultLegendOptions} onChange={this.onLegendContentChange} />
-                </Col>
-              </Row>
+        {this.isShowGraphConfig(configStyle.graphType) && configStyle.graphType != "pie" &&
+        <>
+          <h3>Legend</h3>
+          <Row>
+            <Col span={2} className={'checkbox-col'}>
+              <Checkbox
+                onChange={this.onLegendChange}
+                checked={configStyle.showLegend}
+              />
+            </Col>
+            <Col span={16} className={'checkbox-col-label'}>
+              <label>Show legend</label>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={2} />
+            <Col span={8}>
+              <label>Legend info: </label>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={2} />
+            <Col>
+              <Checkbox.Group options={this.legendOptions()} value={defaultLegendOptions} onChange={this.onLegendContentChange} />
+            </Col>
+          </Row>
+        </>}
+        {this.isMap(configStyle.graphType) &&
+          <>
+            <h3>Colorbar</h3>
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onColorbarChange}
+                  checked={configStyle.colorbar.isShow}
+                />
+              </Col>
+              <Col span={16} className={'checkbox-col-label'}>
+                <label>Show colorbar</label>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onReverse}
+                  checked={configStyle.colorbar.reverse}
+                />
+              </Col>
+              <Col span={16} className={'checkbox-col-label'}>
+                <label>Reverse colorscale</label>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={1} />
+              <Col span={8}>
+                <label>Colors: </label>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={20}>
+                <ColorscalePicker currentBlock={this.props.currentBlock} onColorsChange={this.onColorsChange} />
+              </Col>
+            </Row>
+            <Row>
+              <Col span={1} />
+              <Col span={8}>
+                <label>Label: </label>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={2} />
+              <Col>
+                <Checkbox.Group options={colorbarTitle} value={Object.keys(configStyle.colorbar.title).filter(k => configStyle.colorbar.title[k])} onChange={this.onColorbarTitleChange} />
+              </Col>
+            </Row>
           </>}
       </div>
     );
