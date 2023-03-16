@@ -20,6 +20,7 @@ class MapBlock extends Component<any, any> {
         this.state = {
             geoJsonData: {},
             visibleRegions: [],
+            visibleData: [],
             /**
              * data with timeseries on current block
              */
@@ -40,10 +41,12 @@ class MapBlock extends Component<any, any> {
         });
         const visibleGeoJson = this.getVisibleGeojson(geoJsonData);
         const visibleRegions = this.getVisibleRegions(visibleGeoJson);
+        const visibleData = this.getVisibleData(visibleRegions);
         const obj: MapProperties = this.getMapProperities(visibleGeoJson);
         this.setState({
             geoJsonData: visibleGeoJson,
             visibleRegions,
+            visibleData,
             zoom: obj.zoom,
             center: obj.center,
 
@@ -57,9 +60,11 @@ class MapBlock extends Component<any, any> {
             });
             const visibleGeoJson = this.getVisibleGeojson(geoJsonData);
             const visibleRegions = this.getVisibleRegions(visibleGeoJson);
+            const visibleData = this.getVisibleData(visibleRegions);
             this.setState({
                 geoJsonData: visibleGeoJson,
                 visibleRegions,
+                visibleData,
                 visualData: {
                     model: null,
                     scenario: null,
@@ -255,8 +260,7 @@ class MapBlock extends Component<any, any> {
      */
     getFirstData = () => {
         const options = this.getOptionsSelected();
-        let mapDataTimeseries = JSON.parse(JSON.stringify(this.props.timeseriesData));
-        mapDataTimeseries = mapDataTimeseries.filter(element => element.data != null)
+        let mapDataTimeseries = JSON.parse(JSON.stringify(this.state.visibleData));
 
         if (options.length > 0) {
             options.forEach((key) => {
@@ -319,6 +323,12 @@ class MapBlock extends Component<any, any> {
 
     getVisibleRegions = (visibleGeoJson) => {
         return visibleGeoJson != null ? visibleGeoJson.features.map((feature: any) => feature?.id.toLowerCase()) : [];
+    }
+
+    getVisibleData = (visibleRegions) => {
+        let mapDataTimeseries = JSON.parse(JSON.stringify(this.props.timeseriesData));
+        mapDataTimeseries = mapDataTimeseries.filter(element => element.data != null && visibleRegions.includes(element['region'].toLowerCase()));
+        return mapDataTimeseries;
     }
 
     /**
