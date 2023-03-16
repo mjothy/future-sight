@@ -185,7 +185,7 @@ class MapBlock extends Component<any, any> {
                 locations,
                 z,
                 geojson: this.state.geoJsonData,
-                showscale: configStyle.colorbar.isShow,
+                showscale: configStyle.colorbar.isShow && this.state.visibleRegions.length > 0,
                 reversescale: configStyle.colorbar.reverse,
                 colorbar: {
                     title: {
