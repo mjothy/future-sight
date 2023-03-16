@@ -65,6 +65,7 @@ export default class ExpressServer {
       const response: any[] = [];
       for (const reqData of body) {
         let elements = this.dataProxy.getData()
+        // TODO
         if (reqData.version){
           elements = elements.filter(
               (e) => e.model === reqData.model && e.scenario === reqData.scenario && e.variable === reqData.variable && e.region === reqData.region && e.version === reqData.version
@@ -254,8 +255,9 @@ export default class ExpressServer {
         const version_dict = {};
         for (const raw of dataRaws.versions) {
           !(raw["model"] in version_dict) && (version_dict[raw.model]={});
-          !(raw["scenario"] in version_dict[raw["model"]]) && (version_dict[raw["model"]][raw["scenario"]] = []);
-          !(version_dict[raw.model][raw.scenario].includes(raw.version)) && (version_dict[raw.model][raw.scenario].push(raw.version));
+          !(raw["scenario"] in version_dict[raw["model"]]) && (version_dict[raw["model"]][raw["scenario"]] = {default: "", values:[]});
+          (raw["is_default"] == "True") && (version_dict[raw["model"]][raw["scenario"]].default=raw["version"]);
+          !(version_dict[raw.model][raw.scenario].values.includes(raw.version)) && (version_dict[raw.model][raw.scenario].values.push(raw.version));
         }
         optionsData["versions"] = version_dict;
       }
@@ -328,7 +330,10 @@ export default class ExpressServer {
   filterRawByVersions(dataRaws, metaData) {
     const selectedVersions = metaData.versions
     return dataRaws.versions.filter(raw => {
-      if(!!selectedVersions[raw.model] && !!selectedVersions[raw.model][raw.scenario]){
+      if(!!selectedVersions[raw.model]
+          && !!selectedVersions[raw.model][raw.scenario]
+          && selectedVersions[raw.model][raw.scenario].length>0
+      ){
         return selectedVersions[raw.model][raw.scenario].includes(raw.version)
       } else {
         return true

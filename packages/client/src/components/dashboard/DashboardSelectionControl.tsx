@@ -171,6 +171,7 @@ export default class DashboardSelectionControl extends Component<
   /**
   * Check if data in selection (selected data) are present in Select options
   */
+  // TODO VERSION Add version management
   checkIfSelectedInOptions = (optionsData, block: BlockModel) => {
     const optionsLabel = this.props.optionsLabel;
     const dashboard = { ...this.state.dashboard };

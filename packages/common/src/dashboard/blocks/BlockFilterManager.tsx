@@ -4,7 +4,8 @@ import ControlBlockEditor from './control/ControlBlockEditor';
 import DataBlockEditor from './data/DataBlockEditor';
 import { getBlock } from './utils/BlockDataUtils';
 import { getSelectedFilter } from './utils/DashboardUtils';
-import BlockDataModel from "../../models/BlockDataModel";
+import BlockDataModel, {versionModel} from "../../models/BlockDataModel";
+import DashboardModel from "../../models/DashboardModel";
 
 export default class BlockFilterManager extends Component<any, any> {
     constructor(props) {
@@ -13,7 +14,7 @@ export default class BlockFilterManager extends Component<any, any> {
             /**
              * Data options in dropDown Inputs
              */
-            optionsData: { ...this.props.filters },
+            optionsData: {},
             missingData: {
                 regions: [],
                 variables: [],
@@ -166,6 +167,34 @@ export default class BlockFilterManager extends Component<any, any> {
         this.props.updateDashboard(dashboard)
     };
 
+    onUseVersionSwitched = (checked) => {
+        const dashboard: DashboardModel = JSON.parse(JSON.stringify(this.props.dashboard));
+        const config = JSON.parse(JSON.stringify(this.props.currentBlock.config));
+        // Update config (metaData)
+        config.metaData.useVersion = checked;
+        dashboard.blocks[this.props.currentBlock.id].config = { ...config };
+        this.props.updateDashboard(dashboard)
+    };
+
+    onVersionSelected = (selectedValues: string[]) => {
+        const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+        const version_dict: versionModel = {};
+
+        for (const rawValue of selectedValues) {
+            const {model, scenario, version}  = JSON.parse(rawValue)
+            // Initialise versions[model] and versions[model][scenario]if not exist
+            !(model in version_dict) && (version_dict[model] = {});
+            !(scenario in version_dict[model]) && (version_dict[model][scenario] = []);
+
+            // Update config
+            version_dict[model][scenario].push(version);
+            dashboard.blocks[this.props.currentBlock.id].config.metaData.versions = version_dict;
+        }
+
+        this.props.updateDashboard(dashboard)
+        console.log(this.props.dashboard.blocks[this.props.currentBlock.id].config.metaData.versions)
+    };
+
     updateChildsBlocks = (dashboard, controlBlockId) => {
         const configParent = this.props.dashboard.blocks[controlBlockId].config;
 
@@ -187,6 +216,8 @@ export default class BlockFilterManager extends Component<any, any> {
                 optionsData={this.state.optionsData}
                 onDropdownVisibleChange={this.onDropdownVisibleChange}
                 missingData={this.state.missingData}
+                onUseVersionSwitched={this.onUseVersionSwitched}
+                onVersionSelected={this.onVersionSelected}
             />
         ) : (
             <ControlBlockEditor
