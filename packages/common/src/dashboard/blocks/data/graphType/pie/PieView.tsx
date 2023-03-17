@@ -37,8 +37,7 @@ class PieView extends Component<any, any> {
     const otherIndex = PlotlyUtils.getIndexKeys(data)
       .filter((index) => index !== stackIndex)
 
-    const dataWithColor = this.props.colorizer.colorizeData(data, stackIndex)
-
+    const dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, stackIndex)
     const plotlyData: Record<string, unknown>[] = []
 
     // Get data by year

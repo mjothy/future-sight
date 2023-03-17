@@ -75,16 +75,21 @@
             "showPercent": true,
             "showSubtitle": true
           },
+          "colorscale": [
+            "#1f77b4",
+            "#ff7f0e",
+            "#2ca02c",
+            "#d62728",
+            "#9467bd",
+            "#8c564b",
+            "#e377c2",
+            "#7f7f7f",
+            "#bcbd22",
+            "#17becf"
+          ],
+
           "colorbar": {
             "isShow": true,
-            "colorscale": [
-              "#fafa6e",
-              "#9cdf7c",
-              "#4abd8c",
-              "#00968e",
-              "#106e7c",
-              "#2a4858"
-            ],
             "reverse": false,
             "title": {
               "variable": false,
