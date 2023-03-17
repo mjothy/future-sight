@@ -250,7 +250,8 @@ class PieView extends Component<any, any> {
     const defaultYearIndex = defaultYear ? years.findIndex((year) => year === defaultYear) : 0
     const slidersLayout = [{
       active: defaultYearIndex,
-      pad: { t: 60, b: 8, r: 5, l: 5 },
+      pad: { t: 80, b: 8, r: 5, l: 5 },
+      y: -0.1,
       currentvalue: {
         visible: false
       },
