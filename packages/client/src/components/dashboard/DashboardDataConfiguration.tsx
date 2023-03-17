@@ -1,18 +1,21 @@
 import {
   BlockDataModel,
-  BlockModel, ColorizerProvider,
+  BlockModel,
+  Colorizer,
+  ColorizerProvider,
   ComponentPropsWithDataManager,
-  ConfigurationModel, DataModel,
-  getBlock,
-  ReadOnlyDashboard, Colorizer, PlotDataModel
+  ConfigurationModel,
+  DataModel,
+  PlotDataModel,
+  ReadOnlyDashboard
 } from '@future-sight/common';
-import { Component } from 'react';
+import {Component} from 'react';
 import withDataManager from '../../services/withDataManager';
-import { RoutingProps } from '../app/Routing';
+import {RoutingProps} from '../app/Routing';
 import DashboardSelectionControl from './DashboardSelectionControl';
-import { getDraft, removeDraft } from '../drafts/DraftUtils';
+import {getDraft, removeDraft} from '../drafts/DraftUtils';
 import Utils from '../../services/Utils';
-import { Spin } from 'antd';
+import {Spin} from 'antd';
 
 export interface DashboardDataConfigurationProps
   extends ComponentPropsWithDataManager,
@@ -100,17 +103,39 @@ class DashboardDataConfiguration extends Component<
           metaData.scenarios.forEach((scenario) => {
             metaData.variables.forEach((variable) => {
               metaData.regions.forEach((region) => {
-                const d = this.state.plotData[block.id]?.find(
-                  (e) =>
-                    e.model === model &&
-                    e.scenario === scenario &&
-                    e.variable === variable &&
-                    e.region === region
-                );
-                if (d) {
-                  data.push(d);
+                if (metaData.useVersion
+                    && metaData.versions[model]
+                    && metaData.versions[model][scenario]
+                    && metaData.versions[model][scenario].length>0
+                ){ // TODO VERSION why is fetched called twice?
+                  for (const version of metaData.versions[model][scenario]){
+                    const d = this.state.plotData[block.id]?.find(
+                        (e) =>
+                            e.model === model &&
+                            e.scenario === scenario &&
+                            e.variable === variable &&
+                            e.region === region &&
+                            e.version === version
+                    );
+                    if (d) {
+                      data.push(d);
+                    } else {
+                      missingData.push({model, scenario, variable, region, version});
+                    }
+                  }
                 } else {
-                  missingData.push({ model, scenario, variable, region });
+                  const d = this.state.plotData[block.id]?.find(
+                      (e) =>
+                          e.model === model &&
+                          e.scenario === scenario &&
+                          e.variable === variable &&
+                          e.region === region
+                  );
+                  if (d) {
+                    data.push(d);
+                  } else {
+                    missingData.push({model, scenario, variable, region});
+                  }
                 }
               });
             });

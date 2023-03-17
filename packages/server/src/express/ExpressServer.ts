@@ -1,7 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import path, { join } from 'path';
+import {join} from 'path';
 
 import RedisClient from '../redis/RedisClient';
 import IDataProxy from './IDataProxy';
@@ -65,7 +65,7 @@ export default class ExpressServer {
       const response: any[] = [];
       for (const reqData of body) {
         let elements = this.dataProxy.getData()
-        // TODO
+        // TODO VERSION
         if (reqData.version){
           elements = elements.filter(
               (e) => e.model === reqData.model && e.scenario === reqData.scenario && e.variable === reqData.variable && e.region === reqData.region && e.version === reqData.version
@@ -241,7 +241,7 @@ export default class ExpressServer {
       const dataRaws = this.getRaws(metaData, firstFilterRaws);
 
       optionsLabel.forEach(option => {
-        if (option == "versions") return;
+        if (option == "versions") {return}
         let possible_options: any[] = [];
         if (dataRaws[option].length > 0) {
           possible_options = Array.from(new Set(dataRaws[option].map(raw => raw[option.slice(0, -1)])))
@@ -251,7 +251,10 @@ export default class ExpressServer {
         optionsData[option] = possible_options;
       })
 
-      if (["models", "scenarios"].every(i => metaData.selectOrder.includes(i))){
+      if (
+          metaData.selectOrder.includes("models")
+          && metaData.selectOrder.includes("scenarios")
+      ){
         const version_dict = {};
         for (const raw of dataRaws.versions) {
           !(raw["model"] in version_dict) && (version_dict[raw.model]={});

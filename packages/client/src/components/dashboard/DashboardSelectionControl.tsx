@@ -5,15 +5,15 @@ import {
   ComponentPropsWithDataManager,
   ConfigurationModel,
   DashboardModel,
-  getSelectedFilter,
-  LayoutModel, PlotDataModel,
+  LayoutModel,
+  PlotDataModel,
 } from '@future-sight/common';
-import { Component } from 'react';
-import { RoutingProps } from '../app/Routing';
+import {Component} from 'react';
+import {RoutingProps} from '../app/Routing';
 
 import DashboardView from './DashboardView';
-import { getDraft, setDraft } from '../drafts/DraftUtils';
-import { notification, Spin } from 'antd';
+import {getDraft, setDraft} from '../drafts/DraftUtils';
+import {notification, Spin} from 'antd';
 
 export interface DashboardSelectionControlProps
   extends ComponentPropsWithDataManager,
@@ -172,30 +172,63 @@ export default class DashboardSelectionControl extends Component<
   * Check if data in selection (selected data) are present in Select options
   */
   // TODO VERSION Add version management
+  // TODO difference missing data with DataBlockEditor.clearClick
   checkIfSelectedInOptions = (optionsData, block: BlockModel) => {
     const optionsLabel = this.props.optionsLabel;
-    const dashboard = { ...this.state.dashboard };
-    const config = block.config as ConfigurationModel;
+    const metaData = JSON.parse(JSON.stringify(((block.config) as ConfigurationModel).metaData));
     let isDashboardUpdated = false;
     const missingData = {}
     optionsLabel.forEach(option => {
+      if (option == "versions") {return}
       // Check if selected data (metaData[option]) are in options of drop down list
-      const dataInOptionsData = config.metaData[option].filter(data => optionsData[option].includes(data));
-      missingData[option] = config.metaData[option].filter(data => !optionsData[option].includes(data));
-      if (dataInOptionsData.length < config.metaData[option].length) {
+      const dataInOptionsData = metaData[option].filter(data => optionsData[option].includes(data));
+      if (dataInOptionsData.length < metaData[option].length) {
         isDashboardUpdated = true;
-        config.metaData[option] = dataInOptionsData;
-        if (config.metaData[option].length === 0) {
-          config.metaData.selectOrder = config.metaData.selectOrder.filter(option1 => option1 !== option);
+        missingData[option] = metaData[option].filter(data => !optionsData[option].includes(data));
+        metaData[option] = dataInOptionsData;
+        if (metaData[option].length === 0) {
+          metaData.selectOrder = metaData.selectOrder.filter(option1 => option1 !== option);
         }
-        dashboard.blocks[block.id as string].config = { ...config };
       }
     });
 
+    if (
+        metaData.selectOrder.includes("models")
+        && metaData.selectOrder.includes("scenarios")
+    ){ // check that if selected version exists in new version dictionary
+      let dataInOptionsData = []
+      for(const model of Object.keys(metaData["versions"])){
+        for(const scenario of Object.keys(metaData["versions"][model])) {
+          dataInOptionsData = metaData["versions"][model][scenario].filter(
+              data => {
+                return (
+                    optionsData["versions"][model]
+                    && optionsData["versions"][model][scenario]
+                    && optionsData["versions"][model][scenario].values.includes(data)
+                )
+              }
+          );
+          if (dataInOptionsData.length < metaData["versions"][model][scenario].length) {
+            isDashboardUpdated = true;
+            metaData["versions"][model][scenario] = dataInOptionsData;
+          }
+        }
+      }
+    } else { // Models or scenarios not filled so remove versions
+      if(Object.keys(metaData["versions"]).length>0){
+        isDashboardUpdated = true;
+        metaData["versions"]={}
+      }
+    }
+
+
+
     if (isDashboardUpdated) {
+      const dashboard = JSON.parse(JSON.stringify(this.state.dashboard));
+      dashboard.blocks[block.id as string].config.metaData = { ...metaData };
       this.updateDashboard(dashboard);
-      notification.warning({
-        message: 'Data missing in selection box',
+      Object.keys(missingData).length>0 && notification.warning({
+        message: 'Options removed from selection box',
         description: (<div dangerouslySetInnerHTML={{ __html: this.notifDesc(missingData) }}></div>),
         placement: 'bottomRight',
       });
@@ -203,7 +236,7 @@ export default class DashboardSelectionControl extends Component<
   }
 
   notifDesc = (missingData) => {
-    let notif = "Some selected data are not available in existing options: <br/>";
+    let notif = "Some selected options are not available with new filters: <br/>";
     Object.keys(missingData).forEach(key => {
       if (missingData[key].length > 0) {
         let msg = '';

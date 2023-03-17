@@ -57,10 +57,10 @@ export default class BlockFilterManager extends Component<any, any> {
     /**
      * to update options in input select
      * @param metaData selected data in block
-     * @param filters the first filter(by data focus)
+     * @param filters {[indexType]: valuesToFilter} the first filter(by data focus), only one key
      */
-    filterOptions = (metaData: BlockDataModel, filters) => {
-        this.props.dataManager.fetchDataOptions({ filters, metaData }).then(res => {
+    filterOptions = (metaData: BlockDataModel, filters: {[indexType: string]: string[]}) => {
+        this.props.dataManager.fetchDataOptions({ metaData, filters }).then(res => {
             this.setState({ optionsData: res }, () => {
                 this.props.checkIfSelectedInOptions(this.state.optionsData, this.props.currentBlock)
                 this.missingData();

@@ -11,6 +11,7 @@ require('./DataBlockEditor.css')
  */
 export default class DataBlockEditor extends Component<any, any> {
 
+  // TODO Add delete versions
   clearClick = (option, e) => {
     const dashboard = { ...this.props.dashboard };
     const config = this.props.currentBlock.config;
@@ -58,10 +59,13 @@ export default class DataBlockEditor extends Component<any, any> {
 
     return (
       !isControlled && (
-        <div className={selected ? 'transition' : ''}>
+        <div className={selected ? 'transition' : ''} key={option}>
           <Row className="width-100">
-            <h4>{option} &nbsp;<label className='no-data'> {metaData.selectOrder.length == 4 && this.props.missingData[option].length > 0 && this.getMessage(this.props.missingData[option])}
-            </label>
+            <h4>
+              {option} &nbsp;
+              <label className='warning-label'>
+                {metaData.selectOrder.length == 4 && this.props.missingData[option].length > 0 && this.getMessage(this.props.missingData[option])}
+              </label>
             </h4>
             <SelectInput
               type={option}
@@ -85,20 +89,26 @@ export default class DataBlockEditor extends Component<any, any> {
     return Object.keys(controlBlock.master).map((key) => {
       if (controlBlock.master[key].isMaster) {
         return (
-          <div className='mt-20'>
-            <h4>{key} &nbsp;<label className='no-data'> {metaData.selectOrder.length == 4 && this.props.missingData[key].length > 0 && this.getMessage(this.props.missingData[key])}
-            </label>
+          <div className='mt-20' key={"controlledInputs"+key}>
+            <h4>{key} &nbsp;
+              <label className='warning-label'>
+                {metaData.selectOrder.length == 4 && this.props.missingData[key].length > 0
+                    && this.getMessage(this.props.missingData[key])}
+              </label>
             </h4>
-            {controlBlock[key].length <= 0 ? <div>
-
-              <p><ExclamationCircleOutlined /> No data selected</p>
-            </div> : controlBlock[key].map(element => {
-              let color = "default";
-              if (controlBlock.master[key].values.includes(element)) {
-                color = "blue";
-              }
-              return <Tag key={element} color={color}>{element}</Tag>
-            })}
+            {
+              controlBlock[key].length <= 0 ?
+                <div>
+                  <p><ExclamationCircleOutlined /> No data selected</p>
+                </div> :
+                controlBlock[key].map(element => {
+                  let color = "default";
+                  if (controlBlock.master[key].values.includes(element)) {
+                    color = "blue";
+                  }
+                  return <Tag key={element} color={color}>{element}</Tag>
+                })
+            }
           </div>
         );
       }
@@ -106,10 +116,12 @@ export default class DataBlockEditor extends Component<any, any> {
   };
 
   sortByTitle = (a,b) => {
-    if (a.title < b.title) {
+    const a_version = parseFloat(a.version)
+    const b_version = parseFloat(b.version)
+    if (a_version < b_version) {
       return 1;
     }
-    if (a.title > b.title) {
+    if (a_version > b_version) {
       return -1;
     }
     return 0;
@@ -137,6 +149,7 @@ export default class DataBlockEditor extends Component<any, any> {
           const defaultVersion = versionOptions[model][scenario].default
           for (const version of versionOptions[model][scenario].values) {
             scenarioChildren.push({
+              version: version, // For sorting
               title: version == defaultVersion ? version + " (default)" : version,
               value: JSON.stringify({model, scenario, version})
             })
@@ -161,7 +174,11 @@ export default class DataBlockEditor extends Component<any, any> {
         <div>
           <Divider/>
           <h4>versions</h4>
-          {disabled && <p>Models and scenarios must be selected first</p>}
+          {disabled &&
+              <p className={"warning-label"}>
+                <WarningOutlined /> &nbsp;
+                Models and scenarios must be selected first
+              </p>}
           <TreeSelect
               showSearch
               style={{ width: '100%' }}
@@ -171,7 +188,7 @@ export default class DataBlockEditor extends Component<any, any> {
               allowClear
               multiple
               treeDefaultExpandAll
-              defaultValue={this.getDefaultTreeSelectValue}
+              value={this.getDefaultTreeSelectValue()}
               onChange={this.props.onVersionSelected}
               treeData={treeData}
               disabled={disabled}
@@ -223,11 +240,13 @@ export default class DataBlockEditor extends Component<any, any> {
 
               {/* show dropdown lists of unselected  */}
               <table className="width-100">
-                <tr>
-                  {getUnselectedInputOptions(this.props.currentBlock, this.props.optionsLabel).map((option) => (
-                    <td key={option}>{this.selectDropDownInput(option, false)}</td>
-                  ))}
-                </tr>
+                <tbody>
+                  <tr>
+                    {getUnselectedInputOptions(this.props.currentBlock, this.props.optionsLabel).map((option) => (
+                      <td key={option}>{this.selectDropDownInput(option, false)}</td>
+                    ))}
+                  </tr>
+                </tbody>
               </table>
               {this.renderSelectVersions()}
             </div>
