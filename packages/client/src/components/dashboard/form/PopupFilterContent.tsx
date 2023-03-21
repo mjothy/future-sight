@@ -19,6 +19,7 @@ export default class PopupFilterContent extends Component<any, any> {
         dataStructure[key].isFilter = true;
       } else {
         dataStructure[key].isFilter = false;
+        dataStructure[key].selection = [];
       }
     });
     this.props.updateDataStructure(dataStructure);
@@ -27,15 +28,23 @@ export default class PopupFilterContent extends Component<any, any> {
   onChange = (type: string, selectedData: string[]) => {
     const dataStructure = JSON.parse(JSON.stringify(this.props.dataStructure));
     dataStructure[type].selection = selectedData;
-    this.props.updateDataStructure(dataStructure);
+    this.props.updateDataStructure(dataStructure, type); // Type for UPDATE needToFetch
+
   }
 
+  onDropdownVisibleChange = (type: string, e: any) => {
+    if (e)
+      this.props.updateOptionsData(type); // if input oppened fetch (if using onFocus, we need to delete the focus after input closed)
+
+  }
   selectInput = (type) => {
     return <SelectInput
       type={type}
       value={this.props.dataStructure[type].selection}
-      options={this.props.allData[type]}
+      options={this.props.optionsData[type]}
       onChange={this.onChange}
+      isFetch={this.props.isFetch}
+      onDropdownVisibleChange={this.onDropdownVisibleChange}
     />
   }
 

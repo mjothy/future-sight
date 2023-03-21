@@ -3,20 +3,59 @@ import PopupFilterContent from './PopupFilterContent';
 import { Modal, Button } from 'antd';
 import { FilterTwoTone } from '@ant-design/icons';
 import { getSelectedFiltersLabels } from '@future-sight/common';
+import withDataManager from '../../../services/withDataManager';
+import * as _ from 'lodash';
 
 const { confirm } = Modal;
 
 /**
  * The view for setting dashboard mataData
  */
-export default class SetupView extends Component<any, any> {
+class SetupView extends Component<any, any> {
   constructor(props) {
     super(props);
     this.state = {
       dataStructure: JSON.parse(JSON.stringify(this.props.dashboard.dataStructure)),
       visible: getSelectedFiltersLabels(this.props.dashboard.dataStructure).length <= 0,
-      isSubmit: false
+      isSubmit: false,
+      optionsData: { ...this.props.allData },
+      isFetch: false,
+      needToFetch: {
+        regions: false,
+        variables: false,
+        scenarios: false,
+        models: false
+      }
     };
+  }
+
+  async componentDidMount(): Promise<void> {
+    const optionsData = await this.getOptionsData();
+    this.setState({ optionsData });
+  }
+
+  getOptionsData = async () => {
+    const data = {
+      regions: [],
+      variables: [],
+      scenarios: [],
+      models: []
+    }
+    this.props.optionsLabel.forEach(option => {
+      data[option] = this.state.dataStructure[option].selection;
+    })
+    const optionsData = await this.props.dataManager.fetchDataFocusOptions({
+      data
+    });
+
+    return optionsData;
+  }
+
+  updateOptionsData = async (type) => {
+    if (this.state.needToFetch[type]){
+      const optionsData = await this.getOptionsData();
+      this.setState({ optionsData, isFetch: false });
+    }
   }
 
   show = () => {
@@ -31,8 +70,18 @@ export default class SetupView extends Component<any, any> {
     })
   }
 
-  updateDataStructure = (dataStructure) => {
-    this.setState({ dataStructure });
+  updateDataStructure = (dataStructure, type?: string) => {
+    const state = {
+      dataStructure
+    }
+    if (type) {
+      const needToFetch = { ...this.state.needToFetch };
+      this.props.optionsLabel.forEach(option => {
+        needToFetch[option] = option != type;
+      })
+      state["needToFetch"] = needToFetch
+    }
+    this.setState(state);
   }
 
   handleOk = () => {
@@ -101,13 +150,19 @@ export default class SetupView extends Component<any, any> {
           destroyOnClose={true}
         >
           <PopupFilterContent
-            {...this.props}
+            optionsLabel={this.props.optionsLabel}
             dataStructure={this.state.dataStructure}
             updateDataStructure={this.updateDataStructure}
             handleOk={this.handleOk}
+            optionsData={this.state.optionsData}
+            needToFetch={this.state.needToFetch}
+            isFetch={this.state.isFetch}
+            updateOptionsData={this.updateOptionsData}
           />
         </Modal>
       </>
     );
   }
 }
+
+export default withDataManager(SetupView);

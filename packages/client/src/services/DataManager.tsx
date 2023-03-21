@@ -152,6 +152,21 @@ export default class DataManager implements IDataManager {
   };
 
 
+  fetchDataFocusOptions = (data) => {
+    return fetch(`api/dataFocus`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        return data;
+      })
+      .catch(console.error);
+  };
+
   fetchRegionsGeojson = (regions: string[]) => {
     return fetch(`api/regionsGeojson`, {
       method: 'POST',

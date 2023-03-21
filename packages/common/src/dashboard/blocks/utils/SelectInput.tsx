@@ -1,4 +1,4 @@
-import { CloseCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { CloseCircleOutlined, ExclamationCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { Button, Input, Select, Tooltip } from 'antd'
 import React, { Component } from 'react'
 const { Option } = Select;
@@ -15,6 +15,7 @@ interface SelectOptionProps {
     onClear?: (type, e) => void;
     onDropdownVisibleChange?: (option: string, e: any) => void;
     onDeselect?: (type: string, selectedData: string[]) => void;
+    isFetch?: false;
 }
 
 export default class SelectInput extends Component<SelectOptionProps, any> {
@@ -35,10 +36,27 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                     }
                     onDeselect={(selectedData) => this.props.onDeselect?.(this.props.type, selectedData)}
                     dropdownMatchSelectWidth={false}
-                    notFoundContent={(
+                    notFoundContent={(this.props.isFetch) ? (
+                        <div>
+                            <LoadingOutlined />
+                            <p>Fetching data</p>
+                        </div>
+                    ) : (
                         <div>
                             <ExclamationCircleOutlined />
                             <p>This item does not exists for your filter selections.</p>
+                        </div>
+                    )}
+                    dropdownRender={menu => (
+                        <div>
+                            {menu}
+                            {this.props.value.map(selectedValue => (
+                                !this.props.options.includes(selectedValue) && (
+                                    <div key={selectedValue} style={{ color: 'red' }}>
+                                        {selectedValue} (not found)
+                                    </div>
+                                )
+                            ))}
                         </div>
                     )}
                 >

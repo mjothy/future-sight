@@ -1,14 +1,11 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import path, { join } from 'path';
+import { join } from 'path';
 import RedisClient from '../redis/RedisClient';
 import IDataProxy from './IDataProxy';
-import fetch from 'node-fetch';
-import RegionsGeoJson from './RegionsGeoJson';
 
 const optionsLabel = ["models", "scenarios", "variables", "regions"];
-const COUNTRIES_GEOJSON_URL = "https://datahub.io/core/geo-countries/r/countries.geojson";
 
 export default class ExpressServer {
   private app: any;
@@ -206,6 +203,29 @@ export default class ExpressServer {
         console.error(err);
         next(err);
       }
+    });
+
+    this.app.post('/api/dataFocus', async (req, res, next) => {
+      const selectedData = req.body.data;
+      const optionsData = {
+        regions: [],
+        variables: [],
+        scenarios: [],
+        models: [],
+      };
+      optionsLabel.forEach(option1 => {
+        let dataUnion = this.dataProxy.getDataUnion();
+        optionsLabel.forEach(option2 => {
+          if (option1 != option2) {
+            if (selectedData[option2].length > 0) {
+              dataUnion = dataUnion.filter(raw => selectedData[option2].includes(raw[option2.slice(0, -1)]));
+            }
+          }
+        })
+        optionsData[option1] = Array.from(new Set(dataUnion.map(raw => raw[option1.slice(0, -1)])))
+      })
+
+      res.send(optionsData);
     });
 
     this.app.post('/api/filterOptions', async (req, res, next) => {

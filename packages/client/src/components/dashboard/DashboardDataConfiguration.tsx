@@ -137,7 +137,6 @@ class DashboardDataConfiguration extends Component<
           plotData[blockId] = [...res]
 
         if (res.length > 0) {
-          console.log("res: ", res)
           this.setState({ plotData });
         }
         // else {
