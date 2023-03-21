@@ -34,7 +34,7 @@ class DashboardDataConfiguration extends Component<
     super(props);
     this.optionsLabel = this.props.dataManager.getOptions();
     this.state = {
-      filters: {
+      allData: {
         regions: {},
         variables: {},
         scenarios: {},
@@ -49,13 +49,13 @@ class DashboardDataConfiguration extends Component<
   }
 
   async componentDidMount() {
-    const filters = this.state.filters;
+    const allData = this.state.allData;
     try {
-      filters['regions'] = await this.props.dataManager.fetchRegions();
-      filters['variables'] = await this.props.dataManager.fetchVariables();
-      filters['models'] = await this.props.dataManager.fetchModels();
-      filters['scenarios'] = await this.props.dataManager.fetchScenarios();
-      this.setState({ filters, isFetchData: true });
+      allData['regions'] = await this.props.dataManager.fetchRegions();
+      allData['variables'] = await this.props.dataManager.fetchVariables();
+      allData['models'] = await this.props.dataManager.fetchModels();
+      allData['scenarios'] = await this.props.dataManager.fetchScenarios();
+      this.setState({ allData, isFetchData: true });
     } catch (error) {
       console.log("ERROR FETCH: ", error);
     }
@@ -162,7 +162,7 @@ class DashboardDataConfiguration extends Component<
     ) : (
       (this.state.isFetchData && <DashboardSelectionControl
         saveData={this.saveData}
-        filters={this.state.filters}
+        allData={this.state.allData}
         plotData={this.state.plotData}
         blockData={this.blockData}
         optionsLabel={this.optionsLabel}

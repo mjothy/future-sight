@@ -12,7 +12,7 @@ export default class BlockFilterManager extends Component<any, any> {
             /**
              * Data options in dropDown Inputs
              */
-            optionsData: { ...this.props.filters },
+            optionsData: { ...this.props.allData },
             missingData: {
                 regions: [],
                 variables: [],
