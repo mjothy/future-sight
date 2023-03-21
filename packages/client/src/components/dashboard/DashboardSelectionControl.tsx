@@ -5,7 +5,6 @@ import {
   ComponentPropsWithDataManager,
   ConfigurationModel,
   DashboardModel,
-  getSelectedFilter,
   LayoutModel, PlotDataModel,
 } from '@future-sight/common';
 import { Component } from 'react';

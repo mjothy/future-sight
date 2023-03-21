@@ -1,11 +1,11 @@
 import BlockModel from "../../../models/BlockModel";
 import DataStructureModel from "../../../models/DataStructureModel";
 
-export function getSelectedFilter(dataStructure: DataStructureModel) {
+export function getSelectedFiltersLabels(dataStructure: DataStructureModel) {
     const filterOptions = Object.keys(dataStructure)
         .filter((key) => dataStructure[key].isFilter)
         .map((key) => key);
-    return filterOptions.length > 0 ? filterOptions[0] : '';
+    return filterOptions ? filterOptions : [];
 }
 
 export function compareDataStructure(dataStructure, newDataStructure) {
@@ -30,20 +30,22 @@ export function compareDataStructure(dataStructure, newDataStructure) {
  * @returns array of blocks id that not contains data from data focus
  */
 export function blocksIdToDelete(blocks, dataStructure) {
-    const selectedFilter = getSelectedFilter(dataStructure);
+    const selectedFilter = getSelectedFiltersLabels(dataStructure);
     const toDeleteBlocks = new Set<string>();
 
-    if (dataStructure[selectedFilter].selection.length > 0) {
-        blocks.forEach((block: BlockModel | any) => {
-            if (block.blockType !== "text") {
-                block.config.metaData[selectedFilter].forEach(value => {
-                    if (!dataStructure[selectedFilter].selection.includes(value)) {
-                        toDeleteBlocks.add(block.id);
-                    }
-                })
-            }
-        });
-    }
-    
+    selectedFilter.forEach(filter => {
+        if (dataStructure[filter].selection.length > 0) {
+            blocks.forEach((block: BlockModel | any) => {
+                if (block.blockType !== "text") {
+                    block.config.metaData[filter].forEach(value => {
+                        if (!dataStructure[filter].selection.includes(value)) {
+                            toDeleteBlocks.add(block.id);
+                        }
+                    })
+                }
+            });
+        }
+    })
+
     return toDeleteBlocks;
 }

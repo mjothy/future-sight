@@ -2,7 +2,7 @@ import { Component } from 'react';
 import PopupFilterContent from './PopupFilterContent';
 import { Modal, Button } from 'antd';
 import { FilterTwoTone } from '@ant-design/icons';
-import { DataStructureModel, getSelectedFilter } from '@future-sight/common';
+import { getSelectedFiltersLabels } from '@future-sight/common';
 
 const { confirm } = Modal;
 
@@ -14,7 +14,7 @@ export default class SetupView extends Component<any, any> {
     super(props);
     this.state = {
       dataStructure: JSON.parse(JSON.stringify(this.props.dashboard.dataStructure)),
-      visible: getSelectedFilter(this.props.dashboard.dataStructure) === '',
+      visible: getSelectedFiltersLabels(this.props.dashboard.dataStructure).length <= 0,
       isSubmit: false
     };
   }
@@ -37,7 +37,7 @@ export default class SetupView extends Component<any, any> {
 
   handleOk = () => {
     // Check if there is an already selected filter
-    if (getSelectedFilter(this.props.dashboard.dataStructure) !== '') {
+    if (getSelectedFiltersLabels(this.props.dashboard.dataStructure).length > 0) {
       this.setState({ isSubmit: true }, () => {
         this.showConfirm()
       })
@@ -50,14 +50,8 @@ export default class SetupView extends Component<any, any> {
 
   updateDashboardDataStructure = () => {
     const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
-    dashboard.dataStructure = new DataStructureModel();
-    const selectedFilter = getSelectedFilter(this.state.dataStructure);
-    if (selectedFilter !== '') {
-      dashboard.dataStructure[selectedFilter] = JSON.parse(JSON.stringify(this.state.dataStructure[selectedFilter]));
-    }
-
+    dashboard.dataStructure = this.state.dataStructure;
     this.props.updateDashboard(dashboard);
-
     this.setState({
       visible: false,
       dataStructure: JSON.parse(JSON.stringify(dashboard.dataStructure))
@@ -78,10 +72,15 @@ export default class SetupView extends Component<any, any> {
   }
 
   render() {
-    const selectedFilter = getSelectedFilter(this.props.dashboard.dataStructure);
+    const selectedFilters = getSelectedFiltersLabels(this.props.dashboard.dataStructure);
     let selectedFilterLabel = ""
-    if (selectedFilter !== '' && this.props.dashboard.dataStructure[selectedFilter].selection.length>0) {
-      selectedFilterLabel = ': ' + selectedFilter;
+    if (selectedFilters.length > 0) {
+      selectedFilters.forEach(filter => {
+        if (this.props.dashboard.dataStructure[filter].selection.length > 0) {
+          selectedFilterLabel = ': ' + filter;
+
+        }
+      })
     }
     return (
       <>

@@ -3,7 +3,7 @@ import ConfigurationModel from '../../models/ConfigurationModel';
 import ControlBlockEditor from './control/ControlBlockEditor';
 import DataBlockEditor from './data/DataBlockEditor';
 import { getBlock } from './utils/BlockDataUtils';
-import { getSelectedFilter } from './utils/DashboardUtils';
+import { getSelectedFiltersLabels } from './utils/DashboardUtils';
 
 export default class BlockFilterManager extends Component<any, any> {
     constructor(props) {
@@ -45,9 +45,10 @@ export default class BlockFilterManager extends Component<any, any> {
             metaData = this.getMetaDataIfControlled();
         }
 
-
-        const selectedFilter = getSelectedFilter(this.props.dashboard.dataStructure);
-        filters[selectedFilter] = this.props.dashboard.dataStructure[selectedFilter].selection;
+        const selectedFilters = getSelectedFiltersLabels(this.props.dashboard.dataStructure);
+        selectedFilters.forEach(filter => {
+            filters[filter] = this.props.dashboard.dataStructure[filter].selection;
+        })
 
         this.filterOptions(metaData, filters);
     };
