@@ -9,6 +9,7 @@ import PlotDataModel from "../../../models/PlotDataModel";
 import withColorizer from "../../../hoc/colorizer/withColorizer";
 import { stackGroups } from '../utils/StackGraphs';
 import PieView from "./graphType/pie/PieView";
+import { getColorscale } from 'react-colorscales';
 
 class DataBlockView extends Component<any, any> {
 
@@ -59,7 +60,7 @@ class DataBlockView extends Component<any, any> {
         if (configStyle.stack && configStyle.stack.isStack && configStyle.graphType === 'area') {
           stacks = stackGroups(currentBlock.config.metaData, configStyle.stack.value);
         }
-        const dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale)
+        const dataWithColor = this.props.colorizer.colorizeData(data, getColorscale(configStyle.colorscale, this.props.timeseriesData.length))
         dataWithColor?.map((dataElement) => {
           showData.push(this.preparePlotData(dataElement, configStyle, stacks));
         });

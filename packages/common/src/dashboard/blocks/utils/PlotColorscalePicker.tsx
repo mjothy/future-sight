@@ -10,32 +10,22 @@ ColorscalePicker.defaultProps = {
 
 export default class PlotColorscalePicker extends Component<any, any> {
 
+
     constructor(props) {
         super(props);
         this.state = {
             showColorscalePicker: false
         }
     }
-    onColorsChange = colorscale => {
+    onColorsChange = (colorscale) => {
         this.props.onColorsChange(colorscale);
     }
     toggleColorscalePicker = () => {
         this.setState({ showColorscalePicker: !this.state.showColorscalePicker });
     }
-    getNswatches = () => {
-        const metaData = this.props.currentBlock.config.metaData;
-        const configStyle = this.props.currentBlock.config.configStyle;
 
-        let n = 1;
-        this.props.optionsLabel.forEach(key => {
-            n = n * metaData[key].length;
-        });
-
-        return n != 0 ? n : configStyle.colorscale.lenght;
-    }
     render() {
         const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
-        const nSwatches = this.getNswatches();
         const toggleButtonStyle = { cursor: 'pointer' };
         if (this.state.showColorscalePicker) {
             toggleButtonStyle["borderColor"] = '#A2B1C6';
@@ -58,7 +48,6 @@ export default class PlotColorscalePicker extends Component<any, any> {
                     <ColorscalePicker
                         onChange={this.onColorsChange}
                         colorscale={configStyle.colorscale}
-                        nSwatches={nSwatches}
                         disableSwatchControls
                     />
                 }</div>

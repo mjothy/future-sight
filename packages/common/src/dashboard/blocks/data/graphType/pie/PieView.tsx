@@ -4,6 +4,7 @@ import PlotlyGraph from '../../../../graphs/PlotlyGraph';
 import PlotlyUtils from '../../../../graphs/PlotlyUtils';
 import PlotDataModel from "../../../../../models/PlotDataModel";
 import withColorizer from "../../../../../hoc/colorizer/withColorizer";
+import { getColorscale } from 'react-colorscales';
 
 interface PieDataPerYearModel {
   [year: string]: { values: string[], labels: string[] }
@@ -37,7 +38,7 @@ class PieView extends Component<any, any> {
     const otherIndex = PlotlyUtils.getIndexKeys(data)
       .filter((index) => index !== stackIndex)
 
-    const dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, stackIndex)
+    const dataWithColor = this.props.colorizer.colorizeData(data, getColorscale(configStyle.colorscale, this.props.rawData.length), stackIndex)
     const plotlyData: Record<string, unknown>[] = []
 
     // Get data by year
