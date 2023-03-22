@@ -5,7 +5,7 @@ import { join } from 'path';
 import RedisClient from '../redis/RedisClient';
 import IDataProxy from './IDataProxy';
 
-const optionsLabel = ["models", "scenarios", "variables", "regions"];
+const optionsLabel = ["variables", "regions", "scenarios", "models",];
 
 export default class ExpressServer {
   private app: any;

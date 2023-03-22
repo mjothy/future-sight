@@ -1,6 +1,7 @@
 import {
   BranchesOutlined,
   ControlOutlined,
+  ExclamationCircleOutlined,
   GlobalOutlined,
   LineChartOutlined,
 } from '@ant-design/icons';
@@ -43,9 +44,17 @@ export default class PopupFilterContent extends Component<any, any> {
       value={this.props.dataStructure[type].selection}
       options={this.props.optionsData[type]}
       onChange={this.onChange}
-      isFetch={this.props.isFetch}
+      isFetching={this.props.isFetching}
       onDropdownVisibleChange={this.onDropdownVisibleChange}
     />
+  }
+
+  isDataMissing = (type: string) => {
+    const dataStructureData = this.props.dataStructure[type].selection;
+    const optionsData = this.props.optionsData[type];
+
+    const selected_in_options = dataStructureData.filter(value => optionsData.includes(value));
+    return !(selected_in_options.length == dataStructureData.length)
   }
 
   render() {
@@ -69,7 +78,7 @@ export default class PopupFilterContent extends Component<any, any> {
             <div className="mt-20">
               <Checkbox value={'variables'}>
                 <LineChartOutlined />
-                Variables
+                Variables&nbsp;<label className='no-data'> {this.isDataMissing("variables") ? <><ExclamationCircleOutlined /> Data missing</> : ''}</label>
               </Checkbox>
               {selectedFilter.includes('variables') && this.selectInput('variables')}
             </div>
@@ -83,7 +92,7 @@ export default class PopupFilterContent extends Component<any, any> {
             <div className="mt-20">
               <Checkbox value={'models'}>
                 <ControlOutlined />
-                Models
+                Models&nbsp;<label className='no-data'> {this.isDataMissing("models") ? <><ExclamationCircleOutlined /> Data missing</> : ''}</label>
               </Checkbox>
               {selectedFilter.includes('models') && this.selectInput('models')}
             </div>

@@ -19,7 +19,7 @@ class SetupView extends Component<any, any> {
       visible: getSelectedFiltersLabels(this.props.dashboard.dataStructure).length <= 0,
       isSubmit: false,
       optionsData: { ...this.props.allData },
-      isFetch: false,
+      isFetching: false,
       needToFetch: {
         regions: false,
         variables: false,
@@ -31,7 +31,7 @@ class SetupView extends Component<any, any> {
 
   async componentDidMount(): Promise<void> {
     const optionsData = await this.getOptionsData();
-    this.setState({ optionsData });
+    this.setState({ optionsData, isFetching: false });
   }
 
   getOptionsData = async () => {
@@ -44,17 +44,23 @@ class SetupView extends Component<any, any> {
     this.props.optionsLabel.forEach(option => {
       data[option] = this.state.dataStructure[option].selection;
     })
+    this.setState({ isFetching: true })
     const optionsData = await this.props.dataManager.fetchDataFocusOptions({
       data
     });
-
     return optionsData;
   }
 
   updateOptionsData = async (type) => {
-    if (this.state.needToFetch[type]){
+    if (this.state.needToFetch[type]) {
       const optionsData = await this.getOptionsData();
-      this.setState({ optionsData, isFetch: false });
+      const needToFetch = {
+        regions: false,
+        variables: false,
+        scenarios: false,
+        models: false
+      }
+      this.setState({ optionsData, isFetching: false, needToFetch });
     }
   }
 
@@ -71,17 +77,18 @@ class SetupView extends Component<any, any> {
   }
 
   updateDataStructure = (dataStructure, type?: string) => {
-    const state = {
-      dataStructure
-    }
+    const needToFetch = { ...this.state.needToFetch };
     if (type) {
-      const needToFetch = { ...this.state.needToFetch };
       this.props.optionsLabel.forEach(option => {
         needToFetch[option] = option != type;
       })
-      state["needToFetch"] = needToFetch
+    } else {
+      // check changed
+      this.props.optionsLabel.forEach(option => {
+        needToFetch[option] = true;
+      })
     }
-    this.setState(state);
+    this.setState({ dataStructure, needToFetch });
   }
 
   handleOk = () => {
@@ -156,7 +163,7 @@ class SetupView extends Component<any, any> {
             handleOk={this.handleOk}
             optionsData={this.state.optionsData}
             needToFetch={this.state.needToFetch}
-            isFetch={this.state.isFetch}
+            isFetching={this.state.isFetching}
             updateOptionsData={this.updateOptionsData}
           />
         </Modal>

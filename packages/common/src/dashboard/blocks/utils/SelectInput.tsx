@@ -1,5 +1,5 @@
 import { CloseCircleOutlined, ExclamationCircleOutlined, LoadingOutlined } from '@ant-design/icons';
-import { Button, Input, Select, Tooltip } from 'antd'
+import { Button, Input, Select, Tag, Tooltip } from 'antd'
 import React, { Component } from 'react'
 const { Option } = Select;
 
@@ -15,16 +15,50 @@ interface SelectOptionProps {
     onClear?: (type, e) => void;
     onDropdownVisibleChange?: (option: string, e: any) => void;
     onDeselect?: (type: string, selectedData: string[]) => void;
-    isFetch?: false;
+    isFetching?: false;
 }
 
 export default class SelectInput extends Component<SelectOptionProps, any> {
+    dropdownRender = (menu) => {
+        return (
+            <div>
+                {menu}
+                {!this.props.isFetching && this.props.value.map(selectedValue => (
+                    !this.props.options.includes(selectedValue) && (
+                        <div key={selectedValue} style={{ color: 'red' }} className={"ant-select-item ant-select-item-option"}>
+                            <div className='ant-select-item-option-content'>
+                                <ExclamationCircleOutlined /> {selectedValue}
+                            </div>
+                        </div>
+                    )
+                ))}
+            </div>
+        );
+    }
+
+    tagRender = (props) => {
+        const { label, value, closable, onClose } = props;
+        return (
+            <Tag
+                color={this.props.options.includes(label) ? undefined : 'red'}
+                closable={closable}
+                onClose={onClose}
+                style={{ marginRight: 3 }}
+                icon={this.props.options.includes(label) ? undefined : <ExclamationCircleOutlined />}
+            >
+                {label}
+            </Tag>
+        );
+    }
+
     render() {
         return (
             <Input.Group compact>
                 <Select
                     mode="multiple"
                     className={"width-90"}
+                    dropdownRender={this.dropdownRender}
+                    tagRender={this.tagRender}
                     placeholder={this.props.type}
                     value={this.props.value}
                     onChange={(selectedData) =>
@@ -36,7 +70,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                     }
                     onDeselect={(selectedData) => this.props.onDeselect?.(this.props.type, selectedData)}
                     dropdownMatchSelectWidth={false}
-                    notFoundContent={(this.props.isFetch) ? (
+                    notFoundContent={(this.props.isFetching) ? (
                         <div>
                             <LoadingOutlined />
                             <p>Fetching data</p>
@@ -47,20 +81,8 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                             <p>This item does not exists for your filter selections.</p>
                         </div>
                     )}
-                    dropdownRender={menu => (
-                        <div>
-                            {menu}
-                            {this.props.value.map(selectedValue => (
-                                !this.props.options.includes(selectedValue) && (
-                                    <div key={selectedValue} style={{ color: 'red' }}>
-                                        {selectedValue} (not found)
-                                    </div>
-                                )
-                            ))}
-                        </div>
-                    )}
                 >
-                    {this.props.options.map((value) => (
+                    {!this.props.isFetching && this.props.options.map((value) => (
                         <Option key={value} value={value}>
                             {value}
                         </Option>
