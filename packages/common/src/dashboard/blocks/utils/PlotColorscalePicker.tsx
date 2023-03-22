@@ -3,9 +3,12 @@ import { Colorscale } from 'react-colorscales';
 import ColorscalePicker from 'react-colorscales';
 import { COLOR_PICKER_CONSTANTS } from 'react-colorscales';
 
-COLOR_PICKER_CONSTANTS.COLORSCALE_TYPES = ["sequential", "divergent", "categorical"];
+COLOR_PICKER_CONSTANTS.COLORSCALE_TYPES = ["categorical", "sequential", "divergent"];
+ColorscalePicker.defaultProps = {
+    initialColorscaleType: 'categorical',
+};
 
-export default class ColorscalePicker extends Component<any, any> {
+export default class PlotColorscalePicker extends Component<any, any> {
 
     constructor(props) {
         super(props);

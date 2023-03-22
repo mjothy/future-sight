@@ -5,7 +5,7 @@ import {
   ExclamationCircleOutlined
 } from '@ant-design/icons';
 import { Col, Input, Row, Select, Checkbox, InputNumber } from 'antd';
-import ColorscalePicker from '../utils/ColorscalePicker';
+import PlotColorscalePicker from '../utils/PlotColorscalePicker';
 
 
 const { Option } = Select;
@@ -381,7 +381,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             <h3>Colorscale</h3>
             <Row>
               <Col span={20}>
-                <ColorscalePicker currentBlock={this.props.currentBlock} optionsLabel={this.props.optionsLabel}
+                <PlotColorscalePicker currentBlock={this.props.currentBlock} optionsLabel={this.props.optionsLabel}
                   onColorsChange={this.onColorsChange} />
               </Col>
             </Row>
