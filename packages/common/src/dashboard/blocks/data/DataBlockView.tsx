@@ -60,7 +60,9 @@ class DataBlockView extends Component<any, any> {
         if (configStyle.stack && configStyle.stack.isStack && configStyle.graphType === 'area') {
           stacks = stackGroups(currentBlock.config.metaData, configStyle.stack.value);
         }
-        const dataWithColor = this.props.colorizer.colorizeData(data, getColorscale(configStyle.colorscale, this.props.timeseriesData.length))
+        // const nSwatch = this.props.timeseriesData.length >= 9 ? this.props.timeseriesData.length : 9;
+        // const dataWithColor = this.props.colorizer.colorizeData(data, getColorscale(configStyle.colorscale, nSwatch))
+        const dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale);
         dataWithColor?.map((dataElement) => {
           showData.push(this.preparePlotData(dataElement, configStyle, stacks));
         });
