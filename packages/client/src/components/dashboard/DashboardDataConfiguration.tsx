@@ -2,8 +2,7 @@ import {
   BlockDataModel,
   BlockModel, ColorizerProvider,
   ComponentPropsWithDataManager,
-  ConfigurationModel, DataModel,
-  getBlock,
+  ConfigurationModel,
   ReadOnlyDashboard, Colorizer
 } from '@future-sight/common';
 import { Component } from 'react';
@@ -13,6 +12,7 @@ import DashboardSelectionControl from './DashboardSelectionControl';
 import { getDraft, removeDraft } from '../drafts/DraftUtils';
 import Utils from '../../services/Utils';
 import { Spin } from 'antd';
+import * as _ from 'lodash';
 
 export interface DashboardDataConfigurationProps
   extends ComponentPropsWithDataManager,
@@ -45,6 +45,8 @@ class DashboardDataConfiguration extends Component<
        */
       plotData: {},
       isFetchData: false,
+      response: [],
+      blockId: ""
     };
   }
 
@@ -58,6 +60,18 @@ class DashboardDataConfiguration extends Component<
       this.setState({ filters, isFetchData: true });
     } catch (error) {
       console.log("ERROR FETCH: ", error);
+    }
+  }
+
+  componentDidUpdate(prevProps: Readonly<DashboardDataConfigurationProps>, prevState: Readonly<any>, snapshot?: any): void {
+    if (!_.isEqual(this.state.response, prevState.response)) {
+      const plotData = JSON.parse(JSON.stringify(this.state.plotData))
+      if (plotData[this.state.updateBlockId] != undefined)
+        plotData[this.state.updateBlockId].push(...this.state.response)
+      else
+        plotData[this.state.updateBlockId] = [...this.state.response]
+
+      this.setState({ plotData })
     }
   }
 
@@ -130,19 +144,9 @@ class DashboardDataConfiguration extends Component<
   retreiveAllTimeSeriesData = (data, blockId) => {
     this.props.dataManager.fetchPlotData(data)
       .then(res => {
-        const plotData = { ...this.state.plotData }
-        if (plotData[blockId] != undefined)
-          plotData[blockId] = [...plotData[blockId], ...res]
-        else
-          plotData[blockId] = [...res]
-
         if (res.length > 0) {
-          console.log("res: ", res)
-          this.setState({ plotData });
+          this.setState({ response: res, updateBlockId: blockId });
         }
-        // else {
-        //   this.setState({ plotData });
-        // }
       }
       );
   }
@@ -170,13 +174,13 @@ class DashboardDataConfiguration extends Component<
       />) || <div className="dashboard">
         <Spin className="centered" />
       </div>)
-        // TODO handle error
+      // TODO handle error
     )
 
     return (
-        <ColorizerProvider colorizer={new Colorizer(dataFilterKeys, undefined, undefined, "region")}>
-          {toRender}
-        </ColorizerProvider>
+      <ColorizerProvider colorizer={new Colorizer(dataFilterKeys, undefined, undefined, "region")}>
+        {toRender}
+      </ColorizerProvider>
     )
   }
 }
