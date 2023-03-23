@@ -240,10 +240,10 @@ export default class ExpressServer {
       const dataUnion = this.dataProxy.getDataUnion();
       let firstFilterRaws = dataUnion;
 
-      // First filter (by data focus) -- only one filter selected
+      // First filter (by data focus)
       Object.keys(firstFilters).forEach(option => {
         if (firstFilters[option].length > 0) {
-          firstFilterRaws = dataUnion.filter(raw => firstFilters[option].includes(raw[option.slice(0, -1)]));
+          firstFilterRaws = firstFilterRaws.filter(raw => firstFilters[option].includes(raw[option.slice(0, -1)]));
         }
       })
 

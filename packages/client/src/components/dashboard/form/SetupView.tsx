@@ -34,6 +34,14 @@ class SetupView extends Component<any, any> {
     this.setState({ optionsData, isFetching: false });
   }
 
+
+  async componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): Promise<void> {
+    if (prevState.isSubmit != this.state.isSubmit) {
+      const optionsData = await this.getOptionsData();
+      this.setState({ optionsData, isFetching: false });
+    }
+  }
+
   getOptionsData = async () => {
     const data = {
       regions: [],
