@@ -4,7 +4,7 @@
   display: none;
 }
 
-.colorscalePickerContainer{
-  max-height: 250px;
-  padding-bottom: 20px;
+.tag-selection-item .anticon-close{
+  display: flex;
+  align-items: center;
 }
