@@ -29,16 +29,20 @@ class SetupView extends Component<any, any> {
     };
   }
 
-  async componentDidMount(): Promise<void> {
-    const optionsData = await this.getOptionsData();
-    this.setState({ optionsData, isFetching: false });
-  }
-
-
   async componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): Promise<void> {
-    if (prevState.isSubmit != this.state.isSubmit) {
+    if (prevState.visible != this.state.visible && this.state.visible) {
       const optionsData = await this.getOptionsData();
       this.setState({ optionsData, isFetching: false });
+    }
+
+    if (!_.isEqual(this.state.dataStructure, prevState.dataStructure)) {
+      const selectionDataStructure = Object.keys(this.state.dataStructure).filter(key => this.state.dataStructure[key].isFilter)
+      const selectionPrevDataStructure = Object.keys(prevState.dataStructure).filter(key => prevState.dataStructure[key].isFilter);
+      // If selection changed (input deselected)
+      if (selectionDataStructure.length < selectionPrevDataStructure.length) {
+        const optionsData = await this.getOptionsData();
+        this.setState({ optionsData, isFetching: false });
+      }
     }
   }
 
@@ -60,17 +64,10 @@ class SetupView extends Component<any, any> {
   }
 
   updateOptionsData = async (type) => {
-    if (this.state.needToFetch[type]) {
-      const optionsData = await this.getOptionsData();
-      const needToFetch = {
-        regions: false,
-        variables: false,
-        scenarios: false,
-        models: false
-      }
-      this.setState({ optionsData, isFetching: false, needToFetch });
-    }
+    const optionsData = await this.getOptionsData(); //TODO get options of other selected inputs (!= type)
+    this.setState({ optionsData, isFetching: false });
   }
+
 
   show = () => {
     this.setState({ visible: true })
@@ -84,19 +81,8 @@ class SetupView extends Component<any, any> {
     })
   }
 
-  updateDataStructure = (dataStructure, type?: string) => {
-    const needToFetch = { ...this.state.needToFetch };
-    if (type) {
-      this.props.optionsLabel.forEach(option => {
-        needToFetch[option] = option != type;
-      })
-    } else {
-      // check changed
-      this.props.optionsLabel.forEach(option => {
-        needToFetch[option] = true;
-      })
-    }
-    this.setState({ dataStructure, needToFetch });
+  updateDataStructure = (dataStructure) => {
+    this.setState({ dataStructure });
   }
 
   handleOk = () => {

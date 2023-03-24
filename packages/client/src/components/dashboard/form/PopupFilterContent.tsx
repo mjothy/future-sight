@@ -29,15 +29,17 @@ export default class PopupFilterContent extends Component<any, any> {
   onChange = (type: string, selectedData: string[]) => {
     const dataStructure = JSON.parse(JSON.stringify(this.props.dataStructure));
     dataStructure[type].selection = selectedData;
-    this.props.updateDataStructure(dataStructure, type); // Type for UPDATE needToFetch
+    this.props.updateDataStructure(dataStructure);
 
   }
 
   onDropdownVisibleChange = (type: string, e: any) => {
-    if (e)
-      this.props.updateOptionsData(type); // if input oppened fetch (if using onFocus, we need to delete the focus after input closed)
-
+    const isClosed = !e; // on input close, fetch options in other selected inputs (to track missing data)
+    if (isClosed) {
+      this.props.updateOptionsData(type);
+    }
   }
+
   selectInput = (type) => {
     return <SelectInput
       type={type}
