@@ -9,7 +9,6 @@ import PlotDataModel from "../../../models/PlotDataModel";
 import withColorizer from "../../../hoc/colorizer/withColorizer";
 import { stackGroups } from '../utils/StackGraphs';
 import PieView from "./graphType/pie/PieView";
-import { getColorscale } from 'react-colorscales';
 
 class DataBlockView extends Component<any, any> {
 
@@ -60,13 +59,8 @@ class DataBlockView extends Component<any, any> {
         if (configStyle.stack && configStyle.stack.isStack && configStyle.graphType === 'area') {
           stacks = stackGroups(currentBlock.config.metaData, configStyle.stack.value);
         }
-        let nSwatch = this.props.timeseriesData.length >= 9 ? this.props.timeseriesData.length : 9; // 9 is the default value for ColorPicker
-        nSwatch = configStyle.colorscale.length > nSwatch ? configStyle.colorscale.length : nSwatch;
-        const colorscale = getColorscale(configStyle.colorscale, nSwatch);
-        const dataWithColor = this.props.colorizer.colorizeData(data, colorscale);
+        const dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale);
 
-        console.log("colorscale1: ", colorscale);
-        console.log("colorscale2: ", dataWithColor);
         dataWithColor?.map((dataElement) => {
           showData.push(this.preparePlotData(dataElement, configStyle, stacks));
         });
@@ -117,8 +111,6 @@ class DataBlockView extends Component<any, any> {
         obj = {
           type: 'scatter',
           fill: 'tonexty',
-          // fillcolor: "#FF0000"+"50",
-          // fillcolor: dataElement.color ? dataElement.color + "50" : null,
           fillcolor: dataElement.color ? dataElement.color + "50" : null,
           x: xyDict.x,
           y: xyDict.y,

@@ -4,7 +4,6 @@ import PlotlyGraph from '../../../../graphs/PlotlyGraph';
 import PlotlyUtils from '../../../../graphs/PlotlyUtils';
 import PlotDataModel from "../../../../../models/PlotDataModel";
 import withColorizer from "../../../../../hoc/colorizer/withColorizer";
-import { getColorscale } from 'react-colorscales';
 
 interface PieDataPerYearModel {
   [year: string]: { values: string[], labels: string[] }
@@ -37,12 +36,7 @@ class PieView extends Component<any, any> {
     const stackIndex = configStyle.stack.value.slice(0, -1)
     const otherIndex = PlotlyUtils.getIndexKeys(data)
       .filter((index) => index !== stackIndex)
-    const colorsNumber = new Set(data.map(raw => raw[stackIndex]));
-    let nSwatch = colorsNumber.size >= 9 ? colorsNumber.size : 9; // 9 is the default value for ColorPicker
-    nSwatch = configStyle.colorscale.length > nSwatch ? configStyle.colorscale.length : nSwatch;
-    const colorscale = getColorscale(configStyle.colorscale, nSwatch);
-    const dataWithColor = this.props.colorizer.colorizeData(data, colorscale, stackIndex)
-    // const dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, stackIndex)
+    const dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, stackIndex) //TODO use only data instead of dataWithColor cuz pie chart take as colors all configStyle.colorscale
     const plotlyData: Record<string, unknown>[] = []
 
     // Get data by year
@@ -67,7 +61,7 @@ class PieView extends Component<any, any> {
         labels: selectedData?.labels || [],
         marker: {
           // colors: colors,
-          colors: colorscale,
+          colors: configStyle.colorscale
         },
         hovertemplate: `%{label} <br> %{value:.2f} ${dataWithColor[0].unit}  <extra></extra>`,
         texttemplate: configStyle.pie.showPercent ? null : `%{value:.4s}`,
@@ -146,7 +140,7 @@ class PieView extends Component<any, any> {
           labels: selectedData?.labels || [],
           marker: {
             // colors: colorsPerIndexValue[idx],
-            colors: colorscale
+            colors: configStyle.colorscale
           },
           hovertemplate: `%{label} <br> %{value:.2f} ${dataWithColor[0].unit} <extra>${idx}</extra>`,
           texttemplate: configStyle.pie.showPercent ? null : `%{value:.4s}`,
