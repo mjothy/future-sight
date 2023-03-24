@@ -37,8 +37,12 @@ class PieView extends Component<any, any> {
     const stackIndex = configStyle.stack.value.slice(0, -1)
     const otherIndex = PlotlyUtils.getIndexKeys(data)
       .filter((index) => index !== stackIndex)
-      
-    const dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, stackIndex)
+    const colorsNumber = new Set(data.map(raw => raw[stackIndex]));
+    let nSwatch = colorsNumber.size >= 9 ? colorsNumber.size : 9; // 9 is the default value for ColorPicker
+    nSwatch = configStyle.colorscale.length > nSwatch ? configStyle.colorscale.length : nSwatch;
+    const colorscale = getColorscale(configStyle.colorscale, nSwatch);
+    const dataWithColor = this.props.colorizer.colorizeData(data, colorscale, stackIndex)
+    // const dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, stackIndex)
     const plotlyData: Record<string, unknown>[] = []
 
     // Get data by year
@@ -62,7 +66,8 @@ class PieView extends Component<any, any> {
         values: selectedData?.values || [],
         labels: selectedData?.labels || [],
         marker: {
-          colors: colors
+          // colors: colors,
+          colors: colorscale,
         },
         hovertemplate: `%{label} <br> %{value:.2f} ${dataWithColor[0].unit}  <extra></extra>`,
         texttemplate: configStyle.pie.showPercent ? null : `%{value:.4s}`,
@@ -140,7 +145,8 @@ class PieView extends Component<any, any> {
           values: selectedData?.values || [],
           labels: selectedData?.labels || [],
           marker: {
-            colors: colorsPerIndexValue[idx]
+            // colors: colorsPerIndexValue[idx],
+            colors: colorscale
           },
           hovertemplate: `%{label} <br> %{value:.2f} ${dataWithColor[0].unit} <extra>${idx}</extra>`,
           texttemplate: configStyle.pie.showPercent ? null : `%{value:.4s}`,
