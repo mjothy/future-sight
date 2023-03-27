@@ -10,8 +10,8 @@ import { getUnselectedInputOptions } from '../utils/BlockDataUtils';
 export default class DataBlockEditor extends Component<any, any> {
 
   clearClick = (option, e) => {
-    const dashboard = { ...this.props.dashboard };
-    const config = this.props.currentBlock.config;
+    const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+    const config = JSON.parse(JSON.stringify(this.props.currentBlock.config));
 
     const index = config.metaData.selectOrder.indexOf(option);
     if (index >= 0) {
@@ -19,15 +19,22 @@ export default class DataBlockEditor extends Component<any, any> {
 
       for (let i = index; i < config.metaData.selectOrder.length; i++) {
         selectOrder.splice(selectOrder.indexOf(config.metaData.selectOrder[i]), 1);
-        // TODO add condition for controlled inputs
         config.metaData[config.metaData.selectOrder[i]] = [];
       }
-      config.metaData.selectOrder = Array.from(new Set<string>([...selectOrder]));
+      config.metaData.selectOrder = [...selectOrder];
       dashboard.blocks[this.props.currentBlock.id].config = { ...config };
       this.props.updateDashboard(dashboard);
     }
 
   };
+
+  onChange = (option, selectedData: string[]) => {
+    if (selectedData.length <= 0) {
+      this.clearClick(option, null);
+    } else {
+      this.props.onChange(option, selectedData);
+    }
+  }
 
   getMessage = (missing) => {
     let msg = '';
@@ -65,7 +72,7 @@ export default class DataBlockEditor extends Component<any, any> {
               type={option}
               value={metaData[option]}
               options={this.props.optionsData[option]}
-              onChange={this.props.onChange}
+              onChange={this.onChange}
               isClear={selected}
               onClear={this.clearClick}
               onDropdownVisibleChange={this.props.onDropdownVisibleChange}
