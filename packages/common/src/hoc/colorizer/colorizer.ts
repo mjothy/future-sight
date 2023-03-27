@@ -8,15 +8,14 @@ export default class Colorizer {
         private dataFilterKeys: string[],
         private colors: string[] = defaultColorizer.colors,
         private indexToColor: IndexToColorModel = defaultColorizer.indexToColor,
-        private defaultIndex: string | null = defaultColorizer.defaultIndex)
-    {}
+        private defaultIndex: string | null = defaultColorizer.defaultIndex) { }
 
 
     /**
      * Add color to each element of the data array
      * @returns PlotDataModel[]
      */
-    colorizeData = (data: PlotDataModel[], customIndex?: string) => {
+    colorizeData = (data: PlotDataModel[], colorset: string[], customIndex?: string) => {
         if (data.length === 0) {
             return data
         }
@@ -30,11 +29,14 @@ export default class Colorizer {
         }
 
         // add color to data
-        return data.map((dataElement) => {
-            const dataElementWithColor = {...dataElement}
-            dataElementWithColor.color = this.getColor(dataElement, indexKeys)
+        const dataWithColor = data.map((dataElement) => {
+            const dataElementWithColor = { ...dataElement }
+            dataElementWithColor.color = this.getColor(dataElement, colorset, indexKeys)
             return dataElementWithColor
         })
+
+        this.resetIndexToColor()
+        return dataWithColor;
     }
 
 
@@ -42,9 +44,9 @@ export default class Colorizer {
      * Get color of the graph curve
      * @returns string index
      */
-    private getColor = (dataElement: PlotDataModel, indexKeys: string[]) => {
+    private getColor = (dataElement: PlotDataModel, colorset: string[], indexKeys: string[]) => {
 
-        if(indexKeys.length==0) {
+        if (indexKeys.length == 0) {
             // console.log("no index")
             return null
         }
@@ -55,21 +57,21 @@ export default class Colorizer {
             .map((indexKey) => dataElement[indexKey])
             .join("-")
 
-        if (!this.indexToColor[indexKeysJoined] || !this.indexToColor[indexKeysJoined][indexValue]){
-            this.updateIndexToColor(indexKeysJoined, indexValue)
+        if (!this.indexToColor[indexKeysJoined] || !this.indexToColor[indexKeysJoined][indexValue]) {
+            this.updateIndexToColor(indexKeysJoined, colorset, indexValue)
         }
 
         return this.indexToColor[indexKeysJoined][indexValue]
     }
 
-    private updateIndexToColor = (indexKey, indexValue)=>{
-        if (!this.indexToColor[indexKey]){
-            this.indexToColor[indexKey]={}
+    private updateIndexToColor = (indexKey, colorset, indexValue) => {
+        if (!this.indexToColor[indexKey]) {
+            this.indexToColor[indexKey] = {}
         }
 
-        if (!this.indexToColor[indexKey][indexValue]){
-            const colorIdx = Object.keys(this.indexToColor[indexKey]).length % this.colors.length
-            this.indexToColor[indexKey][indexValue] = this.colors[colorIdx]
+        if (!this.indexToColor[indexKey][indexValue]) {
+            const colorIdx = Object.keys(this.indexToColor[indexKey]).length % colorset.length;
+            this.indexToColor[indexKey][indexValue] = colorset[colorIdx]
         }
     }
 

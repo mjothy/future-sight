@@ -5,7 +5,7 @@ import {
   ExclamationCircleOutlined
 } from '@ant-design/icons';
 import { Col, Input, Row, Select, Checkbox, InputNumber } from 'antd';
-import ColorscalePicker from '../utils/ColorscalePicker';
+import PlotColorscalePicker from '../utils/PlotColorscalePicker';
 
 
 const { Option } = Select;
@@ -175,7 +175,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
 
   onColorsChange = colorscale => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
-    configStyle.colorbar.colorscale = colorscale;
+    configStyle.colorscale = colorscale;
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
@@ -350,32 +350,43 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         </Row>
 
         {this.isShowGraphConfig(configStyle.graphType) && configStyle.graphType != "pie" &&
-        <>
-          <h3>Legend</h3>
-          <Row>
-            <Col span={2} className={'checkbox-col'}>
-              <Checkbox
-                onChange={this.onLegendChange}
-                checked={configStyle.showLegend}
-              />
-            </Col>
-            <Col span={16} className={'checkbox-col-label'}>
-              <label>Show legend</label>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={2} />
-            <Col span={8}>
-              <label>Legend info: </label>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={2} />
-            <Col>
-              <Checkbox.Group options={this.legendOptions()} value={defaultLegendOptions} onChange={this.onLegendContentChange} />
-            </Col>
-          </Row>
-        </>}
+          <>
+            <h3>Legend</h3>
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onLegendChange}
+                  checked={configStyle.showLegend}
+                />
+              </Col>
+              <Col span={16} className={'checkbox-col-label'}>
+                <label>Show legend</label>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={2} />
+              <Col span={8}>
+                <label>Legend info: </label>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={2} />
+              <Col>
+                <Checkbox.Group options={this.legendOptions()} value={defaultLegendOptions} onChange={this.onLegendContentChange} />
+              </Col>
+            </Row>
+          </>}
+        {configStyle.graphType != "table" &&
+          <>
+            <h3>Colorscale</h3>
+            <Row>
+              <Col span={20}>
+                <PlotColorscalePicker currentBlock={this.props.currentBlock} optionsLabel={this.props.optionsLabel}
+                  onColorsChange={this.onColorsChange} />
+              </Col>
+            </Row>
+          </>
+        }
         {this.isMap(configStyle.graphType) &&
           <>
             <h3>Colorbar</h3>
@@ -399,17 +410,6 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
               </Col>
               <Col span={16} className={'checkbox-col-label'}>
                 <label>Reverse colorscale</label>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={1} />
-              <Col span={8}>
-                <label>Colors: </label>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={20}>
-                <ColorscalePicker currentBlock={this.props.currentBlock} onColorsChange={this.onColorsChange} />
               </Col>
             </Row>
             <Row>
