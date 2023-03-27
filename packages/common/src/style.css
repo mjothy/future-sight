@@ -4,7 +4,7 @@
   display: none;
 }
 
-.tag-selection-item .anticon-close{
+.ant-tag .anticon{
   display: flex;
   align-items: center;
 }

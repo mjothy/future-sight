@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import PopupFilterContent from './PopupFilterContent';
 import { Modal, Button } from 'antd';
-import { FilterTwoTone } from '@ant-design/icons';
+import { FilterTwoTone, WarningOutlined } from '@ant-design/icons';
 import { getSelectedFiltersLabels } from '@future-sight/common';
 import withDataManager from '../../../services/withDataManager';
 import * as _ from 'lodash';
@@ -121,6 +121,26 @@ class SetupView extends Component<any, any> {
     });
   }
 
+  isDataMissing = (type?: string) => {
+    if (type) {
+      const dataStructureData = this.state.dataStructure[type].selection;
+      const optionsData = this.state.optionsData[type];
+
+      const selected_in_options = dataStructureData.filter(value => optionsData.includes(value));
+      return !(selected_in_options.length == dataStructureData.length)
+    } else {
+      let isMissing = false;
+      for (const option of this.props.optionsLabel) {
+        if (this.isDataMissing(option)) {
+          isMissing = true;
+          break;
+        }
+      }
+      return isMissing;
+    }
+
+  }
+
   render() {
     const selectedFilters = getSelectedFiltersLabels(this.props.dashboard.dataStructure);
     let selectedFilterLabel = ""
@@ -142,13 +162,20 @@ class SetupView extends Component<any, any> {
         <Modal
           title="Choose the data to focus on:"
           visible={this.state.visible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
           closable={false}
           maskClosable={false}
           zIndex={2}
           okText={'submit'}
           destroyOnClose={true}
+          footer={
+            <div>
+              <Button onClick={this.handleCancel}>Cancel</Button>
+              <Button type="primary" onClick={this.handleOk}>Submit</Button>
+              {this.isDataMissing() && <p style={{ color: "#ff4d4f", margin: "5px 0" }}> <WarningOutlined /> There are missing data in your selection</p>}
+
+
+            </div>
+          }
         >
           <PopupFilterContent
             optionsLabel={this.props.optionsLabel}
@@ -159,8 +186,9 @@ class SetupView extends Component<any, any> {
             needToFetch={this.state.needToFetch}
             isFetching={this.state.isFetching}
             updateOptionsData={this.updateOptionsData}
+            isDataMissing={this.isDataMissing}
           />
-        </Modal>
+        </Modal >
       </>
     );
   }

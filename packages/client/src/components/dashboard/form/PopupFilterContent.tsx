@@ -51,14 +51,6 @@ export default class PopupFilterContent extends Component<any, any> {
     />
   }
 
-  isDataMissing = (type: string) => {
-    const dataStructureData = this.props.dataStructure[type].selection;
-    const optionsData = this.props.optionsData[type];
-
-    const selected_in_options = dataStructureData.filter(value => optionsData.includes(value));
-    return !(selected_in_options.length == dataStructureData.length)
-  }
-
   render() {
     const selectedFilter = getSelectedFiltersLabels(this.props.dataStructure);
     return (
@@ -80,7 +72,7 @@ export default class PopupFilterContent extends Component<any, any> {
             <div className="mt-20">
               <Checkbox value={'variables'}>
                 <LineChartOutlined />
-                Variables&nbsp;<label className='no-data'> {this.isDataMissing("variables") ? <><ExclamationCircleOutlined /> Data missing</> : ''}</label>
+                Variables&nbsp;<label className='no-data'> {this.props.isDataMissing("variables") ? <><ExclamationCircleOutlined /> Data missing</> : ''}</label>
               </Checkbox>
               {selectedFilter.includes('variables') && this.selectInput('variables')}
             </div>
@@ -94,7 +86,7 @@ export default class PopupFilterContent extends Component<any, any> {
             <div className="mt-20">
               <Checkbox value={'models'}>
                 <ControlOutlined />
-                Models&nbsp;<label className='no-data'> {this.isDataMissing("models") ? <><ExclamationCircleOutlined /> Data missing</> : ''}</label>
+                Models&nbsp;<label className='no-data'> {this.props.isDataMissing("models") ? <><ExclamationCircleOutlined /> Data missing</> : ''}</label>
               </Checkbox>
               {selectedFilter.includes('models') && this.selectInput('models')}
             </div>
