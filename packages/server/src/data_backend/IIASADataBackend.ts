@@ -72,7 +72,7 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         } else {
             const body = filter.getBody(filterId);
             const data = await this.patchPromise(filters[filterId].path, body);
-            filteredValues[filterId] = data.map(element => element.name);
+            filteredValues[filterId] = data?.map(element => element.name);
         }
 
         // Return only data in dataFocus (if exist);

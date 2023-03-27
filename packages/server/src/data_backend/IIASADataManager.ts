@@ -38,7 +38,7 @@ export default class IIASADataManager {
 
             switch (response.status) {
                 case 200:
-                    return resp_obj;
+                    return resp_obj.results;
                 case 401:
                     err.message = resp_obj.error_name + ": " + resp_obj.message;
                     err.status = 401;
