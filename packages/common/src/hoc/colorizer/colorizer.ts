@@ -16,6 +16,8 @@ export default class Colorizer {
      * @returns PlotDataModel[]
      */
     colorizeData = (data: PlotDataModel[], colorset: string[], customIndex?: string) => {
+        this.resetIndexToColor()
+
         if (data.length === 0) {
             return data
         }
@@ -35,7 +37,6 @@ export default class Colorizer {
             return dataElementWithColor
         })
 
-        this.resetIndexToColor()
         return dataWithColor;
     }
 
