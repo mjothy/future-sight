@@ -7,8 +7,6 @@ import type {DashboardModel} from '@future-sight/common';
 
 export default class PreviewGroup extends React.Component<any, any> {
     render() {
-        console.log("this.props.dashboards: ", this.props.dashboards);
-
         const ret: JSX.Element[] = []
         let i = 1
         let bucket: JSX.Element[] = []

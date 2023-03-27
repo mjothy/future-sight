@@ -5,7 +5,6 @@ import {
   ComponentPropsWithDataManager,
   ConfigurationModel,
   DashboardModel,
-  getSelectedFilter,
   LayoutModel, PlotDataModel,
 } from '@future-sight/common';
 import { Component } from 'react';
@@ -19,7 +18,7 @@ export interface DashboardSelectionControlProps
   extends ComponentPropsWithDataManager,
   RoutingProps {
   saveData: (id: string, image?: string) => Promise<any>;
-  filters: any;
+  allData: any;
   plotData: PlotDataModel[];
   blockData: (block: BlockModel) => PlotDataModel[];
   optionsLabel: string[];
