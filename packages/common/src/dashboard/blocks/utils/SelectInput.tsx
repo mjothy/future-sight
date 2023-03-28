@@ -1,5 +1,5 @@
 import { CloseCircleOutlined, ExclamationCircleOutlined, LoadingOutlined } from '@ant-design/icons';
-import { Button, Input, Select, Tag, Tooltip } from 'antd'
+import { Button, Input, Select, Tag, Tooltip, TreeSelect } from 'antd'
 import React, { Component } from 'react'
 const { Option } = Select;
 
@@ -19,6 +19,41 @@ interface SelectOptionProps {
 }
 
 export default class SelectInput extends Component<SelectOptionProps, any> {
+
+    constructor(props) {
+        super(props);
+        this.state = { searchValue: "" }
+    }
+
+    // TODO add number of children for each tree node
+    splitOptions = (options) => {
+        const treeData: any[] = [];
+
+        options.forEach((option) => {
+            const values = option.split('|');
+
+            let currentNode = treeData.find((node) => node?.title === values[0]);
+            if (!currentNode) {
+                const checkable = values.length === 1; // Set only Leafs as checkable
+                currentNode = { title: values[0], label: values[0], key: values[0], value: values[0], children: [], checkable };
+                treeData.push(currentNode);
+            }
+
+            for (let i = 1; i < values.length; i++) {
+                let childNode = currentNode.children.find((node) => node.title === values[i]);
+                if (!childNode) {
+                    const checkable = i === values.length - 1; // Set only Leafs as checkable
+                    const value = values.slice(0, i + 1).join('|');
+                    childNode = { title: values[i], label: values[0], key: value, value, children: [], checkable, selectabl: false };
+                    currentNode.children.push(childNode);
+                }
+                currentNode = childNode;
+            }
+        });
+
+        return treeData;
+    }
+
     dropdownRender = (menu) => {
         return (
             <div>
@@ -37,67 +72,122 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
     }
 
     tagRender = (props) => {
-        const { label, value, closable, onClose } = props;
+        const { value, closable, onClose } = props;
         return (
             <Tag
-                color={this.props.options.includes(label) ? undefined : 'red'}
+                color={this.props.options.includes(value) ? undefined : 'red'}
                 closable={closable}
                 onClose={onClose}
                 style={{ marginRight: 3 }}
-                icon={this.props.options.includes(label) ? undefined : <ExclamationCircleOutlined />}
-                className={this.props.options.includes(label) ? 'ant-select-selection-item tag-selection-item' : 'ant-select-selection-item tag-selection-item data-missing-tag'}
+                icon={this.props.options.includes(value) ? undefined : <ExclamationCircleOutlined />}
+                className={this.props.options.includes(value) ? 'ant-select-selection-item tag-selection-item' : 'ant-select-selection-item tag-selection-item data-missing-tag'}
             >
-                <label className='ant-select-selection-item-content'>{label}</label>
+                <label className='ant-select-selection-item-content'>{value}</label>
             </Tag>
         );
     }
 
-    render() {
-        return (
-            <Input.Group compact>
-                <Select
-                    mode="multiple"
-                    className={"width-90"}
-                    dropdownRender={this.dropdownRender}
-                    tagRender={this.tagRender}
-                    placeholder={this.props.type}
-                    value={this.props.value}
-                    onChange={(selectedData) =>
-                        this.props.onChange(this.props.type, selectedData)
-                    }
-                    // on close: save data
-                    onDropdownVisibleChange={(e) =>
-                        this.props.onDropdownVisibleChange?.(this.props.type, e)
-                    }
-                    onDeselect={(selectedData) => this.props.onDeselect?.(this.props.type, selectedData)}
-                    dropdownMatchSelectWidth={false}
-                    notFoundContent={(this.props.isFetching) ? (
-                        <div>
-                            <LoadingOutlined />
-                            <p>Fetching data</p>
-                        </div>
-                    ) : (
-                        <div>
-                            <ExclamationCircleOutlined />
-                            <p>This item does not exists for your filter selections.</p>
-                        </div>
-                    )}
-                >
-                    {!this.props.isFetching && this.props.options.map((value) => (
-                        <Option key={value} value={value}>
-                            {value}
-                        </Option>
-                    ))}
-                </Select>
-                {this.props.isClear && <Tooltip title="Clear">
-                    <Button
-                        type="default"
-                        onClick={(e) => this.props.onClear?.(this.props.type, e)}
+    onSearch = (searchValue) => {
+        this.setState({ searchValue });
+    }
 
-                        icon={<CloseCircleOutlined />}
+    render() {
+        console.log("variables: ", this.splitOptions(this.props.options))
+        return (
+            this.props.type == "variables" ?
+                <Input.Group compact>
+
+                    <TreeSelect
+                        value={this.props.value}
+                        treeCheckable={true}
+                        placeholder={this.props.type}
+                        onChange={(selectedData: any[]) =>
+                            this.props.onChange(this.props.type, selectedData.map((data: any) => data.value))
+                        }
+                        treeData={this.splitOptions(this.props.options)}
+                        tagRender={this.tagRender}
+                        treeCheckStrictly={true}
+                        showCheckedStrategy="SHOW_ALL"
+                        className={"width-90"}
+                        // on close: save data
+                        onDropdownVisibleChange={(e) =>
+                            this.props.onDropdownVisibleChange?.(this.props.type, e)
+                        }
+                        onDeselect={(selectedData) => this.props.onDeselect?.(this.props.type, selectedData.map((data: any) => data.value))}
+                        dropdownMatchSelectWidth={false}
+                        notFoundContent={(this.props.isFetching) ? (
+                            <div>
+                                <LoadingOutlined />
+                                <p>Fetching data</p>
+                            </div>
+                        ) : (
+                            <div>
+                                <ExclamationCircleOutlined />
+                                <p>This item does not exists for your filter selections.</p>
+                            </div>
+                        )}
+                        treeExpandAction="doubleClick"
+                        onSearch={this.onSearch}
+                        searchValue={this.state.searchValue}
+
+
                     />
-                </Tooltip>}
-            </Input.Group>
+                    {this.props.isClear && <Tooltip title="Clear">
+                        <Button
+                            type="default"
+                            onClick={(e) => this.props.onClear?.(this.props.type, e)}
+
+                            icon={<CloseCircleOutlined />}
+                        />
+                    </Tooltip>}
+                </Input.Group>
+                :
+                <Input.Group compact>
+                    <Select
+                        mode="multiple"
+                        className={"width-90"}
+                        dropdownRender={this.dropdownRender}
+                        tagRender={this.tagRender}
+                        placeholder={this.props.type}
+                        value={this.props.value}
+                        onChange={(selectedData) =>
+                            this.props.onChange(this.props.type, selectedData)
+                        }
+                        // on close: save data
+                        onDropdownVisibleChange={(e) =>
+                            this.props.onDropdownVisibleChange?.(this.props.type, e)
+                        }
+                        onDeselect={(selectedData) => this.props.onDeselect?.(this.props.type, selectedData)}
+                        dropdownMatchSelectWidth={false}
+                        notFoundContent={(this.props.isFetching) ? (
+                            <div>
+                                <LoadingOutlined />
+                                <p>Fetching data</p>
+                            </div>
+                        ) : (
+                            <div>
+                                <ExclamationCircleOutlined />
+                                <p>This item does not exists for your filter selections.</p>
+                            </div>
+                        )}
+                        onSearch={this.onSearch}
+                        searchValue={this.state.searchValue}
+                    >
+                        {!this.props.isFetching && this.props.options.map((value) => (
+                            <Option key={value} value={value}>
+                                {value}
+                            </Option>
+                        ))}
+                    </Select>
+                    {this.props.isClear && <Tooltip title="Clear">
+                        <Button
+                            type="default"
+                            onClick={(e) => this.props.onClear?.(this.props.type, e)}
+
+                            icon={<CloseCircleOutlined />}
+                        />
+                    </Tooltip>}
+                </Input.Group>
         )
     }
 }
