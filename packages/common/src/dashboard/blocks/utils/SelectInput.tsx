@@ -45,7 +45,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 onClose={onClose}
                 style={{ marginRight: 3 }}
                 icon={this.props.options.includes(label) ? undefined : <ExclamationCircleOutlined />}
-                className={"ant-select-selection-item tag-selection-item"}
+                className={this.props.options.includes(label) ? 'ant-select-selection-item tag-selection-item' : 'ant-select-selection-item tag-selection-item data-missing-tag'}
             >
                 <label className='ant-select-selection-item-content'>{label}</label>
             </Tag>
