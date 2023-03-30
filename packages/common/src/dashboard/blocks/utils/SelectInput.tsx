@@ -106,7 +106,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         if (this.props.type == "variables")
             console.log("variables: ", this.props.options.includes('Emissions|CO2'))
         return (
-            this.props.type == "variables" ?
+            (this.props.type == "variables" || this.props.type == "regions") ?
                 <Input.Group compact>
 
                     <TreeSelect
