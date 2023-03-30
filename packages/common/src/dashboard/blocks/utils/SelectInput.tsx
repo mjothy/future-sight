@@ -32,20 +32,28 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         options.forEach((option) => {
             const values = option.split('|');
 
-            let currentNode = treeData.find((node) => node?.title === values[0]);
+            let currentNode = treeData.find((node) => node.title === values[0]);
+
+            // Set the first element
             if (!currentNode) {
                 const checkable = values.length === 1; // Set only Leafs as checkable
                 currentNode = { title: values[0], label: values[0], key: values[0], value: values[0], children: [], checkable };
                 treeData.push(currentNode);
             }
 
+            // Set other element (children)
             for (let i = 1; i < values.length; i++) {
                 let childNode = currentNode.children.find((node) => node.title === values[i]);
                 if (!childNode) {
                     const checkable = i === values.length - 1; // Set only Leafs as checkable
                     const value = values.slice(0, i + 1).join('|');
-                    childNode = { title: values[i], label: values[0], key: value, value, children: [], checkable, selectabl: false };
+                    childNode = { title: values[i], label: values[0], key: value, value, children: [], checkable };
                     currentNode.children.push(childNode);
+                } else {
+                    if (!childNode.checkable) {
+                        const checkable = i === values.length - 1;
+                        childNode.checkable = checkable;
+                    }
                 }
                 currentNode = childNode;
             }
@@ -92,7 +100,8 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
     }
 
     render() {
-        console.log("variables: ", this.splitOptions(this.props.options))
+        if (this.props.type == "variables")
+            console.log("variables: ", this.props.options.includes('Emissions|CO2'))
         return (
             this.props.type == "variables" ?
                 <Input.Group compact>
