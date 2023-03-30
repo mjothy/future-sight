@@ -205,6 +205,10 @@ export default class ExpressServer {
       }
     });
 
+    this.app.get(`/api/categories`, (req, res) => {
+      res.send(this.dataProxy.getCategories());
+    });
+
     this.app.post('/api/dataFocus', async (req, res, next) => {
       const selectedData = req.body.data;
       const optionsData = {

@@ -181,4 +181,13 @@ export default class DataManager implements IDataManager {
       })
       .catch(console.error);
   };
+
+  fetchCategories = () => {
+    return fetch(`api/categories`)
+      .then((response) => response.json())
+      .then((data) => {
+        return data;
+      })
+      .catch(console.error);
+  };
 }

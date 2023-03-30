@@ -30,4 +30,6 @@ export default interface IDataManager {
   fetchDataFocusOptions: (data: any) => Promise<any>;
 
   fetchRegionsGeojson: (regions: string[]) => Promise<any>;
+
+  fetchCategories: () => Promise<any>;
 }
