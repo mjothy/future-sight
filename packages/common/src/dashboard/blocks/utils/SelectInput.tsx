@@ -25,29 +25,29 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         this.state = { searchValue: "" }
     }
 
-    // TODO add number of children for each tree node
     splitOptions = (options) => {
         const treeData: any[] = [];
 
         options.forEach((option) => {
             const values = option.split('|');
 
-            let currentNode = treeData.find((node) => node.title === values[0]);
+            let currentNode = treeData.find((node) => node.label === values[0]);
 
             // Set the first element
             if (!currentNode) {
                 const checkable = values.length === 1; // Set only Leafs as checkable
                 currentNode = { title: values[0], label: values[0], key: values[0], value: values[0], children: [], checkable };
+                currentNode.title = `${currentNode.label} (${currentNode.children.length})`;
                 treeData.push(currentNode);
             }
 
             // Set other element (children)
             for (let i = 1; i < values.length; i++) {
-                let childNode = currentNode.children.find((node) => node.title === values[i]);
+                let childNode = currentNode.children.find((node) => node.label === values[i]);
                 if (!childNode) {
                     const checkable = i === values.length - 1; // Set only Leafs as checkable
                     const value = values.slice(0, i + 1).join('|');
-                    childNode = { title: values[i], label: values[0], key: value, value, children: [], checkable };
+                    childNode = { title: values[i], label: values[i], key: value, value, children: [], checkable };
                     currentNode.children.push(childNode);
                 } else {
                     if (!childNode.checkable) {
@@ -55,8 +55,11 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                         childNode.checkable = checkable;
                     }
                 }
+
+                currentNode.title = `${currentNode.label} (${currentNode.children.length})`;
                 currentNode = childNode;
             }
+
         });
 
         return treeData;
