@@ -6,6 +6,7 @@ export default class BlockDataModel {
   scenarios: string[] = [];
   regions: string[] = [];
   variables: string[] = [];
+  categories: string[] = []
 
   /**
    * Selection order
@@ -32,6 +33,10 @@ export default class BlockDataModel {
       isMaster: false,
       values: [],
     },
+    categories: {
+      isMaster: false,
+      values: []
+    }
   };
 
 }

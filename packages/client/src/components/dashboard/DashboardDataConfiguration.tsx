@@ -3,7 +3,7 @@ import {
   BlockModel, ColorizerProvider,
   ComponentPropsWithDataManager,
   ConfigurationModel,
-  ReadOnlyDashboard, Colorizer
+  ReadOnlyDashboard, Colorizer, OptionsDataModel
 } from '@future-sight/common';
 import { Component } from 'react';
 import withDataManager from '../../services/withDataManager';
@@ -34,12 +34,7 @@ class DashboardDataConfiguration extends Component<
     super(props);
     this.optionsLabel = this.props.dataManager.getOptions();
     this.state = {
-      allData: {
-        regions: {},
-        variables: {},
-        scenarios: {},
-        models: {},
-      },
+      allData: new OptionsDataModel(),
       /**
        * Data (with timeseries from IASA API)
        */
@@ -57,6 +52,7 @@ class DashboardDataConfiguration extends Component<
       allData['variables'] = await this.props.dataManager.fetchVariables();
       allData['models'] = await this.props.dataManager.fetchModels();
       allData['scenarios'] = await this.props.dataManager.fetchScenarios();
+      allData['categories'] = await this.props.dataManager.fetchCategories();
       this.setState({ allData, isFetchData: true });
     } catch (error) {
       console.log("ERROR FETCH: ", error);
@@ -104,6 +100,7 @@ class DashboardDataConfiguration extends Component<
       const data: any[] = [];
       const missingData: any[] = [];
 
+      // TODO add categories 
       if (
         metaData.models &&
         metaData.scenarios &&

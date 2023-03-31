@@ -24,4 +24,6 @@ export { default as BlockDataModel } from './models/BlockDataModel';
 export { default as ConfigurationModel } from './models/ConfigurationModel'
 export type { default as PlotDataModel } from './models/PlotDataModel';
 export type { default as IndexToColorModel } from './models/IndexToColorModel';
+export type { default as CategorieModel } from './models/CategorieModel';
+export { default as OptionsDataModel } from './models/OptionsDataModel';
 

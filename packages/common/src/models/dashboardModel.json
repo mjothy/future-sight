@@ -45,6 +45,10 @@
             "variables": {
               "isCustom": false,
               "value": ""
+            },
+            "categories": {
+              "isCustom": false,
+              "value": ""
             }
           },
           "YAxis": {
@@ -102,6 +106,7 @@
           "scenarios": [],
           "regions": [],
           "variables": [],
+          "categories": [],
           "selectOrder": [],
           "master": {
             "models": {
@@ -117,6 +122,10 @@
               "values": []
             },
             "variables": {
+              "isMaster": false,
+              "values": []
+            },
+            "categories": {
               "isMaster": false,
               "values": []
             }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ConfigurationModel from '../../models/ConfigurationModel';
+import OptionsDataModel from '../../models/OptionsDataModel';
 import ControlBlockEditor from './control/ControlBlockEditor';
 import DataBlockEditor from './data/DataBlockEditor';
 import { getBlock } from './utils/BlockDataUtils';
@@ -13,12 +14,7 @@ export default class BlockFilterManager extends Component<any, any> {
              * Data options in dropDown Inputs
              */
             optionsData: { ...this.props.allData },
-            missingData: {
-                regions: [],
-                variables: [],
-                scenarios: [],
-                models: [],
-            }
+            missingData: new OptionsDataModel()
         };
 
     }
@@ -73,15 +69,10 @@ export default class BlockFilterManager extends Component<any, any> {
     missingData = () => {
         const metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
 
-        if (metaData.selectOrder.length == 4) {
+        if (this.isAllSelected()) {
             const existDataRaws = this.getExistingRaws(metaData, this.props.currentBlock.id);
 
-            const data = {
-                regions: [],
-                variables: [],
-                scenarios: [],
-                models: [],
-            }
+            const data = new OptionsDataModel()
 
             this.props.optionsLabel.forEach(option => {
                 data[option] = Array.from(new Set(existDataRaws.map(raw => raw[option.slice(0, -1)])))
@@ -179,6 +170,12 @@ export default class BlockFilterManager extends Component<any, any> {
         })
     }
 
+    isAllSelected = () => {
+        const selectedOrder = this.props.currentBlock.config.metaData.selectOrder;
+        const obligatory = selectedOrder.filter(key => key != "categories");
+        return obligatory.length == 4
+    }
+
     render() {
         return this.props.currentBlock.blockType === 'data' ? (
             <DataBlockEditor
@@ -187,6 +184,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 optionsData={this.state.optionsData}
                 onDropdownVisibleChange={this.onDropdownVisibleChange}
                 missingData={this.state.missingData}
+                isAllSelected={this.isAllSelected}
             />
         ) : (
             <ControlBlockEditor
@@ -194,7 +192,6 @@ export default class BlockFilterManager extends Component<any, any> {
                 onChange={this.onChange}
                 optionsData={this.state.optionsData}
                 onDropdownVisibleChange={this.onDropdownVisibleChange}
-                missingData={this.state.missingData}
             />
         );
     }

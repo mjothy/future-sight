@@ -13,7 +13,7 @@ export interface DashboardConfigControlProps extends DashboardProps {
  * Show {Edit selected block} OR {Add new block}
  */
 export default class DashboardConfigControl extends Component<
-    DashboardConfigControlProps,
+  DashboardConfigControlProps,
   any
 > {
   static propTypes = {

@@ -99,6 +99,7 @@ export default class ControlBlockEditor extends Component<any, any> {
 
         {metaData.master[option].isMaster && <SelectInput
           type={option}
+          className={"width-90"}
           value={metaData[option]}
           options={this.props.optionsData[option]}
           onChange={this.onChange}

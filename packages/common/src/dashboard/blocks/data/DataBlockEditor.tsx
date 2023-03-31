@@ -63,35 +63,33 @@ export default class DataBlockEditor extends Component<any, any> {
 
     return (
       !isControlled && (
-        <div className={selected ? 'transition' : ''}>
-          <Row className="width-100 mt-16">
-            <h4>{option} &nbsp;<label className='no-data'> {metaData.selectOrder.length == 4 && this.props.missingData[option].length > 0 && this.getMessage(this.props.missingData[option])}
-            </label>
-            </h4>
-            <SelectInput
-              type={option}
-              value={metaData[option]}
-              options={this.props.optionsData[option]}
-              onChange={this.onChange}
-              isClear={selected}
-              onClear={this.clearClick}
-              onDropdownVisibleChange={this.props.onDropdownVisibleChange}
-            />
-          </Row>
-        </div>
+        <Row className="width-100 mt-16">
+          <h4>{option} {option == "categories" ? "(optional)" : ""} &nbsp;<label className='no-data'> {this.props.isAllSelected() && this.props.missingData[option].length > 0 && this.getMessage(this.props.missingData[option])}
+          </label>
+          </h4>
+          <SelectInput
+            type={option}
+            className={"width-90"}
+            value={metaData[option]}
+            options={this.props.optionsData[option]}
+            onChange={this.onChange}
+            isClear={selected}
+            onClear={this.clearClick}
+            onDropdownVisibleChange={this.props.onDropdownVisibleChange}
+          />
+        </Row>
       )
     );
   };
 
   controlledInputs = () => {
     const id = this.props.currentBlock.controlBlock;
-    const metaData = this.props.currentBlock.config.metaData;
     const controlBlock = this.props.dashboard.blocks[id].config.metaData;
     return Object.keys(controlBlock.master).map((key) => {
       if (controlBlock.master[key].isMaster) {
         return (
           <div className='mt-20'>
-            <h4>{key} &nbsp;<label className='no-data'> {metaData.selectOrder.length == 4 && this.props.missingData[key].length > 0 && this.getMessage(this.props.missingData[key])}
+            <h4>{key} &nbsp;<label className='no-data'> {this.props.isAllSelected() && this.props.missingData[key].length > 0 && this.getMessage(this.props.missingData[key])}
             </label>
             </h4>
             {controlBlock[key].length <= 0 ? <div>
@@ -114,31 +112,29 @@ export default class DataBlockEditor extends Component<any, any> {
     const metaData = this.props.currentBlock.config.metaData;
 
     return (
-      <div>
-        <div className={'block-flex'}>
-          {/* show inputs if they are controlled */}
-          {this.props.currentBlock.controlBlock !== '' && (
-            <div>
-              <strong>Controlled inputs</strong>
-              {this.controlledInputs()}
-              <Divider />
-            </div>
-          )}
+      <div className={'block-flex'}>
+        {/* show inputs if they are controlled */}
+        {this.props.currentBlock.controlBlock !== '' && (
+          <div>
+            <strong>Controlled inputs</strong>
+            {this.controlledInputs()}
+            <Divider />
+          </div>
+        )}
 
-          {/* show dropdown lists of selected  */}
-          {metaData.selectOrder.map((option) =>
-            this.selectDropDownInput(option, true)
-          )}
-          <Divider />
-          {/* show dropdown lists of unselected  */}
-          <table className="width-100">
-            <tr>
-              {getUnselectedInputOptions(this.props.currentBlock, this.props.optionsLabel).map((option) => (
-                <td key={option}>{this.selectDropDownInput(option, false)}</td>
-              ))}
-            </tr>
-          </table>
-        </div>
+        {/* show dropdown lists of selected  */}
+        {metaData.selectOrder.map((option) =>
+          this.selectDropDownInput(option, true)
+        )}
+        <Divider />
+        {/* show dropdown lists of unselected  */}
+        <table className="width-100">
+          <tr>
+            {getUnselectedInputOptions(this.props.currentBlock, this.props.optionsLabel).map((option) => (
+              <td key={option}>{this.selectDropDownInput(option, false)}</td>
+            ))}
+          </tr>
+        </table>
       </div>
     );
   }

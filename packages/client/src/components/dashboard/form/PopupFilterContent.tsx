@@ -4,6 +4,7 @@ import {
   ExclamationCircleOutlined,
   GlobalOutlined,
   LineChartOutlined,
+  TagOutlined,
 } from '@ant-design/icons';
 import { getSelectedFiltersLabels, SelectInput } from '@future-sight/common';
 import { Checkbox, Space } from 'antd';
@@ -15,7 +16,7 @@ export default class PopupFilterContent extends Component<any, any> {
   handleCheckedFilter = (selectedFilters: CheckboxValueType[]) => {
     const dataStructure = JSON.parse(JSON.stringify(this.props.dataStructure));
     // tHE KEY can be: models/scenarios/regions/variables
-    this.props.optionsLabel.forEach((key) => {
+    Object.keys(dataStructure).forEach((key) => {
       if (selectedFilters.includes(key)) {
         dataStructure[key].isFilter = true;
       } else {
@@ -27,6 +28,7 @@ export default class PopupFilterContent extends Component<any, any> {
   };
 
   onChange = (type: string, selectedData: string[]) => {
+    console.log("onChange: ", selectedData)
     const dataStructure = JSON.parse(JSON.stringify(this.props.dataStructure));
     dataStructure[type].selection = selectedData;
     this.props.updateDataStructure(dataStructure);
@@ -43,6 +45,7 @@ export default class PopupFilterContent extends Component<any, any> {
   selectInput = (type) => {
     return <SelectInput
       type={type}
+      className={"width-90"}
       value={this.props.dataStructure[type].selection}
       options={this.props.optionsData[type]}
       onChange={this.onChange}
@@ -89,6 +92,15 @@ export default class PopupFilterContent extends Component<any, any> {
                 Models&nbsp;<label className='no-data'> {this.props.isDataMissing("models") ? <><ExclamationCircleOutlined /> Data missing</> : ''}</label>
               </Checkbox>
               {selectedFilter.includes('models') && this.selectInput('models')}
+            </div>
+            <div className="mt-20">
+              <Checkbox value={'categories'}>
+                <TagOutlined />
+                Categories(optional)&nbsp;
+                {/* TODO uncomment  */}
+                {/* <label className='no-data'> {this.props.isDataMissing("categories") ? <><ExclamationCircleOutlined /> Data missing</> : ''}</label> */}
+              </Checkbox>
+              {selectedFilter.includes('categories') && this.selectInput('categories')}
             </div>
           </Space>
         </Checkbox.Group>

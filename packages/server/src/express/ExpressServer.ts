@@ -216,6 +216,7 @@ export default class ExpressServer {
         variables: [],
         scenarios: [],
         models: [],
+        catagories: []
       };
       optionsLabel.forEach(option1 => {
         let dataUnion = this.dataProxy.getDataUnion();
@@ -229,6 +230,8 @@ export default class ExpressServer {
         optionsData[option1] = Array.from(new Set(dataUnion.map(raw => raw[option1.slice(0, -1)])))
       })
 
+      optionsData["categories"] = this.dataProxy.getCategories();
+
       res.send(optionsData);
     });
 
@@ -240,12 +243,15 @@ export default class ExpressServer {
         variables: [],
         scenarios: [],
         models: [],
+        catagories: []
       };
       const dataUnion = this.dataProxy.getDataUnion();
       let firstFilterRaws = dataUnion;
 
+      let filterKeys = Object.keys(firstFilters);
+      filterKeys = filterKeys.filter(key => key != "categories"); // TODO delete after
       // First filter (by data focus)
-      Object.keys(firstFilters).forEach(option => {
+      filterKeys.forEach(option => {
         if (firstFilters[option].length > 0) {
           firstFilterRaws = firstFilterRaws.filter(raw => firstFilters[option].includes(raw[option.slice(0, -1)]));
         }
@@ -262,6 +268,8 @@ export default class ExpressServer {
         }
         optionsData[option] = possible_options;
       })
+
+      optionsData["categories"] = this.dataProxy.getCategories(); // TODO add categories to filter
 
       res.send(optionsData);
     });
@@ -300,7 +308,10 @@ export default class ExpressServer {
       variables: [],
       scenarios: [],
       models: [],
+      catagories: []
     };
+
+    metaData.selectOrder = metaData.selectOrder.filter(key => key != "categories"); // TODO delete after
 
     if (metaData.selectOrder.length > 0) {
       const option_unselected = optionsLabel.filter(option => !metaData.selectOrder.includes(option));

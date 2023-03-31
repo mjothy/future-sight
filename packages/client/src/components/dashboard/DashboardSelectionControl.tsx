@@ -171,11 +171,12 @@ export default class DashboardSelectionControl extends Component<
   * Check if data in selection (selected data) are present in Select options
   */
   checkIfSelectedInOptions = (optionsData, block: BlockModel) => {
-    const optionsLabel = this.props.optionsLabel;
+    let optionsLabel = [...this.props.optionsLabel];
     const dashboard = { ...this.state.dashboard };
     const config = block.config as ConfigurationModel;
     let isDashboardUpdated = false;
     const missingData = {}
+    optionsLabel = optionsLabel.filter(key => key != "categories"); // TODO delete after
     optionsLabel.forEach(option => {
       // Check if selected data (metaData[option]) are in options of drop down list
       const dataInOptionsData = config.metaData[option].filter(data => optionsData[option].includes(data));

@@ -2,7 +2,7 @@ import { Component } from 'react';
 import PopupFilterContent from './PopupFilterContent';
 import { Modal, Button } from 'antd';
 import { FilterTwoTone, WarningOutlined } from '@ant-design/icons';
-import { getSelectedFiltersLabels } from '@future-sight/common';
+import { getSelectedFiltersLabels, OptionsDataModel } from '@future-sight/common';
 import withDataManager from '../../../services/withDataManager';
 import * as _ from 'lodash';
 
@@ -47,12 +47,7 @@ class SetupView extends Component<any, any> {
   }
 
   getOptionsData = async () => {
-    const data = {
-      regions: [],
-      variables: [],
-      scenarios: [],
-      models: []
-    }
+    const data = new OptionsDataModel();
     this.props.optionsLabel.forEach(option => {
       data[option] = this.state.dataStructure[option].selection;
     })
@@ -131,7 +126,7 @@ class SetupView extends Component<any, any> {
     } else {
       let isMissing = false;
       for (const option of this.props.optionsLabel) {
-        if (this.isDataMissing(option)) {
+        if (this.isDataMissing(option) && option != "categories") {
           isMissing = true;
           break;
         }
