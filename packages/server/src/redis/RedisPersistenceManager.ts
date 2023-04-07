@@ -1,6 +1,6 @@
 import { DashboardModel } from "@future-sight/common";
 import RedisClient from "./RedisClient";
-import IPersistenceManager from "./IPersistenceManager";
+import IPersistenceManager from "../interfaces/IPersistenceManager";
 
 export default class RedisPersistenceManager extends RedisClient implements IPersistenceManager {
 

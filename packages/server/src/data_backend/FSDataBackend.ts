@@ -1,10 +1,10 @@
-import IDataProxy from "./IDataProxy";
 import * as fs from "fs";
-import RegionsGeoJson from "./RegionsGeoJson";
+import IDataBackend from "../interfaces/IDataBackend ";
+import RegionsGeoJson from "../express/RegionsGeoJson";
 
 const optionsLabel = ["models", "scenarios", "variables", "regions"];
 
-export default class FSDataProxy implements IDataProxy {
+export default class FSDataBackend implements IDataBackend {
     private readonly data: any[];
     private readonly dataUnion: any[];
     private readonly models: any;
@@ -30,6 +30,16 @@ export default class FSDataProxy implements IDataProxy {
         const rg = new RegionsGeoJson(countriesGeojsonPath);
         this.geojson = rg.getRegionGeoJson();
     }
+
+    getUnits = () => { return [] };
+
+    getRuns = () => {
+        return { id: null, version: null };
+    }
+
+    getTimeSeries = () => [];
+
+    getFilteredData = (selectedData: any, keyFilter: any) => [];
 
     getCategories(): any {
         return this.categories;

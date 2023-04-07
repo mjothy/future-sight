@@ -1,9 +1,8 @@
-import RedisClient from './redis/RedisClient';
 import ExpressServer from './express/ExpressServer';
 import basicAuth from 'express-basic-auth';
-import FSDataProxy from "./express/FSDataProxy";
 import path from "path";
 import RedisPersistenceManager from './redis/RedisPersistenceManager';
+import FSDataBackend from './data_backend/FSDataBackend';
 
 const DEFAULT_PORT = 8080;
 const DEFAULT_COOKIE_KEY = '8azoijuem2aois3Qsjeir';
@@ -38,7 +37,7 @@ const countriesGeojsonPath = isProd ? PROD_COUNTRIES_GEOJSON_PATH : DEV_COUNTRIE
 const categoriesPath = isProd ? PROD_CATEGORIES_PATH : DEV_CATEGORIES_PATH;
 
 // data loading
-const dataProxy = new FSDataProxy(dataPath, dataUnionPath, countriesGeojsonPath, categoriesPath);
+const dataProxy = new FSDataBackend(dataPath, dataUnionPath, countriesGeojsonPath, categoriesPath);
 
 // redis initialisation
 // const redisClient = new RedisClient(redisUrl);

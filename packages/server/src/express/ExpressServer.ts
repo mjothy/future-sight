@@ -2,10 +2,10 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import { join } from 'path';
-import IDataProxy from './IDataProxy';
-import IPersistenceManager from '../redis/IPersistenceManager';
+import IPersistenceManager from '../interfaces/IPersistenceManager';
 import { DashboardModel } from '@future-sight/common';
 import BrowseObject from '../models/BrowseObject';
+import IDataBackend from '../interfaces/IDataBackend ';
 
 const optionsLabel = ["variables", "regions", "scenarios", "models",];
 
@@ -15,7 +15,7 @@ export default class ExpressServer {
   private readonly auth: any;
   private readonly clientPath: any;
   private readonly dbClient: IPersistenceManager;
-  private readonly dataProxy: IDataProxy;
+  private readonly dataProxy: IDataBackend;
 
   constructor(
     port,
@@ -23,7 +23,7 @@ export default class ExpressServer {
     auth,
     clientPath,
     dbClient,
-    dataProxy: IDataProxy
+    dataProxy: IDataBackend
   ) {
     this.app = express();
     this.port = port;
@@ -290,5 +290,3 @@ export default class ExpressServer {
     return dataRaws;
   }
 }
-
-
