@@ -169,7 +169,8 @@ export default class DashboardSelectionControl extends Component<
   };
 
   /**
-  * Check if data in selection (selected data) are present in Select options
+   * Check if data in selection (selected data) are present in Select options
+   * Add default version to metadata.versions
   */
   // TODO VERSION Add version management
   // TODO difference missing data with DataBlockEditor.clearClick
@@ -195,18 +196,14 @@ export default class DashboardSelectionControl extends Component<
     if (
         metaData.selectOrder.includes("models")
         && metaData.selectOrder.includes("scenarios")
-    ){ // check that if selected version exists in new version dictionary
+    ){ // check if selected version exists in new version dictionary
       let dataInOptionsData = []
+
+      // Remove versions that do not exists
       for(const model of Object.keys(metaData["versions"])){
         for(const scenario of Object.keys(metaData["versions"][model])) {
           dataInOptionsData = metaData["versions"][model][scenario].filter(
-              data => {
-                return (
-                    optionsData["versions"][model]
-                    && optionsData["versions"][model][scenario]
-                    && optionsData["versions"][model][scenario].values.includes(data)
-                )
-              }
+              data => optionsData["versions"]?.[model]?.[scenario]?.values.includes(data)
           );
           if (dataInOptionsData.length < metaData["versions"][model][scenario].length) {
             isDashboardUpdated = true;
@@ -214,14 +211,26 @@ export default class DashboardSelectionControl extends Component<
           }
         }
       }
+
+      // add default versions to metadata if no version is selected
+      for(const model in optionsData["versions"]){
+        for(const scenario in optionsData["versions"][model]) {
+          if (!metaData["versions"][model]){
+            (metaData["versions"][model] = {});
+          }
+          if (!metaData["versions"][model][scenario]) {
+            isDashboardUpdated = true;
+            metaData["versions"][model][scenario] = [optionsData["versions"][model][scenario].default]
+          }
+        }
+      }
+
     } else { // Models or scenarios not filled so remove versions
       if(Object.keys(metaData["versions"]).length>0){
         isDashboardUpdated = true;
         metaData["versions"]={}
       }
     }
-
-
 
     if (isDashboardUpdated) {
       const dashboard = JSON.parse(JSON.stringify(this.state.dashboard));

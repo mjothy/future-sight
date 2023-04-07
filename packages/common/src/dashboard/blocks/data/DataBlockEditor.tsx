@@ -198,7 +198,6 @@ export default class DataBlockEditor extends Component<any, any> {
               // value={value}
               dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
               placeholder="Please select versions"
-              allowClear
               multiple
               treeDefaultExpandAll
               value={this.getDefaultTreeSelectValue()}
@@ -211,7 +210,7 @@ export default class DataBlockEditor extends Component<any, any> {
   }
 
   getDefaultTreeSelectValue = () => {
-    const version_dict: versionModel = this.props.dashboard.blocks[this.props.currentBlock.id].config.metaData.versions
+    const version_dict: versionModel = this.props.currentBlock.config.metaData.versions
     const defaultValues: string[] = []
     for (const model in version_dict){
       for (const scenario in version_dict[model]){

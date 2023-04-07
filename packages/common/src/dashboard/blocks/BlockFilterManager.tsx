@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import ConfigurationModel from '../../models/ConfigurationModel';
 import ControlBlockEditor from './control/ControlBlockEditor';
 import DataBlockEditor from './data/DataBlockEditor';
-import { getBlock } from './utils/BlockDataUtils';
-import { getSelectedFilter } from './utils/DashboardUtils';
+import {getBlock} from './utils/BlockDataUtils';
+import {getSelectedFilter} from './utils/DashboardUtils';
 import BlockDataModel, {versionModel} from "../../models/BlockDataModel";
 import DashboardModel from "../../models/DashboardModel";
 
@@ -59,9 +59,9 @@ export default class BlockFilterManager extends Component<any, any> {
      * @param metaData selected data in block
      * @param filters {[indexType]: valuesToFilter} the first filter(by data focus), only one key
      */
-    filterOptions = (metaData: BlockDataModel, filters: {[indexType: string]: string[]}) => {
-        this.props.dataManager.fetchDataOptions({ metaData, filters }).then(res => {
-            this.setState({ optionsData: res }, () => {
+    filterOptions = (metaData: BlockDataModel, filters: { [indexType: string]: string[] }) => {
+        this.props.dataManager.fetchDataOptions({metaData, filters}).then(res => {
+            this.setState({optionsData: res}, () => {
                 this.props.checkIfSelectedInOptions(this.state.optionsData, this.props.currentBlock)
                 this.missingData();
             })
@@ -89,7 +89,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 data[option] = metaData[option].filter(value => !data[option].includes(value))
             })
 
-            this.setState({ missingData: data });
+            this.setState({missingData: data});
         }
     };
 
@@ -109,7 +109,7 @@ export default class BlockFilterManager extends Component<any, any> {
                         );
                         if (d) {
                             if (d.data != undefined)
-                                existDataRaws.push({ model, scenario, variable, region });
+                                existDataRaws.push({model, scenario, variable, region});
                         }
                     });
                 });
@@ -148,7 +148,7 @@ export default class BlockFilterManager extends Component<any, any> {
             config.metaData.selectOrder = Array.from(
                 new Set<string>([...config.metaData.selectOrder, option])
             );
-            dashboard.blocks[this.props.currentBlock.id].config = { ...config };
+            dashboard.blocks[this.props.currentBlock.id].config = {...config};
             this.props.updateDashboard(dashboard);
         }
     };
@@ -158,7 +158,7 @@ export default class BlockFilterManager extends Component<any, any> {
         const config = JSON.parse(JSON.stringify(this.props.currentBlock.config));
         // Update config (metaData)
         config.metaData[option] = selectedData;
-        dashboard.blocks[this.props.currentBlock.id].config = { ...config };
+        dashboard.blocks[this.props.currentBlock.id].config = {...config};
 
         if (this.props.currentBlock.blockType === 'control') {
             dashboard.blocks[this.props.currentBlock.id].config.metaData.master[option].values = []; // clear selected data on control view
@@ -172,27 +172,37 @@ export default class BlockFilterManager extends Component<any, any> {
         const config = JSON.parse(JSON.stringify(this.props.currentBlock.config));
         // Update config (metaData)
         config.metaData.useVersion = checked;
-        dashboard.blocks[this.props.currentBlock.id].config = { ...config };
+        dashboard.blocks[this.props.currentBlock.id].config = {...config};
         this.props.updateDashboard(dashboard)
     };
 
+    // When updating version tree select update metaData.versions.
+    // Always keep one leaf selected
     onVersionSelected = (selectedValues: string[]) => {
         const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+        const state_version_dict: versionModel = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData.versions));
         const version_dict: versionModel = {};
 
         for (const rawValue of selectedValues) {
-            const {model, scenario, version}  = JSON.parse(rawValue)
+            const {model, scenario, version} = JSON.parse(rawValue)
             // Initialise versions[model] and versions[model][scenario]if not exist
             !(model in version_dict) && (version_dict[model] = {});
             !(scenario in version_dict[model]) && (version_dict[model][scenario] = []);
 
             // Update config
             version_dict[model][scenario].push(version);
-            dashboard.blocks[this.props.currentBlock.id].config.metaData.versions = version_dict;
         }
 
+        for (const model in state_version_dict) {
+            for (const scenario in state_version_dict[model]) {
+                if (version_dict[model]?.[scenario]) {
+                    state_version_dict[model][scenario] = version_dict[model][scenario]
+                }
+            }
+        }
+
+        dashboard.blocks[this.props.currentBlock.id].config.metaData.versions = state_version_dict;
         this.props.updateDashboard(dashboard)
-        console.log(this.props.dashboard.blocks[this.props.currentBlock.id].config.metaData.versions)
     };
 
     updateChildsBlocks = (dashboard, controlBlockId) => {

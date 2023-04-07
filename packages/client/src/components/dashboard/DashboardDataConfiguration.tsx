@@ -107,7 +107,7 @@ class DashboardDataConfiguration extends Component<
                     && metaData.versions[model]
                     && metaData.versions[model][scenario]
                     && metaData.versions[model][scenario].length>0
-                ){ // TODO VERSION why is fetched called twice?
+                ){
                   for (const version of metaData.versions[model][scenario]){
                     const d = this.state.plotData[block.id]?.find(
                         (e) =>
