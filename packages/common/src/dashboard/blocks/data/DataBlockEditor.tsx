@@ -11,7 +11,6 @@ require('./DataBlockEditor.css')
  */
 export default class DataBlockEditor extends Component<any, any> {
 
-  // TODO Add delete versions
   clearClick = (option, e) => {
     const dashboard = { ...this.props.dashboard };
     const config = this.props.currentBlock.config;
@@ -128,16 +127,27 @@ export default class DataBlockEditor extends Component<any, any> {
   }
 
   renderSelectVersions = () => {
+    const controlId = this.props.currentBlock.controlBlock;
     const metaData :BlockDataModel = this.props.currentBlock.config.metaData
-    let disabled = false
     const versionOptions = this.props.optionsData.versions
+    let disabled = true
 
     if (!metaData.useVersion) {
       return
     }
 
-    if (metaData.models.length==0 || metaData.scenarios.length==0){
-      disabled = true
+    if (controlId !=="") {
+      const controlBlockMeta = this.props.dashboard.blocks[controlId].config.metaData;
+      if (
+          (metaData.models.length!=0 || controlBlockMeta.master.models.isMaster)
+          && (metaData.scenarios.length!=0 || controlBlockMeta.master.scenarios.isMaster)
+      ){
+        disabled = false
+      }
+    } else {
+      if ((metaData.models.length!=0) && (metaData.scenarios.length!=0)){
+        disabled = false
+      }
     }
 
     const treeData: any[]=[]
@@ -148,9 +158,12 @@ export default class DataBlockEditor extends Component<any, any> {
           const scenarioChildren: any[] = []
           const defaultVersion = versionOptions[model][scenario].default
           for (const version of versionOptions[model][scenario].values) {
+            const title = version == defaultVersion
+                ? `${version} (default)`
+                : `${version}`
             scenarioChildren.push({
               version: version, // For sorting
-              title: version == defaultVersion ? version + " (default)" : version,
+              title: title,
               value: JSON.stringify({model, scenario, version})
             })
           }
@@ -219,7 +232,7 @@ export default class DataBlockEditor extends Component<any, any> {
             <div>
               <span className={"advanced-options-switch"}>
                 <span>Advanced options</span>
-                <Switch size="small" onChange={this.props.onUseVersionSwitched} defaultChecked={metaData.useVersion}/>
+                <Switch size="small" onChange={this.props.onUseVersionSwitched} checked={metaData.useVersion}/>
               </span>
 
               {/* show inputs if they are controlled */}

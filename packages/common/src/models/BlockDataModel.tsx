@@ -33,11 +33,7 @@ export default class BlockDataModel {
     variables: {
       isMaster: false,
       values: [],
-    },
-    versions: {
-      isMaster: false,
-      values: [],
-    },
+    }
   };
 }
 

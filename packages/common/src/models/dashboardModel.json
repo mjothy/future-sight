@@ -45,10 +45,6 @@
             "variables": {
               "isCustom": false,
               "value": ""
-            },
-            "versions": {
-              "isCustom": false,
-              "value": ""
             }
           },
           "YAxis": {
@@ -103,10 +99,6 @@
               "values": []
             },
             "variables": {
-              "isMaster": false,
-              "values": []
-            },
-            "versions": {
               "isMaster": false,
               "values": []
             }

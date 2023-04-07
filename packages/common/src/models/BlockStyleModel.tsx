@@ -33,10 +33,6 @@ export default class BlockStyleModel {
     variables:{
       isCustom: false,
       value: ""
-    },
-    versions:{
-      isCustom: false,
-      value: ""
     }
   };
   XAxis = {
