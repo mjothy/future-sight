@@ -2,8 +2,10 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import { join } from 'path';
-import RedisClient from '../redis/RedisClient';
 import IDataProxy from './IDataProxy';
+import IPersistenceManager from '../redis/IPersistenceManager';
+import { DashboardModel } from '@future-sight/common';
+import BrowseObject from '../models/BrowseObject';
 
 const optionsLabel = ["variables", "regions", "scenarios", "models",];
 
@@ -12,7 +14,7 @@ export default class ExpressServer {
   private readonly port: number;
   private readonly auth: any;
   private readonly clientPath: any;
-  private readonly dbClient: RedisClient;
+  private readonly dbClient: IPersistenceManager;
   private readonly dataProxy: IDataProxy;
 
   constructor(
@@ -59,6 +61,9 @@ export default class ExpressServer {
       res.send(`Hello , From server`);
     });
 
+    // ===================
+    //   IIASA calls
+    // ===================
     this.app.post('/api/plotData', (req, res) => {
       const body = req.body;
       const response: any[] = [];
@@ -87,126 +92,6 @@ export default class ExpressServer {
 
     this.app.get(`/api/regions`, (req, res) => {
       res.send(this.dataProxy.getRegions());
-    });
-    const appendDashboardIdToIndexList = async (id: string, indexListKey: string, value: string) => {
-      // Initialize the key if it does not exist
-      const valueTransform = value.replace(/ /g, '%');
-      await this.dbClient.getClient().json.set(indexListKey, `.${valueTransform}`, [], {
-        NX: true, // only set the key if it does not already exist
-      });
-      // Append the dashboard id to the list
-      await this.dbClient
-        .getClient()
-        .json.arrAppend(indexListKey, `.${valueTransform}`, id);
-    };
-
-    // Posts methods
-    this.app.post(`/api/dashboard/save`, async (req, res, next) => {
-      try {
-        const id = await this.dbClient.getClient().incr('dashboards:id');
-        // Save the dashboard
-        req.body.id = id; // change id
-        await this.dbClient
-          .getClient()
-          .json.set('dashboards', `.${id}`, req.body);
-
-        // Update the indexes
-        for (const tag of req.body.userData.tags) {
-          await appendDashboardIdToIndexList(id, 'tags', tag) // Set the tags indexes
-        }
-        // Set the authors indexes
-        await appendDashboardIdToIndexList(id, 'authors', req.body.userData.author);
-        res.send(JSON.stringify({ id: id }));
-      } catch (err) {
-        console.error(err);
-        next(err);
-      }
-    });
-
-    this.app.get(`/api/dashboards/:id`, async (req, res, next) => {
-      try {
-        const id = req.params.id;
-        const dashboard = await this.dbClient
-          .getClient()
-          .json.get('dashboards', { path: [`.${id}`] });
-        res.send(dashboard);
-      } catch (err) {
-        console.error(err);
-        next(err);
-      }
-    });
-
-    this.app.get(`/api/dashboards`, async (req, res, next) => {
-      try {
-        const latestId = await this.dbClient.getClient().get('dashboards:id');
-        const idsToFetch = [latestId];
-        // Get the 5 last published dashboards
-        for (let i = 1; i < 5; i++) {
-          idsToFetch.push(latestId - i);
-        }
-        const dashboards: any[] = [];
-        for (let i = latestId; i > latestId - 5; i--) {
-          try {
-            const dashboard = await this.dbClient
-              .getClient()
-              .json.get('dashboards', { path: i.toString() });
-            dashboards.push(dashboard)
-          } catch (e) {
-            // no dashboard found for id
-          }
-        }
-
-        res.send(dashboards);
-      } catch (err) {
-        console.error(err);
-        next(err);
-      }
-    });
-
-    this.app.get('/api/browse/init', async (req, res, next) => {
-      try {
-        const data = await this.dbClient
-          .getClient()
-          .json.mGet(['authors', 'tags'], '.');
-        // data is returned as: [ { author1: [], author2: [], ... }, { tag1: [], tag2: [], ... } ]
-        const authors = data[0];
-        const tags = data[1];
-        const authorsTransform = {};
-        const tagsTransform = {};
-        Object.keys(authors).forEach(key => authorsTransform[key.replace(/%/g, ' ')] = authors[key])
-        Object.keys(tags).forEach(key => tagsTransform[key.replace(/%/g, ' ')] = tags[key])
-        res.send({ authors: authorsTransform, tags: tagsTransform });
-      } catch (err) {
-        console.error(err);
-        next(err);
-      }
-    });
-
-    this.app.post('/api/browse', async (req, res, next) => {
-      try {
-        const { dashboards } = req.body;
-        const data = await this.dbClient
-          .getClient()
-          .json.get('dashboards', { path: dashboards.map(String) });
-        let results = {}
-        if (dashboards.length === 1) {
-          results[dashboards[0]] = data;
-        } else {
-          results = Object.entries(data).reduce(
-            (obj, [key, dashboard]) => Object.assign(obj, { [key]: dashboard }),
-            {}
-          );
-        }
-
-        res.send(results);
-      } catch (err) {
-        console.error(err);
-        next(err);
-      }
-    });
-
-    this.app.get(`/api/categories`, (req, res) => {
-      res.send(this.dataProxy.getCategories());
     });
 
     this.app.post('/api/dataFocus', async (req, res, next) => {
@@ -272,6 +157,71 @@ export default class ExpressServer {
       optionsData["categories"] = this.dataProxy.getCategories(); // TODO add categories to filter
 
       res.send(optionsData);
+    });
+
+    // ===================
+    //   Redis calls
+    // ===================
+
+    this.app.post(`/api/dashboard/save`, async (req, res, next) => {
+      try {
+        const response = await this.dbClient.saveDashboard(req.body)
+        res.send(response);
+      } catch (err) {
+        console.error(err);
+        next(err);
+      }
+    });
+
+    this.app.get(`/api/dashboards/:id`, async (req, res, next) => {
+      try {
+        const id = req.params.id;
+        const dashboard = await this.dbClient.getDashboardById(id);
+        res.send(dashboard);
+      } catch (err) {
+        console.error(err);
+        next(err);
+      }
+    });
+
+    this.app.get(`/api/dashboards`, async (req, res, next) => {
+      try {
+        const dashboards: DashboardModel[] = await this.dbClient.getAllDashboards();
+        res.send(dashboards);
+      } catch (err) {
+        console.error(err);
+        next(err);
+      }
+    });
+
+    this.app.get('/api/browse/init', async (req, res, next) => {
+      try {
+        const response: BrowseObject = await this.dbClient.getBrowseData();
+        res.send(response);
+      } catch (err) {
+        console.error(err);
+        next(err);
+      }
+    });
+
+    this.app.post('/api/browse', async (req, res, next) => {
+      try {
+        const { dashboards } = req.body;
+        const response: { [id: number]: DashboardModel } = await this.dbClient.searchDashboard(dashboards)
+        res.send(response);
+      } catch (err) {
+        console.error(err);
+        next(err);
+      }
+    });
+
+
+    // ===================
+    //   System files
+    // ===================
+
+    this.app.get(`/api/categories`, (req, res) => {
+      res.send(this.dataProxy.getCategories());
     });
 
     this.app.post(`/api/regionsGeojson`, async (req, res) => {

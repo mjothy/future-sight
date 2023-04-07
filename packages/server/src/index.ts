@@ -3,6 +3,7 @@ import ExpressServer from './express/ExpressServer';
 import basicAuth from 'express-basic-auth';
 import FSDataProxy from "./express/FSDataProxy";
 import path from "path";
+import RedisPersistenceManager from './redis/RedisPersistenceManager';
 
 const DEFAULT_PORT = 8080;
 const DEFAULT_COOKIE_KEY = '8azoijuem2aois3Qsjeir';
@@ -40,8 +41,8 @@ const categoriesPath = isProd ? PROD_CATEGORIES_PATH : DEV_CATEGORIES_PATH;
 const dataProxy = new FSDataProxy(dataPath, dataUnionPath, countriesGeojsonPath, categoriesPath);
 
 // redis initialisation
-const redisClient = new RedisClient(redisUrl);
-
+// const redisClient = new RedisClient(redisUrl);
+const redisClient = new RedisPersistenceManager(redisUrl);
 // Backend initialisation
 let auth;
 if (username && password) {
