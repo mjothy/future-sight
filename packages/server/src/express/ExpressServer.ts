@@ -124,42 +124,15 @@ export default class ExpressServer {
     });
 
     this.app.post('/api/filterOptions', async (req, res, next) => {
-      const firstFilters = req.body.filters;
-      const metaData = req.body.metaData;
-      const optionsData = {
-        regions: [],
-        variables: [],
-        scenarios: [],
-        models: [],
-        catagories: []
-      };
-      const dataUnion = this.dataProxy.getDataUnion();
-      let firstFilterRaws = dataUnion;
 
-      let filterKeys = Object.keys(firstFilters);
-      filterKeys = filterKeys.filter(key => key != "categories"); // TODO delete after
-      // First filter (by data focus)
-      filterKeys.forEach(option => {
-        if (firstFilters[option].length > 0) {
-          firstFilterRaws = firstFilterRaws.filter(raw => firstFilters[option].includes(raw[option.slice(0, -1)]));
-        }
-      })
-
-      const dataRaws = this.getRaws(metaData, firstFilterRaws);
-
-      optionsLabel.forEach(option => {
-        let possible_options: any[] = [];
-        if (dataRaws[option].length > 0) {
-          possible_options = Array.from(new Set(dataRaws[option].map(raw => raw[option.slice(0, -1)])))
-        } else {
-          possible_options = Array.from(new Set(firstFilterRaws.map(raw => raw[option.slice(0, -1)])))
-        }
-        optionsData[option] = possible_options;
-      })
-
-      optionsData["categories"] = this.configurationProvider.getMetaIndicators(); // TODO add categories to filter
-
-      res.send(optionsData);
+      try {
+        const optionsData = this.dataProxy.getFilteredData(req.body.metaData, req.body.filters);
+        optionsData["categories"] = this.configurationProvider.getMetaIndicators(); // TODO add categories to filter
+        res.send(optionsData);
+      } catch (err) {
+        console.error(err);
+        next(err);
+      }
     });
 
     // ===================
@@ -245,51 +218,4 @@ export default class ExpressServer {
       console.log(`app started at http://localhost:${this.port}`);
     });
   };
-
-  /**
-   * Get possible raws based on selected order in config.metaData.selectOrder
-   * Exemple: selectOrder = [regions, models]
-   * dataRaws[models] will contains all raws of selected regions
-   * @param metaData the selected data in block
-   * @param firstFilterRaws filtred raws based on data focus
-   * @returns possible raws of {model,scenario,region,variable} in each index based on the before selection
-   */
-  getRaws = (metaData, firstFilterRaws) => {
-
-    const dataRaws = {
-      regions: [],
-      variables: [],
-      scenarios: [],
-      models: [],
-      catagories: []
-    };
-
-    metaData.selectOrder = metaData.selectOrder.filter(key => key != "categories"); // TODO delete after
-
-    if (metaData.selectOrder.length > 0) {
-      const option_unselected = optionsLabel.filter(option => !metaData.selectOrder.includes(option));
-      const option_selected = metaData.selectOrder;
-
-      // The first selection contains all raws
-      const option = metaData.selectOrder[0];
-      dataRaws[option] = firstFilterRaws;
-
-      // set possible raws for selected inputs
-      for (let i = 1; i < option_selected.length; i++) {
-        const current_option = metaData.selectOrder[i];
-        const prev_option = metaData.selectOrder[i - 1];
-        dataRaws[current_option] = dataRaws[prev_option].filter(raw => metaData[prev_option].includes(raw[prev_option.slice(0, -1)]));
-      }
-
-      // set possible raws for unselected inputs
-      if (option_unselected.length > 0) {
-        const prev_option = metaData.selectOrder[metaData.selectOrder.length - 1];// last label selected (drop down)
-        const possible_raws = dataRaws[prev_option].filter(raw => metaData[prev_option].includes(raw[prev_option.slice(0, -1)]));
-        option_unselected.forEach((option) => {
-          dataRaws[option] = possible_raws;
-        })
-      }
-    }
-    return dataRaws;
-  }
 }
