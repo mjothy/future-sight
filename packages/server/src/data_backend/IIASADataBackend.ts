@@ -1,3 +1,4 @@
+import FilterManager from "../configurations/FilterManager";
 import { ACCESS_TOKEN, SPECIAL_KEY, URL_ECEMF } from "../env";
 import IDataBackend from "../interfaces/IDataBackend ";
 import IIASADataManager from "./IIASADataManager";
@@ -5,9 +6,18 @@ import IIASADataManager from "./IIASADataManager";
 
 export default class IIASADataBackend extends IIASADataManager implements IDataBackend {
 
-    constructor() {
+    private readonly filterManager: FilterManager;
+
+    constructor(filterManager: FilterManager) {
         super(URL_ECEMF, SPECIAL_KEY, ACCESS_TOKEN);
+        this.filterManager = filterManager;
     }
+
+    getFilters = () => this.filterManager.getFilters();
+
+    getFilterPossibleValues = (filterId: string, selectedData?: any | undefined, runId?: number | undefined) => {
+        return [];
+    };
 
     getModels = () => {
         return this.getPromise('/models')
@@ -45,5 +55,4 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
 
     getData = () => [];
     getDataUnion = () => [];
-    getGeojson = (regions: string[]) => [];
 }

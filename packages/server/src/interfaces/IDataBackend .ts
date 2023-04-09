@@ -1,13 +1,10 @@
 import TimeSerieObject from "../models/TimeSerieObject";
+import FilterObject from "../models/FilterObject";
 
 export default interface IDataBackend {
 
-    getModels: () => any;
-    getVariables: (runId?: number) => any;
-    getScenarios: () => any;
-    getRegions: () => any;
-    getUnits: () => any;
-    getCategories: () => any;
+    getFilters: () => { [id: string]: FilterObject };
+    getFilterPossibleValues: (filterId: string, selectedData?: any, runId?: number) => string[]
     getRuns: () => { id; version }
     getTimeSeries: () => TimeSerieObject[]; //TODO add TimeSerieObject to models
     getFilteredData: (selectedData, keyFilter) => any;
@@ -15,6 +12,5 @@ export default interface IDataBackend {
     // TODO delete after
     getData: () => any[];
     getDataUnion: () => any[];
-    getGeojson: (regions: string[]) => any;
 
 }

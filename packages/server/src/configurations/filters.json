@@ -1,0 +1,26 @@
+{
+  "model": {
+    "id": "model",
+    "label": "Models",
+    "path": "/models",
+    "active": true
+  },
+  "scenario": {
+    "id": "scenario",
+    "label": "Scenarios",
+    "path": "/scenarios",
+    "active": true
+  },
+  "variable": {
+    "id": "variable",
+    "label": "Variables",
+    "path": "/variables",
+    "active": true
+  },
+  "region": {
+    "id": "region",
+    "label": "Regions",
+    "path": "/regions",
+    "active": true
+  }
+}

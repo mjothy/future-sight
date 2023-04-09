@@ -6,6 +6,7 @@ import IPersistenceManager from '../interfaces/IPersistenceManager';
 import { DashboardModel } from '@future-sight/common';
 import BrowseObject from '../models/BrowseObject';
 import IDataBackend from '../interfaces/IDataBackend ';
+import IConfigurationProvider from '../interfaces/IConfigurationProvider';
 
 const optionsLabel = ["variables", "regions", "scenarios", "models",];
 
@@ -16,14 +17,15 @@ export default class ExpressServer {
   private readonly clientPath: any;
   private readonly dbClient: IPersistenceManager;
   private readonly dataProxy: IDataBackend;
-
+  private readonly configurationProvider: IConfigurationProvider;
   constructor(
     port,
     cookieKey,
     auth,
     clientPath,
     dbClient,
-    dataProxy: IDataBackend
+    dataProxy: IDataBackend,
+    configurationProvider
   ) {
     this.app = express();
     this.port = port;
@@ -31,6 +33,7 @@ export default class ExpressServer {
     this.clientPath = clientPath;
     this.dbClient = dbClient;
     this.dataProxy = dataProxy;
+    this.configurationProvider = configurationProvider;
     this.app.use(bodyParser.json({ limit: '50mb' }));
     this.app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
     if (auth) {
@@ -79,19 +82,19 @@ export default class ExpressServer {
     });
 
     this.app.get('/api/models', (req, res) => {
-      res.send(this.dataProxy.getModels());
+      res.send(this.dataProxy.getFilterPossibleValues("model"));
     });
 
     this.app.get('/api/scenarios', (req, res) => {
-      res.send(this.dataProxy.getScenarios());
+      res.send(this.dataProxy.getFilterPossibleValues("scenario"));
     });
 
     this.app.get(`/api/variables`, (req, res) => {
-      res.send(this.dataProxy.getVariables());
+      res.send(this.dataProxy.getFilterPossibleValues("variable"));
     });
 
     this.app.get(`/api/regions`, (req, res) => {
-      res.send(this.dataProxy.getRegions());
+      res.send(this.dataProxy.getFilterPossibleValues("region"));
     });
 
     this.app.post('/api/dataFocus', async (req, res, next) => {
@@ -115,7 +118,7 @@ export default class ExpressServer {
         optionsData[option1] = Array.from(new Set(dataUnion.map(raw => raw[option1.slice(0, -1)])))
       })
 
-      optionsData["categories"] = this.dataProxy.getCategories();
+      optionsData["categories"] = this.configurationProvider.getMetaIndicators();
 
       res.send(optionsData);
     });
@@ -154,7 +157,7 @@ export default class ExpressServer {
         optionsData[option] = possible_options;
       })
 
-      optionsData["categories"] = this.dataProxy.getCategories(); // TODO add categories to filter
+      optionsData["categories"] = this.configurationProvider.getMetaIndicators(); // TODO add categories to filter
 
       res.send(optionsData);
     });
@@ -221,12 +224,12 @@ export default class ExpressServer {
     // ===================
 
     this.app.get(`/api/categories`, (req, res) => {
-      res.send(this.dataProxy.getCategories());
+      res.send(this.configurationProvider.getMetaIndicators());
     });
 
     this.app.post(`/api/regionsGeojson`, async (req, res) => {
       const regions = req.body.regions;
-      const geojson = this.dataProxy.getGeojson(regions);
+      const geojson = this.configurationProvider.getGeojson(regions);
       res.send(geojson);
     });
 

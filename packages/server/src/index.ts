@@ -3,6 +3,8 @@ import basicAuth from 'express-basic-auth';
 import path from "path";
 import RedisPersistenceManager from './redis/RedisPersistenceManager';
 import FSDataBackend from './data_backend/FSDataBackend';
+import FSConfigurationProvider from './configurations/FSConfigurationProvider';
+import FilterManager from './configurations/FilterManager';
 
 const DEFAULT_PORT = 8080;
 const DEFAULT_COOKIE_KEY = '8azoijuem2aois3Qsjeir';
@@ -36,12 +38,14 @@ const dataUnionPath = isProd ? PROD_DATA_UNION_PATH : DEV_DATA_UNION_PATH;
 const countriesGeojsonPath = isProd ? PROD_COUNTRIES_GEOJSON_PATH : DEV_COUNTRIES_GEOJSON_PATH;
 const categoriesPath = isProd ? PROD_CATEGORIES_PATH : DEV_CATEGORIES_PATH;
 
+const filterManager = new FilterManager();
 // data loading
-const dataProxy = new FSDataBackend(dataPath, dataUnionPath, countriesGeojsonPath, categoriesPath);
+const fsDataProxy = new FSDataBackend(filterManager, dataPath, dataUnionPath); // Or new IIASADataBackend
+const fsConfProvider = new FSConfigurationProvider(countriesGeojsonPath, categoriesPath);
 
 // redis initialisation
-// const redisClient = new RedisClient(redisUrl);
 const redisClient = new RedisPersistenceManager(redisUrl);
+
 // Backend initialisation
 let auth;
 if (username && password) {
@@ -50,7 +54,7 @@ if (username && password) {
     challenge: true,
   });
 }
-const app = new ExpressServer(port, cookieKey, auth, clientPath, redisClient, dataProxy);
+const app = new ExpressServer(port, cookieKey, auth, clientPath, redisClient, fsDataProxy, fsConfProvider);
 
 // Startup
 redisClient.startup().then((r) => {

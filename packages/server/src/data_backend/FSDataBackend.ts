@@ -1,35 +1,36 @@
 import * as fs from "fs";
 import IDataBackend from "../interfaces/IDataBackend ";
-import RegionsGeoJson from "../express/RegionsGeoJson";
+import FilterManager from "../configurations/FilterManager";
 
-const optionsLabel = ["models", "scenarios", "variables", "regions"];
 
 export default class FSDataBackend implements IDataBackend {
     private readonly data: any[];
     private readonly dataUnion: any[];
-    private readonly models: any;
-    private readonly scenarios: any;
-    private readonly variables: any;
-    private readonly regions: any;
-    private readonly geojson: any;
-    private readonly categories: any;
+    private readonly filterDataValues: any = {};
 
-    constructor(dataPath: string, dataUnionPath: string, countriesGeojsonPath: string, categoriesPath: string) {
+    private readonly filterManager: FilterManager;
+
+    constructor(filterManager: FilterManager, dataPath: string, dataUnionPath: string) {
+
+        this.filterManager = filterManager;
+
         const dataRaw = fs.readFileSync(dataPath);
         const dataUnionRaw = fs.readFileSync(dataUnionPath);
-        const categoriesRaw = fs.readFileSync(categoriesPath);
 
         this.data = JSON.parse(dataRaw.toString());
         this.dataUnion = JSON.parse(dataUnionRaw.toString());
-        this.categories = JSON.parse(categoriesRaw.toString());
 
-        optionsLabel.forEach(option => {
-            this[option] = Array.from(new Set(this.dataUnion.map(raw => raw[option.slice(0, -1)])))
+        const keys = Object.keys(filterManager.getFilters())
+        keys.forEach(option => {
+            this.filterDataValues[option] = Array.from(new Set(this.dataUnion.map(raw => raw[option])))
         })
-
-        const rg = new RegionsGeoJson(countriesGeojsonPath);
-        this.geojson = rg.getRegionGeoJson();
     }
+
+    getFilters = () => this.filterManager.getFilters();
+
+    getFilterPossibleValues = (filterId: string, selectedData?: any | undefined, runId?: number | undefined) => {
+        return this.filterDataValues[filterId];
+    };
 
     getUnits = () => { return [] };
 
@@ -41,10 +42,6 @@ export default class FSDataBackend implements IDataBackend {
 
     getFilteredData = (selectedData: any, keyFilter: any) => [];
 
-    getCategories(): any {
-        return this.categories;
-    }
-
     getData(): any[] {
         return this.data;
     }
@@ -53,34 +50,4 @@ export default class FSDataBackend implements IDataBackend {
         return this.dataUnion;
     }
 
-    getModels() {
-        return this.models;
-    }
-
-    getScenarios() {
-        return this.scenarios;
-    }
-
-    getVariables() {
-        return this.variables;
-    }
-
-    getRegions() {
-        return this.regions;
-    }
-
-    getGeojson(regions: string[] = []) {
-        const geojsonResult: { type: string, features: any } = {
-            type: "FeatureCollection",
-            features: []
-        };
-        regions.forEach(region => {
-            const geojson = this.geojson[region.toLowerCase()]
-            if (geojson != null) {
-                geojson["id"] = region;
-                geojsonResult.features.push(geojson);
-            }
-        });
-        return geojsonResult;
-    }
 }
