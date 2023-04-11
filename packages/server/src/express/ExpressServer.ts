@@ -67,6 +67,16 @@ export default class ExpressServer {
     // ===================
     //   IIASA calls
     // ===================
+
+    this.app.get('/api/filters', (req, res) => {
+      res.send(this.dataProxy.getFilters());
+    });
+
+    this.app.post('/api/filterValues', (req, res) => {
+      res.send(this.dataProxy.getFilterPossibleValues(req.body.filterId));
+    });
+
+
     this.app.post('/api/plotData', (req, res) => {
       const body = req.body;
       const response: any[] = [];
@@ -79,22 +89,6 @@ export default class ExpressServer {
         }
       }
       res.status(200).send(response);
-    });
-
-    this.app.get('/api/models', (req, res) => {
-      res.send(this.dataProxy.getFilterPossibleValues("model"));
-    });
-
-    this.app.get('/api/scenarios', (req, res) => {
-      res.send(this.dataProxy.getFilterPossibleValues("scenario"));
-    });
-
-    this.app.get(`/api/variables`, (req, res) => {
-      res.send(this.dataProxy.getFilterPossibleValues("variable"));
-    });
-
-    this.app.get(`/api/regions`, (req, res) => {
-      res.send(this.dataProxy.getFilterPossibleValues("region"));
     });
 
     this.app.post('/api/dataFocus', async (req, res, next) => {

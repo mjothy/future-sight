@@ -31,6 +31,7 @@ export default class BlockViewManager extends Component<any, any> {
           dashboard: this.props.dashboard,
           currentBlock: this.props.currentBlock,
           optionsLabel: this.props.optionsLabel,
+          filters: this.props.filters,
           updateDashboard: this.props.updateDashboard
         }} />;
       // MapControlView

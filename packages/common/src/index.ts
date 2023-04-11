@@ -26,4 +26,4 @@ export type { default as PlotDataModel } from './models/PlotDataModel';
 export type { default as IndexToColorModel } from './models/IndexToColorModel';
 export type { default as CategorieModel } from './models/CategorieModel';
 export { default as OptionsDataModel } from './models/OptionsDataModel';
-
+export type { FilterObject } from './models/FilterObject';

@@ -10,6 +10,7 @@ import BlockModel from '../models/BlockModel';
 import DashboardModel from '../models/DashboardModel';
 import GetGeoJsonContextProvider from '../services/GetGeoJsonContextProvider';
 import DashboardConfigView from './DashboardConfigView';
+import { FilterObject } from '../models/FilterObject';
 
 /*TODO Check that embedded and published view have the same purpose and always look ok,
 * For instance, do we want full width with scrolling when in published view
@@ -27,6 +28,7 @@ interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
     blockData: (block: BlockModel) => any[];
     optionsLabel: string[]
     plotData: any[];
+    filters: FilterObject;
 }
 
 type LocationState = { dashboard: DashboardModel };
@@ -138,6 +140,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                             readonly
                             blockData={props.blockData}
                             optionsLabel={props.optionsLabel}
+                            filters={props.filters}
                         />
                     </GetGeoJsonContextProvider>
                 )}

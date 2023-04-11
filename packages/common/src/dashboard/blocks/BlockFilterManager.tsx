@@ -74,7 +74,7 @@ export default class BlockFilterManager extends Component<any, any> {
 
             const data = new OptionsDataModel()
 
-            this.props.optionsLabel.forEach(option => {
+            Object.keys(this.props.filters).forEach(option => {
                 data[option] = Array.from(new Set(existDataRaws.map(raw => raw[option.slice(0, -1)])))
                 data[option] = metaData[option].filter(value => !data[option].includes(value))
             })
@@ -163,7 +163,7 @@ export default class BlockFilterManager extends Component<any, any> {
         Object.values(dashboard.blocks).forEach((block: any) => {
             if (block.controlBlock === this.props.currentBlock.id) {
                 block.config.metaData.selectOrder = configParent.metaData.selectOrder;
-                this.props.optionsLabel.forEach(option => {
+                Object.keys(this.props.filters).forEach(option => {
                     (block.config as ConfigurationModel).metaData[option] = [];
                 });
             }

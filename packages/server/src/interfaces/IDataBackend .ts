@@ -1,9 +1,9 @@
+import { FilterObject } from "@future-sight/common";
 import TimeSerieObject from "../models/TimeSerieObject";
-import FilterObject from "../models/FilterObject";
 
 export default interface IDataBackend {
 
-    getFilters: () => { [id: string]: FilterObject };
+    getFilters: () => FilterObject;
     getFilterPossibleValues: (filterId: string, selectedData?: any, runId?: number) => string[]
     getRuns: () => { id; version }
     getTimeSeries: () => TimeSerieObject[]; //TODO add TimeSerieObject to models

@@ -38,7 +38,7 @@ export default class ControlBlockView extends Component<any, any> {
     if (childrens.length > 0) {
       childrens.map((child: BlockModel | any) => {
         const configChild = child.config;
-        this.props.optionsLabel.map((option) => {
+        Object.keys(this.props.filters).map((option) => {
           const isMaster = config.metaData.master[option].isMaster;
           if (isMaster) {
             configChild.metaData[option] = config.metaData.master[option].values;

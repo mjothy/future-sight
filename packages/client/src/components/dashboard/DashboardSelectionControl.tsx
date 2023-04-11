@@ -5,6 +5,7 @@ import {
   ComponentPropsWithDataManager,
   ConfigurationModel,
   DashboardModel,
+  FilterObject,
   LayoutModel, PlotDataModel,
 } from '@future-sight/common';
 import { Component } from 'react';
@@ -22,6 +23,7 @@ export interface DashboardSelectionControlProps
   plotData: PlotDataModel[];
   blockData: (block: BlockModel) => PlotDataModel[];
   optionsLabel: string[];
+  filters: FilterObject;
 }
 
 export default class DashboardSelectionControl extends Component<
@@ -171,13 +173,13 @@ export default class DashboardSelectionControl extends Component<
   * Check if data in selection (selected data) are present in Select options
   */
   checkIfSelectedInOptions = (optionsData, block: BlockModel) => {
-    let optionsLabel = [...this.props.optionsLabel];
+    let filterKeys = Object.keys(this.props.filters);
     const dashboard = { ...this.state.dashboard };
     const config = block.config as ConfigurationModel;
     let isDashboardUpdated = false;
     const missingData = {}
-    optionsLabel = optionsLabel.filter(key => key != "categories"); // TODO delete after
-    optionsLabel.forEach(option => {
+    filterKeys = filterKeys.filter(key => key != "categorie"); // TODO delete after
+    filterKeys.forEach(option => {
       // Check if selected data (metaData[option]) are in options of drop down list
       const dataInOptionsData = config.metaData[option].filter(data => optionsData[option].includes(data));
       missingData[option] = config.metaData[option].filter(data => !optionsData[option].includes(data));

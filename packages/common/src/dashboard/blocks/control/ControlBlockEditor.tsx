@@ -22,7 +22,7 @@ export default class ControlBlockEditor extends Component<any, any> {
 
     // update current block config (metadata)
     parentBlock.config.metaData.master[option].isMaster = e.target.checked;
-    this.props.optionsLabel.forEach(label => {
+    Object.keys(this.props.filters).forEach(label => {
       parentBlock.config.metaData.master[label].values = []; // clear selected data in control block view
     })
 
@@ -47,7 +47,7 @@ export default class ControlBlockEditor extends Component<any, any> {
       childrens.map((child: BlockModel | any) => {
         const configChild = child.config;
         configChild.metaData.selectOrder = parentBlock.config.metaData.selectOrder;
-        this.props.optionsLabel.forEach(option => {
+        Object.keys(this.props.filters).forEach(option => {
           configChild.metaData[option] = [];
         })
         dashboard.blocks[child.id].config = { ...configChild };
@@ -62,7 +62,7 @@ export default class ControlBlockEditor extends Component<any, any> {
 
     // update data selected in block view)
     parentBlock.config.metaData.master[option].isMaster = false;
-    this.props.optionsLabel.forEach(label => {
+    Object.keys(this.props.filters).forEach(label => {
       parentBlock.config.metaData.master[label].values = []; // clear selected data in control block view
     })
 
@@ -112,10 +112,9 @@ export default class ControlBlockEditor extends Component<any, any> {
   };
 
   render() {
-    const optionsLabel = this.props.optionsLabel;
     return (
       <>
-        <div>{optionsLabel.map((option) => this.selectDropDown(option))}</div>
+        <div>{Object.keys(this.props.filters).map((option) => this.selectDropDown(option))}</div>
         <Divider />
         <Row style={{ marginTop: "auto" }}>
           <Col span={24}>

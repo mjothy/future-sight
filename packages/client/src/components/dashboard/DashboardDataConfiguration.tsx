@@ -34,6 +34,7 @@ class DashboardDataConfiguration extends Component<
     super(props);
     this.optionsLabel = this.props.dataManager.getOptions();
     this.state = {
+      filters: {},
       allData: new OptionsDataModel(),
       /**
        * Data (with timeseries from IASA API)
@@ -47,16 +48,19 @@ class DashboardDataConfiguration extends Component<
 
   async componentDidMount() {
     const allData = this.state.allData;
+    let filters = {};
     try {
-      allData['regions'] = await this.props.dataManager.fetchRegions();
-      allData['variables'] = await this.props.dataManager.fetchVariables();
-      allData['models'] = await this.props.dataManager.fetchModels();
-      allData['scenarios'] = await this.props.dataManager.fetchScenarios();
-      allData['categories'] = await this.props.dataManager.fetchCategories();
-      this.setState({ allData, isFetchData: true });
+      filters = await this.props.dataManager.getFilters();
+      const keys: string[] = Object.keys(filters);
+      for (const key of keys) {
+        allData[key] = await this.props.dataManager.getFilterPossibleValues(filters[key]);
+      }
+      console.log("allData: ", allData);
     } catch (error) {
       console.log("ERROR FETCH: ", error);
     }
+    this.setState({ allData, filters, isFetchData: true });
+
   }
 
   componentDidUpdate(prevProps: Readonly<DashboardDataConfigurationProps>, prevState: Readonly<any>, snapshot?: any): void {
@@ -157,6 +161,7 @@ class DashboardDataConfiguration extends Component<
         embedButtonOnClickHandler={() => Utils.copyToClipboard(undefined, "&embedded")}
         blockData={this.blockData}
         optionsLabel={this.optionsLabel}
+        filters={this.state.filters}
         plotData={this.state.plotData}
         {...this.props}
       />
@@ -167,6 +172,7 @@ class DashboardDataConfiguration extends Component<
         plotData={this.state.plotData}
         blockData={this.blockData}
         optionsLabel={this.optionsLabel}
+        filters={this.state.filters}
         {...this.props}
       />) || <div className="dashboard">
         <Spin className="centered" />

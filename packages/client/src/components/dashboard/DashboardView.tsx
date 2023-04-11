@@ -3,6 +3,7 @@ import {
   ComponentPropsWithDataManager,
   Dashboard,
   DashboardModel,
+  FilterObject,
 } from '@future-sight/common';
 import React from 'react';
 import SetupView from './form/SetupView';
@@ -20,6 +21,7 @@ interface DashboardViewProps extends ComponentPropsWithDataManager, RoutingProps
   updateDashboard: (dashboard: DashboardModel) => void;
   checkIfSelectedInOptions: (optionsData, block: BlockModel) => void;
   optionsLabel: string[],
+  filters: FilterObject,
   allData: any,
 }
 
@@ -34,6 +36,7 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
         <SetupView
           dashboard={this.props.dashboard}
           optionsLabel={this.props.optionsLabel}
+          filters={this.props.filters}
           updateDashboard={this.props.updateDashboard}
           allData={this.props.allData}
         />

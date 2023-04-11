@@ -22,7 +22,7 @@ export default class FSDataBackend implements IDataBackend {
 
         const keys = Object.keys(filterManager.getFilters())
         keys.forEach(option => {
-            this.filterDataValues[option] = Array.from(new Set(this.dataUnion.map(raw => raw[option])))
+            this.filterDataValues[option] = Array.from(new Set(this.dataUnion.map(raw => raw[option.slice(0, -1)])))
         })
     }
 
@@ -48,7 +48,6 @@ export default class FSDataBackend implements IDataBackend {
         let filterKeys = Object.keys(firstFilters);
         filterKeys = filterKeys.filter(key => key != "categories"); // TODO delete after
         // First filter (by data focus)
-        console.log("firstFilters: ", firstFilters)
         filterKeys.forEach(option => {
             if (firstFilters[option].length > 0) {
                 firstFilterRaws = firstFilterRaws.filter(raw => firstFilters[option].includes(raw[option.slice(0, -1)]));
@@ -56,7 +55,6 @@ export default class FSDataBackend implements IDataBackend {
         })
 
         const dataRaws = this.getRaws(blockMetaData, firstFilterRaws);
-        console.log("dataRaws:", dataRaws);
 
         Object.keys(dataRaws).forEach(option => {
             let possible_options: any[] = [];
@@ -68,7 +66,6 @@ export default class FSDataBackend implements IDataBackend {
             optionsData[option] = possible_options;
         })
 
-        console.log("optionsData:", optionsData);
 
         return optionsData;
     };
@@ -96,7 +93,7 @@ export default class FSDataBackend implements IDataBackend {
         const filtersLabel = Object.keys(this.filterManager.getFilters());
 
         // Initialize dataRaws
-        filtersLabel.forEach(key => dataRaws[key + "s"] = []); // TODO delete the s
+        filtersLabel.forEach(key => dataRaws[key] = []); // TODO delete the s
 
         metaData.selectOrder = metaData.selectOrder.filter(key => key != "categories"); // TODO delete after
 

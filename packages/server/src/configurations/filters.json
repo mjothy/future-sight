@@ -1,26 +1,37 @@
 {
-  "model": {
-    "id": "model",
+  "models": {
+    "id": "models",
     "label": "Models",
     "path": "/models",
-    "active": true
+    "required": true,
+    "origin": "iaasa"
   },
-  "scenario": {
-    "id": "scenario",
+  "scenarios": {
+    "id": "scenarios",
     "label": "Scenarios",
     "path": "/scenarios",
-    "active": true
+    "required": true,
+    "origin": "iaasa"
   },
-  "variable": {
-    "id": "variable",
+  "variables": {
+    "id": "variables",
     "label": "Variables",
     "path": "/variables",
-    "active": true
+    "required": true,
+    "origin": "iaasa"
   },
-  "region": {
-    "id": "region",
+  "regions": {
+    "id": "regions",
     "label": "Regions",
     "path": "/regions",
-    "active": true
+    "required": true,
+    "origin": "iaasa"
+  },
+  "categories": {
+    "id": "categories",
+    "label": "Categories",
+    "path": "/categories",
+    "required": false,
+    "origin": "fs"
   }
 }

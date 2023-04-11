@@ -3,15 +3,11 @@ import DataModel from '../models/DataModel';
 export default interface IDataManager {
   getBaseUrl: () => string;
 
+  getFilters: () => any; // {[id: string]: FilterObject}
+
   fetchPlotData: (data: DataModel[]) => Promise<any>;
 
-  fetchModels: () => Promise<any>;
-
-  fetchScenarios: () => Promise<any>;
-
-  fetchVariables: () => Promise<any>;
-
-  fetchRegions: () => Promise<any>;
+  getFilterPossibleValues: (filter: any) => Promise<any> | undefined;
 
   getDashboard: (id: string) => Promise<any>;
 
@@ -30,6 +26,4 @@ export default interface IDataManager {
   fetchDataFocusOptions: (data: any) => Promise<any>;
 
   fetchRegionsGeojson: (regions: string[]) => Promise<any>;
-
-  fetchCategories: () => Promise<any>;
 }

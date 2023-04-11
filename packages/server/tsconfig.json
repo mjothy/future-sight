@@ -6,5 +6,5 @@
     "outDir": "build",
     "isolatedModules": false
   },
-  "include": ["src"]
+  "include": ["src", "../common/src/models/FilterObject.ts"]
 }
