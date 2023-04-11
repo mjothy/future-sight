@@ -247,7 +247,6 @@ class DashboardConfigView extends Component<any, any> {
                                         : this.height
                                 }
                                 dashboard={this.props.dashboard}
-                                optionsLabel={this.props.optionsLabel}
                                 filters={this.props.filters}
                                 updateDashboard={this.props.updateDashboard}
                             />

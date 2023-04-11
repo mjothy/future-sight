@@ -26,6 +26,31 @@ export default class FSDataBackend implements IDataBackend {
         })
     }
 
+    getDataFocus = (selectedData) => {
+        const optionsData = {
+            regions: [],
+            variables: [],
+            scenarios: [],
+            models: [],
+            catagories: []
+        };
+
+        // Filter data origin from IIASA Api
+        const keysIaasa = Object.values(this.getFilters()).filter((filter: any) => filter.origin == "iaasa").map((filter: any) => filter.id);
+        keysIaasa.forEach(option1 => {
+            let dataUnion = this.getDataUnion();
+            keysIaasa.forEach(option2 => {
+                if (option1 != option2) {
+                    if (selectedData[option2].length > 0) {
+                        dataUnion = dataUnion.filter(raw => selectedData[option2].includes(raw[option2.slice(0, -1)]));
+                    }
+                }
+            })
+            optionsData[option1] = Array.from(new Set(dataUnion.map(raw => raw[option1.slice(0, -1)])))
+        })
+        return optionsData;
+    };
+
     getFilters = () => this.filterManager.getFilters();
 
     getFilterPossibleValues = (filterId: string, selectedData?: any | undefined, runId?: number | undefined) => {

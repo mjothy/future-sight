@@ -172,8 +172,9 @@ export default class BlockFilterManager extends Component<any, any> {
 
     isAllSelected = () => {
         const selectedOrder = this.props.currentBlock.config.metaData.selectOrder;
-        const obligatory = selectedOrder.filter(key => key != "categories");
-        return obligatory.length == 4
+        const filters = Object.values(this.props.filters);
+        const unselected = filters.filter((filter: any) => filter.required && !selectedOrder.includes(filter.id));
+        return unselected.length == 0
     }
 
     render() {

@@ -26,7 +26,6 @@ interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
     shareButtonOnClickHandler: () => void;
     embedButtonOnClickHandler: () => void;
     blockData: (block: BlockModel) => any[];
-    optionsLabel: string[]
     plotData: any[];
     filters: FilterObject;
 }
@@ -139,7 +138,6 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                             }}
                             readonly
                             blockData={props.blockData}
-                            optionsLabel={props.optionsLabel}
                             filters={props.filters}
                         />
                     </GetGeoJsonContextProvider>

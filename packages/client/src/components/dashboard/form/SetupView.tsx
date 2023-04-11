@@ -127,7 +127,7 @@ class SetupView extends Component<any, any> {
       let isMissing = false;
       const filteKeys = Object.keys(this.props.filters);
       for (const option of filteKeys) {
-        if (this.isDataMissing(option) && option != "categorie") {
+        if (this.isDataMissing(option)) {
           isMissing = true;
           break;
         }
@@ -174,7 +174,6 @@ class SetupView extends Component<any, any> {
           }
         >
           <PopupFilterContent
-            optionsLabel={this.props.optionsLabel}
             dataStructure={this.state.dataStructure}
             updateDataStructure={this.updateDataStructure}
             handleOk={this.handleOk}

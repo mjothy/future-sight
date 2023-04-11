@@ -22,7 +22,6 @@ export interface DashboardSelectionControlProps
   allData: any;
   plotData: PlotDataModel[];
   blockData: (block: BlockModel) => PlotDataModel[];
-  optionsLabel: string[];
   filters: FilterObject;
 }
 

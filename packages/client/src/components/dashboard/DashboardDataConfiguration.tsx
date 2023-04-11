@@ -29,10 +29,8 @@ class DashboardDataConfiguration extends Component<
   DashboardDataConfigurationProps,
   any
 > {
-  optionsLabel: string[] = [];
   constructor(props) {
     super(props);
-    this.optionsLabel = this.props.dataManager.getOptions();
     this.state = {
       filters: {},
       allData: new OptionsDataModel(),
@@ -55,7 +53,6 @@ class DashboardDataConfiguration extends Component<
       for (const key of keys) {
         allData[key] = await this.props.dataManager.getFilterPossibleValues(filters[key]);
       }
-      console.log("allData: ", allData);
     } catch (error) {
       console.log("ERROR FETCH: ", error);
     }
@@ -160,7 +157,6 @@ class DashboardDataConfiguration extends Component<
         shareButtonOnClickHandler={() => Utils.copyToClipboard()}
         embedButtonOnClickHandler={() => Utils.copyToClipboard(undefined, "&embedded")}
         blockData={this.blockData}
-        optionsLabel={this.optionsLabel}
         filters={this.state.filters}
         plotData={this.state.plotData}
         {...this.props}
@@ -171,7 +167,6 @@ class DashboardDataConfiguration extends Component<
         allData={this.state.allData}
         plotData={this.state.plotData}
         blockData={this.blockData}
-        optionsLabel={this.optionsLabel}
         filters={this.state.filters}
         {...this.props}
       />) || <div className="dashboard">

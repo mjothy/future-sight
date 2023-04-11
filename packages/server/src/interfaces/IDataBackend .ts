@@ -4,13 +4,14 @@ import TimeSerieObject from "../models/TimeSerieObject";
 export default interface IDataBackend {
 
     getFilters: () => FilterObject;
-    getFilterPossibleValues: (filterId: string, selectedData?: any, runId?: number) => string[]
+    getFilterPossibleValues: (filterId: string, selectedData?: any, runId?: number) => string[];
+    getDataFocus: (selectedData) => any;
     getRuns: () => { id; version }
-    getTimeSeries: () => TimeSerieObject[]; //TODO add TimeSerieObject to models
+    getTimeSeries: () => TimeSerieObject[];
     getFilteredData: (selectedData, keyFilter) => any;
 
     // TODO delete after
-    getData: () => any[];
+    getData: () => any[]; // TODO delete it and use instead getTimeSeries
     getDataUnion: () => any[];
 
 }

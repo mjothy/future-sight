@@ -19,8 +19,6 @@ export default interface IDataManager {
 
   browseData: (data: any) => Promise<any>;
 
-  getOptions: () => string[];
-
   fetchDataOptions: (data: any) => Promise<any>;
 
   fetchDataFocusOptions: (data: any) => Promise<any>;

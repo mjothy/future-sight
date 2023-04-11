@@ -64,7 +64,7 @@ export default class DataBlockEditor extends Component<any, any> {
     return (
       !isControlled && (
         <Row className="width-100 mt-16">
-          <h4>{option} {option == "categories" ? "(optional)" : ""} &nbsp;<label className='no-data'> {this.props.isAllSelected() && this.props.missingData[option].length > 0 && this.getMessage(this.props.missingData[option])}
+          <h4>{option} {this.props.filters[option].required ? "" : "(optional)"} &nbsp;<label className='no-data'> {this.props.isAllSelected() && this.props.missingData[option].length > 0 && this.getMessage(this.props.missingData[option])}
           </label>
           </h4>
           <SelectInput
@@ -130,7 +130,7 @@ export default class DataBlockEditor extends Component<any, any> {
         {/* show dropdown lists of unselected  */}
         <table className="width-100">
           <tr>
-            {getUnselectedInputOptions(this.props.currentBlock, this.props.optionsLabel).map((option) => (
+            {getUnselectedInputOptions(this.props.currentBlock, Object.keys(this.props.filters)).map((option) => (
               <td key={option}>{this.selectDropDownInput(option, false)}</td>
             ))}
           </tr>

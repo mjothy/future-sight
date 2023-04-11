@@ -132,10 +132,6 @@ export default class DataManager implements IDataManager {
     }
   };
 
-  getOptions = () => {
-    return ["models", "scenarios", "variables", "regions", "categories"];
-  };
-
   fetchDataOptions = (data) => {
     return fetch(`api/filterOptions`, {
       method: 'POST',

@@ -8,8 +8,6 @@ import BrowseObject from '../models/BrowseObject';
 import IDataBackend from '../interfaces/IDataBackend ';
 import IConfigurationProvider from '../interfaces/IConfigurationProvider';
 
-const optionsLabel = ["variables", "regions", "scenarios", "models",];
-
 export default class ExpressServer {
   private app: any;
   private readonly port: number;
@@ -93,25 +91,10 @@ export default class ExpressServer {
 
     this.app.post('/api/dataFocus', async (req, res, next) => {
       const selectedData = req.body.data;
-      const optionsData = {
-        regions: [],
-        variables: [],
-        scenarios: [],
-        models: [],
-        catagories: []
-      };
-      optionsLabel.forEach(option1 => {
-        let dataUnion = this.dataProxy.getDataUnion();
-        optionsLabel.forEach(option2 => {
-          if (option1 != option2) {
-            if (selectedData[option2].length > 0) {
-              dataUnion = dataUnion.filter(raw => selectedData[option2].includes(raw[option2.slice(0, -1)]));
-            }
-          }
-        })
-        optionsData[option1] = Array.from(new Set(dataUnion.map(raw => raw[option1.slice(0, -1)])))
-      })
+      const optionsData = this.dataProxy.getDataFocus(selectedData);
 
+      // Get categories from file system
+      // TODO add category to filter when request to iaasa is provided
       optionsData["categories"] = this.configurationProvider.getMetaIndicators();
 
       res.send(optionsData);
