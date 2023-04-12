@@ -1,9 +1,10 @@
 import { Component } from 'react';
-import {Divider, Row, Switch, Tag, TreeSelect} from 'antd';
+import {Checkbox, Col, Divider, Input, Row, Switch, Tag, TreeSelect} from 'antd';
 import SelectInput from '../utils/SelectInput';
 import { ExclamationCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { getUnselectedInputOptions } from '../utils/BlockDataUtils';
 import BlockDataModel, {versionModel} from "../../../models/BlockDataModel";
+import BlockStyleModel from "../../../models/BlockStyleModel";
 require('./DataBlockEditor.css')
 
 /**
@@ -129,6 +130,7 @@ export default class DataBlockEditor extends Component<any, any> {
   renderSelectVersions = () => {
     const controlId = this.props.currentBlock.controlBlock;
     const metaData :BlockDataModel = this.props.currentBlock.config.metaData
+    const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle
     const versionOptions = this.props.optionsData.versions
     let disabled = true
 
@@ -193,9 +195,8 @@ export default class DataBlockEditor extends Component<any, any> {
                 Models and scenarios must be selected first
               </p>}
           <TreeSelect
+              className={"version-tree-select"}
               showSearch
-              style={{ width: '100%' }}
-              // value={value}
               dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
               placeholder="Please select versions"
               multiple
@@ -205,8 +206,26 @@ export default class DataBlockEditor extends Component<any, any> {
               treeData={treeData}
               disabled={disabled}
           />
+          <Row>
+            <Col span={2} className={'checkbox-col'}>
+              <Checkbox
+                  onChange={this.onShowWarningVersionChange}
+                  checked={configStyle.showDeprecatedVersionWarning}
+              />
+            </Col>
+            <Col span={22} className={'checkbox-col-label'}>
+              <label>Show warning when deprecated version selected</label>
+            </Col>
+          </Row>
         </div>
     )
+  }
+
+  onShowWarningVersionChange = (e) => {
+    const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+    dashboard.blocks[this.props.currentBlock.id].config.configStyle.showDeprecatedVersionWarning = e.target.checked;
+    this.props.updateDashboard(dashboard)
+
   }
 
   getDefaultTreeSelectValue = () => {

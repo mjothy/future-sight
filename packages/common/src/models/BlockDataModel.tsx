@@ -7,6 +7,7 @@ export default class BlockDataModel {
   regions: string[] = [];
   variables: string[] = [];
   versions: versionModel = {};
+  hasDeprecatedVersion = false;
   useVersion = false;
 
   /**

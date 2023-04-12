@@ -103,6 +103,10 @@ class DashboardDataConfiguration extends Component<
           metaData.scenarios.forEach((scenario) => {
             metaData.variables.forEach((variable) => {
               metaData.regions.forEach((region) => {
+                if (metaData.versions[model]
+                    && metaData.versions[model][scenario]
+                    && metaData.versions[model][scenario].length>0
+                ){
                   for (const version of metaData.versions[model][scenario]){
                     const d = this.state.plotData[block.id]?.find(
                         (e) =>
@@ -118,6 +122,20 @@ class DashboardDataConfiguration extends Component<
                       missingData.push({model, scenario, variable, region, version});
                     }
                   }
+                } else {
+                  const d = this.state.plotData[block.id]?.find(
+                      (e) =>
+                          e.model === model &&
+                          e.scenario === scenario &&
+                          e.variable === variable &&
+                          e.region === region
+                  );
+                  if (d) {
+                    data.push(d);
+                  } else {
+                    missingData.push({model, scenario, variable, region});
+                  }
+                }
               });
             });
           });

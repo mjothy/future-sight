@@ -11,6 +11,6 @@ export default interface PlotDataModel {
     variable: string | any;
     region: string | any;
     version: string | any;
-    is_default: string | any; // is default version of run?
+    is_default: boolean | any; // is default version of run?
     color?: string | null;
 }

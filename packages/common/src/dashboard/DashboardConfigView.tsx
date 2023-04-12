@@ -2,8 +2,9 @@ import { Component } from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import BlockViewManager from './blocks/BlockViewManager';
 import PropTypes from 'prop-types';
-import { EditTwoTone, DragOutlined } from '@ant-design/icons';
+import { EditTwoTone, DragOutlined, WarningOutlined } from '@ant-design/icons';
 import { Button, Space } from 'antd';
+import './DashboardConfigView.css';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 const GRID_RATIO = 16 / 9
@@ -233,6 +234,18 @@ class DashboardConfigView extends Component<any, any> {
                                     </div>
                                 </Space>
                             )}
+
+                            {
+                                blocks[layout.i].config.metaData.hasDeprecatedVersion &&
+                                blocks[layout.i].config.configStyle.showDeprecatedVersionWarning && (
+                                    <Space style={{position: "fixed", top: 1, left: 1, zIndex: 2}}>
+                                        <p className={"warning-deprecated-versions"}>
+                                            <WarningOutlined/> Deprecated versions
+                                        </p>
+                                    </Space>
+                                )
+                            }
+
                             <BlockViewManager
                                 {...this.props}
                                 currentBlock={blocks[layout.i]}

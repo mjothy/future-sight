@@ -29,6 +29,8 @@ export default class BlockViewManager extends Component<any, any> {
           blockData: this.props.blockData,
           width: this.props.width,
           height: this.props.height,
+          // TODO try to remove this function, might be overkill to pass this big function
+          updateDashboard: this.props.updateDashboard
         }} />;
       case 'control':
         return <ControlBlockView {...{

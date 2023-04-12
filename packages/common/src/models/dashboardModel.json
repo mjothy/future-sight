@@ -25,6 +25,7 @@
         "configStyle": {
           "graphType": "line",
           "showLegend": false,
+          "showDeprecatedVersionWarning": true,
           "title": {
             "value": "Title",
             "isVisible": true
@@ -84,6 +85,7 @@
           "variables": [],
           "versions": {},
           "useVersion": false,
+          "hasDeprecatedVersion": false,
           "selectOrder": [],
           "master": {
             "models": {

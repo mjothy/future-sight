@@ -1,6 +1,7 @@
 export default class BlockStyleModel {
   graphType = 'line';
   showLegend = false;
+  showDeprecatedVersionWarning = true;
   YAxis = {
     label: false,
     unit: false,
