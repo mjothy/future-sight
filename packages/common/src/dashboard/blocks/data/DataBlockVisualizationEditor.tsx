@@ -11,20 +11,6 @@ import {Component} from 'react';
 import PieVisualizationEditor from "./graphType/pie/PieVisualizationEditor";
 
 const { Option } = Select;
-const ATTRIBUTES = {
-  Region: {
-
-  },
-  Variable: {
-
-  },
-  Scenario: {
-
-  },
-  Model: {
-
-  }
-}
 
 const plotTypes = [
   {type: 'line', label: 'Line', icon: <LineChartOutlined/>},
@@ -80,20 +66,20 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
 
   onLegendContentChange = (checkedValues) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
-    configStyle.legend = {
-      Model: false,
-      Scenario: false,
-      Region: false,
-      Variable: false
+
+    for(const key in configStyle.legend){
+      configStyle.legend[key]=false
     }
     for (const value of checkedValues) {
       configStyle.legend[value] = true;
     }
+
     this.updateBlockConfig({ configStyle: configStyle })
   };
 
   legendOptions = () => {
-    return Object.keys(ATTRIBUTES).map((att) => { return { "label": att, "value": att } });
+    const legendKeys = Object.keys(this.props.currentBlock.config.configStyle.legend)
+    return legendKeys.map((att) => { return { "label": att, "value": att } });
   }
 
   onYAxisLabelChange = (e) => {
@@ -142,12 +128,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     const metaData = this.props.currentBlock.config.metaData;
     const legend = this.props.currentBlock.config.configStyle.legend;
-    const defaultLegendOptions: any[] = [];
-    for (const key of Object.keys(legend)) {
-      if (legend[key]) {
-        defaultLegendOptions.push(key);
-      }
-    }
+    const defaultLegendOptions = Object.keys(legend).filter((key)=>legend[key])
     return (
       <div>
         <h3>General</h3>

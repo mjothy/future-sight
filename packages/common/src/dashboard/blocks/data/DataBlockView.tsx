@@ -176,6 +176,9 @@ class DataBlockView extends Component<any, any> {
       if (legend.Model && dataElement.model) {
         label.push(dataElement.model)
       }
+      if (legend.Version && dataElement.version) {
+        label.push("V. " + dataElement.version)
+      }
       return label.join(' - ')
     }
   }
