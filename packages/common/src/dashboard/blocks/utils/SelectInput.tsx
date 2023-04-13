@@ -19,6 +19,8 @@ interface SelectOptionProps {
     className?: string;
 }
 
+const COLORS = ['red', 'blue', 'green', 'yellow'];
+
 export default class SelectInput extends Component<SelectOptionProps, any> {
 
     constructor(props) {
@@ -66,27 +68,6 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         return treeData;
     }
 
-    // getCategoriesOptions = (options) => { // for categorie: {value:string, children:string[]}
-    //     const trees: any[] = []
-
-    //     options.forEach(element => {
-    //         const newElement: any = {};
-    //         newElement.title = element.value;
-    //         newElement.key = element.value;
-    //         newElement.value = element.value;
-    //         const childs: any[] = [];
-    //         element.children?.forEach((child: string) => {
-    //             childs.push({ value: child, title: child, key: child })
-    //         });
-
-    //         newElement.children = childs;
-    //         trees.push(newElement)
-    //     });
-
-    //     console.log("trees: ", trees);
-    //     return trees;
-    // }
-
     dropdownRender = (menu) => {
         return (
             <div>
@@ -115,13 +96,14 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 icon={this.props.options.includes(value) ? undefined : <ExclamationCircleOutlined />}
                 className={this.props.options.includes(value) ? 'ant-select-selection-item tag-selection-item' : 'ant-select-selection-item tag-selection-item data-missing-tag'}
             >
-                <label className='ant-select-selection-item-content'>{value}</label>
+                <label className='ant-select-selection-item-content'>{value} </label>
             </Tag>
         );
     }
 
     tagRenderCategories = (props) => {
         const { value, closable, onClose } = props;
+        console.log("props tag: ", props.label.props)
         return (
             <Tag
                 color={this.props.options.includes(value) ? undefined : 'red'}
@@ -150,9 +132,9 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                     this.props.onChange(this.props.type, selectedData.map((data: any) => data.value != null ? data.value : data))
                 }
                 treeData={this.splitOptions(this.props.options)}
-                tagRender={this.props.type == "categories" ? this.tagRenderCategories : this.tagRender}
-                treeCheckStrictly={this.props.type != "categories"}
-                showCheckedStrategy={this.props.type == "categories" ? "SHOW_CHILD" : "SHOW_ALL"}
+                tagRender={this.tagRender}
+                treeCheckStrictly={true}
+                showCheckedStrategy={"SHOW_ALL"}
                 className={this.props.className}
                 onDropdownVisibleChange={(e) =>
                     this.props.onDropdownVisibleChange?.(this.props.type, e)
@@ -172,13 +154,77 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 treeExpandAction="doubleClick"
                 onSearch={this.onSearch}
                 searchValue={this.state.searchValue}
-            // status={this.props.value.length <= 0 ? "error" : ""}
+                dropdownRender={this.dropdownRender}
             />
             {this.props.isClear && <Tooltip title="Clear">
                 <Button
                     type="default"
                     onClick={(e) => this.props.onClear?.(this.props.type, e)}
 
+                    icon={<CloseCircleOutlined />}
+                />
+            </Tooltip>}
+        </Input.Group>
+    }
+
+    renderTreeNodes = (treeData, color?: string) => {
+        return treeData.map((item, key) => {
+            let colorNode = color;
+            if (colorNode == null) {
+                colorNode = COLORS[key % COLORS.length];
+            }
+            item.style = {
+                color: colorNode,
+            }
+            if (item.children) {
+                return (
+                    <TreeSelect.TreeNode title={item.title} key={item.key} value={item.value} style={item.style}>
+                        {this.renderTreeNodes(item.children, colorNode)}
+                    </TreeSelect.TreeNode>
+                );
+            }
+            return <TreeSelect.TreeNode {...item} key={item.key} />;
+        });
+    }
+
+    treeSelectForCategories = () => {
+        return <Input.Group compact>
+            <TreeSelect
+                value={this.props.value}
+                treeCheckable={true}
+                placeholder={this.props.type}
+                onChange={(selectedData: any[]) =>
+                    this.props.onChange(this.props.type, selectedData.map((data: any) => data.value != null ? data.value : data))
+                }
+                tagRender={this.tagRenderCategories}
+                showCheckedStrategy={"SHOW_CHILD"}
+                className={this.props.className}
+                onDropdownVisibleChange={(e) =>
+                    this.props.onDropdownVisibleChange?.(this.props.type, e)
+                }
+                onDeselect={(selectedData) => this.props.onDeselect?.(this.props.type, selectedData.map((data: any) => data.value))}
+                dropdownMatchSelectWidth={false}
+                notFoundContent={(this.props.isFetching) ? (
+                    <div>
+                        <LoadingOutlined />
+                        <p>Fetching data</p>
+                    </div>
+                ) : (
+                    <div>
+                        <ExclamationCircleOutlined /> This item does not exists for your filter selections.
+                    </div>
+                )}
+                treeExpandAction="doubleClick"
+                onSearch={this.onSearch}
+                searchValue={this.state.searchValue}
+            >
+                {this.renderTreeNodes(this.splitOptions(this.props.options))}
+
+            </TreeSelect>
+            {this.props.isClear && <Tooltip title="Clear">
+                <Button
+                    type="default"
+                    onClick={(e) => this.props.onClear?.(this.props.type, e)}
                     icon={<CloseCircleOutlined />}
                 />
             </Tooltip>}
@@ -236,7 +282,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
 
     render() {
         switch (this.props.type) {
-            case "categories":
+            case "categories": return this.treeSelectForCategories();
             case "variables":
             case "regions": return this.treeSelect();
             default: return this.defaultSelect();
