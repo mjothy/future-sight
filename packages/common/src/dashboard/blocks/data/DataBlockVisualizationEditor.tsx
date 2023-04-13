@@ -253,7 +253,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
               <Col span={9} className={'checkbox-col-label'}>
                 <Select
                   placeholder="Select"
-                  defaultValue={metaData[configStyle.stack.value]?.length > 1 ? configStyle.stack.value : null}
+                  value={metaData[configStyle.stack.value]?.length > 1 ? configStyle.stack.value : null}
                   onChange={this.onStackValueChange}
                   notFoundContent={(
                     <div>
@@ -320,7 +320,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
           <Col span={2} className={'checkbox-col'}>
             <Checkbox
               onChange={this.onCustomRangeChange}
-              defaultChecked={configStyle.XAxis.useCustomRange}
+              checked={configStyle.XAxis.useCustomRange}
             />
           </Col>
           <Col span={16} className={'checkbox-col-label'}>
@@ -334,7 +334,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
               className="width-100"
               placeholder="Left"
               onChange={this.onXRangeLeftChange}
-              defaultValue={configStyle.XAxis.left}
+              value={configStyle.XAxis.left}
               disabled={!configStyle.XAxis.useCustomRange}
             />
           </Col>
@@ -343,7 +343,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
               className="width-100"
               placeholder="Right"
               onChange={this.onXRangeRightChange}
-              defaultValue={configStyle.XAxis.right}
+              value={configStyle.XAxis.right}
               disabled={!configStyle.XAxis.useCustomRange}
             />
           </Col>
