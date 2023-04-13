@@ -1,29 +1,42 @@
+import fetch from 'node-fetch';
 
 export default class IIASADataManager {
 
     private readonly url: string;
-    private readonly specialKey: string;
-    private readonly accessToken: string;
 
-    constructor(url, specialKey, accessToken) {
+    constructor(url) {
         this.url = url;
-        this.specialKey = specialKey;
-        this.accessToken = accessToken;
     }
 
-    getUrlBase = (url) => {
-        return this.url + this.specialKey + url;
+    getUrlBase = (path) => {
+        return this.url + path;
     }
 
-    getPromise = async (url) => {
+    getPromise = async (url, token) => {
         const fullUrl = this.getUrlBase(url);
         const options = {
             method: 'GET',
             headers: {
-                'Authorization': 'Bearer ' + this.accessToken,
+                'Authorization': 'Bearer ' + token,
                 'Content-Type': 'application/json'
             }
         };
+        const response = await fetch(fullUrl, options);
+
+        return response;
+    }
+
+    postPromise = async (url, body?: any) => {
+        const fullUrl = this.getUrlBase(url);
+        const options = {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + "",
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        };
+
         const response = await fetch(fullUrl, options);
 
         return response;
@@ -34,7 +47,7 @@ export default class IIASADataManager {
         const options = {
             method: 'PATCH',
             headers: {
-                'Authorization': 'Bearer ' + this.accessToken,
+                'Authorization': 'Bearer ' + "",
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(body)

@@ -1,9 +1,9 @@
-import {Checkbox, Col, Row, Select} from 'antd';
-import {Component} from 'react';
+import { Checkbox, Col, Row, Select } from 'antd';
+import { Component } from 'react';
 import PlotlyUtils from "../../../../graphs/PlotlyUtils";
 import PlotDataModel from "../../../../../models/PlotDataModel";
 
-const {Option} = Select;
+const { Option } = Select;
 
 export default class PieVisualizationEditor extends Component<any, any> {
 
@@ -52,7 +52,7 @@ export default class PieVisualizationEditor extends Component<any, any> {
         return (
             <>
                 <h3>Pie</h3>
-                <Row style={{marginBottom: 2}}>
+                <Row style={{ marginBottom: 2 }}>
                     <Col span={2}></Col>
                     <Col span={16}>
                         Stack by:
@@ -68,7 +68,7 @@ export default class PieVisualizationEditor extends Component<any, any> {
                             onChange={this.props.onStackValueChange}
                             status={configStyle.stack.value ? undefined : "error"}
                         >
-                            {this.props.optionsLabel.map((value) => (
+                            {Object.keys(this.props.filters).map((value) => (
                                 <Option key={value} value={value}>
                                     {value}
                                 </Option>
@@ -77,7 +77,7 @@ export default class PieVisualizationEditor extends Component<any, any> {
                     </Col>
                 </Row>
 
-                <Row style={{marginBottom: 2}}>
+                <Row style={{ marginBottom: 2 }}>
                     <Col span={2}>
                     </Col>
                     <Col span={16}>
@@ -85,7 +85,7 @@ export default class PieVisualizationEditor extends Component<any, any> {
                     </Col>
                 </Row>
                 <Row className="mb-10">
-                    <Col span={2}/>
+                    <Col span={2} />
                     <Col span={16}>
                         <Select
                             className="width-100"

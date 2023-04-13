@@ -69,6 +69,7 @@ export default class DataBlockEditor extends Component<any, any> {
           </h4>
           <SelectInput
             type={option}
+            placeholder={this.props.filters[option].label}
             className={"width-90"}
             value={metaData[option]}
             options={this.props.optionsData[option]}

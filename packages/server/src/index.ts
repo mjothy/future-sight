@@ -5,6 +5,8 @@ import RedisPersistenceManager from './redis/RedisPersistenceManager';
 import FSDataBackend from './data_backend/FSDataBackend';
 import FSConfigurationProvider from './configurations/FSConfigurationProvider';
 import FilterManager from './configurations/FilterManager';
+import IIASAAuthenticationBackend from './auth/IIASAAuthenticationBackend';
+import IIASADataBackend from './data_backend/IIASADataBackend';
 
 const DEFAULT_PORT = 8080;
 const DEFAULT_COOKIE_KEY = '8azoijuem2aois3Qsjeir';
@@ -40,7 +42,16 @@ const categoriesPath = isProd ? PROD_CATEGORIES_PATH : DEV_CATEGORIES_PATH;
 
 const filterManager = new FilterManager();
 // data loading
-const fsDataProxy = new FSDataBackend(filterManager, dataPath, dataUnionPath); // Or new IIASADataBackend
+const fsDataProxy = new FSDataBackend(filterManager, dataPath, dataUnionPath);
+/**
+ * uncomment the following code to use IIASA API 
+ */
+// const authentication = new IIASAAuthenticationBackend(username, password);
+// async function refreshing() {
+//   await authentication.startRefreshing(); // to refresh token
+// }
+// refreshing()
+// const fsDataProxy = new IIASADataBackend(filterManager, authentication); 
 const fsConfProvider = new FSConfigurationProvider(countriesGeojsonPath, categoriesPath);
 
 // redis initialisation

@@ -182,6 +182,7 @@ class SetupView extends Component<any, any> {
             isFetching={this.state.isFetching}
             updateOptionsData={this.updateOptionsData}
             isDataMissing={this.isDataMissing}
+            filters={this.props.filters}
           />
         </Modal >
       </>

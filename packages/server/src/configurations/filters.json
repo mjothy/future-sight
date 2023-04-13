@@ -4,34 +4,39 @@
     "label": "Models",
     "path": "/models",
     "required": true,
-    "origin": "iaasa"
+    "origin": "iiasa",
+    "icon": "control"
   },
   "scenarios": {
     "id": "scenarios",
     "label": "Scenarios",
     "path": "/scenarios",
     "required": true,
-    "origin": "iaasa"
+    "origin": "iiasa",
+    "icon": "branches"
   },
   "variables": {
     "id": "variables",
     "label": "Variables",
-    "path": "/variables",
+    "path": "/iamc/variables",
     "required": true,
-    "origin": "iaasa"
+    "origin": "iiasa",
+    "icon": "line-chart"
   },
   "regions": {
     "id": "regions",
     "label": "Regions",
-    "path": "/regions",
+    "path": "/iamc/regions",
     "required": true,
-    "origin": "iaasa"
+    "origin": "iiasa",
+    "icon": "global"
   },
   "categories": {
     "id": "categories",
     "label": "Categories",
     "path": "/categories",
     "required": false,
-    "origin": "fs"
+    "origin": "fs",
+    "icon": "tag"
   }
 }

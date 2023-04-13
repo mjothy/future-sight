@@ -30,9 +30,8 @@ export default class DataManager implements IDataManager {
   };
 
   getFilterPossibleValues = (filter: any) => {
-    console.log("filter: ", filter)
     switch (filter.origin) {
-      case "iaasa": return fetch(`${this.getBaseUrl()}/filterValues`, {
+      case "iiasa": return fetch(`${this.getBaseUrl()}/filterValues`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

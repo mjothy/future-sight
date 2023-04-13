@@ -17,6 +17,7 @@ interface SelectOptionProps {
     onDeselect?: (type: string, selectedData: string[]) => void;
     isFetching?: false;
     className?: string;
+    placeholder?: string;
 }
 
 export default class SelectInput extends Component<SelectOptionProps, any> {
@@ -145,7 +146,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
             <TreeSelect
                 value={this.props.value}
                 treeCheckable={true}
-                placeholder={this.props.type}
+                placeholder={this.props.placeholder}
                 onChange={(selectedData: any[]) =>
                     this.props.onChange(this.props.type, selectedData.map((data: any) => data.value != null ? data.value : data))
                 }
@@ -192,7 +193,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 className={this.props.className}
                 dropdownRender={this.dropdownRender}
                 tagRender={this.tagRender}
-                placeholder={this.props.type}
+                placeholder={this.props.placeholder}
                 value={this.props.value}
                 onChange={(selectedData) =>
                     this.props.onChange(this.props.type, selectedData)

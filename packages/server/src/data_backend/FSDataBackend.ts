@@ -36,10 +36,10 @@ export default class FSDataBackend implements IDataBackend {
         };
 
         // Filter data origin from IIASA Api
-        const keysIaasa = Object.values(this.getFilters()).filter((filter: any) => filter.origin == "iaasa").map((filter: any) => filter.id);
-        keysIaasa.forEach(option1 => {
+        const keysIiasa = Object.values(this.getFilters()).filter((filter: any) => filter.origin == "iiasa").map((filter: any) => filter.id);
+        keysIiasa.forEach(option1 => {
             let dataUnion = this.getDataUnion();
-            keysIaasa.forEach(option2 => {
+            keysIiasa.forEach(option2 => {
                 if (option1 != option2) {
                     if (selectedData[option2].length > 0) {
                         dataUnion = dataUnion.filter(raw => selectedData[option2].includes(raw[option2.slice(0, -1)]));
@@ -53,7 +53,7 @@ export default class FSDataBackend implements IDataBackend {
 
     getFilters = () => this.filterManager.getFilters();
 
-    getFilterPossibleValues = (filterId: string, selectedData?: any | undefined, runId?: number | undefined) => {
+    getFilterPossibleValues = (filterId: string) => {
         return this.filterDataValues[filterId];
     };
 
@@ -63,7 +63,7 @@ export default class FSDataBackend implements IDataBackend {
         return { id: null, version: null };
     }
 
-    getTimeSeries = () => [];
+    getTimeSeries = () => []; // rename of getData
 
     getFilteredData = (blockMetaData: any, firstFilters: any) => {
         const optionsData = {};
@@ -105,14 +105,24 @@ export default class FSDataBackend implements IDataBackend {
 
 
     /**
-  * Get possible raws based on selected order in config.metaData.selectOrder
-  * Exemple: selectOrder = [regions, models]
-  * dataRaws[models] will contains all raws of selected regions
-  * @param metaData the selected data in block
-  * @param firstFilterRaws filtred raws based on data focus
-  * @returns possible raws of {model,scenario,region,variable} in each index based on the before selection
-  */
+    * Get possible raws based on selected order in config.metaData.selectOrder
+    * Exemple: selectOrder = [regions, models]
+    * dataRaws[models] will contains all raws of selected regions
+    * @param metaData the selected data in block
+    * @param firstFilterRaws filtred raws based on data focus
+    * @returns possible raws of {model,scenario,region,variable} in each index based on the before selection
+    */
     getRaws = (metaData, firstFilterRaws) => {
+
+        // @User selects Model & scenario
+        // + request /iamc/runs with model & scenario
+        // => retreive all runid & associated versions
+        // @User selects one or more version
+        // +request /iamc/variables with runid=
+        // => retreive all corresponding variables
+        // @User select one or more variable
+        // +request /iamc/regions with runid & variable
+        // => retreive all regions
 
         const dataRaws = {};
         const filtersLabel = Object.keys(this.filterManager.getFilters());

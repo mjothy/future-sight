@@ -70,8 +70,9 @@ export default class ExpressServer {
       res.send(this.dataProxy.getFilters());
     });
 
-    this.app.post('/api/filterValues', (req, res) => {
-      res.send(this.dataProxy.getFilterPossibleValues(req.body.filterId));
+    this.app.post('/api/filterValues', async (req, res) => {
+      const filterValues = await this.dataProxy.getFilterPossibleValues(req.body.filterId);
+      res.send(filterValues);
     });
 
 
@@ -79,6 +80,7 @@ export default class ExpressServer {
       const body = req.body;
       const response: any[] = [];
       for (const reqData of body) {
+        // TODO replace by getTimeseries
         const elements = this.dataProxy.getData().filter(
           (e) => e.model === reqData.model && e.scenario === reqData.scenario && e.variable === reqData.variable && e.region === reqData.region
         );

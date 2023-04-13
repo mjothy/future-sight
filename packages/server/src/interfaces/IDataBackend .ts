@@ -4,11 +4,11 @@ import TimeSerieObject from "../models/TimeSerieObject";
 export default interface IDataBackend {
 
     getFilters: () => FilterObject;
-    getFilterPossibleValues: (filterId: string, selectedData?: any, runId?: number) => string[];
-    getDataFocus: (selectedData) => any;
+    getFilterPossibleValues: (filterId: string) => string[] | Promise<string[]>;
+    getDataFocus: (selectedData) => any | Promise<string[]>;
     getRuns: () => { id; version }
-    getTimeSeries: () => TimeSerieObject[];
-    getFilteredData: (selectedData, keyFilter) => any;
+    getTimeSeries: () => TimeSerieObject[] | Promise<TimeSerieObject[]>;
+    getFilteredData: (selectedData, keyFilter) => any | Promise<any>;
 
     // TODO delete after
     getData: () => any[]; // TODO delete it and use instead getTimeSeries

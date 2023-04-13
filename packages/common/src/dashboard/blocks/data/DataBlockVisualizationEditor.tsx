@@ -228,7 +228,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
 
         {configStyle.graphType === "pie" &&
           <PieVisualizationEditor
-            optionsLabel={this.props.optionsLabel}
+            filters={this.props.filters}
             onStackValueChange={this.onStackValueChange}
             updateBlockConfig={this.updateBlockConfig}
             blockData={this.props.blockData}
@@ -265,7 +265,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                   disabled={!configStyle.stack.isStack}
                   dropdownMatchSelectWidth={false}
                 >
-                  {this.props.optionsLabel.map((value) => {
+                  {Object.keys(this.props.filters).map((value) => {
                     if (metaData[value].length > 1) return (
                       <Option key={value} value={value}>
                         {value}
@@ -381,7 +381,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             <h3>Colorscale</h3>
             <Row>
               <Col span={20}>
-                <PlotColorscalePicker currentBlock={this.props.currentBlock} optionsLabel={this.props.optionsLabel}
+                <PlotColorscalePicker currentBlock={this.props.currentBlock} filters={this.props.filters}
                   onColorsChange={this.onColorsChange} />
               </Col>
             </Row>
