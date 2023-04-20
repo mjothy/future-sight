@@ -6,13 +6,17 @@ import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithData
 import { useNavigate } from 'react-router-dom'
 import DashboardModel from '../models/DashboardModel';
 import { Layout, notification } from "antd";
+import '../style.css';
 const { Content } = Layout;
 import html2canvas from "html2canvas";
 import Colorizer from "../hoc/colorizer/colorizer";
 import withColorizer from "../hoc/colorizer/withColorizer";
+import GetGeoJsonContextProvider from '../services/GetGeoJsonContextProvider';
 
 const DEFAULT_PREVIEW_WIDTH = 800;
 const DEFAULT_PREVIEW_HEIGHT = 450;
+const DASHBOARD_PADDING = 10;
+const NAVBAR_HEIGHT = 60;
 
 export const withNavigation = (Comp: React.ComponentType) => {
     return (props) => <Comp {...props} navigate={useNavigate()} />;
@@ -46,7 +50,13 @@ class Dashboard extends Component<DashboardProps, any> {
     }
 
     makeAndResizePreview = (dashboard) => {
-        return html2canvas(dashboard).then(((canvas) => {
+        return html2canvas(dashboard, {
+            foreignObjectRendering: true,
+            // It's important to add scrollX and scrollY because foreignObjectRendering: true
+            // in this case, the captured image include additional space equal to the parent element height and width
+            scrollX: -DASHBOARD_PADDING,
+            scrollY: -(NAVBAR_HEIGHT + DASHBOARD_PADDING)
+        }).then(((canvas) => {
             const dataURL = canvas.toDataURL();
             return this.resizeDataURL(dataURL, DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT)
         }));
@@ -122,7 +132,9 @@ class Dashboard extends Component<DashboardProps, any> {
                 <div className="no-sidebar-margin" />
                 <Content className={"dashboard-content-wrapper"}>
                     <div className="dashboard-content">
-                        <DashboardConfigView {...this.props} readonly={this.state.readonly} />
+                        <GetGeoJsonContextProvider getGeoJson={this.props.dataManager.fetchRegionsGeojson}>
+                            <DashboardConfigView {...this.props} readonly={this.state.readonly} />
+                        </GetGeoJsonContextProvider>
                     </div>
                 </Content>
                 <div className="no-sidebar-margin" />

@@ -7,8 +7,8 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
 import BlockModel from '../models/BlockModel';
-import ConfigurationModel from '../models/ConfigurationModel';
 import DashboardModel from '../models/DashboardModel';
+import GetGeoJsonContextProvider from '../services/GetGeoJsonContextProvider';
 import DashboardConfigView from './DashboardConfigView';
 
 /*TODO Check that embedded and published view have the same purpose and always look ok,
@@ -126,20 +126,20 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                 {/*<div className="dashboard-content" style={{width: `${TEST_RATIO*100}vh`}}>*/}
                 {(isLoading || !dashboard) && <Spin />}
                 {dashboard && (
-                    <DashboardConfigView
-                        dashboard={dashboard}
-                        getData={() => { }}
-                        updateSelectedBlock={(blockSelectedId: string) => {
-                        }}
-                        blockSelectedId={undefined}
-                        updateDashboard={updateDashboard}
-                        updateDashboardMetadata={(data) => {
-                        }}
-                        readonly
-                        blockData={props.blockData}
-                        plotData={props.plotData}
-                        optionsLabel={props.optionsLabel}
-                    />
+                    <GetGeoJsonContextProvider getGeoJson={props.dataManager.fetchRegionsGeojson}>
+                        <DashboardConfigView
+                            dashboard={dashboard}
+                            updateSelectedBlock={(blockSelectedId: string) => {
+                            }}
+                            blockSelectedId={undefined}
+                            updateDashboard={updateDashboard}
+                            updateDashboardMetadata={(data) => {
+                            }}
+                            readonly
+                            blockData={props.blockData}
+                            optionsLabel={props.optionsLabel}
+                        />
+                    </GetGeoJsonContextProvider>
                 )}
             </div>
         </div>

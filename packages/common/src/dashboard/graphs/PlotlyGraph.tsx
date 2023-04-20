@@ -9,7 +9,7 @@ export default class PlotlyGraph extends Component<any, any> {
       hasTitle = this.props.currentBlock.config.configStyle.title.isVisible
     }
 
-    if(this.props.currentBlock.config.configStyle.graphType === "pie"){
+    if (this.props.currentBlock.config.configStyle.graphType === "pie") {
       return {
         l: 10,
         r: 10,
@@ -20,13 +20,12 @@ export default class PlotlyGraph extends Component<any, any> {
     }
 
     return {
-      l: this.props.layout.YAxis.title ? 60 : 40,
+      l: this.props.currentBlock.config.configStyle.graphType == 'map' ? 10 : (this.props.layout.YAxis.title ? 60 : 40),
       r: 10,
       b: 30,
       t: hasTitle ? 25 : 5,
       pad: 4,
     }
-
   }
 
   render() {
@@ -49,9 +48,11 @@ export default class PlotlyGraph extends Component<any, any> {
       font: {
         size: 10,
       },
-      yaxis: {...this.props.layout.YAxis},
-      grid: {...this.props.layout.grid},
-      annotations: this.props.layout.annotations
+      yaxis: { ...this.props.layout.YAxis },
+      grid: { ...this.props.layout.grid },
+      annotations: this.props.layout.annotations,
+      dragmode: "zoom",
+      mapbox: { style: "carto-positron", center: { lat: 38, lon: -90 }, zoom: 3 },
     };
 
     if (currentBlock.config.configStyle.title.isVisible) {
@@ -86,6 +87,7 @@ export default class PlotlyGraph extends Component<any, any> {
         layout={layout}
         config={config}
         frames={this.props.frames}
+        onSliderChange={this.props.onSliderChange}
       />
     );
   }

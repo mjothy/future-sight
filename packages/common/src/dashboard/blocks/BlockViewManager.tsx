@@ -3,8 +3,6 @@ import ControlBlockView from './control/ControlBlockView';
 import DataBlockView from './data/DataBlockView';
 import TextBlockView from './text/TextBlockView';
 
-
-
 /**
  * Render the view of block in Grid Layout
  */
@@ -23,10 +21,8 @@ export default class BlockViewManager extends Component<any, any> {
         return <TextBlockView currentBlock={this.props.currentBlock} />;
       case 'data':
         return <DataBlockView {...{
-          dashboard: this.props.dashboard,
-          blockPlotData: this.props.plotData[this.props.currentBlock.id],
           currentBlock: this.props.currentBlock,
-          blockData: this.props.blockData,
+          timeseriesData: this.props.timeseriesData,
           width: this.props.width,
           height: this.props.height,
           // TODO try to remove this function, might be overkill to pass this big function
@@ -39,6 +35,7 @@ export default class BlockViewManager extends Component<any, any> {
           optionsLabel: this.props.optionsLabel,
           updateDashboard: this.props.updateDashboard
         }} />;
+      // MapControlView
       default:
         return <p>Error !</p>;
     }

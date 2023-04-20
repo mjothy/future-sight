@@ -1,6 +1,7 @@
 import type { ColumnsType } from 'antd/lib/table';
 import React, { Component } from 'react';
 import BlockStyleModel from '../../../models/BlockStyleModel';
+import MapBlock from '../../graphs/MapBlock';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
 import PlotlyUtils from '../../graphs/PlotlyUtils';
 import * as _ from 'lodash';
@@ -17,24 +18,14 @@ class DataBlockView extends Component<any, any> {
     const config2 = this.props.currentBlock.config;
     // Check configuration
     if (this.props.width == nextProps.width && this.props.height == nextProps.height) {
-      if (_.isEqual(config1.metaData, config2.metaData) && _.isEqual(config1.configStyle, config2.configStyle)) {
+      if (_.isEqual(config1, config2)) {
         shouldUpdate = false;
       }
     }
 
     // Check updatede plotData (we need to check this because component render before fetch finish)
-    if (this.props.blockPlotData?.length != nextProps.blockPlotData?.length) {
+    if (this.props.timeseriesData?.length != nextProps.timeseriesData?.length) {
       shouldUpdate = true;
-    }
-
-    // if type is controlled control and control block updated -> update also child
-    if (nextProps.currentBlock.controlBlock !== '') {
-      const parrent_block_config1 = nextProps.dashboard.blocks[nextProps.currentBlock.controlBlock].config;
-      const parrent_block_config2 = this.props.dashboard.blocks[nextProps.currentBlock.controlBlock].config;
-      if (!_.isEqual(parrent_block_config1.metaData, parrent_block_config2.metaData)) {
-        shouldUpdate = true;
-      }
-
     }
 
     return shouldUpdate;
@@ -42,7 +33,7 @@ class DataBlockView extends Component<any, any> {
 
 
   getPlotData = () => {
-    let data: PlotDataModel[] = this.props.blockData(this.props.currentBlock);
+    let data: PlotDataModel[] = this.props.timeseriesData;
     data = PlotlyUtils.filterByCustomXRange(data, this.props.currentBlock.config.configStyle)
     this.checkDeprecatedVersion(data)
     return data
@@ -246,6 +237,11 @@ class DataBlockView extends Component<any, any> {
         },
         rangemode: configStyle.YAxis.force0 ? "tozero" : "normal",
         automargin: true,
+        dragmode: "zoom",
+        mapbox: { style: "carto-positron", center: { lat: 38, lon: -90 }, zoom: 3 },
+        margin: { r: 0, t: 0, b: 0, l: 0 },
+        width: this.props.width,
+        height: this.props.height,
       }
     }
 
@@ -283,6 +279,7 @@ class DataBlockView extends Component<any, any> {
 
   render() {
     const rawData = this.getPlotData()
+    const { data, layout } = this.settingPlotData(rawData);
     switch (this.props.currentBlock.config.configStyle.graphType) {
       case "pie":{
         return <PieView
@@ -292,8 +289,10 @@ class DataBlockView extends Component<any, any> {
             height={this.props.height}
         />
       }
+      case "map": {
+        return <MapBlock {...this.props} data={data} layout={layout} />
+      }
       default: {
-        const { data, layout } = this.settingPlotData(rawData);
         return <PlotlyGraph {...this.props} data={data} layout={layout} />;
       }
     }

@@ -1,12 +1,14 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import {join} from 'path';
-
+import path, { join } from 'path';
 import RedisClient from '../redis/RedisClient';
 import IDataProxy from './IDataProxy';
+import fetch from 'node-fetch';
+import RegionsGeoJson from './RegionsGeoJson';
 
 const optionsLabel = ["models", "scenarios", "variables", "regions", "versions"];
+const COUNTRIES_GEOJSON_URL = "https://datahub.io/core/geo-countries/r/countries.geojson";
 
 export default class ExpressServer {
   private app: any;
@@ -266,7 +268,13 @@ export default class ExpressServer {
       }
 
       res.send(optionsData);
-    })
+    });
+
+    this.app.post(`/api/regionsGeojson`, async (req, res) => {
+      const regions = req.body.regions;
+      const geojson = this.dataProxy.getGeojson(regions);
+      res.send(geojson);
+    });
 
     // Serve the HTML page
     this.app.get('*', (req: any, res: any) => {
@@ -344,3 +352,5 @@ export default class ExpressServer {
     });
   }
 }
+
+
