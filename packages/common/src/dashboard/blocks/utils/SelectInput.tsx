@@ -15,6 +15,7 @@ interface SelectOptionProps {
     onClear?: (type, e) => void;
     onDropdownVisibleChange?: (option: string, e: any) => void;
     onDeselect?: (type: string, selectedData: string[]) => void;
+    loading?: boolean;
 }
 
 export default class SelectInput extends Component<SelectOptionProps, any> {
@@ -26,14 +27,14 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                     className={"width-90"}
                     placeholder={this.props.type}
                     value={this.props.value}
-                    onChange={(selectedData) =>
-                        this.props.onChange(this.props.type, selectedData)
-                    }
+                    loading={this.props.loading}
+                    onChange={(selectedData) => {
+                        return this.props.onChange(this.props.type, selectedData)
+                    }}
                     // on close: save data
                     onDropdownVisibleChange={(e) =>
-                        this.props.onDropdownVisibleChange?.(this.props.type, e)
-                    }
-                    onDeselect={(selectedData) => this.props.onDeselect?.(this.props.type, selectedData)}
+                    {return this.props.onDropdownVisibleChange?.(this.props.type, e)}}
+                    removeIcon={<></>}
                     dropdownMatchSelectWidth={false}
                     notFoundContent={(
                         <div>

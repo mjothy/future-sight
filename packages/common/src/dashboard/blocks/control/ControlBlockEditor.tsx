@@ -68,6 +68,14 @@ export default class ControlBlockEditor extends Component<any, any> {
     })
 
     if (!e.target.checked) {
+
+      // set higher idx filters as stale
+      const index = parentBlock.config.metaData.selectOrder.indexOf(option);
+      const higherIdxFilters = [...parentBlock.config.metaData.selectOrder].slice(index);
+      for (const clearedFilter of higherIdxFilters) {
+        this.props.setStaleFilters(clearedFilter, true)
+      }
+
       parentBlock.config.metaData[option] = [];
       parentBlock.config.metaData.selectOrder = parentBlock.config.metaData.selectOrder.filter(optionFilter => optionFilter !== option);
     } else {
@@ -97,6 +105,7 @@ export default class ControlBlockEditor extends Component<any, any> {
         {metaData.master[option].isMaster && <SelectInput
           type={option}
           value={metaData[option]}
+          loading={this.props.isLoadingOptions[option]}
           options={this.props.optionsData[option]}
           onChange={this.props.onChange}
           isClear={true}

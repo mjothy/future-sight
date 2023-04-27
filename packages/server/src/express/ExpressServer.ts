@@ -1,11 +1,9 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import path, { join } from 'path';
+import {join} from 'path';
 import RedisClient from '../redis/RedisClient';
 import IDataProxy from './IDataProxy';
-import fetch from 'node-fetch';
-import RegionsGeoJson from './RegionsGeoJson';
 
 const optionsLabel = ["models", "scenarios", "variables", "regions", "versions"];
 const COUNTRIES_GEOJSON_URL = "https://datahub.io/core/geo-countries/r/countries.geojson";
@@ -222,51 +220,36 @@ export default class ExpressServer {
     });
 
     this.app.post('/api/filterOptions', async (req, res, next) => {
-      const firstFilters = req.body.filters;
+      const filterId = req.body.filterId
+      const dataFocusFilters = req.body.dataFocusFilters;
       const metaData = req.body.metaData;
-      const optionsData = {
-        regions: [],
-        variables: [],
-        scenarios: [],
-        models: [],
-      };
+      const optionsData = {};
       const dataUnion = this.dataProxy.getDataUnion();
-      let firstFilterRaws = dataUnion;
-
-      // First filter (by data focus) -- only one filter selected
-      Object.keys(firstFilters).forEach(option => {
-        if (firstFilters[option].length > 0) {
-          firstFilterRaws = dataUnion.filter(raw => firstFilters[option].includes(raw[option.slice(0, -1)]));
-        }
-      })
-
-      const dataRaws = this.getRaws(metaData, firstFilterRaws);
-
-      optionsLabel.forEach(option => {
-        if (option == "versions") {return}
-        let possible_options: any[] = [];
-        if (dataRaws[option].length > 0) {
-          possible_options = Array.from(new Set(dataRaws[option].map(raw => raw[option.slice(0, -1)])))
-        } else {
-          possible_options = Array.from(new Set(firstFilterRaws.map(raw => raw[option.slice(0, -1)])))
-        }
-        optionsData[option] = possible_options;
-      })
 
       if (
-          metaData.selectOrder.includes("models")
-          && metaData.selectOrder.includes("scenarios")
-      ){
-        const version_dict = {};
-        for (const raw of dataRaws.versions) {
-          !(raw["model"] in version_dict) && (version_dict[raw.model]={});
-          !(raw["scenario"] in version_dict[raw["model"]]) && (version_dict[raw["model"]][raw["scenario"]] = {default: "", values:[]});
-          (raw["is_default"] == "True") && (version_dict[raw["model"]][raw["scenario"]].default=raw["version"]);
-          !(version_dict[raw.model][raw.scenario].values.includes(raw.version)) && (version_dict[raw.model][raw.scenario].values.push(raw.version));
-        }
-        optionsData["versions"] = version_dict;
+          filterId === "versions"
+          && !["models", "scenarios"].every(item => metaData.selectOrder.includes(item))
+      ) {
+        const err = "Both models and scenarios should be chosen before asking for versions"
+        console.error(err);
+        res.status(400).send(new Error(err));
       }
 
+      // First filter (by data focus) -- only one filter selected
+      let dataFocusFiltersRaws = dataUnion;
+      Object.keys(dataFocusFilters).forEach(option => {
+        if (dataFocusFilters[option].length > 0) {
+          dataFocusFiltersRaws = dataUnion.filter(raw => dataFocusFilters[option].includes(raw[option.slice(0, -1)]));
+        }
+      })
+
+      const dataRaws = this.getRawsByFilterId(filterId, metaData, dataFocusFiltersRaws);
+
+      if (filterId === "versions"){
+        optionsData["versions"] = this.getVersionDictFromRaws(dataRaws);
+      } else {
+        optionsData[filterId] = Array.from(new Set(dataRaws.map(raw => raw[filterId.slice(0, -1)])))
+      }
       res.send(optionsData);
     });
 
@@ -292,65 +275,84 @@ export default class ExpressServer {
   /**
    * Get possible raws based on selected order in config.metaData.selectOrder
    * Exemple: selectOrder = [regions, models]
-   * dataRaws[models] will contains all raws of selected regions
+   * dataRaws[models] will contain all raws of selected regions
+   * @param filterId the filter which updates its options
    * @param metaData the selected data in block
-   * @param firstFilterRaws filtred raws based on data focus
+   * @param dataFocusFiltersRaws filtred raws based on data focus
    * @returns possible raws of {model,scenario,region,variable} in each index based on the before selection
    */
-  getRaws = (metaData, firstFilterRaws) => {
+  getRawsByFilterId = (filterId, metaData, dataFocusFiltersRaws) => {
+    // Get filterToApply
+    const filtersToApply = this.getFiltersToApply(filterId, metaData)
 
-    const dataRaws:{[index: string]: any[]} = {
-      regions: [],
-      variables: [],
-      scenarios: [],
-      models: [],
-      versions: []
-    };
+    // The first selection contains all raws
+    let dataRaws = dataFocusFiltersRaws;
 
-    if (metaData.selectOrder.length > 0) {
-      const option_unselected = optionsLabel.filter(option => !metaData.selectOrder.includes(option));
-      const option_selected = metaData.selectOrder;
+    // Filter by filters with lower idx
+    for (const tempFilter of filtersToApply) {
+      console.log(tempFilter)
+      dataRaws = (tempFilter == "versions")
+          ? this.filterRawByVersions(dataRaws, metaData)
+          : dataRaws.filter(raw => metaData[tempFilter].includes(raw[tempFilter.slice(0, -1)]));
+    }
 
-      // The first selection contains all raws
-      const option = metaData.selectOrder[0];
-      dataRaws[option] = firstFilterRaws;
+    return dataRaws;
+  }
 
-      // set possible raws for selected inputs
-      for (let i = 1; i < option_selected.length; i++) {
-        const current_option = metaData.selectOrder[i];
-        const prev_option = metaData.selectOrder[i - 1];
-        dataRaws[current_option] = (prev_option == "versions")
-            ? this.filterRawByVersions(dataRaws, metaData)
-            : dataRaws[prev_option].filter(raw => metaData[prev_option].includes(raw[prev_option.slice(0, -1)]));
-      }
 
-      // set possible raws for unselected inputs
-      if (option_unselected.length > 0) {
-        const prev_option = metaData.selectOrder[metaData.selectOrder.length - 1];// last label selected (drop down)
-        const possible_raws = (prev_option == "versions")
-            ? this.filterRawByVersions(dataRaws, metaData)
-            : dataRaws[prev_option].filter(raw => metaData[prev_option].includes(raw[prev_option.slice(0, -1)]));
-        option_unselected.forEach((option) => {
-          dataRaws[option] = possible_raws;
-        })
+  getFiltersToApply(filterId, metaData){
+
+    let lowerIdxFilters;
+
+    if (filterId === "versions"){
+      // Get all filters with idx <= idx(models) and idx(scenarios)
+      const maxIdx = Math.max(metaData.selectOrder.indexOf("models"), metaData.selectOrder.indexOf("scenarios"))
+      lowerIdxFilters=  metaData.selectOrder.slice(0, maxIdx+1) // TODO replace by runId here
+    }
+    else{
+      const filterIdOrder = metaData.selectOrder.indexOf(filterId)
+      lowerIdxFilters = filterIdOrder<0
+          ? [...metaData.selectOrder] // filterId not in selectOrder, all selectOrder have lower idx
+          : metaData.selectOrder.slice(0, filterIdOrder) // only filters with idx lower than filterIdOrder
+
+      // Replace scenario or model by version if both in selectOrder, choose the highest idx
+      // To filter by version/runId when both scenario and model are selected
+      if(["models", "scenarios"].every(item => metaData.selectOrder.includes(item))){
+        console.log(metaData.selectOrder.indexOf("models"), metaData.selectOrder.indexOf("scenarios"))
+        const maxIdx = Math.max(metaData.selectOrder.indexOf("models"), metaData.selectOrder.indexOf("scenarios"))
+        lowerIdxFilters[maxIdx] =  "versions" // TODO replace by runId here
       }
     }
-    return dataRaws;
+    console.log(metaData.selectOrder)
+    console.log(lowerIdxFilters)
+    return lowerIdxFilters
   }
 
   filterRawByVersions(dataRaws, metaData) {
     const selectedVersions = metaData.versions
-    return dataRaws.versions.filter(raw => {
+    return dataRaws.filter(raw => {
       if(!!selectedVersions[raw.model]
           && !!selectedVersions[raw.model][raw.scenario]
           && selectedVersions[raw.model][raw.scenario].length>0
       ){
         return selectedVersions[raw.model][raw.scenario].includes(raw.version)
       } else {
-        return true
+        // No selection so select default
+        return raw.is_default
       }
     });
   }
+
+
+  getVersionDictFromRaws(dataRaws){
+    const version_dict = {};
+    for (const raw of dataRaws) {
+      !(raw["model"] in version_dict) && (version_dict[raw.model]={});
+      !(raw["scenario"] in version_dict[raw["model"]]) && (version_dict[raw["model"]][raw["scenario"]] = {default: "", values:[]});
+      (raw["is_default"] == "True") && (version_dict[raw["model"]][raw["scenario"]].default=raw["version"]);
+      !(version_dict[raw.model][raw.scenario].values.includes(raw.version)) && (version_dict[raw.model][raw.scenario].values.push(raw.version));
+    }
+    return version_dict
+  }
+
 }
-
-

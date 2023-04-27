@@ -1,4 +1,5 @@
 import type {IDataManager, DataModel, PlotDataModel} from '@future-sight/common';
+import {BlockDataModel} from "@future-sight/common";
 
 export default class DataManager implements IDataManager {
   getBaseUrl() {
@@ -136,7 +137,7 @@ export default class DataManager implements IDataManager {
     return ["models", "scenarios", "variables", "regions"];
   };
 
-  fetchDataOptions = (data) => {
+  fetchFilterOptions = (data: {filterId: string, metaData: BlockDataModel, dataFocusFilters: any}) => {
     return fetch(`api/filterOptions`, {
       method: 'POST',
       headers: {

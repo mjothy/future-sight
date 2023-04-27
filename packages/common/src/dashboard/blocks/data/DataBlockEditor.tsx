@@ -1,10 +1,11 @@
-import { Component } from 'react';
-import {Checkbox, Col, Divider, Input, Row, Switch, Tag, TreeSelect} from 'antd';
+import React, {Component} from 'react';
+import {Checkbox, Col, Divider, Row, Switch, Tag, TreeSelect} from 'antd';
 import SelectInput from '../utils/SelectInput';
-import { ExclamationCircleOutlined, WarningOutlined } from '@ant-design/icons';
-import { getUnselectedInputOptions } from '../utils/BlockDataUtils';
-import BlockDataModel, {versionModel} from "../../../models/BlockDataModel";
+import {ExclamationCircleOutlined, WarningOutlined} from '@ant-design/icons';
+import {getUnselectedInputOptions} from '../utils/BlockDataUtils';
+import BlockDataModel, {versionsModel} from "../../../models/BlockDataModel";
 import BlockStyleModel from "../../../models/BlockStyleModel";
+
 require('./DataBlockEditor.css')
 
 /**
@@ -18,14 +19,16 @@ export default class DataBlockEditor extends Component<any, any> {
 
     const index = config.metaData.selectOrder.indexOf(option);
     if (index >= 0) {
-      const selectOrder = [...config.metaData.selectOrder];
+      const newSelectOrder = [...config.metaData.selectOrder].slice(0,index);
+      const clearedFilters = [...config.metaData.selectOrder].slice(index);
 
-      for (let i = index; i < config.metaData.selectOrder.length; i++) {
-        selectOrder.splice(selectOrder.indexOf(config.metaData.selectOrder[i]), 1);
+      for (const clearedFilter of clearedFilters) {
         // TODO add condition for controlled inputs
-        config.metaData[config.metaData.selectOrder[i]] = [];
+        config.metaData[clearedFilter] = [];
+        this.props.setStaleFilters(clearedFilter, true)
       }
-      config.metaData.selectOrder = Array.from(new Set<string>([...selectOrder]));
+
+      config.metaData.selectOrder = Array.from(new Set<string>([...newSelectOrder]));
       dashboard.blocks[this.props.currentBlock.id].config = { ...config };
       this.props.updateDashboard(dashboard);
     }
@@ -72,6 +75,7 @@ export default class DataBlockEditor extends Component<any, any> {
               value={metaData[option]}
               options={this.props.optionsData[option]}
               onChange={this.props.onChange}
+              loading={this.props.isLoadingOptions[option]}
               isClear={selected}
               onClear={this.clearClick}
               onDropdownVisibleChange={this.props.onDropdownVisibleChange}
@@ -205,6 +209,7 @@ export default class DataBlockEditor extends Component<any, any> {
               onChange={this.props.onVersionSelected}
               treeData={treeData}
               disabled={disabled}
+              removeIcon={<></>}
           />
           <Row>
             <Col span={2} className={'checkbox-col'}>
@@ -229,7 +234,7 @@ export default class DataBlockEditor extends Component<any, any> {
   }
 
   getDefaultTreeSelectValue = () => {
-    const version_dict: versionModel = this.props.currentBlock.config.metaData.versions
+    const version_dict: versionsModel = this.props.currentBlock.config.metaData.versions
     const defaultValues: string[] = []
     for (const model in version_dict){
       for (const scenario in version_dict[model]){

@@ -4,42 +4,58 @@ import ControlBlockEditor from './control/ControlBlockEditor';
 import DataBlockEditor from './data/DataBlockEditor';
 import {getBlock} from './utils/BlockDataUtils';
 import {getSelectedFilter} from './utils/DashboardUtils';
-import BlockDataModel, {versionModel} from "../../models/BlockDataModel";
+import BlockDataModel, {versionsModel} from "../../models/BlockDataModel";
 import DashboardModel from "../../models/DashboardModel";
 
 export default class BlockFilterManager extends Component<any, any> {
     constructor(props) {
         super(props);
+        const metadata = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData))
         this.state = {
             /**
              * Data options in dropDown Inputs
              */
-            optionsData: {},
+            optionsData: {
+                regions: metadata["regions"],
+                variables: metadata["variables"],
+                scenarios: metadata["scenarios"],
+                models: metadata["models"],
+                versions:metadata["versions"]
+            },
             missingData: {
                 regions: [],
                 variables: [],
                 scenarios: [],
                 models: [],
-            }
+            },
+            staleFilters:{
+                regions: true,
+                variables: true,
+                scenarios: true,
+                models: true
+            },
+            isLoadingOptions:{
+                regions: false,
+                variables: false,
+                scenarios: false,
+                models: false
+            },
+            currentSelection: []
         };
-
-    }
-
-    componentDidMount() {
-        this.updateDropdownData();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.props.dashboard != prevProps.dashboard || prevProps.blockSelectedId !== this.props.blockSelectedId) {
-            this.updateDropdownData();
-        }
         if (this.props.plotData[this.props.currentBlock.id]?.length != prevProps.plotData[this.props.currentBlock.id]?.length) {
             this.missingData();
         }
     }
 
-    updateDropdownData = () => {
-        const filters = {};
+    /**
+     * Update input select options data for a filter
+     * @param filterId filter to update
+     */
+    updateFilterOptions = (filterId) => {
+        const dataFocusFilters: { [indexType: string]: string[] } = {}; //the first filter(by data focus), only one key
         let metaData: BlockDataModel = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
         const currentBlock = this.props.currentBlock;
 
@@ -47,25 +63,39 @@ export default class BlockFilterManager extends Component<any, any> {
             metaData = this.getMetaDataIfControlled();
         }
 
-
         const selectedFilter = getSelectedFilter(this.props.dashboard.dataStructure);
-        filters[selectedFilter] = this.props.dashboard.dataStructure[selectedFilter].selection;
+        dataFocusFilters[selectedFilter] = this.props.dashboard.dataStructure[selectedFilter].selection;
 
-        this.filterOptions(metaData, filters);
-    };
+        this.setState({isLoadingOptions: {...this.state.isLoadingOptions, [filterId]: true}})
+        return this.props.dataManager.fetchFilterOptions({filterId, metaData, dataFocusFilters})
+            .then(res => {
+                let optionsData = JSON.parse(JSON.stringify(this.state.optionsData))
+                optionsData = {...optionsData, ...res}
+                this.setState({
+                        optionsData,
+                        isLoadingOptions: {...this.state.isLoadingOptions, [filterId]: false}
+                    }, () => {
+                    this.props.checkIfSelectedInOptions(this.state.optionsData, this.props.currentBlock)
+                    this.missingData();
+                })})
+            .catch(err => console.error("error fetch: ", err));
+    }
 
     /**
-     * to update options in input select
-     * @param metaData selected data in block
-     * @param filters {[indexType]: valuesToFilter} the first filter(by data focus), only one key
+     * Get meta data of controlled options of current data block
+     * @returns meta data
      */
-    filterOptions = (metaData: BlockDataModel, filters: { [indexType: string]: string[] }) => {
-        this.props.dataManager.fetchDataOptions({metaData, filters}).then(res => {
-            this.setState({optionsData: res}, () => {
-                this.props.checkIfSelectedInOptions(this.state.optionsData, this.props.currentBlock)
-                this.missingData();
-            })
-        }).catch(err => console.error("error fetch: ", err));
+    getMetaDataIfControlled = () => {
+        const metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
+        const controlBlock = getBlock(this.props.dashboard.blocks, this.props.currentBlock.controlBlock);
+        const masterMetaData = (controlBlock.config as ConfigurationModel).metaData;
+        Object.keys(masterMetaData.master).forEach((option) => {
+            if (masterMetaData.master[option].isMaster) {
+                metaData[option] = masterMetaData[option];
+            }
+        });
+
+        return metaData;
     }
 
     /**
@@ -118,50 +148,98 @@ export default class BlockFilterManager extends Component<any, any> {
         return existDataRaws;
     }
 
-    /**
-     * Get meta data of controlled options of current data block
-     * @returns meta data
-     */
-    getMetaDataIfControlled = () => {
-        const metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
-        const controlBlock = getBlock(this.props.dashboard.blocks, this.props.currentBlock.controlBlock);
-        const masterMetaData = (controlBlock.config as ConfigurationModel).metaData;
-        Object.keys(masterMetaData.master).forEach((option) => {
-            if (masterMetaData.master[option].isMaster) {
-                metaData[option] = masterMetaData[option];
-            }
-        });
-
-        return metaData;
-    }
 
     /**
-     * Update block select order after close of inputSelect
-     * @param option input label
-     * @param e TRUE if input select open and FALSE if closed
+     * After closing inputSelect, add selected filter to selectOrder array
+     * @param filterId input label
+     * @param isOpening TRUE if input select opening and FALSE if closing
      */
-    onDropdownVisibleChange = (option, e) => {
+    onDropdownVisibleChange = async (filterId, isOpening) => {
         const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
         const config = JSON.parse(JSON.stringify(this.props.currentBlock.config));
-        if (!e && config.metaData[option].length > 0 && !config.metaData.selectOrder.includes(option)) {
-            // Update the order of selection
-            config.metaData.selectOrder = Array.from(
-                new Set<string>([...config.metaData.selectOrder, option])
-            );
-            dashboard.blocks[this.props.currentBlock.id].config = {...config};
-            this.props.updateDashboard(dashboard);
+
+        // onOpen if filter is stale, fetch data
+        if(isOpening){
+            this.setState({currentSelection: config.metaData[filterId]})
+            const staleFilters = {...this.state.staleFilters}
+            if (staleFilters[filterId]){
+                await this.updateFilterOptions(filterId)
+                staleFilters[filterId] = false
+                this.setState({staleFilters})
+            }
+        }
+
+        // onClose
+        else {
+            let selectOrder = config.metaData.selectOrder
+
+            // add selected filter to selectOrder array
+            if (config.metaData[filterId].length > 0 && !selectOrder.includes(filterId)){
+                selectOrder = Array.from(
+                    new Set<string>([...config.metaData.selectOrder, filterId])
+                );
+                dashboard.blocks[this.props.currentBlock.id].config.metaData.selectOrder = selectOrder
+                this.props.updateDashboard(dashboard);
+            }
+
+            // Check added and deleted options from selection
+            const addedOptions = config.metaData[filterId].filter((x)=> !this.state.currentSelection.includes(x))
+            const deletedOptions = this.state.currentSelection.filter((x) => !config.metaData[filterId].includes(x))
+
+            // update versions if model or scenario modified
+            if(
+                ["models", "scenarios"].includes(filterId)
+                && ["models", "scenarios"].every(item => selectOrder.includes(item))
+                && (deletedOptions.length>0 || addedOptions.length>0)
+            ){
+                await this.updateFilterOptions("versions")
+            }
+
+
+            if (deletedOptions.length>0){
+                const selectOrderIndex = selectOrder.indexOf(filterId)
+
+                // Update cascade all higher idx filters
+                for (const tempFilterId of selectOrder.slice(selectOrderIndex+1)){
+                    await this.updateFilterOptions(tempFilterId)
+
+                    // Check versions
+                    if(
+                        ["models", "scenarios"].includes(tempFilterId)
+                        && ["models", "scenarios"].every(item => selectOrder.includes(item))
+                    ) {
+                        await this.updateFilterOptions("versions")
+                    }
+                }
+            } else if (addedOptions.length>0){
+                // Update lower order and unselected filter to stale
+                const staleFilters = {...this.state.staleFilters}
+                const selectOrderIndex = selectOrder.indexOf(filterId)
+
+                // - lower order filters
+                for (const tempFilterId of selectOrder.slice(selectOrderIndex+1)){
+                    staleFilters[tempFilterId] = true
+                }
+
+                // - unselected filters
+                for (const tempFilterId of Object.keys(staleFilters).filter((x)=>!selectOrder.includes(x))){
+                    staleFilters[tempFilterId] = true
+                }
+                this.setState({staleFilters: staleFilters})
+            }
         }
     };
 
-    onChange = (option, selectedData: string[]) => {
+    // On select filter changes
+    onChange = (filterId, selectedData: string[]) => {
         const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
         const config = JSON.parse(JSON.stringify(this.props.currentBlock.config));
         // Update config (metaData)
-        config.metaData[option] = selectedData;
+        config.metaData[filterId] = selectedData;
         dashboard.blocks[this.props.currentBlock.id].config = {...config};
 
         if (this.props.currentBlock.blockType === 'control') {
-            dashboard.blocks[this.props.currentBlock.id].config.metaData.master[option].values = []; // clear selected data on control view
+            dashboard.blocks[this.props.currentBlock.id].config.metaData.master[filterId].values = []; // clear selected data on control view
             this.updateChildsBlocks(dashboard, this.props.currentBlock.id); //clear selected values of childs
         }
         this.props.updateDashboard(dashboard)
@@ -176,12 +254,14 @@ export default class BlockFilterManager extends Component<any, any> {
         this.props.updateDashboard(dashboard)
     };
 
+    // TODO Update to match new fetching style, when deleting refetch filters that are higher idx than model and scenario
+    // TODO When clearing models or scenarios, should also clear versions
     // When updating version tree select update metaData.versions.
     // Always keep one leaf selected
     onVersionSelected = (selectedValues: string[]) => {
         const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
-        const state_version_dict: versionModel = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData.versions));
-        const version_dict: versionModel = {};
+        const state_version_dict: versionsModel = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData.versions));
+        const version_dict: versionsModel = {};
 
         for (const rawValue of selectedValues) {
             const {model, scenario, version} = JSON.parse(rawValue)
@@ -218,24 +298,38 @@ export default class BlockFilterManager extends Component<any, any> {
         })
     }
 
+    setStaleFilters = (filterId: string, value: boolean) => {
+        this.setState({
+            staleFilters:
+                {
+                    ...this.state.staleFilters,
+                    [filterId]:value
+                }
+        })
+    }
+
     render() {
         return this.props.currentBlock.blockType === 'data' ? (
             <DataBlockEditor
                 {...this.props}
-                onChange={this.onChange}
                 optionsData={this.state.optionsData}
-                onDropdownVisibleChange={this.onDropdownVisibleChange}
                 missingData={this.state.missingData}
+                isLoadingOptions={this.state.isLoadingOptions}
+                onChange={this.onChange}
+                onDropdownVisibleChange={this.onDropdownVisibleChange}
                 onUseVersionSwitched={this.onUseVersionSwitched}
                 onVersionSelected={this.onVersionSelected}
+                setStaleFilters={this.setStaleFilters}
             />
         ) : (
             <ControlBlockEditor
                 {...this.props}
-                onChange={this.onChange}
                 optionsData={this.state.optionsData}
-                onDropdownVisibleChange={this.onDropdownVisibleChange}
                 missingData={this.state.missingData}
+                isLoadingOptions={this.state.isLoadingOptions}
+                onChange={this.onChange}
+                onDropdownVisibleChange={this.onDropdownVisibleChange}
+                setStaleFilters={this.setStaleFilters}
             />
         );
     }

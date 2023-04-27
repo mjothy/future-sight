@@ -6,7 +6,7 @@ export default class BlockDataModel {
   scenarios: string[] = [];
   regions: string[] = [];
   variables: string[] = [];
-  versions: versionModel = {};
+  versions: versionsModel = {};
   hasDeprecatedVersion = false;
   useVersion = false;
 
@@ -39,7 +39,7 @@ export default class BlockDataModel {
 }
 
 
-export interface versionModel{
+export interface versionsModel {
   [model: string]: {
     [scenario: string]: string[]
   }

@@ -26,7 +26,7 @@ export default interface IDataManager {
 
   getOptions: () => string[];
 
-  fetchDataOptions: (data: any) => Promise<any>;
+  fetchFilterOptions: (data: any) => Promise<any>;
 
   fetchRegionsGeojson: (regions: string[]) => Promise<any>;
 }
