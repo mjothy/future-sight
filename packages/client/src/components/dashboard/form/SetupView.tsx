@@ -138,20 +138,17 @@ class SetupView extends Component<any, any> {
 
   render() {
     const selectedFilters = getSelectedFiltersLabels(this.props.dashboard.dataStructure);
-    let selectedFilterLabel = ""
+    let selectedFilterLabel = ": "
     if (selectedFilters.length > 0) {
       selectedFilters.forEach(filter => {
-        if (this.props.dashboard.dataStructure[filter].selection.length > 0) {
-          selectedFilterLabel = ': ' + filter;
-
-        }
+        selectedFilterLabel = selectedFilterLabel + filter + ", ";
       })
     }
     return (
       <>
         <div className="back-to-setup">
           <Button value="setup" onClick={this.show}>
-            <FilterTwoTone />Data focus {selectedFilterLabel}
+            <FilterTwoTone />Data focus {selectedFilterLabel.slice(0, -2)}
           </Button>
         </div>
         <Modal
