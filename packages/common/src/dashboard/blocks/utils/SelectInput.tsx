@@ -86,24 +86,8 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         );
     }
 
-    tagRender = (props) => {
-        const { value, closable, onClose } = props;
-        return (
-            <Tag
-                color={this.props.options.includes(value) ? undefined : 'red'}
-                closable={closable}
-                onClose={onClose}
-                icon={this.props.options.includes(value) ? undefined : <ExclamationCircleOutlined />}
-                className={this.props.options.includes(value) ? 'ant-select-selection-item' : 'ant-select-selection-item data-missing-tag'}
-            >
-                <label className='ant-select-selection-item-content'>{value} </label>
-            </Tag>
-        );
-    }
-
-    tagRenderCategories = (props) => {
+    tagRender = (props, isShowValue) => {
         const { value, label, closable, onClose } = props;
-        console.log("props tag: ", props.label.props)
         return (
             <Tag
                 color={this.props.options.includes(value) ? undefined : 'red'}
@@ -112,7 +96,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 icon={this.props.options.includes(value) ? undefined : <ExclamationCircleOutlined />}
                 className={this.props.options.includes(value) ? 'ant-select-selection-item' : 'ant-select-selection-item data-missing-tag'}
             >
-                <label className='ant-select-selection-item-content' style={VALUE_STYLE[value]}>{label}</label>
+                <label className='ant-select-selection-item-content' style={VALUE_STYLE[value]}>{isShowValue ? value : label}</label>
             </Tag>
         );
     }
@@ -121,6 +105,10 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         this.setState({ searchValue });
     }
 
+    /**
+     * Customize TreeSelect component
+     * @returns TreeSelect
+     */
     treeSelect = () => {
         return <Input.Group compact>
             <TreeSelect
@@ -131,7 +119,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                     this.props.onChange(this.props.type, selectedData.map((data: any) => data.value != null ? data.value : data))
                 }
                 treeData={this.splitOptions(this.props.options)}
-                tagRender={this.tagRender}
+                tagRender={(props) => this.tagRender(props, true)}
                 treeCheckStrictly={true}
                 showCheckedStrategy={"SHOW_ALL"}
                 className={this.props.className}
@@ -166,6 +154,12 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         </Input.Group>
     }
 
+    /**
+     * 
+     * @param treeData Customize the node (option) in TreeSelect component
+     * @param color Text color
+     * @returns Tree node (option in TreeSelect component)
+     */
     renderTreeNodes = (treeData, color?: string) => {
         return treeData.map((item, key) => {
             let colorNode = color;
@@ -187,7 +181,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         });
     }
 
-    treeSelectForCategories = () => {
+    treeSelectLeafOnly = () => {
         return <Input.Group compact>
             <TreeSelect
                 value={this.props.value}
@@ -196,7 +190,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 onChange={(selectedData: any[]) =>
                     this.props.onChange(this.props.type, selectedData.map((data: any) => data.value != null ? data.value : data))
                 }
-                tagRender={this.tagRenderCategories}
+                tagRender={(props) => this.tagRender(props, false)} // false: show only the value of selected leaf
                 showCheckedStrategy={"SHOW_CHILD"}
                 className={this.props.className}
                 onDropdownVisibleChange={(e) =>
@@ -237,7 +231,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 mode="multiple"
                 className={this.props.className}
                 dropdownRender={this.dropdownRender}
-                tagRender={this.tagRender}
+                tagRender={(props) => this.tagRender(props, true)}
                 placeholder={this.props.type}
                 value={this.props.value}
                 onChange={(selectedData) =>
@@ -282,7 +276,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
 
     render() {
         switch (this.props.type) {
-            case "categories": return this.treeSelectForCategories();
+            case "categories": return this.treeSelectLeafOnly();
             case "variables":
             case "regions": return this.treeSelect();
             default: return this.defaultSelect();
