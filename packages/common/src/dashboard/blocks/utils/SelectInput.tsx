@@ -20,6 +20,7 @@ interface SelectOptionProps {
 }
 
 const COLORS = ['red', 'blue', 'green', 'yellow'];
+const VALUE_STYLE = {};
 
 export default class SelectInput extends Component<SelectOptionProps, any> {
 
@@ -92,9 +93,8 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 color={this.props.options.includes(value) ? undefined : 'red'}
                 closable={closable}
                 onClose={onClose}
-                style={{ marginRight: 3 }}
                 icon={this.props.options.includes(value) ? undefined : <ExclamationCircleOutlined />}
-                className={this.props.options.includes(value) ? 'ant-select-selection-item tag-selection-item' : 'ant-select-selection-item tag-selection-item data-missing-tag'}
+                className={this.props.options.includes(value) ? 'ant-select-selection-item' : 'ant-select-selection-item data-missing-tag'}
             >
                 <label className='ant-select-selection-item-content'>{value} </label>
             </Tag>
@@ -102,18 +102,17 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
     }
 
     tagRenderCategories = (props) => {
-        const { value, closable, onClose } = props;
+        const { value, label, closable, onClose } = props;
         console.log("props tag: ", props.label.props)
         return (
             <Tag
                 color={this.props.options.includes(value) ? undefined : 'red'}
                 closable={closable}
                 onClose={onClose}
-                style={{ marginRight: 3 }}
                 icon={this.props.options.includes(value) ? undefined : <ExclamationCircleOutlined />}
-                className={this.props.options.includes(value) ? 'ant-select-selection-item tag-selection-item' : 'ant-select-selection-item tag-selection-item data-missing-tag'}
+                className={this.props.options.includes(value) ? 'ant-select-selection-item' : 'ant-select-selection-item data-missing-tag'}
             >
-                <label className='ant-select-selection-item-content'>{value}</label>
+                <label className='ant-select-selection-item-content' style={VALUE_STYLE[value]}>{label}</label>
             </Tag>
         );
     }
@@ -176,6 +175,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
             item.style = {
                 color: colorNode,
             }
+            VALUE_STYLE[item.value] = item.style
             if (item.children) {
                 return (
                     <TreeSelect.TreeNode title={item.title} key={item.key} value={item.value} style={item.style}>
