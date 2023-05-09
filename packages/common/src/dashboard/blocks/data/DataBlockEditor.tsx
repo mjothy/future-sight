@@ -14,8 +14,8 @@ require('./DataBlockEditor.css')
 export default class DataBlockEditor extends Component<any, any> {
 
   clearClick = (option, e) => {
-    const dashboard = { ...this.props.dashboard };
-    const config = this.props.currentBlock.config;
+    const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+    const config = JSON.parse(JSON.stringify(this.props.currentBlock.config));
 
     const index = config.metaData.selectOrder.indexOf(option);
     if (index >= 0) {
@@ -28,12 +28,20 @@ export default class DataBlockEditor extends Component<any, any> {
         this.props.setStaleFilters(clearedFilter, true)
       }
 
-      config.metaData.selectOrder = Array.from(new Set<string>([...newSelectOrder]));
+      config.metaData.selectOrder = [...selectOrder];
       dashboard.blocks[this.props.currentBlock.id].config = { ...config };
       this.props.updateDashboard(dashboard);
     }
 
   };
+
+  onChange = (option, selectedData: string[]) => {
+    if (selectedData.length <= 0) {
+      this.clearClick(option, null);
+    } else {
+      this.props.onChange(option, selectedData);
+    }
+  }
 
   getMessage = (missing) => {
     let msg = '';
@@ -63,15 +71,21 @@ export default class DataBlockEditor extends Component<any, any> {
     return (
       !isControlled && (
         <div className={selected ? 'transition' : ''} key={option}>
-          <Row className="width-100">
+          <Row className="width-100 mt-16">
             <h4>
-              {option} &nbsp;
+              {option} {option == "categories" ? "(optional)" : ""} &nbsp;
               <label className='warning-label'>
-                {metaData.selectOrder.length == 4 && this.props.missingData[option].length > 0 && this.getMessage(this.props.missingData[option])}
+                {
+                    this.props.isAllSelected()
+                    && this.props.missingData[option].length > 0
+                    && this.getMessage(this.props.missingData[option])
+                }
               </label>
             </h4>
+
             <SelectInput
               type={option}
+              className={"width-90"}
               value={metaData[option]}
               options={this.props.optionsData[option]}
               onChange={this.props.onChange}
@@ -88,7 +102,6 @@ export default class DataBlockEditor extends Component<any, any> {
 
   controlledInputs = () => {
     const id = this.props.currentBlock.controlBlock;
-    const metaData = this.props.currentBlock.config.metaData;
     const controlBlock = this.props.dashboard.blocks[id].config.metaData;
     return Object.keys(controlBlock.master).map((key) => {
       if (controlBlock.master[key].isMaster) {
@@ -96,8 +109,11 @@ export default class DataBlockEditor extends Component<any, any> {
           <div className='mt-20' key={"controlledInputs"+key}>
             <h4>{key} &nbsp;
               <label className='warning-label'>
-                {metaData.selectOrder.length == 4 && this.props.missingData[key].length > 0
-                    && this.getMessage(this.props.missingData[key])}
+                {
+                  this.props.isAllSelected()
+                    && this.props.missingData[key].length > 0
+                    && this.getMessage(this.props.missingData[key])
+                }
               </label>
             </h4>
             {

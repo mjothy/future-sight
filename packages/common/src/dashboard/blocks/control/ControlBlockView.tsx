@@ -4,6 +4,7 @@ import BlockModel from '../../../models/BlockModel';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 import { getChildrens } from '../utils/BlockDataUtils';
 import * as _ from 'lodash';
+import SelectInput from '../utils/SelectInput';
 require('./ControlBlockView.css')
 const { Option } = Select;
 
@@ -53,24 +54,19 @@ export default class ControlBlockView extends Component<any, any> {
   selectDropDown = (option) => {
     const metaData = this.props.currentBlock.config.metaData;
     const optionLabel = this.props.currentBlock.config.configStyle.subtitle[option].isCustom ?
-        this.props.currentBlock.config.configStyle.subtitle[option].value :
-        option
+      this.props.currentBlock.config.configStyle.subtitle[option].value :
+      option
     return (
-        <div className="control-block-row" key={option}>
-          <h4 className="control-block-subtitle"> {optionLabel}: </h4>
-          <Select
-              mode="multiple"
-              className="control-block-select"
-              value={metaData.master[option].values}
-              onChange={(e) => this.onChange(option, e)}
-              dropdownMatchSelectWidth={false}>
-            {metaData[option].map((element) => (
-                <Option key={element} value={element}>
-                  {element}
-                </Option>
-            ))}
-          </Select>
-        </div>
+      <div className="control-block-row" key={option}>
+        <h4 className="control-block-subtitle"> {optionLabel}: </h4>
+        <SelectInput
+          type={optionLabel}
+          className={"control-block-select"}
+          value={metaData.master[option].values}
+          onChange={this.onChange}
+          options={metaData[option]}
+        />
+      </div>
       // <Row className="mb-10" key={option}>
       //   <Col span={6}>
       //     <h4>{optionLabel}: </h4>

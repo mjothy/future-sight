@@ -19,7 +19,7 @@ export interface DashboardSelectionControlProps
   extends ComponentPropsWithDataManager,
   RoutingProps {
   saveData: (id: string, image?: string) => Promise<any>;
-  filters: any;
+  allData: any;
   plotData: PlotDataModel[];
   blockData: (block: BlockModel) => PlotDataModel[];
   optionsLabel: string[];
@@ -172,13 +172,14 @@ export default class DashboardSelectionControl extends Component<
    * Check if data in selection (selected data) are present in Select options
    * Add default version to metadata.versions
   */
-  // TODO VERSION Add version management
-  // TODO difference missing data with DataBlockEditor.clearClick
   checkIfSelectedInOptions = (optionsData, block: BlockModel) => {
-    const optionsLabel = this.props.optionsLabel;
+    let optionsLabel = [...this.props.optionsLabel];
+    const dashboard = { ...this.state.dashboard };
+    const config = block.config as ConfigurationModel;
     const metaData = JSON.parse(JSON.stringify(((block.config) as ConfigurationModel).metaData));
     let isDashboardUpdated = false;
     const missingData = {}
+    optionsLabel = optionsLabel.filter(key => key != "categories"); // TODO delete after
     optionsLabel.forEach(option => {
       if (option == "versions") {return}
       // Check if selected data (metaData[option]) are in options of drop down list

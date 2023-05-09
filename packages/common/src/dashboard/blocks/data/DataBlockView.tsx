@@ -46,7 +46,7 @@ class DataBlockView extends Component<any, any> {
   settingPlotData = (data: PlotDataModel[]) => {
     const { currentBlock } = this.props;
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
-    console.log("Run settingPlotData", currentBlock.id);
+    // console.log("Run settingPlotData", currentBlock.id);
     const showData: any[] = [];
 
     let visualizeData: any = [];
@@ -60,7 +60,8 @@ class DataBlockView extends Component<any, any> {
         if (configStyle.stack && configStyle.stack.isStack && configStyle.graphType === 'area') {
           stacks = stackGroups(currentBlock.config.metaData, configStyle.stack.value);
         }
-        const dataWithColor = this.props.colorizer.colorizeData(data)
+        const dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale);
+
         dataWithColor?.map((dataElement) => {
           showData.push(this.preparePlotData(dataElement, configStyle, stacks));
         });
@@ -111,7 +112,6 @@ class DataBlockView extends Component<any, any> {
         obj = {
           type: 'scatter',
           fill: 'tonexty',
-          // fillcolor: "#FF0000"+"50",
           fillcolor: dataElement.color ? dataElement.color + "50" : null,
           x: xyDict.x,
           y: xyDict.y,
@@ -151,9 +151,9 @@ class DataBlockView extends Component<any, any> {
   getLegend = (dataElement: PlotDataModel, legend) => {
     if (!legend) {
       return dataElement.region
-          + " - " + dataElement.variable
-          + " - " + dataElement.scenario
-          + " - " + dataElement.model
+        + " - " + dataElement.variable
+        + " - " + dataElement.scenario
+        + " - " + dataElement.model
     } else {
       const label: any[] = [];
       if (legend.Region && dataElement.region) {
@@ -210,7 +210,7 @@ class DataBlockView extends Component<any, any> {
         y.push(d.value)
       }
     });
-    return {x,y};
+    return { x, y };
   };
 
   prepareLayout = (data) => {
@@ -267,12 +267,12 @@ class DataBlockView extends Component<any, any> {
     const rawData = this.getPlotData()
     const { data, layout } = this.settingPlotData(rawData);
     switch (this.props.currentBlock.config.configStyle.graphType) {
-      case "pie":{
+      case "pie": {
         return <PieView
-            rawData={rawData}
-            currentBlock={this.props.currentBlock}
-            width={this.props.width}
-            height={this.props.height}
+          rawData={rawData}
+          currentBlock={this.props.currentBlock}
+          width={this.props.width}
+          height={this.props.height}
         />
       }
       case "map": {

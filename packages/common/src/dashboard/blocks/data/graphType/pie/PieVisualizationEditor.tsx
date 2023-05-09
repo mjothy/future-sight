@@ -1,9 +1,9 @@
-import {Checkbox, Col, Row, Select} from 'antd';
-import {Component} from 'react';
+import { Checkbox, Col, Row, Select } from 'antd';
+import { Component } from 'react';
 import PlotlyUtils from "../../../../graphs/PlotlyUtils";
 import PlotDataModel from "../../../../../models/PlotDataModel";
 
-const {Option} = Select;
+const { Option } = Select;
 
 export default class PieVisualizationEditor extends Component<any, any> {
 
@@ -52,7 +52,7 @@ export default class PieVisualizationEditor extends Component<any, any> {
         return (
             <>
                 <h3>Pie</h3>
-                <Row style={{marginBottom: 2}}>
+                <Row style={{ marginBottom: 2 }}>
                     <Col span={2}></Col>
                     <Col span={16}>
                         Stack by:
@@ -64,7 +64,7 @@ export default class PieVisualizationEditor extends Component<any, any> {
                         <Select
                             className="width-100"
                             placeholder={"Select a slice category"}
-                            defaultValue={configStyle.stack.value || null}
+                            value={configStyle.stack.value || null}
                             onChange={this.props.onStackValueChange}
                             status={configStyle.stack.value ? undefined : "error"}
                         >
@@ -77,7 +77,7 @@ export default class PieVisualizationEditor extends Component<any, any> {
                     </Col>
                 </Row>
 
-                <Row style={{marginBottom: 2}}>
+                <Row style={{ marginBottom: 2 }}>
                     <Col span={2}>
                     </Col>
                     <Col span={16}>
@@ -85,12 +85,12 @@ export default class PieVisualizationEditor extends Component<any, any> {
                     </Col>
                 </Row>
                 <Row className="mb-10">
-                    <Col span={2}/>
+                    <Col span={2} />
                     <Col span={16}>
                         <Select
                             className="width-100"
                             placeholder={"Select a default year"}
-                            defaultValue={configStyle.XAxis.default || null}
+                            value={configStyle.XAxis.default || null}
                             onChange={this.onDefaultYearChange}
                             status={this.getAvailableYears(blockData).includes(configStyle.XAxis.default) ? undefined : "error"}
                         >

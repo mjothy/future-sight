@@ -3,9 +3,13 @@ import { Colorscale } from 'react-colorscales';
 import ColorscalePicker from 'react-colorscales';
 import { COLOR_PICKER_CONSTANTS } from 'react-colorscales';
 
-COLOR_PICKER_CONSTANTS.COLORSCALE_TYPES = ["sequential", "divergent", "categorical"];
+COLOR_PICKER_CONSTANTS.COLORSCALE_TYPES = ["categorical", "sequential", "divergent"];
+ColorscalePicker.defaultProps = {
+    initialColorscaleType: 'categorical',
+};
 
-export default class ColorscalePicker extends Component<any, any> {
+export default class PlotColorscalePicker extends Component<any, any> {
+
 
     constructor(props) {
         super(props);
@@ -13,15 +17,15 @@ export default class ColorscalePicker extends Component<any, any> {
             showColorscalePicker: false
         }
     }
-    onColorsChange = colorscale => {
+    onColorsChange = (colorscale) => {
         this.props.onColorsChange(colorscale);
     }
     toggleColorscalePicker = () => {
         this.setState({ showColorscalePicker: !this.state.showColorscalePicker });
     }
+
     render() {
         const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
-
         const toggleButtonStyle = { cursor: 'pointer' };
         if (this.state.showColorscalePicker) {
             toggleButtonStyle["borderColor"] = '#A2B1C6';
@@ -33,7 +37,7 @@ export default class ColorscalePicker extends Component<any, any> {
                 style={toggleButtonStyle}
             >
                 <Colorscale
-                    colorscale={configStyle.colorbar.colorscale}
+                    colorscale={configStyle.colorscale}
                     onClick={() => {
                         // 
                     }}
@@ -43,8 +47,7 @@ export default class ColorscalePicker extends Component<any, any> {
                 {this.state.showColorscalePicker &&
                     <ColorscalePicker
                         onChange={this.onColorsChange}
-                        colorscale={configStyle.colorbar.colorscale}
-                        nSwatches={configStyle.colorbar.colorscale.length}
+                        colorscale={configStyle.colorscale}
                         disableSwatchControls
                     />
                 }</div>

@@ -24,5 +24,5 @@ export default class DashboardModel {
   dataStructure: DataStructureModel = new DataStructureModel();
   layout: LayoutModel[] = [];
   blocks: { [id: string]: BlockModel } = {};
-  date?: Date |string;
+  date?: Date | string;
 }

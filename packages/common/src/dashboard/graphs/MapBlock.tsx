@@ -182,7 +182,7 @@ class MapBlock extends Component<any, any> {
             const configStyle = this.props.currentBlock.config.configStyle;
 
             // Prepare Data
-            const plotlyColorscale = configStyle.colorbar.colorscale.map((x, i) => { return [i / (configStyle.colorbar.colorscale.length - 1), x] });
+            const plotlyColorscale = configStyle.colorscale.map((x, i) => { return [i / (configStyle.colorscale.length - 1), x] });
             obj = {
                 ...obj,
                 type: 'choroplethmapbox',

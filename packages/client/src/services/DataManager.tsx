@@ -134,7 +134,7 @@ export default class DataManager implements IDataManager {
   };
 
   getOptions = () => {
-    return ["models", "scenarios", "variables", "regions"];
+    return ["models", "scenarios", "variables", "regions", "categories"];
   };
 
   fetchFilterOptions = (data: {filterId: string, metaData: BlockDataModel, dataFocusFilters: any}) => {
@@ -153,6 +153,21 @@ export default class DataManager implements IDataManager {
   };
 
 
+  fetchDataFocusOptions = (data) => {
+    return fetch(`api/dataFocus`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        return data;
+      })
+      .catch(console.error);
+  };
+
   fetchRegionsGeojson = (regions: string[]) => {
     return fetch(`api/regionsGeojson`, {
       method: 'POST',
@@ -161,6 +176,15 @@ export default class DataManager implements IDataManager {
       },
       body: JSON.stringify(regions),
     })
+      .then((response) => response.json())
+      .then((data) => {
+        return data;
+      })
+      .catch(console.error);
+  };
+
+  fetchCategories = () => {
+    return fetch(`api/categories`)
       .then((response) => response.json())
       .then((data) => {
         return data;

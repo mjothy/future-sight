@@ -53,7 +53,6 @@ export default class ControlBlockEditor extends Component<any, any> {
         dashboard.blocks[child.id].config = { ...configChild };
       });
     }
-    return dashboard;
   }
 
   clearClick = (option, e) => {
@@ -61,26 +60,21 @@ export default class ControlBlockEditor extends Component<any, any> {
     const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
     const parentBlock = JSON.parse(JSON.stringify(this.props.currentBlock));
 
-    // update current block config (metadata)
+    // update data selected in block view)
     parentBlock.config.metaData.master[option].isMaster = false;
     this.props.optionsLabel.forEach(label => {
       parentBlock.config.metaData.master[label].values = []; // clear selected data in control block view
     })
 
-    if (!e.target.checked) {
-
-      // set higher idx filters as stale
-      const index = parentBlock.config.metaData.selectOrder.indexOf(option);
-      const higherIdxFilters = [...parentBlock.config.metaData.selectOrder].slice(index);
-      for (const clearedFilter of higherIdxFilters) {
-        this.props.setStaleFilters(clearedFilter, true)
-      }
-
-      parentBlock.config.metaData[option] = [];
-      parentBlock.config.metaData.selectOrder = parentBlock.config.metaData.selectOrder.filter(optionFilter => optionFilter !== option);
-    } else {
-      parentBlock.config.metaData.selectOrder.push(option)
+    // set higher idx filters as stale
+    const index = parentBlock.config.metaData.selectOrder.indexOf(option);
+    const higherIdxFilters = [...parentBlock.config.metaData.selectOrder].slice(index);
+    for (const clearedFilter of higherIdxFilters) {
+      this.props.setStaleFilters(clearedFilter, true)
     }
+
+    parentBlock.config.metaData[option] = [];
+    parentBlock.config.metaData.selectOrder = parentBlock.config.metaData.selectOrder.filter(optionFilter => optionFilter !== option);
 
     dashboard.blocks[this.props.currentBlock.id].config = { ...parentBlock.config };
 
@@ -89,6 +83,14 @@ export default class ControlBlockEditor extends Component<any, any> {
 
     this.props.updateDashboard(dashboard);
   };
+
+  onChange = (option, selectedData: string[]) => {
+    if (selectedData.length <= 0) {
+      this.clearClick(option, null);
+    } else {
+      this.props.onChange(option, selectedData);
+    }
+  }
 
   selectDropDown = (option) => {
     const metaData = this.props.currentBlock.config.metaData;
@@ -104,10 +106,11 @@ export default class ControlBlockEditor extends Component<any, any> {
 
         {metaData.master[option].isMaster && <SelectInput
           type={option}
+          className={"width-90"}
           value={metaData[option]}
           loading={this.props.isLoadingOptions[option]}
           options={this.props.optionsData[option]}
-          onChange={this.props.onChange}
+          onChange={this.onChange}
           isClear={true}
           onClear={this.clearClick}
           onDropdownVisibleChange={this.props.onDropdownVisibleChange}

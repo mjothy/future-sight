@@ -8,6 +8,8 @@ import {
   DataModel,
   PlotDataModel,
   ReadOnlyDashboard
+  ConfigurationModel,
+  ReadOnlyDashboard, Colorizer, OptionsDataModel
 } from '@future-sight/common';
 import {Component} from 'react';
 import withDataManager from '../../services/withDataManager';
@@ -16,6 +18,7 @@ import DashboardSelectionControl from './DashboardSelectionControl';
 import {getDraft, removeDraft} from '../drafts/DraftUtils';
 import Utils from '../../services/Utils';
 import {Spin} from 'antd';
+import * as _ from 'lodash';
 
 export interface DashboardDataConfigurationProps
   extends ComponentPropsWithDataManager,
@@ -37,30 +40,40 @@ class DashboardDataConfiguration extends Component<
     super(props);
     this.optionsLabel = this.props.dataManager.getOptions();
     this.state = {
-      filters: {
-        regions: {},
-        variables: {},
-        scenarios: {},
-        models: {},
-      },
+      allData: new OptionsDataModel(),
       /**
        * Data (with timeseries from IASA API)
        */
       plotData: {},
       isFetchData: false,
+      response: [],
+      blockId: ""
     };
   }
 
   async componentDidMount() {
-    const filters = this.state.filters;
+    const allData = this.state.allData;
     try {
-      filters['regions'] = await this.props.dataManager.fetchRegions();
-      filters['variables'] = await this.props.dataManager.fetchVariables();
-      filters['models'] = await this.props.dataManager.fetchModels();
-      filters['scenarios'] = await this.props.dataManager.fetchScenarios();
-      this.setState({ filters, isFetchData: true });
+      allData['regions'] = await this.props.dataManager.fetchRegions();
+      allData['variables'] = await this.props.dataManager.fetchVariables();
+      allData['models'] = await this.props.dataManager.fetchModels();
+      allData['scenarios'] = await this.props.dataManager.fetchScenarios();
+      allData['categories'] = await this.props.dataManager.fetchCategories();
+      this.setState({ allData, isFetchData: true });
     } catch (error) {
       console.log("ERROR FETCH: ", error);
+    }
+  }
+
+  componentDidUpdate(prevProps: Readonly<DashboardDataConfigurationProps>, prevState: Readonly<any>, snapshot?: any): void {
+    if (!_.isEqual(this.state.response, prevState.response)) {
+      const plotData = JSON.parse(JSON.stringify(this.state.plotData))
+      if (plotData[this.state.updateBlockId] != undefined)
+        plotData[this.state.updateBlockId].push(...this.state.response)
+      else
+        plotData[this.state.updateBlockId] = [...this.state.response]
+
+      this.setState({ plotData })
     }
   }
 
@@ -93,6 +106,7 @@ class DashboardDataConfiguration extends Component<
       const data: PlotDataModel[] = [];
       const missingData: DataModel[] = [];
 
+      // TODO add categories
       if (
         metaData.models &&
         metaData.scenarios &&
@@ -151,22 +165,13 @@ class DashboardDataConfiguration extends Component<
     return [];
   };
 
+  // TODO Check merge
   retreiveAllTimeSeriesData = (data, blockId) => {
     this.props.dataManager.fetchPlotData(data)
       .then(res => {
-        const plotData = { ...this.state.plotData }
-        if (plotData[blockId] != undefined)
-          plotData[blockId] = [...plotData[blockId], ...res]
-        else
-          plotData[blockId] = [...res]
-
         if (res.length > 0) {
-          console.log("res: ", res)
-          this.setState({ plotData });
+          this.setState({ response: res, updateBlockId: blockId });
         }
-        // else {
-        //   this.setState({ plotData });
-        // }
       }
       );
   }
@@ -186,7 +191,7 @@ class DashboardDataConfiguration extends Component<
     ) : (
       (this.state.isFetchData && <DashboardSelectionControl
         saveData={this.saveData}
-        filters={this.state.filters}
+        allData={this.state.allData}
         plotData={this.state.plotData}
         blockData={this.blockData}
         optionsLabel={this.optionsLabel}
@@ -194,13 +199,13 @@ class DashboardDataConfiguration extends Component<
       />) || <div className="dashboard">
         <Spin className="centered" />
       </div>)
-        // TODO handle error
+      // TODO handle error
     )
 
     return (
-        <ColorizerProvider colorizer={new Colorizer(dataFilterKeys, undefined, undefined, "region")}>
-          {toRender}
-        </ColorizerProvider>
+      <ColorizerProvider colorizer={new Colorizer(dataFilterKeys, undefined, undefined, "region")}>
+        {toRender}
+      </ColorizerProvider>
     )
   }
 }

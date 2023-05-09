@@ -1,11 +1,13 @@
 import React, {Component} from 'react';
 import ConfigurationModel from '../../models/ConfigurationModel';
+import OptionsDataModel from '../../models/OptionsDataModel';
 import ControlBlockEditor from './control/ControlBlockEditor';
 import DataBlockEditor from './data/DataBlockEditor';
 import {getBlock} from './utils/BlockDataUtils';
 import {getSelectedFilter} from './utils/DashboardUtils';
 import BlockDataModel, {versionsModel} from "../../models/BlockDataModel";
 import DashboardModel from "../../models/DashboardModel";
+import { getSelectedFiltersLabels } from './utils/DashboardUtils';
 
 export default class BlockFilterManager extends Component<any, any> {
     constructor(props) {
@@ -81,8 +83,10 @@ export default class BlockFilterManager extends Component<any, any> {
             metaData = this.getMetaDataIfControlled();
         }
 
-        const selectedFilter = getSelectedFilter(this.props.dashboard.dataStructure);
-        dataFocusFilters[selectedFilter] = this.props.dashboard.dataStructure[selectedFilter].selection;
+        const selectedFilters = getSelectedFiltersLabels(this.props.dashboard.dataStructure);
+        selectedFilters.forEach(filter => {
+            dataFocusFilters[filter] = this.props.dashboard.dataStructure[filter].selection;
+        })
 
         this.setState({isLoadingOptions: {...this.state.isLoadingOptions, [filterId]: true}})
         return this.props.dataManager.fetchFilterOptions({filterId, metaData, dataFocusFilters})
@@ -122,15 +126,10 @@ export default class BlockFilterManager extends Component<any, any> {
     missingData = () => {
         const metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
 
-        if (metaData.selectOrder.length == 4) {
+        if (this.isAllSelected()) {
             const existDataRaws = this.getExistingRaws(metaData, this.props.currentBlock.id);
 
-            const data = {
-                regions: [],
-                variables: [],
-                scenarios: [],
-                models: [],
-            }
+            const data = new OptionsDataModel()
 
             this.props.optionsLabel.forEach(option => {
                 data[option] = Array.from(new Set(existDataRaws.map(raw => raw[option.slice(0, -1)])))
@@ -324,6 +323,12 @@ export default class BlockFilterManager extends Component<any, any> {
         })
     }
 
+    isAllSelected = () => {
+        const selectedOrder = this.props.currentBlock.config.metaData.selectOrder;
+        const obligatory = selectedOrder.filter(key => key != "categories");
+        return obligatory.length == 4
+    }
+
     render() {
         return this.props.currentBlock.blockType === 'data' ? (
             <DataBlockEditor
@@ -336,6 +341,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 onUseVersionSwitched={this.onUseVersionSwitched}
                 onVersionSelected={this.onVersionSelected}
                 setStaleFilters={this.setStaleFilters}
+                isAllSelected={this.isAllSelected}
             />
         ) : (
             <ControlBlockEditor

@@ -219,6 +219,36 @@ export default class ExpressServer {
       }
     });
 
+    this.app.get(`/api/categories`, (req, res) => {
+      res.send(this.dataProxy.getCategories());
+    });
+
+    this.app.post('/api/dataFocus', async (req, res, next) => {
+      const selectedData = req.body.data;
+      const optionsData = {
+        regions: [],
+        variables: [],
+        scenarios: [],
+        models: [],
+        catagories: []
+      };
+      optionsLabel.forEach(option1 => {
+        let dataUnion = this.dataProxy.getDataUnion();
+        optionsLabel.forEach(option2 => {
+          if (option1 != option2) {
+            if (selectedData[option2].length > 0) {
+              dataUnion = dataUnion.filter(raw => selectedData[option2].includes(raw[option2.slice(0, -1)]));
+            }
+          }
+        })
+        optionsData[option1] = Array.from(new Set(dataUnion.map(raw => raw[option1.slice(0, -1)])))
+      })
+
+      optionsData["categories"] = this.dataProxy.getCategories();
+
+      res.send(optionsData);
+    });
+
     this.app.post('/api/filterOptions', async (req, res, next) => {
       const filterId = req.body.filterId
       const dataFocusFilters = req.body.dataFocusFilters;
@@ -238,8 +268,12 @@ export default class ExpressServer {
       // First filter (by data focus) -- only one filter selected
       let dataFocusFiltersRaws = dataUnion;
       Object.keys(dataFocusFilters).forEach(option => {
+        if (option === "categories"){ // TODO delete after
+          return
+        }
+
         if (dataFocusFilters[option].length > 0) {
-          dataFocusFiltersRaws = dataUnion.filter(raw => dataFocusFilters[option].includes(raw[option.slice(0, -1)]));
+          dataFocusFiltersRaws = dataFocusFiltersRaws.filter(raw => dataFocusFilters[option].includes(raw[option.slice(0, -1)]));
         }
       })
 
@@ -250,6 +284,12 @@ export default class ExpressServer {
       } else {
         optionsData[filterId] = Array.from(new Set(dataRaws.map(raw => raw[filterId.slice(0, -1)])))
       }
+
+      // TODO add categories to filter
+      if(filterId === "categories"){
+        optionsData["categories"] = this.dataProxy.getCategories();
+      }
+
       res.send(optionsData);
     });
 
