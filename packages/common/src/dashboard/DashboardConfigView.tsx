@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { EditTwoTone, DragOutlined, WarningOutlined } from '@ant-design/icons';
 import { Button, Space } from 'antd';
 import './DashboardConfigView.css';
+import PlotDataModel from "../models/PlotDataModel";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 const GRID_RATIO = 16 / 9
@@ -180,6 +181,19 @@ class DashboardConfigView extends Component<any, any> {
         this.setState({ rowHeight: width / cols / GRID_RATIO });
     }
 
+    /**
+     * Check if fetched data has any deprecated version, and update metadata if has one
+     */
+    checkDeprecatedVersion = (data: PlotDataModel[], currentBlock) => {
+        const hasDeprecatedVersion = !data.every((plotData)=> plotData.is_default.toLowerCase() === "true")
+
+        if(hasDeprecatedVersion !== currentBlock.config.metaData.hasDeprecatedVersion){
+            const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+            dashboard.blocks[currentBlock.id].config.metaData.hasDeprecatedVersion = hasDeprecatedVersion
+            this.props.updateDashboard(dashboard)
+        }
+    }
+
     render() {
         const { blocks, layout } = this.props.dashboard;
         return (
@@ -262,6 +276,7 @@ class DashboardConfigView extends Component<any, any> {
                                 dashboard={this.props.dashboard}
                                 optionsLabel={this.props.optionsLabel}
                                 updateDashboard={this.props.updateDashboard}
+                                checkDeprecatedVersion={this.checkDeprecatedVersion}
                             />
                         </div>
                     </div>

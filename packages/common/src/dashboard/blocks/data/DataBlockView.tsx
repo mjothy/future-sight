@@ -35,23 +35,9 @@ class DataBlockView extends Component<any, any> {
   getPlotData = () => {
     let data: PlotDataModel[] = this.props.timeseriesData;
     data = PlotlyUtils.filterByCustomXRange(data, this.props.currentBlock.config.configStyle)
-    this.checkDeprecatedVersion(data)
+    this.props.checkDeprecatedVersion(data, this.props.currentBlock)
     return data
   }
-
-  /**
-   * Check if fetched data has any deprecated version, and update metadata if has one
-   */
-  checkDeprecatedVersion = (data: PlotDataModel[]) => {
-    const hasDeprecatedVersion = !data.every((plotData)=> plotData.is_default.toLowerCase() === "true")
-
-    if(hasDeprecatedVersion !== this.props.currentBlock.config.metaData.hasDeprecatedVersion){
-      const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
-      dashboard.blocks[this.props.currentBlock.id].config.metaData.hasDeprecatedVersion = hasDeprecatedVersion
-      this.props.updateDashboard(dashboard)
-    }
-  }
-
 
   /**
    * Preparing the fetched data to adapt plotly data OR antd table

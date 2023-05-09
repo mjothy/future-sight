@@ -20,7 +20,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 variables: metadata["variables"],
                 scenarios: metadata["scenarios"],
                 models: metadata["models"],
-                versions:metadata["versions"]
+                versions: this.initVersionOptions(metadata["versions"])
             },
             missingData: {
                 regions: [],
@@ -44,10 +44,28 @@ export default class BlockFilterManager extends Component<any, any> {
         };
     }
 
+    componentDidMount() {
+        this.updateFilterOptions("versions")
+    }
+
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.props.plotData[this.props.currentBlock.id]?.length != prevProps.plotData[this.props.currentBlock.id]?.length) {
             this.missingData();
         }
+    }
+
+    initVersionOptions = (versionsMetadata: versionsModel) => {
+        const tempVersions = JSON.parse(JSON.stringify(versionsMetadata))
+        for (const model of Object.keys(versionsMetadata)){
+            for(const scenario of Object.keys(versionsMetadata[model])){
+                tempVersions[model][scenario] = {
+                    default: "",
+                    values: tempVersions[model][scenario]
+                }
+            }
+        }
+
+        return tempVersions
     }
 
     /**
@@ -254,9 +272,7 @@ export default class BlockFilterManager extends Component<any, any> {
         this.props.updateDashboard(dashboard)
     };
 
-    // TODO Update to match new fetching style, when deleting refetch filters that are higher idx than model and scenario
-    // TODO When clearing models or scenarios, should also clear versions
-    // When updating version tree select update metaData.versions.
+     // When updating version tree select update metaData.versions.
     // Always keep one leaf selected
     onVersionSelected = (selectedValues: string[]) => {
         const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));

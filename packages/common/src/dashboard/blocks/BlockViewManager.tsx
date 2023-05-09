@@ -25,8 +25,7 @@ export default class BlockViewManager extends Component<any, any> {
           timeseriesData: this.props.timeseriesData,
           width: this.props.width,
           height: this.props.height,
-          // TODO try to remove this function, might be overkill to pass this big function
-          updateDashboard: this.props.updateDashboard
+          checkDeprecatedVersion: this.props.checkDeprecatedVersion
         }} />;
       case 'control':
         return <ControlBlockView {...{
