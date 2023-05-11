@@ -134,7 +134,7 @@ export default class DataManager implements IDataManager {
   };
 
   getOptions = () => {
-    return ["models", "scenarios", "variables", "regions", "categories"];
+    return ["models", "scenarios", "variables", "regions"];
   };
 
   fetchFilterOptions = (data: {filterId: string, metaData: BlockDataModel, dataFocusFilters: any}) => {
