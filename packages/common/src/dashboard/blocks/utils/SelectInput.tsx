@@ -43,7 +43,11 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
             if (!currentNode) {
                 const checkable = (values.length === 1 || this.props.type == "categories"); // Set only Leafs as checkable
                 currentNode = { title: values[0], label: values[0], key: values[0], value: values[0], children: [], checkable };
-                currentNode.title = `${currentNode.label} (${currentNode.children.length})`;
+                let title = `${currentNode.label}`;
+                if (currentNode.children.length > 0) {
+                    title += `(${currentNode.children.length})`
+                }
+                currentNode.title = title
                 treeData.push(currentNode);
             }
 
@@ -62,7 +66,11 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                     }
                 }
 
-                currentNode.title = `${currentNode.label} (${currentNode.children.length})`;
+                let title = `${currentNode.label}`;
+                if (currentNode.children.length > 0) {
+                    title += `(${currentNode.children.length})`
+                }
+                currentNode.title = title
                 currentNode = childNode;
             }
 

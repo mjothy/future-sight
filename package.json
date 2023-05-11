@@ -36,5 +36,7 @@
     "serve": "node ./build/index.js",
     "generate": "ts-node ./scripts/IIASAToJson.ts"
   },
-  "dependencies": {}
+  "dependencies": {
+    "source-map-explorer": "^2.5.3"
+  }
 }

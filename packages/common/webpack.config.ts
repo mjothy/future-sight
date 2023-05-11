@@ -31,6 +31,12 @@ const getConfig = (env, argv) => {
         externals: {
             react: 'react',
             'react-router-dom': 'react-router-dom',
+            "@ant-design/icons": "@ant-design/icons",
+            "antd": "antd",
+            "react-grid-layout": "react-grid-layout",
+            "react-plotly.js": "react-plotly.js",
+            "html2canvas": "html2canvas",
+            "plotly.js": "plotly.js"
         },
     };
     if (argv.mode === 'development') {
