@@ -48,7 +48,7 @@ class SetupView extends Component<any, any> {
 
   getOptionsData = async () => {
     const data = new OptionsDataModel();
-    this.props.optionsLabel.forEach(option => {
+    Object.keys(this.state.dataStructure).forEach(option => {
       data[option] = this.state.dataStructure[option].selection;
     })
     this.setState({ isFetching: true })
@@ -125,7 +125,7 @@ class SetupView extends Component<any, any> {
       return !(selected_in_options.length == dataStructureData.length)
     } else {
       let isMissing = false;
-      for (const option of this.props.optionsLabel) {
+      for (const option of Object.keys(this.state.dataStructure)) {
         if (this.isDataMissing(option) && option != "categories") {
           isMissing = true;
           break;

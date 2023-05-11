@@ -21,18 +21,15 @@ export default class DataBlockEditor extends Component<any, any> {
     if (index >= 0) {
       const newSelectOrder = [...config.metaData.selectOrder].slice(0,index);
       const clearedFilters = [...config.metaData.selectOrder].slice(index);
-
       for (const clearedFilter of clearedFilters) {
-        // TODO add condition for controlled inputs
         config.metaData[clearedFilter] = [];
-        this.props.setStaleFilters(clearedFilter, true)
       }
-
-      config.metaData.selectOrder = [...selectOrder];
+      config.metaData.selectOrder = [...newSelectOrder];
       dashboard.blocks[this.props.currentBlock.id].config = { ...config };
-      this.props.updateDashboard(dashboard);
-    }
 
+      this.props.updateDashboard(dashboard);
+      this.props.setStaleFiltersFromSelectOrder(newSelectOrder)
+    }
   };
 
   onChange = (option, selectedData: string[]) => {

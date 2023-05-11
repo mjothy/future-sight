@@ -28,7 +28,6 @@ export default class PopupFilterContent extends Component<any, any> {
   };
 
   onChange = (type: string, selectedData: string[]) => {
-    console.log("onChange: ", selectedData)
     const dataStructure = JSON.parse(JSON.stringify(this.props.dataStructure));
     dataStructure[type].selection = selectedData;
     this.props.updateDataStructure(dataStructure);
@@ -51,6 +50,7 @@ export default class PopupFilterContent extends Component<any, any> {
       onChange={this.onChange}
       isFetching={this.props.isFetching}
       onDropdownVisibleChange={this.onDropdownVisibleChange}
+      isClosable={true}
     />
   }
 

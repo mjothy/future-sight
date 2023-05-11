@@ -18,6 +18,7 @@ interface SelectOptionProps {
     loading?: boolean;
     isFetching?: false;
     className?: string;
+    isClosable?: boolean;
 }
 
 const COLORS = ['red', 'blue', 'green', 'yellow'];
@@ -92,7 +93,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         return (
             <Tag
                 color={this.props.options.includes(value) ? undefined : 'red'}
-                closable={closable}
+                closable={this.props.isClosable}
                 onClose={onClose}
                 icon={this.props.options.includes(value) ? undefined : <ExclamationCircleOutlined />}
                 className={this.props.options.includes(value) ? 'ant-select-selection-item' : 'ant-select-selection-item data-missing-tag'}
@@ -113,6 +114,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
     treeSelect = () => {
         return <Input.Group compact>
             <TreeSelect
+                removeIcon={<></>}
                 value={this.props.value}
                 treeCheckable={true}
                 placeholder={this.props.type}
@@ -212,6 +214,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 treeExpandAction="doubleClick"
                 onSearch={this.onSearch}
                 searchValue={this.state.searchValue}
+                removeIcon={<></>}
             >
                 {this.renderTreeNodes(this.splitOptions(this.props.options))}
 

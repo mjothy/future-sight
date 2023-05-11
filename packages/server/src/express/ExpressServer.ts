@@ -6,7 +6,6 @@ import RedisClient from '../redis/RedisClient';
 import IDataProxy from './IDataProxy';
 
 const optionsLabel = ["models", "scenarios", "variables", "regions", "versions"];
-const COUNTRIES_GEOJSON_URL = "https://datahub.io/core/geo-countries/r/countries.geojson";
 
 export default class ExpressServer {
   private app: any;
@@ -230,11 +229,10 @@ export default class ExpressServer {
         variables: [],
         scenarios: [],
         models: [],
-        catagories: []
       };
-      optionsLabel.forEach(option1 => {
+      Object.keys(optionsData).forEach(option1 => {
         let dataUnion = this.dataProxy.getDataUnion();
-        optionsLabel.forEach(option2 => {
+        Object.keys(optionsData).forEach(option2 => {
           if (option1 != option2) {
             if (selectedData[option2].length > 0) {
               dataUnion = dataUnion.filter(raw => selectedData[option2].includes(raw[option2.slice(0, -1)]));
@@ -277,6 +275,7 @@ export default class ExpressServer {
         }
       })
 
+      // Filter by selection
       const dataRaws = this.getRawsByFilterId(filterId, metaData, dataFocusFiltersRaws);
 
       if (filterId === "versions"){
@@ -330,8 +329,7 @@ export default class ExpressServer {
 
     // Filter by filters with lower idx
     for (const tempFilter of filtersToApply) {
-      console.log(tempFilter)
-      dataRaws = (tempFilter == "versions")
+      dataRaws = (tempFilter === "versions")
           ? this.filterRawByVersions(dataRaws, metaData)
           : dataRaws.filter(raw => metaData[tempFilter].includes(raw[tempFilter.slice(0, -1)]));
     }
@@ -339,7 +337,14 @@ export default class ExpressServer {
     return dataRaws;
   }
 
-
+  /**
+   * Get filters that has to be used on this filterId (filters that have a lower idx in selectOrder)
+   * Special case when scenario and models are in selectOrder, the last selected is replaced by versions and runId
+   * in the future to always filter by versions/runId after scenarios or models
+   * @param filterId the filter which updates its options
+   * @param metaData the selected data in block
+   * @returns a list of filterId to be applied
+   */
   getFiltersToApply(filterId, metaData){
 
     let lowerIdxFilters;
@@ -355,19 +360,23 @@ export default class ExpressServer {
           ? [...metaData.selectOrder] // filterId not in selectOrder, all selectOrder have lower idx
           : metaData.selectOrder.slice(0, filterIdOrder) // only filters with idx lower than filterIdOrder
 
-      // Replace scenario or model by version if both in selectOrder, choose the highest idx
-      // To filter by version/runId when both scenario and model are selected
+      // Replace scenarios or models by versions if both in selectOrder, choose the highest idx between them.
+      // As it is the same to filter by model/scenario/version or to filter by runId
+      // when both scenario and model are selected
       if(["models", "scenarios"].every(item => metaData.selectOrder.includes(item))){
-        console.log(metaData.selectOrder.indexOf("models"), metaData.selectOrder.indexOf("scenarios"))
         const maxIdx = Math.max(metaData.selectOrder.indexOf("models"), metaData.selectOrder.indexOf("scenarios"))
         lowerIdxFilters[maxIdx] =  "versions" // TODO replace by runId here
       }
     }
-    console.log(metaData.selectOrder)
-    console.log(lowerIdxFilters)
     return lowerIdxFilters
   }
 
+  /**
+   * Filter by versions. Versions are stored differently hence a different function than other filters
+   * @param dataRaws rows of data to filter
+   * @param metaData the selected data in block
+   * @returns a dataRaws filtered by versions/runId in the future
+   */
   filterRawByVersions(dataRaws, metaData) {
     const selectedVersions = metaData.versions
     return dataRaws.filter(raw => {
@@ -383,7 +392,11 @@ export default class ExpressServer {
     });
   }
 
-
+  /**
+   * Transform dataRaws into a versionDict format
+   * @param dataRaws rows of data
+   * @returns a dict in format dict[model][scenario]: versionId[]
+   */
   getVersionDictFromRaws(dataRaws){
     const version_dict = {};
     for (const raw of dataRaws) {

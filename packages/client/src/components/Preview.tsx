@@ -37,7 +37,7 @@ class Preview extends React.Component<any, any> {
     getTags = () => {
         const content: JSX.Element[] = [];
         this.props.conf.userData.tags.forEach((tag) => {
-            content.push(<Tag>{tag}</Tag>);
+            content.push(<Tag key={tag}>{tag}</Tag>);
         });
         return content;
     };

@@ -1,15 +1,14 @@
 import {
   BlockDataModel,
   BlockModel,
-  Colorizer,
   ColorizerProvider,
   ComponentPropsWithDataManager,
   ConfigurationModel,
   DataModel,
   PlotDataModel,
-  ReadOnlyDashboard
-  ConfigurationModel,
-  ReadOnlyDashboard, Colorizer, OptionsDataModel
+  ReadOnlyDashboard,
+  Colorizer,
+  OptionsDataModel
 } from '@future-sight/common';
 import {Component} from 'react';
 import withDataManager from '../../services/withDataManager';

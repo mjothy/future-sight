@@ -4,7 +4,6 @@ import OptionsDataModel from '../../models/OptionsDataModel';
 import ControlBlockEditor from './control/ControlBlockEditor';
 import DataBlockEditor from './data/DataBlockEditor';
 import {getBlock} from './utils/BlockDataUtils';
-import {getSelectedFilter} from './utils/DashboardUtils';
 import BlockDataModel, {versionsModel} from "../../models/BlockDataModel";
 import DashboardModel from "../../models/DashboardModel";
 import { getSelectedFiltersLabels } from './utils/DashboardUtils';
@@ -22,6 +21,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 variables: metadata["variables"],
                 scenarios: metadata["scenarios"],
                 models: metadata["models"],
+                categories: metadata["categories"],
                 versions: this.initVersionOptions(metadata["versions"])
             },
             missingData: {
@@ -29,6 +29,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 variables: [],
                 scenarios: [],
                 models: [],
+                categories: []
             },
             staleFilters:{
                 regions: true,
@@ -42,18 +43,8 @@ export default class BlockFilterManager extends Component<any, any> {
                 scenarios: false,
                 models: false
             },
-            currentSelection: []
+            currentSelection: [] // When opening a selectInput, store its value here to compare when closing
         };
-    }
-
-    componentDidMount() {
-        this.updateFilterOptions("versions")
-    }
-
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.props.plotData[this.props.currentBlock.id]?.length != prevProps.plotData[this.props.currentBlock.id]?.length) {
-            this.missingData();
-        }
     }
 
     initVersionOptions = (versionsMetadata: versionsModel) => {
@@ -68,6 +59,19 @@ export default class BlockFilterManager extends Component<any, any> {
         }
 
         return tempVersions
+    }
+
+    componentDidMount() {
+        const metadata = this.props.currentBlock.config.metaData
+        if(metadata["scenarios"].length>0 && metadata["models"].length>0){
+            this.updateFilterOptions("versions")
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.props.plotData[this.props.currentBlock.id]?.length != prevProps.plotData[this.props.currentBlock.id]?.length) {
+            this.missingData();
+        }
     }
 
     /**
@@ -313,13 +317,18 @@ export default class BlockFilterManager extends Component<any, any> {
         })
     }
 
-    setStaleFilters = (filterId: string, value: boolean) => {
+    setStaleFiltersFromSelectOrder = (newSelectOrder: string[]) => {
+        const tempStaleFilters = {...this.state.staleFilters}
+        const filtersToStale = Object.keys(this.state.staleFilters).filter(
+            (x)=>!newSelectOrder.includes(x)
+        )
+
+        for (const filter of filtersToStale){
+            tempStaleFilters[filter]=true
+        }
+
         this.setState({
-            staleFilters:
-                {
-                    ...this.state.staleFilters,
-                    [filterId]:value
-                }
+            staleFilters: tempStaleFilters
         })
     }
 
@@ -340,7 +349,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 onDropdownVisibleChange={this.onDropdownVisibleChange}
                 onUseVersionSwitched={this.onUseVersionSwitched}
                 onVersionSelected={this.onVersionSelected}
-                setStaleFilters={this.setStaleFilters}
+                setStaleFiltersFromSelectOrder={this.setStaleFiltersFromSelectOrder}
                 isAllSelected={this.isAllSelected}
             />
         ) : (
@@ -351,7 +360,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 isLoadingOptions={this.state.isLoadingOptions}
                 onChange={this.onChange}
                 onDropdownVisibleChange={this.onDropdownVisibleChange}
-                setStaleFilters={this.setStaleFilters}
+                setStaleFiltersFromSelectOrder={this.setStaleFiltersFromSelectOrder}
             />
         );
     }

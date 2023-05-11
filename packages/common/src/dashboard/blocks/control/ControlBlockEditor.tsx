@@ -66,13 +66,6 @@ export default class ControlBlockEditor extends Component<any, any> {
       parentBlock.config.metaData.master[label].values = []; // clear selected data in control block view
     })
 
-    // set higher idx filters as stale
-    const index = parentBlock.config.metaData.selectOrder.indexOf(option);
-    const higherIdxFilters = [...parentBlock.config.metaData.selectOrder].slice(index);
-    for (const clearedFilter of higherIdxFilters) {
-      this.props.setStaleFilters(clearedFilter, true)
-    }
-
     parentBlock.config.metaData[option] = [];
     parentBlock.config.metaData.selectOrder = parentBlock.config.metaData.selectOrder.filter(optionFilter => optionFilter !== option);
 
@@ -82,6 +75,7 @@ export default class ControlBlockEditor extends Component<any, any> {
     this.updateChildsBlocks(dashboard, parentBlock);
 
     this.props.updateDashboard(dashboard);
+    this.props.setStaleFiltersFromSelectOrder(parentBlock.config.metaData.selectOrder)
   };
 
   onChange = (option, selectedData: string[]) => {
