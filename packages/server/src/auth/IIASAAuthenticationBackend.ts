@@ -1,8 +1,9 @@
 import { IAuthenticationBackend } from "../interfaces/IAuthenticationBackend ";
 import fetch from 'node-fetch';
+import config from '../configurations/config.json';
 
-const AUTH_URL = "https://api.dev.manager.ece.iiasa.ac.at/v1/token/obtain";
-const REFRESH_URL = "https://api.dev.manager.ece.iiasa.ac.at/v1/token/refresh";
+const AUTH_URL = config.auth_url;
+const REFRESH_URL = config.refresh_token_url;
 
 export default class IIASAAuthenticationBackend implements IAuthenticationBackend {
 
@@ -49,7 +50,6 @@ export default class IIASAAuthenticationBackend implements IAuthenticationBacken
             },
             body: JSON.stringify({
                 refresh: this.refresh_token
-
             })
         };
 

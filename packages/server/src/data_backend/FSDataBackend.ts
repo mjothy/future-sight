@@ -1,18 +1,13 @@
 import * as fs from "fs";
 import IDataBackend from "../interfaces/IDataBackend ";
-import FilterManager from "../configurations/FilterManager";
-
+import filters from "../configurations/filters.json";
 
 export default class FSDataBackend implements IDataBackend {
     private readonly data: any[];
     private readonly dataUnion: any[];
     private readonly filterDataValues: any = {};
 
-    private readonly filterManager: FilterManager;
-
-    constructor(filterManager: FilterManager, dataPath: string, dataUnionPath: string) {
-
-        this.filterManager = filterManager;
+    constructor(dataPath: string, dataUnionPath: string) {
 
         const dataRaw = fs.readFileSync(dataPath);
         const dataUnionRaw = fs.readFileSync(dataUnionPath);
@@ -20,7 +15,7 @@ export default class FSDataBackend implements IDataBackend {
         this.data = JSON.parse(dataRaw.toString());
         this.dataUnion = JSON.parse(dataUnionRaw.toString());
 
-        const keys = Object.keys(filterManager.getFilters())
+        const keys = Object.keys(filters)
         keys.forEach(option => {
             this.filterDataValues[option] = Array.from(new Set(this.dataUnion.map(raw => raw[option.slice(0, -1)])))
         })
@@ -51,7 +46,7 @@ export default class FSDataBackend implements IDataBackend {
         return optionsData;
     };
 
-    getFilters = () => this.filterManager.getFilters();
+    getFilters = () => filters;
 
     getFilterPossibleValues = (filterId: string) => {
         return this.filterDataValues[filterId];
@@ -65,17 +60,17 @@ export default class FSDataBackend implements IDataBackend {
 
     getTimeSeries = () => []; // rename of getData
 
-    getFilteredData = (blockMetaData: any, firstFilters: any) => {
+    getFilteredData = (filterId, blockMetaData: any, dataFocusFilters: any) => {
         const optionsData = {};
         const dataUnion = this.dataUnion;
         let firstFilterRaws = dataUnion;
 
-        let filterKeys = Object.keys(firstFilters);
+        let filterKeys = Object.keys(dataFocusFilters);
         filterKeys = filterKeys.filter(key => key != "categories"); // TODO delete after
         // First filter (by data focus)
         filterKeys.forEach(option => {
-            if (firstFilters[option].length > 0) {
-                firstFilterRaws = firstFilterRaws.filter(raw => firstFilters[option].includes(raw[option.slice(0, -1)]));
+            if (dataFocusFilters[option].length > 0) {
+                firstFilterRaws = firstFilterRaws.filter(raw => dataFocusFilters[option].includes(raw[option.slice(0, -1)]));
             }
         })
 
@@ -125,7 +120,7 @@ export default class FSDataBackend implements IDataBackend {
         // => retreive all regions
 
         const dataRaws = {};
-        const filtersLabel = Object.keys(this.filterManager.getFilters());
+        const filtersLabel = Object.keys(filters);
 
         // Initialize dataRaws
         filtersLabel.forEach(key => dataRaws[key] = []); // TODO delete the s

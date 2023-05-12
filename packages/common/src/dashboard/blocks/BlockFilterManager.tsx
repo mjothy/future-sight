@@ -33,7 +33,7 @@ export default class BlockFilterManager extends Component<any, any> {
     }
 
     updateDropdownData = () => {
-        const filters = {};
+        const dataFocusFilters = {};
         let metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
         const currentBlock = this.props.currentBlock;
 
@@ -43,19 +43,19 @@ export default class BlockFilterManager extends Component<any, any> {
 
         const selectedFilters = getSelectedFiltersLabels(this.props.dashboard.dataStructure);
         selectedFilters.forEach(filter => {
-            filters[filter] = this.props.dashboard.dataStructure[filter].selection;
+            dataFocusFilters[filter] = this.props.dashboard.dataStructure[filter].selection;
         })
 
-        this.filterOptions(metaData, filters);
+        this.filterOptions(metaData, dataFocusFilters);
     };
 
     /**
      * to update options in input select
      * @param metaData selected data in block
-     * @param filters the first filter(by data focus)
+     * @param dataFocusFilters the first filter(by data focus)
      */
-    filterOptions = (metaData, filters) => {
-        this.props.dataManager.fetchDataOptions({ filters, metaData }).then(res => {
+    filterOptions = (metaData, dataFocusFilters) => {
+        this.props.dataManager.fetchDataOptions({ dataFocusFilters, metaData }).then(res => {
             this.setState({ optionsData: res }, () => {
                 this.props.checkIfSelectedInOptions(this.state.optionsData, this.props.currentBlock)
                 this.missingData();

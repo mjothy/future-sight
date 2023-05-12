@@ -1,23 +1,24 @@
 import fetch from 'node-fetch';
-
+import config from '../configurations/config.json'
+import { IAuthenticationBackend } from '../interfaces/IAuthenticationBackend ';
 export default class IIASADataManager {
 
-    private readonly url: string;
+    private readonly url: string = config.ecemf_url;
+    private readonly authentication: IAuthenticationBackend;
 
-    constructor(url) {
-        this.url = url;
+    constructor(authentication: IAuthenticationBackend) {
+        this.authentication = authentication;
     }
-
     getUrlBase = (path) => {
         return this.url + path;
     }
 
-    getPromise = async (url, token) => {
+    getPromise = async (url) => {
         const fullUrl = this.getUrlBase(url);
         const options = {
             method: 'GET',
             headers: {
-                'Authorization': 'Bearer ' + token,
+                'Authorization': 'Bearer ' + this.authentication.getToken(),
                 'Content-Type': 'application/json'
             }
         };
@@ -31,7 +32,7 @@ export default class IIASADataManager {
         const options = {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + "",
+                'Authorization': 'Bearer ' + this.authentication.getToken(),
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(body)
@@ -47,7 +48,7 @@ export default class IIASADataManager {
         const options = {
             method: 'PATCH',
             headers: {
-                'Authorization': 'Bearer ' + "",
+                'Authorization': 'Bearer ' + this.authentication.getToken(),
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(body)

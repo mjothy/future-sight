@@ -91,9 +91,14 @@ export default class ExpressServer {
       res.status(200).send(response);
     });
 
+    // We call dataFocus afer each combo-box closed
+    // 1- user open combobox of models, 
+    // 2- user select models = [model1,model2,...], 
+    // 3- close models combo-box
+    // 4- re-fetch filterd values of [variables, regions, scenarions]
     this.app.post('/api/dataFocus', async (req, res, next) => {
       const selectedData = req.body.data;
-      const optionsData = this.dataProxy.getDataFocus(selectedData);
+      const optionsData = await this.dataProxy.getDataFocus(selectedData);
 
       // Get categories from file system
       // TODO add category to filter when request to iaasa is provided
@@ -105,7 +110,7 @@ export default class ExpressServer {
     this.app.post('/api/filterOptions', async (req, res, next) => {
 
       try {
-        const optionsData = this.dataProxy.getFilteredData(req.body.metaData, req.body.filters);
+        const optionsData = this.dataProxy.getFilteredData(req.body.filterId, req.body.metaData, req.body.dataFocusFilters);
         optionsData["categories"] = this.configurationProvider.getMetaIndicators(); // TODO add categories to filter
         res.send(optionsData);
       } catch (err) {

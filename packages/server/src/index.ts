@@ -4,9 +4,10 @@ import path from "path";
 import RedisPersistenceManager from './redis/RedisPersistenceManager';
 import FSDataBackend from './data_backend/FSDataBackend';
 import FSConfigurationProvider from './configurations/FSConfigurationProvider';
-import FilterManager from './configurations/FilterManager';
 import IIASAAuthenticationBackend from './auth/IIASAAuthenticationBackend';
 import IIASADataBackend from './data_backend/IIASADataBackend';
+import config from "./configurations/config.json";
+import { username as env_username, password as env_password } from './env';
 
 const DEFAULT_PORT = 8080;
 const DEFAULT_COOKIE_KEY = '8azoijuem2aois3Qsjeir';
@@ -40,18 +41,20 @@ const dataUnionPath = isProd ? PROD_DATA_UNION_PATH : DEV_DATA_UNION_PATH;
 const countriesGeojsonPath = isProd ? PROD_COUNTRIES_GEOJSON_PATH : DEV_COUNTRIES_GEOJSON_PATH;
 const categoriesPath = isProd ? PROD_CATEGORIES_PATH : DEV_CATEGORIES_PATH;
 
-const filterManager = new FilterManager();
 // data loading
-const fsDataProxy = new FSDataBackend(filterManager, dataPath, dataUnionPath);
-/**
- * uncomment the following code to use IIASA API 
- */
-// const authentication = new IIASAAuthenticationBackend(username, password);
+let dataBackend;
+const authentication = new IIASAAuthenticationBackend(env_username, env_password);
 // async function refreshing() {
 //   await authentication.startRefreshing(); // to refresh token
 // }
-// refreshing()
-// const fsDataProxy = new IIASADataBackend(filterManager, authentication); 
+if (config.origin_data == "IIASA") {
+  // refreshing();
+  authentication.startRefreshing(); // to refresh token
+  dataBackend = new IIASADataBackend(authentication);
+} else {
+  dataBackend = new FSDataBackend(dataPath, dataUnionPath);
+}
+
 const fsConfProvider = new FSConfigurationProvider(countriesGeojsonPath, categoriesPath);
 
 // redis initialisation
@@ -65,7 +68,7 @@ if (username && password) {
     challenge: true,
   });
 }
-const app = new ExpressServer(port, cookieKey, auth, clientPath, redisClient, fsDataProxy, fsConfProvider);
+const app = new ExpressServer(port, cookieKey, auth, clientPath, redisClient, dataBackend, fsConfProvider);
 
 // Startup
 redisClient.startup().then((r) => {
