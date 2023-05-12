@@ -24,7 +24,7 @@ interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
     isFullscreen?: boolean;
     shareButtonOnClickHandler: () => void;
     embedButtonOnClickHandler: () => void;
-    blockData: (block: BlockModel) => any[];
+    blockData: (block: BlockModel) => void;
     optionsLabel: string[]
     plotData: any[];
 }

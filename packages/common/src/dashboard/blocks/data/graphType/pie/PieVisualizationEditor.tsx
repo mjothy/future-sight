@@ -48,7 +48,8 @@ export default class PieVisualizationEditor extends Component<any, any> {
 
     render() {
         const configStyle = structuredClone(this.props.currentBlock.config.configStyle)
-        const blockData = this.props.blockData(this.props.currentBlock)
+        const blockData = this.props.plotData[this.props.currentBlock.id]
+        const availableYears = this.getAvailableYears(blockData)
         return (
             <>
                 <h3>Pie</h3>
@@ -92,9 +93,9 @@ export default class PieVisualizationEditor extends Component<any, any> {
                             placeholder={"Select a default year"}
                             value={configStyle.XAxis.default || null}
                             onChange={this.onDefaultYearChange}
-                            status={this.getAvailableYears(blockData).includes(configStyle.XAxis.default) ? undefined : "error"}
+                            status={availableYears.includes(configStyle.XAxis.default) ? undefined : "error"}
                         >
-                            {this.getAvailableYears(blockData).map((value) => (
+                            {availableYears.map((value) => (
                                 <Option key={value} value={value}>
                                     {value}
                                 </Option>

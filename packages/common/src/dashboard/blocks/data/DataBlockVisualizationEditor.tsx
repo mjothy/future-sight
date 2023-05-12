@@ -211,7 +211,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             optionsLabel={this.props.optionsLabel}
             onStackValueChange={this.onStackValueChange}
             updateBlockConfig={this.updateBlockConfig}
-            blockData={this.props.blockData}
+            plotData={this.props.plotData}
             currentBlock={this.props.currentBlock}
           />
         }

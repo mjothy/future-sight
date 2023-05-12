@@ -43,10 +43,9 @@ class DashboardDataConfiguration extends Component<
       /**
        * Data (with timeseries from IASA API)
        */
+      allPlotData: {},
       plotData: {},
-      isFetchData: false,
-      response: [],
-      blockId: ""
+      isFetchData: false
     };
   }
 
@@ -61,18 +60,6 @@ class DashboardDataConfiguration extends Component<
       this.setState({ allData, isFetchData: true });
     } catch (error) {
       console.log("ERROR FETCH: ", error);
-    }
-  }
-
-  componentDidUpdate(prevProps: Readonly<DashboardDataConfigurationProps>, prevState: Readonly<any>, snapshot?: any): void {
-    if (!_.isEqual(this.state.response, prevState.response)) {
-      const plotData = JSON.parse(JSON.stringify(this.state.plotData))
-      if (plotData[this.state.updateBlockId] != undefined)
-        plotData[this.state.updateBlockId].push(...this.state.response)
-      else
-        plotData[this.state.updateBlockId] = [...this.state.response]
-
-      this.setState({ plotData })
     }
   }
 
@@ -97,82 +84,90 @@ class DashboardDataConfiguration extends Component<
    * @param block the block
    * @returns the fetched data from API with timeseries
    */
-  blockData = (block: BlockModel): PlotDataModel[] => {
+  blockData = (block: BlockModel): void => {
+    if (block.blockType === "text" || block.blockType === "control") {
+      return
+    }
 
-    if (block.blockType !== "text" && block.blockType !== "control") {
-      const config: ConfigurationModel | any = block.config;
-      const metaData: BlockDataModel = config.metaData;
-      const data: PlotDataModel[] = [];
-      const missingData: DataModel[] = [];
+    const config: ConfigurationModel | any = block.config;
+    const metaData: BlockDataModel = config.metaData;
+    const data: PlotDataModel[] = [];
+    const missingData: DataModel[] = [];
 
-      // TODO add categories
-      if (
+    // TODO add categories
+    if (
         metaData.models &&
         metaData.scenarios &&
         metaData.variables &&
         metaData.regions
-      ) {
-        metaData.models.forEach((model) => {
-          metaData.scenarios.forEach((scenario) => {
-            metaData.variables.forEach((variable) => {
-              metaData.regions.forEach((region) => {
-                if (metaData.versions[model]
-                    && metaData.versions[model][scenario]
-                    && metaData.versions[model][scenario].length>0
-                ){
-                  for (const version of metaData.versions[model][scenario]){
-                    const d = this.state.plotData[block.id]?.find(
-                        (e) =>
-                            e.model === model &&
-                            e.scenario === scenario &&
-                            e.variable === variable &&
-                            e.region === region &&
-                            e.version === version
-                    );
-                    if (d) {
-                      data.push(d);
-                    } else {
-                      missingData.push({model, scenario, variable, region, version});
-                    }
-                  }
-                } else {
-                  const d = this.state.plotData[block.id]?.find(
+    ) {
+      metaData.models.forEach((model) => {
+        metaData.scenarios.forEach((scenario) => {
+          metaData.variables.forEach((variable) => {
+            metaData.regions.forEach((region) => {
+              if (metaData.versions[model]
+                  && metaData.versions[model][scenario]
+                  && metaData.versions[model][scenario].length>0
+              ){
+                for (const version of metaData.versions[model][scenario]){
+                  const d = this.state.allPlotData[block.id]?.find(
                       (e) =>
                           e.model === model &&
                           e.scenario === scenario &&
                           e.variable === variable &&
-                          e.region === region
+                          e.region === region &&
+                          e.version === version
                   );
                   if (d) {
                     data.push(d);
                   } else {
-                    missingData.push({model, scenario, variable, region});
+                    missingData.push({model, scenario, variable, region, version});
                   }
                 }
-              });
+              } else {
+                const d = this.state.allPlotData[block.id]?.find(
+                    (e) =>
+                        e.model === model &&
+                        e.scenario === scenario &&
+                        e.variable === variable &&
+                        e.region === region
+                );
+                if (d) {
+                  data.push(d);
+                } else {
+                  missingData.push({model, scenario, variable, region});
+                }
+              }
             });
           });
         });
-      }
-
-      if (missingData.length > 0) {
-        this.retreiveAllTimeSeriesData(missingData, block.id);
-      }
-      return data;
+      });
     }
 
-    return [];
+    if (missingData.length > 0) {
+      this.retreiveAllTimeSeriesData(data, missingData, block.id);
+    } else {
+      const plotData = JSON.parse(JSON.stringify(this.state.plotData))
+      plotData[block.id] = [...data]
+      this.setState({ plotData: plotData })
+    }
   };
 
-  // TODO Check merge
-  retreiveAllTimeSeriesData = (data, blockId) => {
-    this.props.dataManager.fetchPlotData(data)
+  retreiveAllTimeSeriesData = (data, missingData, blockId) => {
+    this.props.dataManager.fetchPlotData(missingData)
       .then(res => {
         if (res.length > 0) {
-          this.setState({ response: res, updateBlockId: blockId });
+          const allPlotData = JSON.parse(JSON.stringify(this.state.allPlotData))
+          if (allPlotData[blockId] != undefined){
+            allPlotData[blockId].push(res)
+          } else {
+            allPlotData[blockId] = [...res]
+          }
+          const plotData = JSON.parse(JSON.stringify(this.state.plotData))
+          plotData[blockId] = [...data, ...res]
+          this.setState({ allPlotData: allPlotData, plotData: plotData })
         }
-      }
-      );
+      });
   }
 
   render() {

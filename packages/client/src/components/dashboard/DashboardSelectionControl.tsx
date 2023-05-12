@@ -21,7 +21,7 @@ export interface DashboardSelectionControlProps
   saveData: (id: string, image?: string) => Promise<any>;
   allData: any;
   plotData: PlotDataModel[];
-  blockData: (block: BlockModel) => PlotDataModel[];
+  blockData: (block: BlockModel) => void;
   optionsLabel: string[];
 }
 
@@ -89,10 +89,8 @@ export default class DashboardSelectionControl extends Component<
       const toDeleteBlocks = blocksIdToDelete(Object.values(this.state.dashboard.blocks), newDataStructure);
       const blockAndLayouts = this.deleteBlocks(Array.from(toDeleteBlocks));
       dashboard = { ...dashboard, ...blockAndLayouts }
-      this.setState({ dashboard });
-    } else {
-      this.setState({ dashboard })
     }
+    this.setState({ dashboard })
   }
 
   addBlock = (blockType: string, masterBlockId?: string) => {

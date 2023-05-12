@@ -46,7 +46,6 @@ class DataBlockView extends Component<any, any> {
   settingPlotData = (data: PlotDataModel[]) => {
     const { currentBlock } = this.props;
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
-    // console.log("Run settingPlotData", currentBlock.id);
     const showData: any[] = [];
 
     let visualizeData: any = [];
