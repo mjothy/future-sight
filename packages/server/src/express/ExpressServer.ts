@@ -365,7 +365,7 @@ export default class ExpressServer {
       // when both scenario and model are selected
       if(["models", "scenarios"].every(item => metaData.selectOrder.includes(item))){
         const maxIdx = Math.max(metaData.selectOrder.indexOf("models"), metaData.selectOrder.indexOf("scenarios"))
-        lowerIdxFilters[maxIdx] =  "versions" // TODO replace by runId here
+        lowerIdxFilters.splice(maxIdx+1, 0, "versions") // TODO replace by runId here
       }
     }
     return lowerIdxFilters
