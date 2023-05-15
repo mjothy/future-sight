@@ -33,7 +33,7 @@ export default class ControlBlockView extends Component<any, any> {
     dashboard.blocks[this.props.currentBlock.id].config = { ...config };
 
     // Update children
-    const childrens = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id);
+    const childrens = getChildrens(dashboard.blocks, this.props.currentBlock.id);
 
     if (childrens.length > 0) {
       childrens.map((child: BlockModel | any) => {
@@ -41,6 +41,7 @@ export default class ControlBlockView extends Component<any, any> {
         this.props.optionsLabel.map((option) => {
           const isMaster = config.metaData.master[option].isMaster;
           if (isMaster) {
+            //we slice to deepcopy the array
             configChild.metaData[option] = config.metaData.master[option].values;
             dashboard.blocks[child.id].config = { ...configChild };
           }

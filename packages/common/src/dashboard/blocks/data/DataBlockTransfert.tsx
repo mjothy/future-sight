@@ -19,7 +19,6 @@ class DataBlockTransfert extends Component<any, any> {
         !==
         JSON.stringify(this.getMetaData(prevProps.currentBlock))
     ) {
-      console.log("new conf", this.getMetaData(this.props.currentBlock))
       this.props.blockData(this.props.currentBlock)
     }
   }
@@ -35,7 +34,6 @@ class DataBlockTransfert extends Component<any, any> {
     if (!timeseriesData) {
       timeseriesData = []
     }
-    console.log("ts", this.props.plotData[this.props.currentBlock.id])
     return <DataBlockView
         currentBlock={this.props.currentBlock}
         timeseriesData={timeseriesData}
