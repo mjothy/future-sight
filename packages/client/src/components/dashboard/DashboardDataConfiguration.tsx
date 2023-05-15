@@ -85,7 +85,7 @@ class DashboardDataConfiguration extends Component<
    * @returns the fetched data from API with timeseries
    */
   blockData = (block: BlockModel): void => {
-    if (block.blockType === "text" || block.blockType === "control") {
+    if (block.blockType === "text") {
       return
     }
 

@@ -1,8 +1,8 @@
 build/**/*
 node_modules
 build
-data
-data_raw/
+./data
+./data_raw/
 
 .vscode
 *.iml
