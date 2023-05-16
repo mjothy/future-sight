@@ -138,6 +138,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                             readonly
                             blockData={props.blockData}
                             optionsLabel={props.optionsLabel}
+                            plotData={props.plotData}
                         />
                     </GetGeoJsonContextProvider>
                 )}
