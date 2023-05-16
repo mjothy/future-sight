@@ -232,12 +232,20 @@ export default class BlockFilterManager extends Component<any, any> {
                         await this.updateFilterOptions("versions")
                     }
                 }
+
+                // Update unselected filter to stale
+                const staleFilters = {...this.state.staleFilters}
+                for (const tempFilterId of Object.keys(staleFilters).filter((x)=>!selectOrder.includes(x))){
+                    staleFilters[tempFilterId] = true
+                }
+                this.setState({staleFilters: staleFilters})
+
             } else if (addedOptions.length>0){
-                // Update lower order and unselected filter to stale
+                // Update higher idx and unselected filter to stale
                 const staleFilters = {...this.state.staleFilters}
                 const selectOrderIndex = selectOrder.indexOf(filterId)
 
-                // - lower order filters
+                // - higher idx filters
                 for (const tempFilterId of selectOrder.slice(selectOrderIndex+1)){
                     staleFilters[tempFilterId] = true
                 }

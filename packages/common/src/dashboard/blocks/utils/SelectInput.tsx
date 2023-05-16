@@ -122,8 +122,8 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
     treeSelect = () => {
         return <Input.Group compact>
             <TreeSelect
-                removeIcon={<></>}
                 value={this.props.value}
+                loading={this.props.loading}
                 treeCheckable={true}
                 placeholder={this.props.type}
                 onChange={(selectedData: any[]) =>
@@ -196,6 +196,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         return <Input.Group compact>
             <TreeSelect
                 value={this.props.value}
+                loading={this.props.loading}
                 treeCheckable={true}
                 placeholder={this.props.type}
                 onChange={(selectedData: any[]) =>
@@ -222,7 +223,6 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 treeExpandAction="doubleClick"
                 onSearch={this.onSearch}
                 searchValue={this.state.searchValue}
-                removeIcon={<></>}
             >
                 {this.renderTreeNodes(this.splitOptions(this.props.options))}
 
@@ -255,7 +255,6 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                     onDropdownVisibleChange={(e) => {
                         return this.props.onDropdownVisibleChange?.(this.props.type, e)}
                     }
-                    removeIcon={<></>}
                     dropdownMatchSelectWidth={false}
                     notFoundContent={(
                         <div>
