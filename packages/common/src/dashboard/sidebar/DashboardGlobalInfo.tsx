@@ -25,6 +25,12 @@ export default class DashboardGlobalInfo extends Component<any, any> {
     this.setState({ userDataTemp: { ...this.props.dashboard.userData } })
   }
 
+  componentDidUpdate(prevProps, prevState): void {
+    if(prevProps.dashboard.userData !== this.props.dashboard.userData) {
+      this.setState({ userDataTemp: { ...this.props.dashboard.userData } })
+    }
+  }
+
   showInput = () => {
     this.setState({ inputVisible: true }, () =>
       this.saveInputRef.current.focus()
