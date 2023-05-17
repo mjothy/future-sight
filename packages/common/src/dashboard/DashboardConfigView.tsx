@@ -194,6 +194,23 @@ class DashboardConfigView extends Component<any, any> {
         }
     }
 
+    getDeprecatedWarning = (block) => {
+        if(block.blockType !== "data") {
+            return
+        }else {
+            if (block.config.metaData.hasDeprecatedVersion
+                && block.config.configStyle.showDeprecatedVersionWarning) {
+                return (
+                    <Space style={{position: "fixed", top: 1, left: 1, zIndex: 2}}>
+                        <p className={"warning-deprecated-versions"}>
+                            <WarningOutlined/> Deprecated versions
+                        </p>
+                    </Space>
+                )
+            }
+        }
+    }
+
     render() {
         const { blocks, layout } = this.props.dashboard;
         return (
@@ -249,16 +266,7 @@ class DashboardConfigView extends Component<any, any> {
                                 </Space>
                             )}
 
-                            {
-                                blocks[layout.i].config.metaData.hasDeprecatedVersion &&
-                                blocks[layout.i].config.configStyle.showDeprecatedVersionWarning && (
-                                    <Space style={{position: "fixed", top: 1, left: 1, zIndex: 2}}>
-                                        <p className={"warning-deprecated-versions"}>
-                                            <WarningOutlined/> Deprecated versions
-                                        </p>
-                                    </Space>
-                                )
-                            }
+                            {this.getDeprecatedWarning(blocks[layout.i])}
 
                             <BlockViewManager
                                 blockData={this.props.blockData}
