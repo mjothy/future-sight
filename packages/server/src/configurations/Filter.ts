@@ -169,6 +169,39 @@ export default class Filter {
         return requestBody;
     }
 
+    static getDatapointsBody = (raw) => {
+        const requestBody: FilterSchema = {};
+
+        if (raw["model"]?.length > 0) {
+            requestBody.model = { name: raw["model"] }
+        }
+
+        if (raw["models"]?.length > 0) {
+            requestBody.scenario = { name: raw["scenario"] }
+
+        }
+
+        if (raw["region"] != null) {
+            requestBody.region = { name: raw["region"] };
+        }
+
+        if (raw["variable"] != null) {
+            requestBody.variable = { name: raw["variable"] };
+        }
+
+        if (raw["unit"] != null) {
+            requestBody.unit = { name: raw["unit"] };
+        }
+
+        if (raw["year__in"] != null) {
+            requestBody.year__in = raw["year__in"];
+        } else {
+            requestBody.year__in = [2005, 2050];
+        }
+
+        return requestBody;
+    }
+
     /**
    * Get filters that has to be used on this filterId (filters that have a lower idx in selectOrder)
    * Special case when scenario and models are in selectOrder, the last selected is replaced by versions and runId

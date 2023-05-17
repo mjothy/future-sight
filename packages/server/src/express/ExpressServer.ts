@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import { join } from 'path';
 import IPersistenceManager from '../interfaces/IPersistenceManager';
-import { DashboardModel } from '@future-sight/common';
+import { DashboardModel, OptionsDataModel } from '@future-sight/common';
 import BrowseObject from '../models/BrowseObject';
 import IDataBackend from '../interfaces/IDataBackend ';
 import IConfigurationProvider from '../interfaces/IConfigurationProvider';
@@ -77,11 +77,12 @@ export default class ExpressServer {
 
 
     this.app.post('/api/plotData', (req, res) => {
-      const body = req.body;
+      // const selectedData: OptionsDataModel = req.body;
+      const selectedData: any = req.body;
       const response: any[] = [];
-      for (const reqData of body) {
+      for (const reqData of selectedData) {
         // TODO replace by getTimeseries
-        const elements = this.dataProxy.getData().filter(
+        const elements = this.dataProxy.getData(selectedData).filter(
           (e) => e.model === reqData.model && e.scenario === reqData.scenario && e.variable === reqData.variable && e.region === reqData.region
         );
         if (elements) {

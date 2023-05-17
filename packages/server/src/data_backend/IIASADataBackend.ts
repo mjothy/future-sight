@@ -112,9 +112,39 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         return filteredValues;
     };
 
-    getTimeSeries = () => [];
+    getTimeSeries = (selectedData: OptionsDataModel) => {
+        // TODO move getData() code here
+        return [];
+    };
 
-    getData = () => [];
+    getData = (selectedData?: any) => {
+        for (const raw of selectedData) {
+            const body = Filter.getDatapointsBody(raw);
+            console.log("body: ", body);
+        }
+
+        // try {
+        //     const body = filter.getBody(key);
+        //     const response = await this.patchPromise(filters[key].path, body);
+        //     let data = await response.json();
+        //     if (key == "versions") {
+        //         // TODO extract all versions from 
+        //         filteredValues[key] = [];
+        //     } else {
+        //         if (!Array.isArray(data)) {
+        //             data = Array.from(data);
+        //         }
+        //         filteredValues[key] = data.map(element => element.name);
+        //     }
+
+        // } catch (e: Error | any) {
+        //     // Scenarios not working 500 internal error
+        //     console.error(`Error fetching (filtering data) ${key}: ${e.toString()}`)
+        //     filteredValues[key] = [];
+        // }
+
+        return [];
+    };
 
     getDataUnion = () => [];
 }
