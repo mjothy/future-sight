@@ -44,11 +44,7 @@ const categoriesPath = isProd ? PROD_CATEGORIES_PATH : DEV_CATEGORIES_PATH;
 // data loading
 let dataBackend;
 const authentication = new IIASAAuthenticationBackend(env_username, env_password);
-// async function refreshing() {
-//   await authentication.startRefreshing(); // to refresh token
-// }
 if (config.origin_data == "IIASA") {
-  // refreshing();
   authentication.startRefreshing(); // to refresh token
   dataBackend = new IIASADataBackend(authentication);
 } else {

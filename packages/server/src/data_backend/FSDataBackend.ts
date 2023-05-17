@@ -54,10 +54,6 @@ export default class FSDataBackend implements IDataBackend {
 
     getUnits = () => { return [] };
 
-    getRuns = () => {
-        return { id: null, version: null };
-    }
-
     getTimeSeries = () => []; // rename of getData
 
     getFilteredData = (filterId, blockMetaData: any, dataFocusFilters: any) => {

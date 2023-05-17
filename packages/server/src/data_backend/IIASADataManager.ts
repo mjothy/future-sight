@@ -43,6 +43,12 @@ export default class IIASADataManager {
         return response;
     }
 
+    /**
+     * Patch request
+     * @param url filter path
+     * @param body The body of url options 
+     * @returns Promise
+     */
     patchPromise = async (url, body?: any) => {
         const fullUrl = this.getUrlBase(url);
         const options = {

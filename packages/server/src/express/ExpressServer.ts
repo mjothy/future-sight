@@ -110,7 +110,7 @@ export default class ExpressServer {
     this.app.post('/api/filterOptions', async (req, res, next) => {
 
       try {
-        const optionsData = this.dataProxy.getFilteredData(req.body.filterId, req.body.metaData, req.body.dataFocusFilters);
+        const optionsData = await this.dataProxy.getFilteredData(req.body.filterId, req.body.metaData, req.body.dataFocusFilters);
         optionsData["categories"] = this.configurationProvider.getMetaIndicators(); // TODO add categories to filter
         res.send(optionsData);
       } catch (err) {
