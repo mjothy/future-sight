@@ -34,7 +34,6 @@ export default class PlotlyUtils {
                 }
             }
         }
-
         return filterKeys.filter(
             (key) => filtersValues[key].size > 1
         )

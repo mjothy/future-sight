@@ -12,7 +12,11 @@ export default class BlockFilterManager extends Component<any, any> {
     constructor(props) {
         super(props);
         const metadata = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData))
-        this.state = {
+        this.state = this.getInitState(metadata)
+    }
+
+    getInitState = (metadata) => {
+        return {
             /**
              * Data options in dropDown Inputs
              */
@@ -72,7 +76,19 @@ export default class BlockFilterManager extends Component<any, any> {
         if (this.props.plotData[this.props.currentBlock.id]?.length != prevProps.plotData[this.props.currentBlock.id]?.length) {
             this.missingData();
         }
+        if (this.props.currentBlock.id !== prevProps.currentBlock.id) {
+            const metadata = this.props.currentBlock.config.metaData
+            this.setState(this.getInitState(metadata),
+                () => {
+                    if(metadata["scenarios"].length>0 && metadata["models"].length>0){
+                        this.updateFilterOptions("versions")
+                    }
+                }
+            )
+        }
     }
+
+
 
     /**
      * Update input select options data for a filter
@@ -347,6 +363,10 @@ export default class BlockFilterManager extends Component<any, any> {
     }
 
     render() {
+        console.log("BFM", this.props.currentBlock.id, "options"
+            , this.state.optionsData,"missing", this.state.missingData
+            , "plot", this.props.plotData[this.props.currentBlock.id]
+        )
         return this.props.currentBlock.blockType === 'data' ? (
             <DataBlockEditor
                 {...this.props}

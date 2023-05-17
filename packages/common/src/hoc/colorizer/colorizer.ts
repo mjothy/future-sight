@@ -16,6 +16,7 @@ export default class Colorizer {
      * @returns PlotDataModel[]
      */
     colorizeData = (data: PlotDataModel[], colorset: string[], customIndex?: string) => {
+        console.log(colorset, data)
         if (data.length === 0) {
             return data
         }
@@ -24,6 +25,7 @@ export default class Colorizer {
             ? [customIndex]
             : PlotlyUtils.getIndexKeys(data, this.dataFilterKeys)
 
+        console.log(indexKeys)
         if (indexKeys.length === 0 && this.defaultIndex) {
             indexKeys = [this.defaultIndex]
         }
@@ -56,25 +58,27 @@ export default class Colorizer {
             .map((indexKey) => dataElement[indexKey])
             .join("-")
 
-        if (!this.indexToColor[indexKeysJoined] || !this.indexToColor[indexKeysJoined][indexValue]) {
+        const colorSetHash = colorset.join()
+        if (!this.indexToColor[colorSetHash]
+            || !this.indexToColor[colorSetHash][indexKeysJoined]
+            || !this.indexToColor[colorSetHash][indexKeysJoined][indexValue]) {
             this.updateIndexToColor(indexKeysJoined, colorset, indexValue)
         }
 
-        const colorSetHash = colorset.join()
-        return this.indexToColor[indexKeysJoined][indexValue][colorSetHash]
+        return this.indexToColor[colorSetHash][indexKeysJoined][indexValue]
     }
 
     private updateIndexToColor = (indexKey, colorset, indexValue) => {
-        if (!this.indexToColor[indexKey]) {
-            this.indexToColor[indexKey] = {}
-        }
-        if (!this.indexToColor[indexKey][indexValue]) {
-            this.indexToColor[indexKey][indexValue] = {}
-        }
         const colorSetHash = colorset.join()
-        if (!this.indexToColor[indexKey][indexValue][colorSetHash]) {
-            const colorIdx = Object.keys(this.indexToColor[indexKey]).length % colorset.length;
-            this.indexToColor[indexKey][indexValue][colorSetHash] = colorset[colorIdx]
+        if (!this.indexToColor[colorSetHash]) {
+            this.indexToColor[colorSetHash] = {}
+        }
+        if (!this.indexToColor[colorSetHash][indexKey]) {
+            this.indexToColor[colorSetHash][indexKey] = {}
+        }
+        if (!this.indexToColor[colorSetHash][indexKey][indexValue]) {
+            const colorIdx = Object.keys(this.indexToColor[colorSetHash][indexKey]).length % colorset.length;
+            this.indexToColor[colorSetHash][indexKey][indexValue] = colorset[colorIdx]
         }
     }
 
