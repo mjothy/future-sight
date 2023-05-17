@@ -16,8 +16,6 @@ export default class Colorizer {
      * @returns PlotDataModel[]
      */
     colorizeData = (data: PlotDataModel[], colorset: string[], customIndex?: string) => {
-        this.resetIndexToColor()
-
         if (data.length === 0) {
             return data
         }
@@ -62,17 +60,21 @@ export default class Colorizer {
             this.updateIndexToColor(indexKeysJoined, colorset, indexValue)
         }
 
-        return this.indexToColor[indexKeysJoined][indexValue]
+        const colorSetHash = colorset.join()
+        return this.indexToColor[indexKeysJoined][indexValue][colorSetHash]
     }
 
     private updateIndexToColor = (indexKey, colorset, indexValue) => {
         if (!this.indexToColor[indexKey]) {
             this.indexToColor[indexKey] = {}
         }
-
         if (!this.indexToColor[indexKey][indexValue]) {
+            this.indexToColor[indexKey][indexValue] = {}
+        }
+        const colorSetHash = colorset.join()
+        if (!this.indexToColor[indexKey][indexValue][colorSetHash]) {
             const colorIdx = Object.keys(this.indexToColor[indexKey]).length % colorset.length;
-            this.indexToColor[indexKey][indexValue] = colorset[colorIdx]
+            this.indexToColor[indexKey][indexValue][colorSetHash] = colorset[colorIdx]
         }
     }
 
