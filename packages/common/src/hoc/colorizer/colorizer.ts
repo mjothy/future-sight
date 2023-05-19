@@ -16,7 +16,6 @@ export default class Colorizer {
      * @returns PlotDataModel[]
      */
     colorizeData = (data: PlotDataModel[], colorset: string[], customIndex?: string) => {
-        console.log(colorset, data)
         if (data.length === 0) {
             return data
         }
@@ -25,7 +24,6 @@ export default class Colorizer {
             ? [customIndex]
             : PlotlyUtils.getIndexKeys(data, this.dataFilterKeys)
 
-        console.log(indexKeys)
         if (indexKeys.length === 0 && this.defaultIndex) {
             indexKeys = [this.defaultIndex]
         }
@@ -48,7 +46,6 @@ export default class Colorizer {
     private getColor = (dataElement: PlotDataModel, colorset: string[], indexKeys: string[]) => {
 
         if (indexKeys.length == 0) {
-            // console.log("no index")
             return null
         }
 

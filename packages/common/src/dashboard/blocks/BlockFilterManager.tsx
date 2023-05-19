@@ -363,10 +363,6 @@ export default class BlockFilterManager extends Component<any, any> {
     }
 
     render() {
-        console.log("BFM", this.props.currentBlock.id, "options"
-            , this.state.optionsData,"missing", this.state.missingData
-            , "plot", this.props.plotData[this.props.currentBlock.id]
-        )
         return this.props.currentBlock.blockType === 'data' ? (
             <DataBlockEditor
                 {...this.props}

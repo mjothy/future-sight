@@ -43,9 +43,6 @@ class MapBlock extends Component<any, any> {
         const visibleRegions = this.getVisibleRegions(visibleGeoJson);
         const visibleData = this.getVisibleData(visibleRegions);
         const obj: MapProperties = this.getMapProperities(visibleGeoJson);
-        console.log("mount")
-        console.log(visibleGeoJson)
-        console.log(visibleRegions)
         this.setState({
             geoJsonData: visibleGeoJson,
             visibleRegions,
@@ -394,9 +391,6 @@ class MapBlock extends Component<any, any> {
     }
 
     render() {
-        console.log("render")
-        console.log(this.state.geoJsonData)
-        console.log(this.state.visibleData)
         const meteData = this.props.currentBlock.config.metaData;
         let height = this.props.height;
         if (this.props.currentBlock.config.configStyle.title.isVisible) {
