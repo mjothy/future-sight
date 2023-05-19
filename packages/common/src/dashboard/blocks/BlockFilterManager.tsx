@@ -14,7 +14,8 @@ export default class BlockFilterManager extends Component<any, any> {
              * Data options in dropDown Inputs
              */
             optionsData: { ...this.props.allData },
-            missingData: new OptionsDataModel()
+            missingData: new OptionsDataModel(),
+            isFetching: false
         };
 
     }
@@ -55,8 +56,9 @@ export default class BlockFilterManager extends Component<any, any> {
      * @param dataFocusFilters the first filter(by data focus)
      */
     filterOptions = (metaData, dataFocusFilters) => {
+        this.setState({ isFetching: true })
         this.props.dataManager.fetchDataOptions({ dataFocusFilters, metaData }).then(res => {
-            this.setState({ optionsData: res }, () => {
+            this.setState({ optionsData: res, isFetching: false }, () => {
                 this.props.checkIfSelectedInOptions(this.state.optionsData, this.props.currentBlock)
                 this.missingData();
             })
@@ -186,6 +188,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 onDropdownVisibleChange={this.onDropdownVisibleChange}
                 missingData={this.state.missingData}
                 isAllSelected={this.isAllSelected}
+                isFetching={this.state.isFetching}
             />
         ) : (
             <ControlBlockEditor
@@ -193,6 +196,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 onChange={this.onChange}
                 optionsData={this.state.optionsData}
                 onDropdownVisibleChange={this.onDropdownVisibleChange}
+                isFetching={this.state.isFetching}
             />
         );
     }

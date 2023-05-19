@@ -107,6 +107,7 @@ export default class Filter {
                 scenario: { name__in: selectedData["scenarios"] }
             };
         }
+        console.log("requestBody: ", requestBody);
         return requestBody;
     }
 
@@ -249,12 +250,12 @@ export default class Filter {
     }
 
     getSelectedDataOfFilter = (selectedData, filtersToApply) => {
+        const selectedFilterData = {};
         if (filtersToApply.length > 0) {
-            const selectedFilterData = {};
             filtersToApply.forEach(key => selectedFilterData[key] = selectedData[key]);
             return selectedFilterData;
         } else {
-            return selectedData;
+            return selectedFilterData;
         }
     }
 

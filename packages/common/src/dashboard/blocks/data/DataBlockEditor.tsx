@@ -77,6 +77,7 @@ export default class DataBlockEditor extends Component<any, any> {
             isClear={selected}
             onClear={this.clearClick}
             onDropdownVisibleChange={this.props.onDropdownVisibleChange}
+            isFetching={this.props.isFetching}
           />
         </Row>
       )
