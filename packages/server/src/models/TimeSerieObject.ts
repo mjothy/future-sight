@@ -4,5 +4,5 @@ export default interface TimeSerieObject {
     region: string;
     variable: string;
     unit: string;
-    data: { value: number; year: number }
+    data: { value: number; year: number }[]
 }

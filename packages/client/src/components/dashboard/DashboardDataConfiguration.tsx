@@ -40,7 +40,6 @@ class DashboardDataConfiguration extends Component<
       plotData: {},
       isFetchData: false,
       response: [],
-      blockId: ""
     };
   }
 
@@ -58,18 +57,6 @@ class DashboardDataConfiguration extends Component<
     }
     this.setState({ allData, filters, isFetchData: true });
 
-  }
-
-  componentDidUpdate(prevProps: Readonly<DashboardDataConfigurationProps>, prevState: Readonly<any>, snapshot?: any): void {
-    if (!_.isEqual(this.state.response, prevState.response)) {
-      const plotData = JSON.parse(JSON.stringify(this.state.plotData))
-      if (plotData[this.state.updateBlockId] != undefined)
-        plotData[this.state.updateBlockId].push(...this.state.response)
-      else
-        plotData[this.state.updateBlockId] = [...this.state.response]
-
-      this.setState({ plotData })
-    }
   }
 
   saveData = async (id: string, image?: string) => {
@@ -140,13 +127,22 @@ class DashboardDataConfiguration extends Component<
   };
 
   retreiveAllTimeSeriesData = (data, blockId) => {
-    this.props.dataManager.fetchPlotData(data)
-      .then(res => {
-        if (res.length > 0) {
-          this.setState({ response: res, updateBlockId: blockId });
-        }
-      }
-      );
+    if (!_.isEqual(this.state.request, data)) {
+      this.setState({ request: data, updateBlockId: blockId }, () => {
+        this.props.dataManager.fetchPlotData(data)
+          .then(res => {
+            const plotData = JSON.parse(JSON.stringify(this.state.plotData))
+            if (plotData[blockId] != undefined)
+              plotData[blockId].push(...this.state.response)
+            else
+              plotData[blockId] = [...this.state.response]
+
+            this.setState({ response: res, plotData });
+          }
+          );
+      })
+    }
+
   }
 
   render() {

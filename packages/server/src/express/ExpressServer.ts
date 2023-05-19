@@ -76,13 +76,14 @@ export default class ExpressServer {
     });
 
 
-    this.app.post('/api/plotData', (req, res) => {
+    this.app.post('/api/plotData', async (req, res) => {
       // const selectedData: OptionsDataModel = req.body;
       const selectedData: any = req.body;
       const response: any[] = [];
       for (const reqData of selectedData) {
         // TODO replace by getTimeseries
-        const elements = this.dataProxy.getData(selectedData).filter(
+        let elements = await this.dataProxy.getData(selectedData);
+        elements = elements.filter(
           (e) => e.model === reqData.model && e.scenario === reqData.scenario && e.variable === reqData.variable && e.region === reqData.region
         );
         if (elements) {

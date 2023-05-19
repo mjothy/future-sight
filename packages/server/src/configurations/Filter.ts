@@ -15,7 +15,6 @@ export default class Filter {
             "variables": this.variableBody(globalSelectedData),
             "units": this.unitsBody(globalSelectedData),
             "versions": this.versionsBody(globalSelectedData)
-
         };
     }
 
@@ -172,13 +171,8 @@ export default class Filter {
     static getDatapointsBody = (raw) => {
         const requestBody: FilterSchema = {};
 
-        if (raw["model"]?.length > 0) {
-            requestBody.model = { name: raw["model"] }
-        }
-
-        if (raw["models"]?.length > 0) {
-            requestBody.scenario = { name: raw["scenario"] }
-
+        if (raw["runId"] != null) {
+            requestBody.run = { id: raw["runId"] }
         }
 
         if (raw["region"] != null) {
@@ -196,7 +190,21 @@ export default class Filter {
         if (raw["year__in"] != null) {
             requestBody.year__in = raw["year__in"];
         } else {
-            requestBody.year__in = [2005, 2050];
+            requestBody.year__in = this.getYears();
+        }
+
+        return requestBody;
+    }
+
+    static getRunBody = (raw) => {
+        const requestBody: FilterSchema = {};
+
+        if (raw["model"] != null) {
+            requestBody.model = { name: raw["model"] };
+        }
+
+        if (raw["scenario"] != null) {
+            requestBody.scenario = { name: raw["scenario"] };
         }
 
         return requestBody;
@@ -265,5 +273,24 @@ export default class Filter {
         return selectedData;
     }
 
+
+    static getYears() {
+        const startYear = 2005;
+        const endYear = 2100;
+        const stepSize = 5;
+
+        // Calculate the number of rows
+        const numRows = Math.floor((endYear - startYear) / stepSize) + 1;
+
+        // Create the table
+        const years: number[] = [];
+
+        for (let i = 0; i < numRows; i++) {
+            const year = startYear + i * stepSize;
+            years.push(year);
+        }
+
+        return years
+    }
 
 }

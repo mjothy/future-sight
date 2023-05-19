@@ -4,6 +4,7 @@ import IDataBackend from "../interfaces/IDataBackend ";
 import IIASADataManager from "./IIASADataManager";
 import filters from '../configurations/filters.json';
 import Filter from "../configurations/Filter";
+import TimeSerieObject from "../models/TimeSerieObject"
 
 export default class IIASADataBackend extends IIASADataManager implements IDataBackend {
 
@@ -78,6 +79,12 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
             models: []
         };
 
+        Object.keys(selectedData).forEach(key => {
+            if (blockMetaData != null) {
+                selectedData[key] = blockMetaData[key]
+            }
+        });
+
         // TODO Fetch values of only filterId (after code merging with develop branch)
         const filter = new Filter(selectedData, dataFocusFilters, selectOrder);
         for (const key of filterKeys) {
@@ -85,6 +92,7 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
                 const body = filter.getBody(key);
                 const response = await this.patchPromise(filters[key].path, body);
                 let data = await response.json();
+
                 if (key == "versions") {
                     // TODO extract all versions from 
                     filteredValues[key] = [];
@@ -117,34 +125,51 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         return [];
     };
 
-    getData = (selectedData?: any) => {
+    getData = async (selectedData?: any) => {
+        const timeSeries: TimeSerieObject[] = [];
         for (const raw of selectedData) {
-            const body = Filter.getDatapointsBody(raw);
-            console.log("body: ", body);
+            const rawWithRunId = await this.getRawWithRunId(raw);
+            const body = Filter.getDatapointsBody(rawWithRunId);
+            try {
+                const response = await this.patchPromise("/iamc/datapoints/", body);
+                const dataPoints = await response.json();
+                const timeSerie = this.prepareTimeSerie(raw, dataPoints)
+                timeSeries.push(timeSerie);
+            } catch (e: Error | any) {
+                // Scenarios not working 500 internal error
+                console.error(`Error fetching (datapoints): ${e.toString()}`)
+            }
         }
 
-        // try {
-        //     const body = filter.getBody(key);
-        //     const response = await this.patchPromise(filters[key].path, body);
-        //     let data = await response.json();
-        //     if (key == "versions") {
-        //         // TODO extract all versions from 
-        //         filteredValues[key] = [];
-        //     } else {
-        //         if (!Array.isArray(data)) {
-        //             data = Array.from(data);
-        //         }
-        //         filteredValues[key] = data.map(element => element.name);
-        //     }
+        return timeSeries;
+    }
 
-        // } catch (e: Error | any) {
-        //     // Scenarios not working 500 internal error
-        //     console.error(`Error fetching (filtering data) ${key}: ${e.toString()}`)
-        //     filteredValues[key] = [];
-        // }
+    getRawWithRunId = async (raw) => {
+        try {
+            const body = Filter.getRunBody(raw);
+            const response = await this.patchPromise("/runs/", body);
+            const data = await response.json();
+            const runDefault = data.find(run => run.is_default);
+            raw["runId"] = runDefault?.id;
+            return raw;
+        } catch (e: Error | any) {
+            console.error(`Error fetching (datapoints): ${e.toString()}`)
+            return raw;
+        }
+    }
 
-        return [];
-    };
+    prepareTimeSerie = (raw: any, dataPoints: any) => {
+        const timeSerie: TimeSerieObject = {
+            ...raw,
+            data: []
+        };
+
+        dataPoints.forEach(point => {
+            timeSerie.data.push({ value: point.value, year: point.step_year });
+        })
+
+        return timeSerie;
+    }
 
     getDataUnion = () => [];
 }

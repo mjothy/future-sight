@@ -15,7 +15,7 @@ export default interface IDataBackend {
     getFilteredData: (filterId, metaData?: any, dataFocus?: any) => any | Promise<any>;
 
     // TODO delete after
-    getData: (selectedData?: any) => any[]; // TODO delete it and use instead getTimeSeries
+    getData: (selectedData?: any) => any[] | Promise<any[]>; // TODO delete it and use instead getTimeSeries
     getDataUnion: () => any[];
 
 }
