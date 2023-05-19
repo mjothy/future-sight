@@ -43,6 +43,9 @@ class MapBlock extends Component<any, any> {
         const visibleRegions = this.getVisibleRegions(visibleGeoJson);
         const visibleData = this.getVisibleData(visibleRegions);
         const obj: MapProperties = this.getMapProperities(visibleGeoJson);
+        console.log("mount")
+        console.log(visibleGeoJson)
+        console.log(visibleRegions)
         this.setState({
             geoJsonData: visibleGeoJson,
             visibleRegions,
@@ -54,7 +57,8 @@ class MapBlock extends Component<any, any> {
     }
 
     async componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): Promise<void> {
-        if (!_.isEqual(prevProps.currentBlock.config.metaData, this.props.currentBlock.config.metaData)) {
+        if (!_.isEqual(prevProps.currentBlock.config.metaData, this.props.currentBlock.config.metaData)
+            || !_.isEqual(prevProps.data, this.props.data)) {
             const geoJsonData = await this.props.getGeoJson({
                 regions: this.props.currentBlock.config.metaData.regions,
             });
@@ -218,7 +222,7 @@ class MapBlock extends Component<any, any> {
      * Get map locations and z (colorbar data)
      * @param data Visible data layer
      * @param year Selected year in slider
-     * @returns 
+     * @returns
      */
     getMapConfig = (data, year) => {
         const locations: string[] = [];
@@ -254,7 +258,7 @@ class MapBlock extends Component<any, any> {
     }
 
     /**
-     * When different layers of data is possible to be presented in the map, 
+     * When different layers of data is possible to be presented in the map,
      * return only the first {model, scenario, variable} for different regions
      * @returns extractData(data to visualized) and unit
      */
@@ -291,7 +295,7 @@ class MapBlock extends Component<any, any> {
     /**
      * Get options of selected data in inputs in the map
      * Exemple: if user selecte 2 models [model1, model2], select box will be shown in the map to select only one value
-     * @returns 
+     * @returns
      */
     getOptionsSelected = () => {
         const options: string[] = [];
@@ -390,6 +394,9 @@ class MapBlock extends Component<any, any> {
     }
 
     render() {
+        console.log("render")
+        console.log(this.state.geoJsonData)
+        console.log(this.state.visibleData)
         const meteData = this.props.currentBlock.config.metaData;
         let height = this.props.height;
         if (this.props.currentBlock.config.configStyle.title.isVisible) {
