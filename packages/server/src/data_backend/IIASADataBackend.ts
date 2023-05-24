@@ -46,7 +46,6 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
                 }
                 filteredValues[key] = data.map(element => element.name);
             } catch (e: Error | any) {
-                // Scenarios not working 500 internal error
                 console.error(`Error fetching (data focus) ${key}: ${e.toString()}`)
                 filteredValues[key] = [];
             }
@@ -71,7 +70,7 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         }
 
         // Filter by blockMetaData
-        // TODO replace {models, scenarios, regions, scenarios, categories} by one attribute of type OptionsDataModel
+        // TODO replace {models, scenarios, regions, scenarios, categories} by one attribute of type OptionsDataModel in MetaData of the block
         const selectedData: OptionsDataModel = {
             regions: [],
             variables: [],
@@ -94,7 +93,7 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
                 let data = await response.json();
 
                 if (key == "versions") {
-                    // TODO extract all versions from 
+                    // TODO extract all versions from (add runId: {model, scenario, version})
                     filteredValues[key] = [];
                 } else {
                     if (!Array.isArray(data)) {
@@ -104,7 +103,6 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
                 }
 
             } catch (e: Error | any) {
-                // Scenarios not working 500 internal error
                 console.error(`Error fetching (filtering data) ${key}: ${e.toString()}`)
                 filteredValues[key] = [];
             }
@@ -133,10 +131,12 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
             try {
                 const response = await this.patchPromise("/iamc/datapoints/", body);
                 const dataPoints = await response.json();
-                const timeSerie = this.prepareTimeSerie(raw, dataPoints)
-                timeSeries.push(timeSerie);
+                if (dataPoints?.length > 0) {
+                    const timeSerie = this.prepareTimeSerie(raw, dataPoints)
+                    timeSeries.push(timeSerie);
+                }
+
             } catch (e: Error | any) {
-                // Scenarios not working 500 internal error
                 console.error(`Error fetching (datapoints): ${e.toString()}`)
             }
         }

@@ -57,7 +57,6 @@ export default class Filter {
         const filtersToApply = this.getFiltersToApply("variables", this.selectOrder);
         let selectedData = this.getSelectedDataOfFilter(globalSelectedData, filtersToApply);
         selectedData = this.addDataFocusToSelectedData(selectedData);
-
         const requestBody: FilterSchema = {};
 
         if (selectedData["regions"]?.length > 0) {
@@ -107,7 +106,7 @@ export default class Filter {
                 scenario: { name__in: selectedData["scenarios"] }
             };
         }
-        console.log("requestBody: ", requestBody);
+
         return requestBody;
     }
 
@@ -139,6 +138,7 @@ export default class Filter {
                 scenario: { name__in: selectedData["scenarios"] }
             };
         }
+
         return requestBody;
     }
 
@@ -212,13 +212,13 @@ export default class Filter {
     }
 
     /**
-   * Get filters that has to be used on this filterId (filters that have a lower idx in selectOrder)
-   * Special case when scenario and models are in selectOrder, the last selected is replaced by versions and runId
-   * in the future to always filter by versions/runId after scenarios or models
-   * @param filterId the filter which updates its options
-   * @param selectOrder the order of selection (filter)
-   * @returns a list of filterId to be applied
-   */
+    * Get filters that has to be used on this filterId (filters that have a lower idx in selectOrder)
+    * Special case when scenario and models are in selectOrder, the last selected is replaced by versions and runId
+    * in the future to always filter by versions/runId after scenarios or models
+    * @param filterId the filter which updates its options
+    * @param selectOrder the order of selection (filter)
+    * @returns a list of filterId to be applied
+    */
     getFiltersToApply(filterId, selectOrder) {
 
         if (selectOrder != undefined) {
@@ -249,6 +249,14 @@ export default class Filter {
         }
     }
 
+    /**
+     * Get selected data that will be applied for filter
+     * exp: SelectOrder = [models, regions, variables ...], the filters to apply for regions is [models]
+     * so the return will be {models: [model1, model2,...]}
+     * @param selectedData selected data for the entire block
+     * @param filtersToApply array of filter that will be applied for the current filter
+     * @returns only selected data of the applying filter
+     */
     getSelectedDataOfFilter = (selectedData, filtersToApply) => {
         const selectedFilterData = {};
         if (filtersToApply.length > 0) {
@@ -259,12 +267,19 @@ export default class Filter {
         }
     }
 
+    /**
+     * Adding values of data focus to selected data of block.
+     * @param selectedData all selected data in the data block.
+     * @returns new selected data that contains both seleced values in the data focus and in data block
+     */
     addDataFocusToSelectedData = (selectedData) => {
         if (this.dataFocusFilters != null) {
             Object.keys(this.dataFocusFilters).forEach(key => {
                 let newSelected: string[] = selectedData[key];
-                if (newSelected != null) {
-                    newSelected = [...newSelected, ...this.dataFocusFilters[key]];
+                if (newSelected?.length > 0) {
+                    // {Second filter} Find matching values in this.dataFocusFilters[key] and selectedData[key]
+                    const values: string[] = this.dataFocusFilters[key].filter(value => newSelected.includes(value));
+                    newSelected = values;
                 } else {
                     newSelected = [...this.dataFocusFilters[key]];
                 }
@@ -275,22 +290,14 @@ export default class Filter {
     }
 
 
-    static getYears() {
-        const startYear = 2005;
-        const endYear = 2100;
+    static getYears(startYear = 1995, endYear = 2100) {
         const stepSize = 5;
-
-        // Calculate the number of rows
         const numRows = Math.floor((endYear - startYear) / stepSize) + 1;
-
-        // Create the table
         const years: number[] = [];
-
         for (let i = 0; i < numRows; i++) {
             const year = startYear + i * stepSize;
             years.push(year);
         }
-
         return years
     }
 
