@@ -31,11 +31,11 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         }
     };
 
-    getDataFocus = async (selectedData: OptionsDataModel) => { // Normal filter
+    getDataFocus = async (dataFocusFilters: OptionsDataModel) => { // Normal filter
         const filteredValues = {};
         const filters: FilterObject = this.getFilters();
         const filterKeys = Object.keys(filters);
-        const filter = new Filter(selectedData);
+        const filter = new Filter({}, dataFocusFilters, undefined);
         for (const key of filterKeys) {
             try {
                 const body = filter.getBody(key);
