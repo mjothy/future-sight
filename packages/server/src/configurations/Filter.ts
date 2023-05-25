@@ -14,7 +14,7 @@ export default class Filter {
             "regions": this.regionsBody(globalSelectedData),
             "variables": this.variableBody(globalSelectedData),
             "units": this.unitsBody(globalSelectedData),
-            "versions": this.versionsBody(globalSelectedData)
+            "runs": this.runBody(globalSelectedData)
         };
     }
 
@@ -114,29 +114,18 @@ export default class Filter {
         return null
     }
 
-    versionsBody = (globalSelectedData) => {
-        const filtersToApply = this.getFiltersToApply("models", this.selectOrder);
-        let selectedData = this.getSelectedDataOfFilter(globalSelectedData, filtersToApply);
-        selectedData = this.addDataFocusToSelectedData(selectedData);
+    runBody = (globalSelectedData) => {
+        const filtersToApply = this.getFiltersToApply("versions", this.selectOrder);
+        const selectedData = this.getSelectedDataOfFilter(globalSelectedData, filtersToApply);
 
         const requestBody: FilterSchema = {};
 
-        if (selectedData["regions"]?.length > 0) {
-            requestBody.region = { name__in: selectedData["regions"] };
-        }
-
-        if (selectedData["variables"]?.length > 0) {
-            requestBody.variable = { name__in: selectedData["variables"] };
-        }
-
-        if (selectedData["units"]?.length > 0) {
-            requestBody.unit = { name__in: selectedData["units"] };
+        if (selectedData["models"]?.length > 0) {
+            requestBody.model = { name__in: selectedData["models"] }
         }
 
         if (selectedData["scenarios"]?.length > 0) {
-            requestBody.run = {
-                scenario: { name__in: selectedData["scenarios"] }
-            };
+            requestBody.scenario = { name__in: selectedData["scenarios"] }
         }
 
         return requestBody;
@@ -213,8 +202,8 @@ export default class Filter {
 
     /**
     * Get filters that has to be used on this filterId (filters that have a lower idx in selectOrder)
-    * Special case when scenario and models are in selectOrder, the last selected is replaced by versions and runId
-    * in the future to always filter by versions/runId after scenarios or models
+    * Special case when scenario and models are in selectOrder, the last selected is replaced by version and runId
+    * in the future to always filter by version/runId after scenarios or models
     * @param filterId the filter which updates its options
     * @param selectOrder the order of selection (filter)
     * @returns a list of filterId to be applied
@@ -235,12 +224,12 @@ export default class Filter {
                     ? [...selectOrder] // filterId not in selectOrder, all selectOrder have lower idx
                     : selectOrder.slice(0, filterIdOrder) // only filters with idx lower than filterIdOrder
 
-                // Replace scenarios or models by versions if both in selectOrder, choose the highest idx between them.
+                // Replace scenarios or models by run if both in selectOrder, choose the highest idx between them.
                 // As it is the same to filter by model/scenario/version or to filter by runId
                 // when both scenario and model are selected
                 if (["models", "scenarios"].every(item => selectOrder.includes(item))) {
                     const maxIdx = Math.max(selectOrder.indexOf("models"), selectOrder.indexOf("scenarios"))
-                    lowerIdxFilters.splice(maxIdx + 1, 0, "versions") // TODO replace by runId here
+                    lowerIdxFilters.splice(maxIdx + 1, 0, "run") // TODO replace by runId here
                 }
             }
             return lowerIdxFilters

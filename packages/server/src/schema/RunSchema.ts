@@ -9,5 +9,6 @@ interface Run {
         name?: string;
         name__in?: string[];
     };
+    is_default?: boolean
 }
 

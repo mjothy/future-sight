@@ -17,13 +17,15 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
     getFilterPossibleValues = async (filterId: string) => {
         const filters: FilterObject = this.getFilters();
         try {
-            const response = await this.patchPromise(filters[filterId].path);
-            let data = await response.json()
+            if (filterId != "versions") {
+                const response = await this.patchPromise(filters[filterId].path);
+                let data = await response.json()
 
-            if (!Array.isArray(data)) {
-                data = Array.from(data);
+                if (!Array.isArray(data)) {
+                    data = Array.from(data);
+                }
+                return data.map(element => element.name);
             }
-            return data.map(element => element.name);
         } catch (e: Error | any) {
             // scenarios not working 500 internal error
             console.error(`Error fetching ${filters[filterId].label}: ${e.toString()}`)
@@ -88,14 +90,17 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         const filter = new Filter(selectedData, dataFocusFilters, selectOrder);
         for (const key of filterKeys) {
             try {
-                const body = filter.getBody(key);
-                const response = await this.patchPromise(filters[key].path, body);
-                let data = await response.json();
 
                 if (key == "versions") {
-                    // TODO extract all versions from (add runId: {model, scenario, version})
-                    filteredValues[key] = [];
+                    const body = filter.getBody("runs");
+                    const response = await this.patchPromise("/runs/", body);
+                    const data = await response.json();
+                    // SEND { "model": {"scenario": default: Run, values: [Runs]}}
+                    filteredValues["versions"] = this.prepareVersions(data);
                 } else {
+                    const body = filter.getBody(key);
+                    const response = await this.patchPromise(filters[key].path, body);
+                    let data = await response.json();
                     if (!Array.isArray(data)) {
                         data = Array.from(data);
                     }
@@ -127,10 +132,13 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         const timeSeries: TimeSerieObject[] = [];
         for (const raw of selectedData) {
             const rawWithRunId = await this.getRawWithRunId(raw);
+            console.log("rawWithRunId: ", rawWithRunId)
             const body = Filter.getDatapointsBody(rawWithRunId);
             try {
                 const response = await this.patchPromise("/iamc/datapoints/", body);
                 const dataPoints = await response.json();
+                console.log("body: ", body);
+                // console.log("result: ", dataPoints);
                 if (dataPoints?.length > 0) {
                     const timeSerie = this.prepareTimeSerie(raw, dataPoints)
                     timeSeries.push(timeSerie);
@@ -164,11 +172,42 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
             data: []
         };
 
+        // Order dataPoints
+        dataPoints.sort((a, b) => a.step_year - b.step_year);
+
         dataPoints.forEach(point => {
             timeSerie.data.push({ value: point.value, year: point.step_year });
         })
 
         return timeSerie;
+    }
+
+
+    prepareVersions = (data) => {
+        const versions: VersionSchema = {};
+        data.forEach((run: Run) => {
+            const model = run?.model?.name;
+            const scenario = run?.scenario?.name;
+            if (model != null && scenario != null) {
+
+                if (versions[model] == null) {
+                    versions[model] = {}
+                }
+                if (versions[model][scenario] == null) {
+                    versions[model][scenario] = {
+                        values: []
+                    };
+                }
+
+                if (run?.is_default) {
+                    versions[model][scenario].default = run;
+                }
+
+                versions[model][scenario].values.push(run);
+            }
+        })
+
+        return versions;
     }
 
     getDataUnion = () => [];
