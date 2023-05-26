@@ -1,6 +1,6 @@
-import { CloseCircleOutlined, ExclamationCircleOutlined, LoadingOutlined } from '@ant-design/icons';
-import { Button, Input, Select, Tag, Tooltip, TreeSelect } from 'antd'
-import React, { Component } from 'react'
+import {CloseCircleOutlined, ExclamationCircleOutlined, LoadingOutlined} from '@ant-design/icons';
+import {Button, Input, Select, Tag, Tooltip, TreeSelect} from 'antd'
+import React, {Component} from 'react'
 const { Option } = Select;
 
 interface SelectOptionProps {
@@ -43,11 +43,6 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
             if (!currentNode) {
                 const checkable = (values.length === 1 || this.props.type == "categories"); // Set only Leafs as checkable
                 currentNode = { title: values[0], label: values[0], key: values[0], value: values[0], children: [], checkable };
-                let title = `${currentNode.label}`;
-                if (currentNode.children.length > 0) {
-                    title += `(${currentNode.children.length})`
-                }
-                currentNode.title = title
                 treeData.push(currentNode);
             }
 
@@ -61,16 +56,13 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                     currentNode.children.push(childNode);
                 } else {
                     if (!childNode.checkable) {
-                        const checkable = i === values.length - 1;
-                        childNode.checkable = checkable;
+                        childNode.checkable = i === values.length - 1;
                     }
                 }
 
-                let title = `${currentNode.label}`;
                 if (currentNode.children.length > 0) {
-                    title += `(${currentNode.children.length})`
+                    currentNode.title = `${currentNode.label} (${currentNode.children.length})`
                 }
-                currentNode.title = title
                 currentNode = childNode;
             }
 

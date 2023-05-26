@@ -70,11 +70,14 @@ export default class BlockFilterManager extends Component<any, any> {
         if(metadata["scenarios"].length>0 && metadata["models"].length>0){
             this.updateFilterOptions("versions")
         }
+        this.updateMissingData();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.props.plotData[this.props.currentBlock.id]?.length != prevProps.plotData[this.props.currentBlock.id]?.length) {
-            this.missingData();
+        if (
+            this.props.plotData[this.props.currentBlock.id]?.length != prevProps.plotData[this.props.currentBlock.id]?.length
+        ) {
+            this.updateMissingData();
         }
         if (this.props.currentBlock.id !== prevProps.currentBlock.id) {
             const metadata = this.props.currentBlock.config.metaData
@@ -85,6 +88,7 @@ export default class BlockFilterManager extends Component<any, any> {
                     }
                 }
             )
+            this.updateMissingData();
         }
     }
 
@@ -118,7 +122,6 @@ export default class BlockFilterManager extends Component<any, any> {
                         isLoadingOptions: {...this.state.isLoadingOptions, [filterId]: false}
                     }, () => {
                     this.props.checkIfSelectedInOptions(this.state.optionsData, this.props.currentBlock)
-                    this.missingData();
                 })})
             .catch(err => console.error("error fetch: ", err));
     }
@@ -143,7 +146,7 @@ export default class BlockFilterManager extends Component<any, any> {
     /**
      * set data that is not present in the graph of the block
      */
-    missingData = () => {
+    updateMissingData = () => {
         const metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
 
         if (this.isAllSelected()) {
@@ -270,6 +273,11 @@ export default class BlockFilterManager extends Component<any, any> {
                 ){
                     this.updateFilterOptions("versions")
                 }
+            }
+
+            // Update missing data message
+            if(addedOptions.length>0 || deletedOptions.length>0){
+                this.updateMissingData();
             }
         }
     };
