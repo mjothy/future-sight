@@ -90,7 +90,7 @@ export default class ControlBlockEditor extends Component<any, any> {
     const metaData = this.props.currentBlock.config.metaData;
 
     return (
-      <div className='mb-20'>
+      <div className='mb-20' key={option}>
         <Checkbox
           onChange={(e) => this.onCheckChange(option, e)}
           checked={metaData.master[option].isMaster}

@@ -223,38 +223,29 @@ export default class BlockFilterManager extends Component<any, any> {
             const addedOptions = config.metaData[filterId].filter((x)=> !this.state.currentSelection.includes(x))
             const deletedOptions = this.state.currentSelection.filter((x) => !config.metaData[filterId].includes(x))
 
-            // update versions if model or scenario modified
-            if(
-                ["models", "scenarios"].includes(filterId)
-                && ["models", "scenarios"].every(item => selectOrder.includes(item))
-                && (deletedOptions.length>0 || addedOptions.length>0)
-            ){
-                await this.updateFilterOptions("versions")
-            }
-
-
             if (deletedOptions.length>0){
-                const selectOrderIndex = selectOrder.indexOf(filterId)
-
-                // Update cascade all higher idx filters
-                for (const tempFilterId of selectOrder.slice(selectOrderIndex+1)){
-                    await this.updateFilterOptions(tempFilterId)
-
-                    // Check versions
-                    if(
-                        ["models", "scenarios"].includes(tempFilterId)
-                        && ["models", "scenarios"].every(item => selectOrder.includes(item))
-                    ) {
-                        await this.updateFilterOptions("versions")
-                    }
-                }
-
                 // Update unselected filter to stale
                 const staleFilters = {...this.state.staleFilters}
                 for (const tempFilterId of Object.keys(staleFilters).filter((x)=>!selectOrder.includes(x))){
                     staleFilters[tempFilterId] = true
                 }
                 this.setState({staleFilters: staleFilters})
+
+                // Update cascade all higher idx filters
+                const selectOrderIndex = selectOrder.indexOf(filterId)
+
+                for (const tempFilterId of selectOrder.slice(selectOrderIndex+1)){
+                    await this.updateFilterOptions(tempFilterId)
+                }
+
+                // Update versions if model or scenario modified
+                const updatedFilters =selectOrder.slice(selectOrderIndex)
+                if(
+                    ["models", "scenarios"].some(item => updatedFilters.includes(item))
+                    && ["models", "scenarios"].every(item => selectOrder.includes(item))
+                ) {
+                    this.updateFilterOptions("versions")
+                }
 
             } else if (addedOptions.length>0){
                 // Update higher idx and unselected filter to stale
@@ -271,6 +262,14 @@ export default class BlockFilterManager extends Component<any, any> {
                     staleFilters[tempFilterId] = true
                 }
                 this.setState({staleFilters: staleFilters})
+
+                // update versions if model or scenario modified
+                if(
+                    ["models", "scenarios"].includes(filterId)
+                    && ["models", "scenarios"].every(item => selectOrder.includes(item))
+                ){
+                    this.updateFilterOptions("versions")
+                }
             }
         }
     };

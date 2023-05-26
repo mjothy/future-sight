@@ -260,7 +260,7 @@ export default class ExpressServer {
       ) {
         const err = "Both models and scenarios should be chosen before asking for versions"
         console.error(err);
-        res.status(400).send(new Error(err));
+        res.status(400).send({versions:{}});
       }
 
       // First filter (by data focus) -- only one filter selected

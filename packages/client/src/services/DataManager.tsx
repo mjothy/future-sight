@@ -15,8 +15,8 @@ export default class DataManager implements IDataManager {
       body: JSON.stringify(data),
     })
       .then((response) => response.json())
-      .then((data) => {
-        return data;
+      .then((plotData) => {
+        return plotData;
       })
       .catch(console.error);
   };

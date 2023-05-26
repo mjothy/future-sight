@@ -24,6 +24,13 @@ export default class DataBlockEditor extends Component<any, any> {
       for (const clearedFilter of clearedFilters) {
         config.metaData[clearedFilter] = [];
       }
+
+      if(
+          ["models", "scenarios"].some(item => clearedFilters.includes(item))
+      ) {
+        config.metaData["versions"]={}
+      }
+
       config.metaData.selectOrder = [...newSelectOrder];
       dashboard.blocks[this.props.currentBlock.id].config = { ...config };
 
