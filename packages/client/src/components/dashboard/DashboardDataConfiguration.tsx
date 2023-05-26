@@ -156,17 +156,24 @@ class DashboardDataConfiguration extends Component<
   retreiveAllTimeSeriesData = (data, missingData, blockId) => {
     this.props.dataManager.fetchPlotData(missingData)
       .then(res => {
-        if (res.length > 0) {
-          const allPlotData = JSON.parse(JSON.stringify(this.state.allPlotData))
-          if (allPlotData[blockId] != undefined){
-            allPlotData[blockId].push(res)
-          } else {
-            allPlotData[blockId] = [...res]
-          }
+        // no new data to add to state.allPLotData, only update state.plotData
+        if (res.length == 0){
           const plotData = JSON.parse(JSON.stringify(this.state.plotData))
-          plotData[blockId] = [...data, ...res]
-          this.setState({ allPlotData: allPlotData, plotData: plotData })
+          plotData[blockId] = data
+          this.setState({plotData: plotData })
+          return
         }
+
+        const allPlotData = JSON.parse(JSON.stringify(this.state.allPlotData))
+        if (allPlotData[blockId] != undefined){
+          allPlotData[blockId].push(...res)
+        } else {
+          allPlotData[blockId] = [...res]
+        }
+        const plotData = JSON.parse(JSON.stringify(this.state.plotData))
+        plotData[blockId] = [...data, ...res]
+        this.setState({ allPlotData: allPlotData, plotData: plotData })
+
       });
   }
 
