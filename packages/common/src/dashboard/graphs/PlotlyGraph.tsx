@@ -69,6 +69,12 @@ export default class PlotlyGraph extends Component<any, any> {
       }
     }
 
+    if (this.props.currentBlock.config.configStyle.graphType == "box"){
+      layout["xaxis"]={
+        showticklabels: false
+      }
+    }
+
 
     return currentBlock.config.configStyle.graphType === 'table' && this.props.data.values.length > 0 ? (
       <Table
