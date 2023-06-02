@@ -1,0 +1,42 @@
+{
+  "models": {
+    "id": "models",
+    "label": "Models",
+    "path": "/iamc/models/",
+    "required": true,
+    "origin": "iiasa",
+    "icon": "control"
+  },
+  "scenarios": {
+    "id": "scenarios",
+    "label": "Scenarios",
+    "path": "/iamc/scenarios/",
+    "required": true,
+    "origin": "iiasa",
+    "icon": "branches"
+  },
+  "variables": {
+    "id": "variables",
+    "label": "Variables",
+    "path": "/iamc/variables/",
+    "required": true,
+    "origin": "iiasa",
+    "icon": "line-chart"
+  },
+  "regions": {
+    "id": "regions",
+    "label": "Regions",
+    "path": "/iamc/regions/",
+    "required": true,
+    "origin": "iiasa",
+    "icon": "global"
+  },
+  "categories": {
+    "id": "categories",
+    "label": "Categories",
+    "path": "/categories",
+    "required": false,
+    "origin": "fs",
+    "icon": "tag"
+  }
+}

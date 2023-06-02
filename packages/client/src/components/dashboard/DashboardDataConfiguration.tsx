@@ -10,13 +10,13 @@ import {
   Colorizer,
   OptionsDataModel
 } from '@future-sight/common';
-import {Component} from 'react';
+import { Component } from 'react';
 import withDataManager from '../../services/withDataManager';
-import {RoutingProps} from '../app/Routing';
+import { RoutingProps } from '../app/Routing';
 import DashboardSelectionControl from './DashboardSelectionControl';
-import {getDraft, removeDraft} from '../drafts/DraftUtils';
+import { getDraft, removeDraft } from '../drafts/DraftUtils';
 import Utils from '../../services/Utils';
-import {Spin} from 'antd';
+import { Spin } from 'antd';
 import * as _ from 'lodash';
 
 export interface DashboardDataConfigurationProps
@@ -39,28 +39,14 @@ class DashboardDataConfiguration extends Component<
     super(props);
     this.optionsLabel = this.props.dataManager.getOptions();
     this.state = {
+      filters: {},
       allData: new OptionsDataModel(),
       /**
        * Data (with timeseries from IASA API)
        */
       allPlotData: {},
       plotData: {},
-      isFetchData: false
     };
-  }
-
-  async componentDidMount() {
-    const allData = this.state.allData;
-    try {
-      allData['regions'] = await this.props.dataManager.fetchRegions();
-      allData['variables'] = await this.props.dataManager.fetchVariables();
-      allData['models'] = await this.props.dataManager.fetchModels();
-      allData['scenarios'] = await this.props.dataManager.fetchScenarios();
-      allData['categories'] = await this.props.dataManager.fetchCategories();
-      this.setState({ allData, isFetchData: true });
-    } catch (error) {
-      console.log("ERROR FETCH: ", error);
-    }
   }
 
   saveData = async (id: string, image?: string) => {
@@ -96,46 +82,46 @@ class DashboardDataConfiguration extends Component<
 
     // TODO add categories
     if (
-        metaData.models &&
-        metaData.scenarios &&
-        metaData.variables &&
-        metaData.regions
+      metaData.models &&
+      metaData.scenarios &&
+      metaData.variables &&
+      metaData.regions
     ) {
       metaData.models.forEach((model) => {
         metaData.scenarios.forEach((scenario) => {
           metaData.variables.forEach((variable) => {
             metaData.regions.forEach((region) => {
               if (metaData.versions[model]
-                  && metaData.versions[model][scenario]
-                  && metaData.versions[model][scenario].length>0
-              ){
-                for (const version of metaData.versions[model][scenario]){
+                && metaData.versions[model][scenario]
+                && metaData.versions[model][scenario].length > 0
+              ) {
+                for (const version of metaData.versions[model][scenario]) {
                   const d = this.state.allPlotData[block.id]?.find(
-                      (e) =>
-                          e.model === model &&
-                          e.scenario === scenario &&
-                          e.variable === variable &&
-                          e.region === region &&
-                          e.version === version
+                    (e) =>
+                      e.model === model &&
+                      e.scenario === scenario &&
+                      e.variable === variable &&
+                      e.region === region &&
+                      e.version === version
                   );
                   if (d) {
                     data.push(d);
                   } else {
-                    missingData.push({model, scenario, variable, region, version});
+                    missingData.push({ model, scenario, variable, region, version });
                   }
                 }
               } else {
                 const d = this.state.allPlotData[block.id]?.find(
-                    (e) =>
-                        e.model === model &&
-                        e.scenario === scenario &&
-                        e.variable === variable &&
-                        e.region === region
+                  (e) =>
+                    e.model === model &&
+                    e.scenario === scenario &&
+                    e.variable === variable &&
+                    e.region === region
                 );
                 if (d) {
                   data.push(d);
                 } else {
-                  missingData.push({model, scenario, variable, region});
+                  missingData.push({ model, scenario, variable, region });
                 }
               }
             });
@@ -157,15 +143,15 @@ class DashboardDataConfiguration extends Component<
     this.props.dataManager.fetchPlotData(missingData)
       .then(res => {
         // no new data to add to state.allPLotData, only update state.plotData
-        if (res.length == 0){
+        if (res.length == 0) {
           const plotData = JSON.parse(JSON.stringify(this.state.plotData))
           plotData[blockId] = data
-          this.setState({plotData: plotData })
+          this.setState({ plotData: plotData })
           return
         }
 
         const allPlotData = JSON.parse(JSON.stringify(this.state.allPlotData))
-        if (allPlotData[blockId] != undefined){
+        if (allPlotData[blockId] != undefined) {
           allPlotData[blockId].push(...res)
         } else {
           allPlotData[blockId] = [...res]
@@ -185,19 +171,21 @@ class DashboardDataConfiguration extends Component<
         shareButtonOnClickHandler={() => Utils.copyToClipboard()}
         embedButtonOnClickHandler={() => Utils.copyToClipboard(undefined, "&embedded")}
         blockData={this.blockData}
-        optionsLabel={this.optionsLabel}
+        // filters={this.state.filters}
         plotData={this.state.plotData}
+        optionsLabel={this.optionsLabel}
         {...this.props}
       />
     ) : (
-      (this.state.isFetchData && <DashboardSelectionControl
+      <DashboardSelectionControl
         saveData={this.saveData}
         allData={this.state.allData}
         plotData={this.state.plotData}
         blockData={this.blockData}
         optionsLabel={this.optionsLabel}
+
         {...this.props}
-      />) || <div className="dashboard">
+      /> || <div className="dashboard">
         <Spin className="centered" />
       </div>)
       // TODO handle error

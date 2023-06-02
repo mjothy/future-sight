@@ -1,8 +1,9 @@
-import {CloseCircleOutlined, ExclamationCircleOutlined, LoadingOutlined} from '@ant-design/icons';
-import {Button, Input, Select, Tag, Tooltip, TreeSelect} from 'antd'
-import React, {Component} from 'react'
+import { CloseCircleOutlined, ExclamationCircleOutlined, LoadingOutlined } from '@ant-design/icons';
+import { Button, Input, Select, Tag, Tooltip, TreeSelect } from 'antd'
+import React, { Component } from 'react'
 const { Option } = Select;
 
+// TODO keep only loading (isFetching and loading have the same behaviour)
 interface SelectOptionProps {
     /**
      * The data option, it could be models, scenarios , ...
@@ -18,6 +19,7 @@ interface SelectOptionProps {
     loading?: boolean;
     isFetching?: false;
     className?: string;
+    placeholder?: string;
     isClosable?: boolean;
 }
 
@@ -75,7 +77,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         return (
             <div>
                 {menu}
-                {!this.props.isFetching && this.props.value.map(selectedValue => (
+                {!(this.props.isFetching || this.props.loading) && this.props.value.map(selectedValue => (
                     !this.props.options.includes(selectedValue) && (
                         <div key={selectedValue} style={{ color: 'red' }} className={"ant-select-item ant-select-item-option"}>
                             <div className='ant-select-item-option-content'>
@@ -117,7 +119,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 value={this.props.value}
                 loading={this.props.loading}
                 treeCheckable={true}
-                placeholder={this.props.type}
+                placeholder={this.props.placeholder}
                 onChange={(selectedData: any[]) =>
                     this.props.onChange(this.props.type, selectedData.map((data: any) => data.value != null ? data.value : data))
                 }
@@ -131,7 +133,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 }
                 onDeselect={(selectedData) => this.props.onDeselect?.(this.props.type, selectedData.map((data: any) => data.value))}
                 dropdownMatchSelectWidth={false}
-                notFoundContent={(this.props.isFetching) ? (
+                notFoundContent={(this.props.isFetching || this.props.loading) ? (
                     <div>
                         <LoadingOutlined />
                         <p>Fetching data</p>
@@ -202,7 +204,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 }
                 onDeselect={(selectedData) => this.props.onDeselect?.(this.props.type, selectedData.map((data: any) => data.value))}
                 dropdownMatchSelectWidth={false}
-                notFoundContent={(this.props.isFetching) ? (
+                notFoundContent={(this.props.isFetching || this.props.loading) ? (
                     <div>
                         <LoadingOutlined />
                         <p>Fetching data</p>
@@ -245,7 +247,8 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                     }}
                     // on close: save data
                     onDropdownVisibleChange={(e) => {
-                        return this.props.onDropdownVisibleChange?.(this.props.type, e)}
+                        return this.props.onDropdownVisibleChange?.(this.props.type, e)
+                    }
                     }
                     dropdownMatchSelectWidth={false}
                     notFoundContent={(
@@ -275,6 +278,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
     }
 
     render() {
+        console.log("DEBUG:", this.props.placeholder, "/", this.props.loading, "/", this.props.loading);
         switch (this.props.type) {
             case "categories": return this.treeSelectLeafOnly();
             case "variables":

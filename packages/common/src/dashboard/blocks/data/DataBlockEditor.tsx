@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
-import {Checkbox, Col, Divider, Row, Switch, Tag, TreeSelect} from 'antd';
+import React, { Component } from 'react';
+import { Checkbox, Col, Divider, Row, Switch, Tag, TreeSelect } from 'antd';
 import SelectInput from '../utils/SelectInput';
-import {ExclamationCircleOutlined, WarningOutlined} from '@ant-design/icons';
-import {getUnselectedInputOptions} from '../utils/BlockDataUtils';
-import BlockDataModel, {versionsModel} from "../../../models/BlockDataModel";
+import { ExclamationCircleOutlined, WarningOutlined } from '@ant-design/icons';
+import { getUnselectedInputOptions } from '../utils/BlockDataUtils';
+import BlockDataModel, { versionsModel } from "../../../models/BlockDataModel";
 import BlockStyleModel from "../../../models/BlockStyleModel";
 
 require('./DataBlockEditor.css')
@@ -19,16 +19,16 @@ export default class DataBlockEditor extends Component<any, any> {
 
     const index = config.metaData.selectOrder.indexOf(option);
     if (index >= 0) {
-      const newSelectOrder = [...config.metaData.selectOrder].slice(0,index);
+      const newSelectOrder = [...config.metaData.selectOrder].slice(0, index);
       const clearedFilters = [...config.metaData.selectOrder].slice(index);
       for (const clearedFilter of clearedFilters) {
         config.metaData[clearedFilter] = [];
       }
 
-      if(
-          ["models", "scenarios"].some(item => clearedFilters.includes(item))
+      if (
+        ["models", "scenarios"].some(item => clearedFilters.includes(item))
       ) {
-        config.metaData["versions"]={}
+        config.metaData["versions"] = {}
       }
 
       config.metaData.selectOrder = [...newSelectOrder];
@@ -80,15 +80,16 @@ export default class DataBlockEditor extends Component<any, any> {
               {option} {option == "categories" ? "(optional)" : ""} &nbsp;
               <label className='warning-label'>
                 {
-                    this.props.isAllSelected()
-                    && this.props.missingData[option].length > 0
-                    && this.getMessage(this.props.missingData[option])
+                  this.props.isAllSelected()
+                  && this.props.missingData[option].length > 0
+                  && this.getMessage(this.props.missingData[option])
                 }
               </label>
             </h4>
 
             <SelectInput
               type={option}
+              placeholder={option}
               className={"width-90"}
               value={metaData[option]}
               options={this.props.optionsData[option]}
@@ -110,13 +111,13 @@ export default class DataBlockEditor extends Component<any, any> {
     return Object.keys(controlBlock.master).map((key) => {
       if (controlBlock.master[key].isMaster) {
         return (
-          <div className='mt-20' key={"controlledInputs"+key}>
+          <div className='mt-20' key={"controlledInputs" + key}>
             <h4>{key} &nbsp;
               <label className='warning-label'>
                 {
                   this.props.isAllSelected()
-                    && this.props.missingData[key].length > 0
-                    && this.getMessage(this.props.missingData[key])
+                  && this.props.missingData[key].length > 0
+                  && this.getMessage(this.props.missingData[key])
                 }
               </label>
             </h4>
@@ -139,7 +140,7 @@ export default class DataBlockEditor extends Component<any, any> {
     });
   };
 
-  sortByTitle = (a,b) => {
+  sortByTitle = (a, b) => {
     const a_version = parseFloat(a.version)
     const b_version = parseFloat(b.version)
     if (a_version < b_version) {
@@ -153,7 +154,7 @@ export default class DataBlockEditor extends Component<any, any> {
 
   renderSelectVersions = () => {
     const controlId = this.props.currentBlock.controlBlock;
-    const metaData :BlockDataModel = this.props.currentBlock.config.metaData
+    const metaData: BlockDataModel = this.props.currentBlock.config.metaData
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle
     const versionOptions = this.props.optionsData.versions
     let disabled = true
@@ -162,21 +163,21 @@ export default class DataBlockEditor extends Component<any, any> {
       return
     }
 
-    if (controlId !=="") {
+    if (controlId !== "") {
       const controlBlockMeta = this.props.dashboard.blocks[controlId].config.metaData;
       if (
-          (metaData.models.length!=0 || controlBlockMeta.master.models.isMaster)
-          && (metaData.scenarios.length!=0 || controlBlockMeta.master.scenarios.isMaster)
-      ){
+        (metaData.models.length != 0 || controlBlockMeta.master.models.isMaster)
+        && (metaData.scenarios.length != 0 || controlBlockMeta.master.scenarios.isMaster)
+      ) {
         disabled = false
       }
     } else {
-      if ((metaData.models.length!=0) && (metaData.scenarios.length!=0)){
+      if ((metaData.models.length != 0) && (metaData.scenarios.length != 0)) {
         disabled = false
       }
     }
 
-    const treeData: any[]=[]
+    const treeData: any[] = []
     if (versionOptions) {
       for (const model of Object.keys(versionOptions)) {
         const modelChildren: any[] = []
@@ -185,12 +186,12 @@ export default class DataBlockEditor extends Component<any, any> {
           const defaultVersion = versionOptions[model][scenario].default
           for (const version of versionOptions[model][scenario].values) {
             const title = version == defaultVersion
-                ? `${version} (default)`
-                : `${version}`
+              ? `${version} (default)`
+              : `${version}`
             scenarioChildren.push({
               version: version, // For sorting
               title: title,
-              value: JSON.stringify({model, scenario, version})
+              value: JSON.stringify({ model, scenario, version })
             })
           }
           modelChildren.push({
@@ -210,39 +211,39 @@ export default class DataBlockEditor extends Component<any, any> {
     }
 
     return (
-        <div>
-          <Divider/>
-          <h4>versions</h4>
-          {disabled &&
-              <p className={"warning-label"}>
-                <WarningOutlined /> &nbsp;
-                Models and scenarios must be selected first
-              </p>}
-          <TreeSelect
-              className={"version-tree-select"}
-              showSearch
-              dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-              placeholder="Please select versions"
-              multiple
-              treeDefaultExpandAll
-              value={this.getDefaultTreeSelectValue()}
-              onChange={this.props.onVersionSelected}
-              treeData={treeData}
-              disabled={disabled}
-              removeIcon={<></>}
-          />
-          <Row>
-            <Col span={2} className={'checkbox-col'}>
-              <Checkbox
-                  onChange={this.onShowWarningVersionChange}
-                  checked={configStyle.showDeprecatedVersionWarning}
-              />
-            </Col>
-            <Col span={22} className={'checkbox-col-label'}>
-              <label>Show warning when deprecated version selected</label>
-            </Col>
-          </Row>
-        </div>
+      <div>
+        <Divider />
+        <h4>versions</h4>
+        {disabled &&
+          <p className={"warning-label"}>
+            <WarningOutlined /> &nbsp;
+            Models and scenarios must be selected first
+          </p>}
+        <TreeSelect
+          className={"version-tree-select"}
+          showSearch
+          dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+          placeholder="Please select versions"
+          multiple
+          treeDefaultExpandAll
+          value={this.getDefaultTreeSelectValue()}
+          onChange={this.props.onVersionSelected}
+          treeData={treeData}
+          disabled={disabled}
+          removeIcon={<></>}
+        />
+        <Row>
+          <Col span={2} className={'checkbox-col'}>
+            <Checkbox
+              onChange={this.onShowWarningVersionChange}
+              checked={configStyle.showDeprecatedVersionWarning}
+            />
+          </Col>
+          <Col span={22} className={'checkbox-col-label'}>
+            <label>Show warning when deprecated version selected</label>
+          </Col>
+        </Row>
+      </div>
     )
   }
 
@@ -256,10 +257,10 @@ export default class DataBlockEditor extends Component<any, any> {
   getDefaultTreeSelectValue = () => {
     const version_dict: versionsModel = this.props.currentBlock.config.metaData.versions
     const defaultValues: string[] = []
-    for (const model in version_dict){
-      for (const scenario in version_dict[model]){
-        for (const version of version_dict[model][scenario]){
-          defaultValues.push(JSON.stringify({model, scenario, version}))
+    for (const model in version_dict) {
+      for (const scenario in version_dict[model]) {
+        for (const version of version_dict[model][scenario]) {
+          defaultValues.push(JSON.stringify({ model, scenario, version }))
         }
       }
     }
@@ -270,43 +271,43 @@ export default class DataBlockEditor extends Component<any, any> {
     const metaData = this.props.currentBlock.config.metaData;
 
     return (
-        Object.keys(this.props.optionsData).length>0 &&
-          <div>
+      Object.keys(this.props.optionsData).length > 0 &&
+      <div>
+        <div>
+          <span className={"advanced-options-switch"}>
+            <span>Advanced options</span>
+            <Switch size="small" onChange={this.props.onUseVersionSwitched} checked={metaData.useVersion} />
+          </span>
+
+          {/* show inputs if they are controlled */}
+          {this.props.currentBlock.controlBlock !== '' && (
             <div>
-              <span className={"advanced-options-switch"}>
-                <span>Advanced options</span>
-                <Switch size="small" onChange={this.props.onUseVersionSwitched} checked={metaData.useVersion}/>
-              </span>
-
-              {/* show inputs if they are controlled */}
-              {this.props.currentBlock.controlBlock !== '' && (
-                <div>
-                  <strong>Controlled inputs</strong>
-                  {this.controlledInputs()}
-                  <Divider />
-                </div>
-              )}
-
-              {/* show dropdown lists of selected  */}
-              {metaData.selectOrder.map((option) =>
-                this.selectDropDownInput(option, true)
-              )}
-
-              {getUnselectedInputOptions(this.props.currentBlock, this.props.optionsLabel).length>0 && <Divider />}
-
-              {/* show dropdown lists of unselected  */}
-              <table className="width-100">
-                <tbody>
-                  <tr>
-                    {getUnselectedInputOptions(this.props.currentBlock, this.props.optionsLabel).map((option) => (
-                      <td key={option}>{this.selectDropDownInput(option, false)}</td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
-              {this.renderSelectVersions()}
+              <strong>Controlled inputs</strong>
+              {this.controlledInputs()}
+              <Divider />
             </div>
-          </div>
+          )}
+
+          {/* show dropdown lists of selected  */}
+          {metaData.selectOrder.map((option) =>
+            this.selectDropDownInput(option, true)
+          )}
+
+          {getUnselectedInputOptions(this.props.currentBlock, this.props.optionsLabel).length > 0 && <Divider />}
+
+          {/* show dropdown lists of unselected  */}
+          <table className="width-100">
+            <tbody>
+              <tr>
+                {getUnselectedInputOptions(this.props.currentBlock, this.props.optionsLabel).map((option) => (
+                  <td key={option}>{this.selectDropDownInput(option, false)}</td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+          {this.renderSelectVersions()}
+        </div>
+      </div>
     );
   }
 }

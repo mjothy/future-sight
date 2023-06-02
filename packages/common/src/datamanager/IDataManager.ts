@@ -4,15 +4,11 @@ import PlotDataModel from "../models/PlotDataModel";
 export default interface IDataManager {
   getBaseUrl: () => string;
 
+  getFilters: () => any; // {[id: string]: FilterObject}
+
   fetchPlotData: (data: DataModel[]) => Promise<PlotDataModel[]>;
 
-  fetchModels: () => Promise<any>;
-
-  fetchScenarios: () => Promise<any>;
-
-  fetchVariables: () => Promise<any>;
-
-  fetchRegions: () => Promise<any>;
+  getFilterPossibleValues: (filter: any) => Promise<any> | undefined;
 
   getDashboard: (id: string) => Promise<any>;
 
@@ -24,13 +20,11 @@ export default interface IDataManager {
 
   browseData: (data: any) => Promise<any>;
 
-  getOptions: () => string[];
+  getOptions: () => any;
 
   fetchFilterOptions: (data: any) => Promise<any>;
 
   fetchDataFocusOptions: (data: any) => Promise<any>;
 
   fetchRegionsGeojson: (regions: string[]) => Promise<any>;
-
-  fetchCategories: () => Promise<any>;
 }

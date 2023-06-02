@@ -19,7 +19,6 @@ interface DashboardViewProps extends ComponentPropsWithDataManager, RoutingProps
   readonly?: boolean;
   updateDashboard: (dashboard: DashboardModel) => void;
   checkIfSelectedInOptions: (optionsData, block: BlockModel) => void;
-  optionsLabel: string[],
   allData: any,
 }
 
@@ -33,7 +32,6 @@ class DashboardView extends React.Component<DashboardViewProps, any> {
         <Dashboard {...this.props} />
         <SetupView
           dashboard={this.props.dashboard}
-          optionsLabel={this.props.optionsLabel}
           updateDashboard={this.props.updateDashboard}
           allData={this.props.allData}
         />

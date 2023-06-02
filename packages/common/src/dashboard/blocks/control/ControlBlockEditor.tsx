@@ -114,10 +114,9 @@ export default class ControlBlockEditor extends Component<any, any> {
   };
 
   render() {
-    const optionsLabel = this.props.optionsLabel;
     return (
       <>
-        <div>{optionsLabel.map((option) => this.selectDropDown(option))}</div>
+        <div>{this.props.optionsLabel.map((option) => this.selectDropDown(option))}</div>
         <Divider />
         <Row style={{ marginTop: "auto" }}>
           <Col span={24}>

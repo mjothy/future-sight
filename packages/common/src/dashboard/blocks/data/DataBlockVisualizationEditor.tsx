@@ -68,8 +68,8 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   onLegendContentChange = (checkedValues) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
 
-    for(const key in configStyle.legend){
-      configStyle.legend[key]=false
+    for (const key in configStyle.legend) {
+      configStyle.legend[key] = false
     }
     for (const value of checkedValues) {
       configStyle.legend[value] = true;
@@ -169,7 +169,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     const metaData = this.props.currentBlock.config.metaData;
     const legend = this.props.currentBlock.config.configStyle.legend;
-    const defaultLegendOptions = Object.keys(legend).filter((key)=>legend[key])
+    const defaultLegendOptions = Object.keys(legend).filter((key) => legend[key])
     return (
       <div>
         <h3>General</h3>
@@ -361,7 +361,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             <h3>Colorscale</h3>
             <Row>
               <Col span={20}>
-                <PlotColorscalePicker currentBlock={this.props.currentBlock} optionsLabel={this.props.optionsLabel}
+                <PlotColorscalePicker currentBlock={this.props.currentBlock} filters={this.props.filters}
                   onColorsChange={this.onColorsChange} />
               </Col>
             </Row>

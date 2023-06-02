@@ -1,5 +1,5 @@
-import type {IDataManager, DataModel, PlotDataModel} from '@future-sight/common';
-import {BlockDataModel} from "@future-sight/common";
+import type { IDataManager, DataModel, PlotDataModel } from '@future-sight/common';
+import { BlockDataModel } from "@future-sight/common";
 
 export default class DataManager implements IDataManager {
   getBaseUrl() {
@@ -21,8 +21,8 @@ export default class DataManager implements IDataManager {
       .catch(console.error);
   };
 
-  fetchModels = () => {
-    return fetch(`${this.getBaseUrl()}/models`)
+  getFilters = () => {
+    return fetch(`${this.getBaseUrl()}/filters`)
       .then((response) => response.json())
       .then((data) => {
         return data;
@@ -30,36 +30,35 @@ export default class DataManager implements IDataManager {
       .catch(console.error);
   };
 
-  fetchScenarios = () => {
-    return fetch(`${this.getBaseUrl()}/scenarios`)
-      .then((response) => response.json())
-      .then((data) => {
-        return data;
+  getFilterPossibleValues = (filter: any) => {
+    switch (filter.origin) {
+      case "iiasa": return fetch(`${this.getBaseUrl()}/filterValues`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          filterId: filter.id
+        }),
       })
-      .catch(console.error);
-  };
+        .then((response) => response.json())
+        .then((data) => {
+          return data;
+        })
+        .catch(console.error);
 
-  fetchVariables = () => {
-    return fetch(
-      `${this.getBaseUrl()}/variables`
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        return data;
-      })
-      .catch(console.error);
-  };
+      case "fs": return fetch(`${this.getBaseUrl()}${filter.path}`)
+        .then((response) => response.json())
+        .then((data) => {
+          return data;
+        })
+        .catch(console.error);
 
-  fetchRegions = () => {
-    return fetch(
-      `${this.getBaseUrl()}/regions`
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        return data;
-      })
-      .catch(console.error);
-  };
+      default: console.error("Error filter !");
+    }
+
+
+  }
 
   addDashboard = (data) => {
     return fetch(`${this.getBaseUrl()}/dashboard`, {
@@ -137,7 +136,7 @@ export default class DataManager implements IDataManager {
     return ["models", "scenarios", "variables", "regions"];
   };
 
-  fetchFilterOptions = (data: {filterId: string, metaData: BlockDataModel, dataFocusFilters: any}) => {
+  fetchFilterOptions = (data) => {
     return fetch(`api/filterOptions`, {
       method: 'POST',
       headers: {
@@ -183,12 +182,4 @@ export default class DataManager implements IDataManager {
       .catch(console.error);
   };
 
-  fetchCategories = () => {
-    return fetch(`api/categories`)
-      .then((response) => response.json())
-      .then((data) => {
-        return data;
-      })
-      .catch(console.error);
-  };
 }

@@ -19,7 +19,7 @@ class SetupView extends Component<any, any> {
       visible: getSelectedFiltersLabels(this.props.dashboard.dataStructure).length <= 0,
       isSubmit: false,
       optionsData: { ...this.props.allData },
-      isFetching: false,
+      isFetching: true,
       needToFetch: {
         regions: false,
         variables: false,
@@ -27,6 +27,11 @@ class SetupView extends Component<any, any> {
         models: false
       }
     };
+  }
+
+  async componentDidMount(): Promise<void> {
+    const optionsData = await this.getOptionsData();
+    this.setState({ optionsData, isFetching: false });
   }
 
   async componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): Promise<void> {

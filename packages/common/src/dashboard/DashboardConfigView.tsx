@@ -185,7 +185,7 @@ class DashboardConfigView extends Component<any, any> {
      * Check if fetched data has any deprecated version, and update metadata if has one
      */
     checkDeprecatedVersion = (data: PlotDataModel[], currentBlock) => {
-        const hasDeprecatedVersion = !data.every((plotData)=> plotData.is_default.toLowerCase() === "true")
+        const hasDeprecatedVersion = !data.every((plotData)=> plotData.is_default)
 
         if(hasDeprecatedVersion !== currentBlock.config.metaData.hasDeprecatedVersion){
             const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
