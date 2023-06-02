@@ -132,13 +132,10 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         const timeSeries: TimeSerieObject[] = [];
         for (const raw of selectedData) {
             const rawWithRunId = await this.getRawWithRunId(raw);
-            console.log("rawWithRunId: ", rawWithRunId)
             const body = Filter.getDatapointsBody(rawWithRunId);
             try {
                 const response = await this.patchPromise("/iamc/datapoints/", body);
                 const dataPoints = await response.json();
-                console.log("body: ", body);
-                // console.log("result: ", dataPoints);
                 if (dataPoints?.length > 0) {
                     const timeSerie = this.prepareTimeSerie(raw, dataPoints)
                     timeSeries.push(timeSerie);
