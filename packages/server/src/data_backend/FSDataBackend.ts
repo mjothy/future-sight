@@ -48,13 +48,7 @@ export default class FSDataBackend implements IDataBackend {
 
     getFilters = () => filters;
 
-    getFilterPossibleValues = (filterId: string) => {
-        return this.filterDataValues[filterId];
-    };
-
     getUnits = () => { return [] };
-
-    getTimeSeries = () => []; // rename of getData
 
     getFilteredData = (filterId, blockMetaData: any, dataFocusFilters: any) => {
         const optionsData = {};
@@ -93,7 +87,7 @@ export default class FSDataBackend implements IDataBackend {
         return optionsData;
     };
 
-    getData(selectedDataRaws?: any): any[] {
+    getTimeSeries(selectedDataRaws?: any): any[] {
 
         let elements = [...this.data];
         const response: any[] = [];

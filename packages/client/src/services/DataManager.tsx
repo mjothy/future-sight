@@ -30,36 +30,6 @@ export default class DataManager implements IDataManager {
       .catch(console.error);
   };
 
-  getFilterPossibleValues = (filter: any) => {
-    switch (filter.origin) {
-      case "iiasa": return fetch(`${this.getBaseUrl()}/filterValues`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          filterId: filter.id
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          return data;
-        })
-        .catch(console.error);
-
-      case "fs": return fetch(`${this.getBaseUrl()}${filter.path}`)
-        .then((response) => response.json())
-        .then((data) => {
-          return data;
-        })
-        .catch(console.error);
-
-      default: console.error("Error filter !");
-    }
-
-
-  }
-
   addDashboard = (data) => {
     return fetch(`${this.getBaseUrl()}/dashboard`, {
       method: 'POST',

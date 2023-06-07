@@ -278,7 +278,6 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
     }
 
     render() {
-        console.log("DEBUG:", this.props.placeholder, "/", this.props.loading, "/", this.props.loading);
         switch (this.props.type) {
             case "categories": return this.treeSelectLeafOnly();
             case "variables":

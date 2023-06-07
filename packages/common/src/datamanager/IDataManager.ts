@@ -8,8 +8,6 @@ export default interface IDataManager {
 
   fetchPlotData: (data: DataModel[]) => Promise<PlotDataModel[]>;
 
-  getFilterPossibleValues: (filter: any) => Promise<any> | undefined;
-
   getDashboard: (id: string) => Promise<any>;
 
   getDashboards: () => Promise<any>;

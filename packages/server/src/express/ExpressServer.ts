@@ -70,20 +70,10 @@ export default class ExpressServer {
       res.send(this.dataProxy.getFilters());
     });
 
-    this.app.post('/api/filterValues', async (req, res) => {
-      const filterValues = await this.dataProxy.getFilterPossibleValues(req.body.filterId);
-      res.send(filterValues);
-    });
-
-
     this.app.post('/api/plotData', async (req, res) => {
       const selectedData: any = req.body;
-      const response = await this.dataProxy.getData(selectedData);
+      const response = await this.dataProxy.getTimeSeries(selectedData);
       res.status(200).send(response);
-    });
-
-    this.app.get('/api/all_data', (req, res) => {
-      res.send(this.dataProxy.getDataUnion()[0]);
     });
 
     // We call dataFocus afer each combo-box closed

@@ -74,7 +74,7 @@ class DashboardDataConfiguration extends Component<
     if (block.blockType === "text") {
       return
     }
-
+    
     const config: ConfigurationModel | any = block.config;
     const metaData: BlockDataModel = config.metaData;
     const data: PlotDataModel[] = [];

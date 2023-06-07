@@ -3,19 +3,30 @@ import TimeSerieObject from "../models/TimeSerieObject";
 
 export default interface IDataBackend {
 
+    /**
+     * Exemple: {"filter": {id, label, path, ...}}
+     * @returns the configuration filter file
+     */
     getFilters: () => FilterObject;
     /**
-     * Called only for initiate Data Focus
-     * @param filterId id of the filter 
-     * @returns liste of all values
+     * Filter Data Focus
+     * @param selectedData The data selected in data focus
+     * @returns filtered data (values)
      */
-    getFilterPossibleValues: (filterId: string) => string[] | Promise<string[]>;
     getDataFocus: (selectedData: any) => any | Promise<string[]>;
-    getTimeSeries: (selectedData: OptionsDataModel) => TimeSerieObject[] | Promise<TimeSerieObject[]>; // TODO replace any by OptionsDataModel
+    /**
+     * Get data with timeseries to plot on graph
+     * @param selectedData Selected values in data block
+     * @returns 
+     */
+    getTimeSeries: (selectedData?: any) => any[] | Promise<any[]>; // TODO replace any by OptionsDataModel
+    /**
+     * Get filterd values in data block
+     * @param filterId the filter id
+     * @param metaData selected data in block
+     * @param dataFocus data selected in data focus
+     * @returns 
+     */
     getFilteredData: (filterId, metaData?: any, dataFocus?: any) => any | Promise<any>;
-
-    // TODO delete after
-    getData: (selectedData?: any) => any[] | Promise<any[]>; // TODO delete it and use instead getTimeSeries
-    getDataUnion: () => any[];
 
 }

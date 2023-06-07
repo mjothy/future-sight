@@ -65,7 +65,6 @@ export default class RedisPersistenceManager extends RedisClient implements IPer
         const tagsTransform = {};
         Object.keys(authors).forEach(key => authorsTransform[key.replace(/%/g, ' ')] = authors[key])
         Object.keys(tags).forEach(key => tagsTransform[key.replace(/%/g, ' ')] = tags[key])
-        console.log({ authors: authorsTransform, tags: tagsTransform })
         return { authors: authorsTransform, tags: tagsTransform };
     };
 
