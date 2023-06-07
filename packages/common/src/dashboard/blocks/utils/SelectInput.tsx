@@ -77,7 +77,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         return (
             <div>
                 {menu}
-                {!(this.props.isFetching || this.props.loading) && this.props.value.map(selectedValue => (
+                {!(this.props.isFetching) && this.props.value.map(selectedValue => (
                     !this.props.options.includes(selectedValue) && (
                         <div key={selectedValue} style={{ color: 'red' }} className={"ant-select-item ant-select-item-option"}>
                             <div className='ant-select-item-option-content'>
@@ -133,7 +133,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 }
                 onDeselect={(selectedData) => this.props.onDeselect?.(this.props.type, selectedData.map((data: any) => data.value))}
                 dropdownMatchSelectWidth={false}
-                notFoundContent={(this.props.isFetching || this.props.loading) ? (
+                notFoundContent={(this.props.isFetching) ? (
                     <div>
                         <LoadingOutlined />
                         <p>Fetching data</p>
@@ -204,7 +204,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 }
                 onDeselect={(selectedData) => this.props.onDeselect?.(this.props.type, selectedData.map((data: any) => data.value))}
                 dropdownMatchSelectWidth={false}
-                notFoundContent={(this.props.isFetching || this.props.loading) ? (
+                notFoundContent={(this.props.isFetching) ? (
                     <div>
                         <LoadingOutlined />
                         <p>Fetching data</p>
