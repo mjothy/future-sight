@@ -58,12 +58,24 @@ const redisClient = new RedisPersistenceManager(redisUrl);
 
 // Backend initialisation
 let auth;
-if (username && password) {
-  auth = basicAuth({
-    users: { [username]: password },
-    challenge: true,
-  });
+
+if (isProd) {
+  if (username && password) {
+    auth = basicAuth({
+      users: { [username]: password },
+      challenge: true,
+    });
+  }
+} else {
+  if (config.username && config.password) {
+    const username: string = config.username;
+    auth = basicAuth({
+      users: { [username]: config.password },
+      challenge: true,
+    });
+  }
 }
+
 const app = new ExpressServer(port, cookieKey, auth, clientPath, redisClient, dataBackend, fsConfProvider);
 
 // Startup
