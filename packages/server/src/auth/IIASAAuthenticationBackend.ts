@@ -1,9 +1,5 @@
 import { IAuthenticationBackend } from "../interfaces/IAuthenticationBackend ";
 import fetch from 'node-fetch';
-import config from '../configurations/config.json';
-
-const AUTH_URL = config.auth_url;
-const REFRESH_URL = config.refresh_token_url;
 
 // TODO handle errors
 // TODO add refresh token into try/catch
@@ -11,16 +7,15 @@ const REFRESH_URL = config.refresh_token_url;
 export default class IIASAAuthenticationBackend implements IAuthenticationBackend {
 
     private intervalId;
-    private username;
-    private password;
+    public config;
     private access_token;
     private refresh_token;
 
-    constructor(username, password) {
-        this.username = username;
-        this.password = password;
+    constructor(config) {
+        this.config = config;
         this.initializeToken();
     }
+    getConfig = () => this.config;
 
     getToken = () => this.access_token;
 
@@ -33,12 +28,12 @@ export default class IIASAAuthenticationBackend implements IAuthenticationBacken
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                username: this.username,
-                password: this.password
+                username: this.config.username,
+                password: this.config.password
             })
         };
         try {
-            const response = await fetch(AUTH_URL, options)
+            const response = await fetch(this.config.auth_url, options)
             const data = await response.json();
             this.access_token = data.access;
             this.refresh_token = data.refresh;
@@ -57,7 +52,7 @@ export default class IIASAAuthenticationBackend implements IAuthenticationBacken
         };
 
         try {
-            const response = await fetch(REFRESH_URL, options);
+            const response = await fetch(this.config.refresh_token_url, options);
             const data = await response.json();
             this.access_token = data.access;
         } catch (err) { console.error("Fetch token with refresh failed: ", err) }
