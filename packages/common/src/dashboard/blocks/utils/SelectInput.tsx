@@ -4,11 +4,13 @@ import React, { Component } from 'react'
 const { Option } = Select;
 
 // TODO keep only loading (isFetching and loading have the same behaviour)
+// same for label and placeholder
 interface SelectOptionProps {
     /**
      * The data option, it could be models, scenarios , ...
      */
     type: string;
+    label?: string;
     value: string[];
     options: any;
     onChange: (type: string, selectedData: string[]) => void;
@@ -77,7 +79,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         return (
             <div>
                 {menu}
-                {!(this.props.isFetching) && this.props.value.map(selectedValue => (
+                {!this.props.isFetching && this.props.value.map(selectedValue => (
                     !this.props.options.includes(selectedValue) && (
                         <div key={selectedValue} style={{ color: 'red' }} className={"ant-select-item ant-select-item-option"}>
                             <div className='ant-select-item-option-content'>
@@ -119,7 +121,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 value={this.props.value}
                 loading={this.props.loading}
                 treeCheckable={true}
-                placeholder={this.props.placeholder}
+                placeholder={this.props.label || this.props.type}
                 onChange={(selectedData: any[]) =>
                     this.props.onChange(this.props.type, selectedData.map((data: any) => data.value != null ? data.value : data))
                 }
@@ -192,7 +194,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 value={this.props.value}
                 loading={this.props.loading}
                 treeCheckable={true}
-                placeholder={this.props.type}
+                placeholder={this.props.label || this.props.type}
                 onChange={(selectedData: any[]) =>
                     this.props.onChange(this.props.type, selectedData.map((data: any) => data.value != null ? data.value : data))
                 }
@@ -239,7 +241,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                     className={this.props.className}
                     dropdownRender={this.dropdownRender} // TODO
                     tagRender={(props) => this.tagRender(props, true)} // TODO
-                    placeholder={this.props.type}
+                    placeholder={this.props.label || this.props.type}
                     value={this.props.value}
                     loading={this.props.loading}
                     onChange={(selectedData) => {

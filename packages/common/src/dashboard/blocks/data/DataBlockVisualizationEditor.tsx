@@ -2,7 +2,7 @@ import { Component } from 'react';
 import PieVisualizationEditor from "./graphType/pie/PieVisualizationEditor";
 import {
   AreaChartOutlined, BarChartOutlined, EnvironmentOutlined, LineChartOutlined, TableOutlined, PieChartOutlined,
-  ExclamationCircleOutlined
+  ExclamationCircleOutlined, BoxPlotOutlined
 } from '@ant-design/icons';
 import { Col, Input, Row, Select, Checkbox, InputNumber } from 'antd';
 import PlotColorscalePicker from '../utils/PlotColorscalePicker';
@@ -17,6 +17,7 @@ const plotTypes = [
   { type: 'pie', label: 'Pie', icon: <PieChartOutlined /> },
   { type: 'table', label: 'Table', icon: <TableOutlined /> },
   { type: 'map', label: 'Map', icon: <EnvironmentOutlined /> },
+  { type: 'box', label: 'Boxplot', icon: <BoxPlotOutlined /> },
 ];
 
 const colorbarTitle = ['variable', 'unit'];

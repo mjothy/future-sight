@@ -116,7 +116,7 @@ class DataBlockView extends Component<any, any> {
           x: xyDict.x,
           y: xyDict.y,
           mode: "none",
-          name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend), this.props.width, "legendtext"),
+          name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend, configStyle.showLegend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
         };
@@ -131,29 +131,38 @@ class DataBlockView extends Component<any, any> {
             }
           });
         }
-
+        break;
+      case "box":
+        obj = {
+          type: configStyle.graphType,
+          y: xyDict.y,
+          name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend, configStyle.showLegend), this.props.width, "legendtext"),
+          showlegend: configStyle.showLegend,
+          hoverinfo: "y",
+          marker: { color: dataElement.color || null }
+        };
         break;
       default:
         obj = {
           type: configStyle.graphType,
           x: xyDict.x,
           y: xyDict.y,
-          name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend), this.props.width, "legendtext"),
+          name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend, configStyle.showLegend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
           marker: { color: dataElement.color || null }
         };
     }
-
     return obj;
   }
 
-  getLegend = (dataElement: PlotDataModel, legend) => {
-    if (!legend) {
+  getLegend = (dataElement: PlotDataModel, legend, showLegend) => {
+    if (!showLegend) {
       return dataElement.region
         + " - " + dataElement.variable
         + " - " + dataElement.scenario
         + " - " + dataElement.model
+        + " - V." + dataElement.version
     } else {
       const label: any[] = [];
       if (legend.Region && dataElement.region) {
