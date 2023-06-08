@@ -1,16 +1,14 @@
 import fetch from 'node-fetch';
-import config from '../configurations/config.json'
 import { IAuthenticationBackend } from '../interfaces/IAuthenticationBackend ';
 export default class IIASADataManager {
 
-    private readonly url: string = config.ecemf_url;
     private readonly authentication: IAuthenticationBackend;
 
     constructor(authentication: IAuthenticationBackend) {
         this.authentication = authentication;
     }
     getUrlBase = (path) => {
-        return this.url + path;
+        return this.authentication.getConfig().ecemf_url + path;
     }
 
     getPromise = async (url) => {
