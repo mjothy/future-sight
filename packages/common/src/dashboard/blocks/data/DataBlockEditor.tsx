@@ -184,11 +184,11 @@ export default class DataBlockEditor extends Component<any, any> {
         const modelChildren: any[] = []
         for (const scenario of Object.keys(versionOptions[model])) {
           const scenarioChildren: any[] = []
-          const defaultVersion = versionOptions[model][scenario].default
+          const defaultVersion = versionOptions[model][scenario].default.id
           for (const version of versionOptions[model][scenario].values) {
-            const title = version == defaultVersion
-              ? `${version} (default)`
-              : `${version}`
+            const title = version.id == defaultVersion
+              ? `${version.version} (default)`
+              : `${version.version}`
             scenarioChildren.push({
               version: version, // For sorting
               title: title,

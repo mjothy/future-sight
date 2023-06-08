@@ -5,6 +5,9 @@ import config from '../configurations/config.json';
 const AUTH_URL = config.auth_url;
 const REFRESH_URL = config.refresh_token_url;
 
+// TODO handle errors
+// TODO add refresh token into try/catch
+// TODO See Decorator design pattern
 export default class IIASAAuthenticationBackend implements IAuthenticationBackend {
 
     private intervalId;

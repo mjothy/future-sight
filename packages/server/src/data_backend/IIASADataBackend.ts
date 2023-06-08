@@ -56,7 +56,8 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
             regions: [],
             variables: [],
             scenarios: [],
-            models: []
+            models: [],
+            versions: []
         };
 
         Object.keys(selectedData).forEach(key => {
@@ -72,15 +73,12 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
                 const body = filter.getBody("runs");
                 const response = await this.patchPromise("/runs/", body);
                 const data = await response.json();
-                // SEND { "model": {"scenario": default: Run, values: [Runs]}}
+                // SEND versions: { "model": {"scenario": default: Run, values: [Runs]}}
                 filteredValues["versions"] = this.prepareVersions(data);
             } else {
                 const body = filter.getBody(filterId);
                 const response = await this.patchPromise(filters[filterId].path, body);
-                let data = await response.json();
-                if (!Array.isArray(data)) {
-                    data = Array.from(data);
-                }
+                const data = await response.json();
                 filteredValues[filterId] = data.map(element => element.name);
             }
 

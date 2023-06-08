@@ -1,5 +1,6 @@
 
 // TODO add interface
+// TODO add run Ids to variable and region body
 export default class Filter {
 
     private body = {};
@@ -177,12 +178,6 @@ export default class Filter {
             requestBody.unit = { name: raw["unit"] };
         }
 
-        if (raw["year__in"] != null) {
-            requestBody.year__in = raw["year__in"];
-        } else {
-            requestBody.year__in = this.getYears();
-        }
-
         return requestBody;
     }
 
@@ -229,7 +224,7 @@ export default class Filter {
                 // when both scenario and model are selected
                 if (["models", "scenarios"].every(item => selectOrder.includes(item))) {
                     const maxIdx = Math.max(selectOrder.indexOf("models"), selectOrder.indexOf("scenarios"))
-                    lowerIdxFilters.splice(maxIdx + 1, 0, "run") // TODO replace by runId here
+                    lowerIdxFilters.splice(maxIdx + 1, 0, "versions") // TODO replace by runId here
                 }
             }
             return lowerIdxFilters
@@ -276,18 +271,6 @@ export default class Filter {
             });
         }
         return selectedData;
-    }
-
-
-    static getYears(startYear = 1995, endYear = 2100) {
-        const stepSize = 5;
-        const numRows = Math.floor((endYear - startYear) / stepSize) + 1;
-        const years: number[] = [];
-        for (let i = 0; i < numRows; i++) {
-            const year = startYear + i * stepSize;
-            years.push(year);
-        }
-        return years
     }
 
 }

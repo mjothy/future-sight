@@ -72,6 +72,7 @@ class DataBlockView extends Component<any, any> {
   }
 
 
+  // TODO delete year
   prepareTableData = (data: PlotDataModel[]) => {
     const columns: ColumnsType<any> = [
       { title: 'model', dataIndex: 'model' },
