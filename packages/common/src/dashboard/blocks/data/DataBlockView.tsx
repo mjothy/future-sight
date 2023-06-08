@@ -72,7 +72,6 @@ class DataBlockView extends Component<any, any> {
   }
 
 
-  // TODO delete year
   prepareTableData = (data: PlotDataModel[]) => {
     const columns: ColumnsType<any> = [
       { title: 'model', dataIndex: 'model' },
@@ -80,18 +79,18 @@ class DataBlockView extends Component<any, any> {
       { title: 'variable', dataIndex: 'variable' },
       { title: 'region', dataIndex: 'region' },
     ];
-    for (let year = 2005; year <= 2100; year = year + 5) {
-      columns.push({
-        title: year,
-        dataIndex: year,
-      });
-    }
+
     const values: any[] = [];
     data?.map((dataElement) => {
       const obj = {};
       dataElement.data?.map((e) => {
         obj[e.year] = e.value;
+        columns.push({
+          title: e.year,
+          dataIndex: e.year,
+        });
       });
+
       values.push({
         model: dataElement.model,
         scenario: dataElement.scenario,
