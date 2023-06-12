@@ -30,10 +30,12 @@ export default class PlotlyGraph extends Component<any, any> {
 
   render() {
     const { currentBlock } = this.props;
+    const configStyle = currentBlock.config.configStyle
+
     const config = {
       displayModeBar: false, // this is the line that hides the bar.
       editable: false,
-      showlegend: currentBlock.config.configStyle.showLegend,
+      showlegend: configStyle.showLegend,
       showTitle: false,
     };
     let layout: any = {
@@ -53,16 +55,17 @@ export default class PlotlyGraph extends Component<any, any> {
       annotations: this.props.layout.annotations,
       dragmode: "zoom",
       mapbox: { style: "carto-positron", center: { lat: 38, lon: -90 }, zoom: 3 },
+      barmode: configStyle.stack.isStack ? 'stack' : null
     };
 
-    if (currentBlock.config.configStyle.title.isVisible) {
+    if (configStyle.title.isVisible) {
       layout = {
         ...layout,
-        title: currentBlock.config.configStyle.title.value,
+        title: configStyle.title.value,
       };
     }
 
-    if (this.props.slidersLayout && currentBlock.config.configStyle.XAxis.useSlider) {
+    if (this.props.slidersLayout && configStyle.XAxis.useSlider) {
       layout = {
         sliders: this.props.slidersLayout,
         ...layout
@@ -75,8 +78,7 @@ export default class PlotlyGraph extends Component<any, any> {
       }
     }
 
-
-    return currentBlock.config.configStyle.graphType === 'table' && this.props.data.values.length > 0 ? (
+    return configStyle.graphType === 'table' && this.props.data.values.length > 0 ? (
       <Table
         // Make the height 100% of the div (not working)
         style={{ minHeight: '100%' }}
