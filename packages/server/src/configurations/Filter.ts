@@ -162,17 +162,9 @@ export default class Filter {
     static getDatapointsBody = (raw) => {
         const requestBody: FilterSchema = {};
 
-        if (raw["run"]?.id != null) {
-            requestBody.run = { id: raw["run"]?.id }
-        }
-
-        if (raw["region"] != null) {
-            requestBody.region = { name: raw["region"] };
-        }
-
-        if (raw["variable"] != null) {
-            requestBody.variable = { name: raw["variable"] };
-        }
+        requestBody.run = { id: raw["run"]?.id != null ? raw["run"]?.id : -1 }
+        requestBody.region = { name: raw["region"] };
+        requestBody.variable = { name: raw["variable"] };
 
         if (raw["unit"] != null) {
             requestBody.unit = { name: raw["unit"] };
