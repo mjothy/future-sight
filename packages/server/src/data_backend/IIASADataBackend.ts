@@ -17,21 +17,13 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
     getDataFocus = async (dataFocusFilters: OptionsDataModel) => { // Normal filter
         const filteredValues = {};
         const filters: FilterObject = this.getFilters();
-        const filterKeys = Object.keys(filters);
+        const filterKeys = Object.keys(filters).filter(key => key != "categories"); // TODO delete filter
         const filter = new Filter({}, dataFocusFilters, undefined);
         for (const key of filterKeys) {
-            try {
-                const body = filter.getBody(key);
-                const response = await this.patchPromise(filters[key].path, body);
-                let data = await response.json();
-                if (!Array.isArray(data)) {
-                    data = Array.from(data);
-                }
-                filteredValues[key] = data.map(element => element.name);
-            } catch (e: Error | any) {
-                console.error(`Error fetching (data focus) ${key}: ${e.toString()}`)
-                filteredValues[key] = [];
-            }
+
+            const body = filter.getBody(key);
+            const data = await this.patchPromise(filters[key].path, body);
+            filteredValues[key] = data.map(element => element.name);
         }
         return filteredValues;
     };
@@ -41,13 +33,14 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         const filters: FilterObject = this.getFilters();
         const selectOrder = blockMetaData?.selectOrder;
 
+        // TODO Handle error
         if (
             filterId === "versions"
             && !["models", "scenarios"].every(item => selectOrder?.includes(item))
         ) {
             const err = "Both models and scenarios should be chosen before asking for versions"
             console.error(err);
-            throw new Error(err);
+            return filteredValues;
         }
 
         // Filter by blockMetaData
@@ -67,24 +60,16 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         });
 
         const filter = new Filter(selectedData, dataFocusFilters, selectOrder);
-        try {
 
-            if (filterId == "versions") {
-                const body = filter.getBody("runs");
-                const response = await this.patchPromise("/runs/", body);
-                const data = await response.json();
-                // SEND versions: { "model": {"scenario": default: Run, values: [Runs]}}
-                filteredValues["versions"] = this.prepareVersions(data);
-            } else {
-                const body = filter.getBody(filterId);
-                const response = await this.patchPromise(filters[filterId].path, body);
-                const data = await response.json();
-                filteredValues[filterId] = data.map(element => element.name);
-            }
-
-        } catch (e: Error | any) {
-            console.error(`Error fetching (filtering data) ${filterId}: ${e.toString()}`)
-            filteredValues[filterId] = [];
+        if (filterId == "versions") {
+            const body = filter.getBody("runs");
+            const data = await this.patchPromise("/runs/", body);
+            // SEND versions: { "model": {"scenario": default: Run, values: [Runs]}}
+            filteredValues["versions"] = this.prepareVersions(data);
+        } else {
+            const body = filter.getBody(filterId);
+            const data = await this.patchPromise(filters[filterId].path, body);
+            filteredValues[filterId] = data.map(element => element.name);
         }
 
         // Return only data in dataFocus (if exist);
@@ -93,6 +78,8 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         }
 
         return filteredValues;
+
+
     };
 
     getTimeSeries = async (selectedData?: any) => {
@@ -100,35 +87,23 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         for (const raw of selectedData) {
             const rawWithRun = await this.getRawWithRun(raw);
             const body = Filter.getDatapointsBody(rawWithRun);
-            try {
-                const response = await this.patchPromise("/iamc/datapoints/", body);
-                const dataPoints = await response.json();
-                if (dataPoints?.length > 0) {
-                    const timeSerie = this.prepareTimeSerie(rawWithRun, dataPoints);
-                    timeSeries.push(timeSerie);
-                }
-
-            } catch (e: Error | any) {
-                console.error(`Error fetching (datapoints): ${e.toString()}`)
+            const dataPoints = await this.patchPromise("/iamc/datapoints/", body);
+            if (dataPoints?.length > 0) {
+                const timeSerie = this.prepareTimeSerie(rawWithRun, dataPoints);
+                timeSeries.push(timeSerie);
             }
         }
         return timeSeries;
     }
 
     getRawWithRun = async (raw) => {
-        try {
-            const body = Filter.getRunBody(raw);
-            const response = await this.patchPromise("/runs/", body);
-            const data = await response.json();
-            const runDefault = data.find(run => run.is_default);
-            raw["run"] = runDefault;
-            raw.is_default = true;
-            raw.version = runDefault.version;
-            return raw;
-        } catch (e: Error | any) {
-            console.error(`Error fetching (datapoints): ${e.toString()}`)
-            return raw;
-        }
+        const body = Filter.getRunBody(raw);
+        const data = await this.patchPromise("/runs/", body);
+        const runDefault = data.find(run => run.is_default);
+        raw["run"] = runDefault;
+        raw.is_default = true;
+        raw.version = runDefault?.version;
+        return raw;
     }
 
     prepareTimeSerie = (raw: any, dataPoints: any) => {

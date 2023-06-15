@@ -5,6 +5,7 @@ import { FilterTwoTone, WarningOutlined } from '@ant-design/icons';
 import { getSelectedFiltersLabels, OptionsDataModel } from '@future-sight/common';
 import withDataManager from '../../../services/withDataManager';
 import * as _ from 'lodash';
+import { notification } from 'antd';
 
 const { confirm } = Modal;
 
@@ -126,7 +127,7 @@ class SetupView extends Component<any, any> {
       const dataStructureData = this.state.dataStructure[type].selection;
       const optionsData = this.state.optionsData[type];
 
-      const selected_in_options = dataStructureData.filter(value => optionsData.includes(value));
+      const selected_in_options = dataStructureData.filter(value => optionsData?.includes(value));
       return !(selected_in_options.length == dataStructureData.length)
     } else {
       let isMissing = false;

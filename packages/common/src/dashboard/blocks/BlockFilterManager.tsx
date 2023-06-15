@@ -7,6 +7,7 @@ import { getBlock } from './utils/BlockDataUtils';
 import BlockDataModel, { versionsModel } from "../../models/BlockDataModel";
 import DashboardModel from "../../models/DashboardModel";
 import { getSelectedFiltersLabels } from './utils/DashboardUtils';
+import { notification } from 'antd';
 
 export default class BlockFilterManager extends Component<any, any> {
     constructor(props) {
@@ -126,7 +127,12 @@ export default class BlockFilterManager extends Component<any, any> {
                     this.props.checkIfSelectedInOptions(this.state.optionsData, this.props.currentBlock)
                 })
             })
-            .catch(err => console.error("error fetch: ", err));
+            .catch(err => {
+                this.setState({
+                    isLoadingOptions: { ...this.state.isLoadingOptions, [filterId]: false },
+                    isFetching: false
+                });
+            })
     }
 
     /**

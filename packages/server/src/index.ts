@@ -51,7 +51,6 @@ const config = JSON.parse(config_file.toString());
 let dataBackend;
 const authentication = new IIASAAuthenticationBackend(config);
 if (config.origin_data == "IIASA") {
-  authentication.startRefreshing(); // to refresh token
   dataBackend = new IIASADataBackend(authentication);
 } else {
   dataBackend = new FSDataBackend(dataPath, dataUnionPath);
@@ -74,11 +73,13 @@ if (isProd) {
   }
 } else {
   if (config.username && config.password) {
-    const username: string = config.username;
     auth = basicAuth({
-      users: { [username]: config.password },
-      challenge: true,
+      authorizer: authentication.initializeToken,
+      authorizeAsync: true,
+      challenge: true, // add WWW-Authenticate to unauthorized resposne 
+      unauthorizedResponse: authentication.unauthorizedResponse
     });
+
   }
 }
 
