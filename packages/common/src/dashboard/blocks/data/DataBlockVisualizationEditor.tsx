@@ -218,9 +218,9 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         }
 
 
-        {configStyle.graphType == "area" &&
+        {["area", "bar"].includes(configStyle.graphType) &&
           <>
-            <h3>Area</h3>
+            <h3>{plotTypes.find(chart => chart.type == configStyle.graphType)?.label}</h3>
             <Row>
               <Col span={2} className={'checkbox-col'}>
                 <Checkbox
