@@ -88,22 +88,22 @@ export default class FSDataBackend implements IDataBackend {
     };
 
     getTimeSeries(selectedDataRaws?: any): any[] {
-
-        let elements = [...this.data];
+        const elements = [...this.data];
         const response: any[] = [];
         for (const reqData of selectedDataRaws) { // TODO delete for
+            let filteredElement: any = [];
             // TODO VERSION
             if (reqData.version) {
-                elements = elements.filter(
+                filteredElement = elements.filter(
                     (e) => e.model === reqData.model && e.scenario === reqData.scenario && e.variable === reqData.variable && e.region === reqData.region && e.version === reqData.version
                 );
             } else {
-                elements = elements.filter(
+                filteredElement = elements.filter(
                     (e) => e.model === reqData.model && e.scenario === reqData.scenario && e.variable === reqData.variable && e.region === reqData.region && e.is_default === "True"
                 );
             }
-            if (elements) {
-                response.push(...elements);
+            if (filteredElement.length > 0) {
+                response.push(...filteredElement);
             }
         }
         return response;
