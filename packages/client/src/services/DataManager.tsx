@@ -131,22 +131,28 @@ export default class DataManager implements IDataManager {
         body: JSON.stringify(data),
       });
 
-      if (!response.ok) {
-        const err: any = new Error(response.statusText);
+      if (!response.ok) { // TODO add antd.notif
+        const err: any = new Error();
         err.status = response.status;
+        if (err.status == 401) {
+          const resp_obj = await response.json();
+          err.message = resp_obj.message;
+        } else {
+          err.message = response.statusText;
+        }
         throw err;
       } else {
         const resp_obj = await response.json();
         return resp_obj;
       }
-    } catch (err: any) {
-      let description = "";
+    } catch (err: any) { // TODO delete catch
+      let message = "";
       if (err.status == 401) {
-        description = "Access denied to ressources. Please authenticate yourself to proceed";
+        message = "Access denied to ressources.";
       }
       notification.error({
-        message: err.message,
-        description: description,
+        message: message,
+        description: err.message,
         placement: 'top',
       });
       return []; // routing to login page

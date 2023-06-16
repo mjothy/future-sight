@@ -52,16 +52,8 @@ export default class IIASADataManager {
                     throw err;
             }
         } catch (err: any) {
-            // invalid_token for access token not valid
-            /**
-             * 
-                {
-                    "message": "The supplied token is expired or invalid.",
-                    "kwargs": {},
-                    "error_name": "invalid_token"
-                }
-             */
             if (err.status == 401 && err.error_name == "invalid_token" && refresh) {
+                // Refresh access token
                 const refreshToken = await this.authentication.refreshToken();
                 if (refreshToken) {
                     return await this.patchPromise(url, body, false);

@@ -71,16 +71,6 @@ if (isProd) {
       challenge: true,
     });
   }
-} else {
-  if (config.username && config.password) {
-    auth = basicAuth({
-      authorizer: authentication.initializeToken,
-      authorizeAsync: true,
-      challenge: true, // add WWW-Authenticate to unauthorized resposne 
-      unauthorizedResponse: authentication.unauthorizedResponse
-    });
-
-  }
 }
 
 const app = new ExpressServer(port, cookieKey, auth, clientPath, redisClient, dataBackend, fsConfProvider);

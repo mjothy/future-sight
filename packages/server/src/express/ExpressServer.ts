@@ -7,7 +7,6 @@ import { DashboardModel } from '@future-sight/common';
 import BrowseObject from '../models/BrowseObject';
 import IDataBackend from '../interfaces/IDataBackend ';
 import IConfigurationProvider from '../interfaces/IConfigurationProvider';
-import { IBasicAuthedRequest } from 'express-basic-auth';
 
 export default class ExpressServer {
   private app: any;
@@ -111,7 +110,6 @@ export default class ExpressServer {
         res.send(optionsData);
       } catch (error: any) {
         if (error.status == 401) {
-          res.setHeader('WWW-Authenticate', 'Basic');
           res.status(401).send({ message: error.message });
         } else {
           console.error(error);
