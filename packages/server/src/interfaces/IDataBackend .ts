@@ -1,4 +1,4 @@
-import { FilterObject, OptionsDataModel } from "@future-sight/common";
+import {DataModel, FilterObject, OptionsDataModel} from "@future-sight/common";
 import TimeSerieObject from "../models/TimeSerieObject";
 
 export default interface IDataBackend {
@@ -19,7 +19,7 @@ export default interface IDataBackend {
      * @param selectedData Selected values in data block
      * @returns 
      */
-    getTimeSeries: (selectedData?: any) => any[] | Promise<any[]>; // TODO replace any by OptionsDataModel
+    getTimeSeries: (selectedData?: DataModel[]) => any[] | Promise<any[]>; // TODO replace any by OptionsDataModel
     /**
      * Get filterd values in data block
      * @param filterId the filter id

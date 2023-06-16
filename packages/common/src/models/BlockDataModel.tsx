@@ -46,6 +46,12 @@ export default class BlockDataModel {
 
 export interface versionsModel {
   [model: string]: {
-    [scenario: string]: string[]
+    [scenario: string]: versionModel[]
   }
+}
+
+export interface versionModel{
+  id: string,
+  version: string,
+  [key: string]: any;
 }
