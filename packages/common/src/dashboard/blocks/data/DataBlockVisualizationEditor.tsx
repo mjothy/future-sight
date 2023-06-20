@@ -102,6 +102,12 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
+  onYAxisTickFormatChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.YAxis.percentage = e.target.checked ? "%" : undefined;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
   onStackCheckChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.stack.isStack = e.target.checked;
@@ -263,6 +269,19 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         <h3>Axis</h3>
         {this.isShowGraphConfig(configStyle.graphType) &&
           <>
+            {configStyle.graphType === "bar" &&
+              <Row>
+                <Col span={2} className={'checkbox-col'}>
+                  <Checkbox
+                      onChange={this.onYAxisTickFormatChange}
+                      checked={configStyle.YAxis.percentage}
+                  />
+                </Col>
+                <Col span={16} className={'checkbox-col-label'}>
+                  <label>Normalize to percentage</label>
+                </Col>
+              </Row>
+            }
             <Row>
               <Col span={2} className={'checkbox-col'}>
                 <Checkbox

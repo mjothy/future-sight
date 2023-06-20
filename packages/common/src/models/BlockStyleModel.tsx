@@ -5,7 +5,8 @@ export default class BlockStyleModel {
   YAxis = {
     label: false,
     unit: false,
-    force0: false
+    force0: false,
+    percentage: false
   };
   legend = {
     Model: false,
