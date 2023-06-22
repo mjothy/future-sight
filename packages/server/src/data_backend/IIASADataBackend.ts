@@ -1,4 +1,4 @@
-import { BlockDataModel, FilterObject, OptionsDataModel } from "@future-sight/common";
+import { BlockDataModel, DataModel, FilterObject, OptionsDataModel, PlotDataModel } from "@future-sight/common";
 import { IAuthenticationBackend } from "../interfaces/IAuthenticationBackend ";
 import IDataBackend from "../interfaces/IDataBackend ";
 import IIASADataManager from "./IIASADataManager";
@@ -14,7 +14,7 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
 
     getFilters = () => filters;
 
-    getDataFocus = async (dataFocusFilters: OptionsDataModel, filterIDs ?: string[]) => { // Normal filter
+    getDataFocus = async (dataFocusFilters: OptionsDataModel, filterIDs?: string[]) => { // Normal filter
         const filteredValues = {};
         if (filterIDs == null) {
             const filters: FilterObject = this.getFilters();
@@ -35,13 +35,13 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         const filters: FilterObject = this.getFilters();
         const selectOrder = blockMetaData?.selectOrder;
 
-        // TODO Handle error
         if (
             filterId === "versions"
             && !["models", "scenarios"].every(item => selectOrder?.includes(item))
         ) {
             const err = "Both models and scenarios should be chosen before asking for versions"
             console.error(err);
+            //throw new Error(err);
             return filteredValues;
         }
 
@@ -80,11 +80,9 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         }
 
         return filteredValues;
-
-
     };
 
-    getTimeSeries = async (selectedData?: any) => {
+    getTimeSeries = async (selectedData: DataModel[]) => {
         const timeSeries: TimeSerieObject[] = [];
         for (const raw of selectedData) {
             const rawWithRun = await this.getRawWithRun(raw);
@@ -96,16 +94,25 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
             }
         }
         return timeSeries;
+
     }
 
-    getRawWithRun = async (raw) => {
+    // TODO getting runs could probably be optimized if we use multiple timeseries with same scenario model
+    // Here call /runs for each timeserie instead of each combination of scenario model
+    getRawWithRun = async (raw: DataModel) => {
         const body = Filter.getRunBody(raw);
         const data = await this.patchPromise("/runs/", body);
         const runDefault = data.find(run => run.is_default);
-        raw["run"] = runDefault;
-        raw.is_default = true;
-        raw.version = runDefault?.version;
-        return raw;
+        const outputRaw: PlotDataModel = JSON.parse(JSON.stringify(raw))
+
+        if (Object.keys(raw).includes("run")) {
+            // Check if run is default when provided
+            outputRaw.is_default = outputRaw.run.id == runDefault?.id
+        } else {
+            outputRaw.run = runDefault;
+            outputRaw.is_default = true;
+        }
+        return outputRaw;
     }
 
     prepareTimeSerie = (raw: any, dataPoints: any) => {

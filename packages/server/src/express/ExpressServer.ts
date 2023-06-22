@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import { join } from 'path';
 import IPersistenceManager from '../interfaces/IPersistenceManager';
-import { DashboardModel } from '@future-sight/common';
+import {DashboardModel, DataModel, OptionsDataModel} from '@future-sight/common';
 import BrowseObject from '../models/BrowseObject';
 import IDataBackend from '../interfaces/IDataBackend ';
 import IConfigurationProvider from '../interfaces/IConfigurationProvider';
@@ -40,7 +40,6 @@ export default class ExpressServer {
     this.app.use(cors());
     // Serve static resources from the "public" folder (ex: when there are images to display)
     this.app.use(express.static(join(__dirname, clientPath)));
-    this.app
     this.endpoints();
   }
 
@@ -73,7 +72,7 @@ export default class ExpressServer {
 
     this.app.post('/api/plotData', async (req, res) => {
       try {
-        const selectedData: any = req.body;
+        const selectedData: DataModel[] = req.body;
         const response = await this.dataProxy.getTimeSeries(selectedData);
         res.status(200).send(response);
       } catch (error: any) {

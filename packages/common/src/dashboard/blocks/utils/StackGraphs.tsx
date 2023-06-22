@@ -47,9 +47,10 @@ export function stackGroups(metaData, stackBy) {
             }
             const arrInStack: any = [];
             metaData[stackBy].forEach(valueStack => {
-                const newObj = { ...obj }
-                newObj[stackBy] = valueStack;
-                arrInStack.push(newObj);
+                arrInStack.push({
+                    [stackBy]:valueStack,
+                    ...obj
+                });
             })
             stacks.push([...arrInStack])
         });

@@ -202,7 +202,9 @@ export default class DashboardSelectionControl extends Component<
       for(const model of Object.keys(metaData["versions"])){
         for(const scenario of Object.keys(metaData["versions"][model])) {
           dataInOptionsData = metaData["versions"][model][scenario].filter(
-              data => optionsData["versions"]?.[model]?.[scenario]?.values.includes(data)
+              data => optionsData["versions"]?.[model]?.[scenario]?.values
+                  .map(tempVersionDict => tempVersionDict.id)
+                  .includes(data.id)
           );
           if (dataInOptionsData.length < metaData["versions"][model][scenario].length) {
             isDashboardUpdated = true;

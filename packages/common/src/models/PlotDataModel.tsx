@@ -1,3 +1,5 @@
+import {versionModel} from "./BlockDataModel";
+
 interface DataPoint{
     year: string;
     value: string;
@@ -10,7 +12,7 @@ export default interface PlotDataModel {
     scenario: string | any;
     variable: string | any;
     region: string | any;
-    version: string | any;
+    run: versionModel | any;
     is_default: boolean | any; // is default version of run?
     color?: string | null;
 }

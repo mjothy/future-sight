@@ -33,7 +33,7 @@ class PieView extends Component<any, any> {
     }
 
     const configStyle = this.props.currentBlock.config.configStyle
-    const stackIndex = configStyle.stack.value.slice(0, -1)
+    const stackIndex = configStyle.stack.value?.slice(0, -1)
     const otherIndex = PlotlyUtils.getIndexKeys(data)
       .filter((index) => index !== stackIndex)
     const dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, stackIndex) //TODO use only data instead of dataWithColor cuz pie chart take as colors all configStyle.colorscale

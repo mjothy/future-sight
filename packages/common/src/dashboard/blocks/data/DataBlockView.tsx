@@ -55,14 +55,15 @@ class DataBlockView extends Component<any, any> {
         break;
       }
       default: {
-        let stacks = null;
-        if (configStyle.stack && configStyle.stack.isStack && configStyle.graphType === 'area') {
+        let stacks = [];
+        if (configStyle.stack && configStyle.stack.isStack && (configStyle.graphType === 'area' || configStyle.graphType === 'bar')) {
           stacks = stackGroups(currentBlock.config.metaData, configStyle.stack.value);
         }
         const dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale);
+        const indexKeys = PlotlyUtils.getIndexKeys(data)
 
         dataWithColor?.map((dataElement) => {
-          showData.push(this.preparePlotData(dataElement, configStyle, stacks));
+          showData.push(this.preparePlotData(dataElement, configStyle, stacks, indexKeys));
         });
         visualizeData = showData;
       }
@@ -103,7 +104,7 @@ class DataBlockView extends Component<any, any> {
     return { columns, values };
   }
 
-  preparePlotData = (dataElement: PlotDataModel, configStyle: BlockStyleModel, stack?: null) => {
+  preparePlotData = (dataElement: PlotDataModel, configStyle: BlockStyleModel, stacks?: undefined[], indexKeys: string[] = []) => {
     let obj;
     const xyDict = this.getXY(dataElement);
     switch (configStyle.graphType) {
@@ -119,16 +120,52 @@ class DataBlockView extends Component<any, any> {
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
         };
-        if (configStyle.stack.isStack && stack != null) {
+        if (configStyle.stack.isStack && stacks != null) {
           // Add the current element to a stack (if it exist in stagGroups)
           // stack is array contains possible stacks [[{},{}], [{},{}]]
-          Object.entries(stack).forEach(([key, val]: any) => {
-            const isExist = val.find(raw => dataElement.model == raw["models"] && dataElement.variable == raw["variables"]
-              && dataElement.region == raw["regions"] && dataElement.scenario == raw["scenarios"])
+          if (stacks.length == 0) {
+            obj.stackgroup = 0;
+          } else {
+            Object.entries(stacks).forEach(([key, val]: any) => {
+              const isExist = val.find(
+                raw => dataElement.model == raw["models"] &&
+                  dataElement.variable == raw["variables"] &&
+                  dataElement.region == raw["regions"] &&
+                  dataElement.scenario == raw["scenarios"]
+              )
+              if (isExist) {
+                obj.stackgroup = key;
+              }
+            })
+          }
+        }
+        break;
+      case 'bar':
+        obj = {
+          type: configStyle.graphType,
+          x: xyDict.x,
+          y: xyDict.y,
+          name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend, configStyle.showLegend), this.props.width, "legendtext"),
+          showlegend: configStyle.showLegend,
+          hovertext: this.plotHoverText(dataElement),
+          marker: { color: dataElement.color || null }
+        };
+        if (configStyle.stack.isStack && stacks != null) {
+          // Add the current element to a stack (if it exist in stagGroups)
+          // stack is array contains possible stacks [[{},{}], [{},{}]]
+          Object.entries(stacks).forEach(([key, val]: any) => {
+            const isExist = val.find(
+              raw => dataElement.model == raw["models"] &&
+                dataElement.variable == raw["variables"] &&
+                dataElement.region == raw["regions"] &&
+                dataElement.scenario == raw["scenarios"]
+            )
             if (isExist) {
-              obj.stackgroup = key;
+              const nonStackIndex = indexKeys.filter(x => x !== configStyle.stack.value.slice(0, -1))
+              const groupIndexName = nonStackIndex.map(idx => dataElement[idx]).join(" - ")
+              obj.x = [xyDict.x, new Array(xyDict.x.length).fill(groupIndexName)]
             }
-          });
+          })
         }
         break;
       case "box":
@@ -161,7 +198,7 @@ class DataBlockView extends Component<any, any> {
         + " - " + dataElement.variable
         + " - " + dataElement.scenario
         + " - " + dataElement.model
-        + " - V." + dataElement.version
+        + " - V." + dataElement.run?.version
     } else {
       const label: any[] = [];
       if (legend.Region && dataElement.region) {
@@ -176,8 +213,8 @@ class DataBlockView extends Component<any, any> {
       if (legend.Model && dataElement.model) {
         label.push(dataElement.model)
       }
-      if (legend.Version && dataElement.version) {
-        label.push("V. " + dataElement.version)
+      if (legend.Version && dataElement.run?.version) {
+        label.push("V. " + dataElement.run?.version)
       }
       return label.join(' - ')
     }

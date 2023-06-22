@@ -1,6 +1,8 @@
 
 // TODO add interface
 // TODO add run Ids to variable and region body
+import {versionsModel} from "@future-sight/common/build/models/BlockDataModel";
+
 export default class Filter {
 
     private body = {};
@@ -38,6 +40,12 @@ export default class Filter {
             requestBody.unit = { name__in: selectedData["units"] };
         }
 
+        if (Object.keys(selectedData["versions"] || {})?.length>0) {
+            requestBody.run = {
+                id__in: this.getRunIdsFromVersionsModel(selectedData["versions"])
+            };
+        }
+
         if (selectedData["scenarios"]?.length > 0) {
             requestBody.run = {
                 scenario: { name__in: selectedData["scenarios"] }
@@ -66,6 +74,12 @@ export default class Filter {
 
         if (selectedData["units"]?.length > 0) {
             requestBody.unit = { name__in: selectedData["units"] };
+        }
+
+        if (Object.keys(selectedData["versions"] || {})?.length>0) {
+            requestBody.run = {
+                id__in: this.getRunIdsFromVersionsModel(selectedData["versions"])
+            };
         }
 
         if (selectedData["scenarios"]?.length > 0) {
@@ -203,7 +217,7 @@ export default class Filter {
             if (filterId === "versions") {
                 // Get all filters with idx <= idx(models) and idx(scenarios)
                 const maxIdx = Math.max(selectOrder.indexOf("models"), selectOrder.indexOf("scenarios"))
-                lowerIdxFilters = selectOrder.slice(0, maxIdx + 1) // TODO replace by runId here
+                lowerIdxFilters = selectOrder.slice(0, maxIdx + 1)
             }
             else {
                 const filterIdOrder = selectOrder.indexOf(filterId)
@@ -211,12 +225,17 @@ export default class Filter {
                     ? [...selectOrder] // filterId not in selectOrder, all selectOrder have lower idx
                     : selectOrder.slice(0, filterIdOrder) // only filters with idx lower than filterIdOrder
 
-                // Replace scenarios or models by run if both in selectOrder, choose the highest idx between them.
+                // Replace scenarios or models by run if both in selectOrder, keep the highest idx between them.
                 // As it is the same to filter by model/scenario/version or to filter by runId
                 // when both scenario and model are selected
-                if (["models", "scenarios"].every(item => selectOrder.includes(item))) {
+                if (
+                    !["models", "scenarios"].includes(filterId) &&
+                    ["models", "scenarios"].every(item => selectOrder.includes(item))
+                ) {
                     const maxIdx = Math.max(selectOrder.indexOf("models"), selectOrder.indexOf("scenarios"))
-                    lowerIdxFilters.splice(maxIdx + 1, 0, "versions") // TODO replace by runId here
+                    const minIdx = Math.min(selectOrder.indexOf("models"), selectOrder.indexOf("scenarios"))
+                    lowerIdxFilters.splice(maxIdx, 1, "versions")
+                    lowerIdxFilters.splice(minIdx, 1)
                 }
             }
             return lowerIdxFilters
@@ -263,6 +282,18 @@ export default class Filter {
             });
         }
         return selectedData;
+    }
+
+    getRunIdsFromVersionsModel = (versionsDict: versionsModel)=>{
+        const runIds: string[] = []
+        Object.values(versionsDict).forEach(
+            scenario => Object.values(scenario).forEach(
+                versions => versions.forEach(
+                    version => runIds.push(version.id)
+                )
+            )
+        )
+        return runIds
     }
 
 }

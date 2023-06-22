@@ -18,6 +18,7 @@ import { getDraft, removeDraft } from '../drafts/DraftUtils';
 import Utils from '../../services/Utils';
 import { Spin } from 'antd';
 import * as _ from 'lodash';
+import {versionModel, versionsModel} from "@future-sight/common/build/models/BlockDataModel";
 
 export interface DashboardDataConfigurationProps
   extends ComponentPropsWithDataManager,
@@ -97,17 +98,17 @@ class DashboardDataConfiguration extends Component<
               ) {
                 for (const version of metaData.versions[model][scenario]) {
                   const d = this.state.allPlotData[block.id]?.find(
-                    (e) =>
+                    (e: PlotDataModel) =>
                       e.model === model &&
                       e.scenario === scenario &&
                       e.variable === variable &&
                       e.region === region &&
-                      e.version === version
+                      e.run.id === version.id
                   );
                   if (d) {
                     data.push(d);
                   } else {
-                    missingData.push({ model, scenario, variable, region, version });
+                    missingData.push({ model, scenario, variable, region, run: version });
                   }
                 }
               } else {
@@ -139,7 +140,7 @@ class DashboardDataConfiguration extends Component<
     }
   };
 
-  retreiveAllTimeSeriesData = (data, missingData, blockId) => {
+  retreiveAllTimeSeriesData = (data: PlotDataModel[], missingData: DataModel[], blockId) => {
     this.props.dataManager.fetchPlotData(missingData)
       .then(res => {
         // no new data to add to state.allPLotData, only update state.plotData
