@@ -11,30 +11,53 @@ export default class Utils {
     });
   };
 
-  static throttle(cb, delay = 1000) { // 2s
+  // static throttle(cb, delay = 1000) { // 2s
 
+  //   let shouldWait = false
+  //   let waitingArgs
+  //   const timeoutFunc = () => {
+  //     if (waitingArgs == null) {
+  //       shouldWait = false
+  //     } else { // To call the cb function at the end of excecution
+  //       cb(...waitingArgs)
+  //       waitingArgs = null
+  //       setTimeout(timeoutFunc, delay)
+  //     }
+  //   }
+
+  //   return (...args) => {
+  //     if (shouldWait) {
+  //       waitingArgs = args
+  //       return
+  //     }
+
+  //     cb(...args)
+  //     shouldWait = true
+  //     setTimeout(timeoutFunc, delay)
+  //   }
+  // }
+
+  static throttle_notif(cb, delay = 3500) { // Antd notif take 4.5s
     let shouldWait = false
-    let waitingArgs
-    const timeoutFunc = () => {
-      if (waitingArgs == null) {
-        shouldWait = false
-      } else { // To call the cb function at the end of excecution
-        cb(...waitingArgs)
-        waitingArgs = null
-        setTimeout(timeoutFunc, delay)
-      }
-    }
 
     return (...args) => {
-      if (shouldWait) {
-        waitingArgs = args
-        return
-      }
+      if (shouldWait) return
 
       cb(...args)
       shouldWait = true
-      setTimeout(timeoutFunc, delay)
+      setTimeout(() => {
+        shouldWait = false
+      }, delay)
     }
   }
+
+  static showNotif = Utils.throttle_notif((title, description) => {
+    return notification.error({
+      message: title,
+      description: description,
+      placement: 'top',
+    });
+  }
+  );
 
 }

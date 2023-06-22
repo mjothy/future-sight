@@ -98,6 +98,7 @@ export default class ExpressServer {
 
         res.send(optionsData);
       } catch (error: any) {
+        console.error(error)
         res.status(error.status).send({ message: error.message });
       }
 

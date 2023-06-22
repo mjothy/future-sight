@@ -1,10 +1,8 @@
 import { IAuthenticationBackend } from "../interfaces/IAuthenticationBackend ";
 import fetch from 'node-fetch';
-
-// TODO handle errors
-// TODO add refresh token into try/catch
-// TODO See Decorator design pattern
-// getData -> refresh -> and getData (2 fois)
+/**
+ * Set access and refresh tokens
+ */
 export default class IIASAAuthenticationBackend implements IAuthenticationBackend {
 
     public config;
@@ -70,7 +68,7 @@ export default class IIASAAuthenticationBackend implements IAuthenticationBacken
         // If refresh token is expired --> auth required
         // For the first request -> process.env["refresh_token"] == null
         await this.initializeToken();
-        return true;
+        return true; // No error had been thrown by this.initializeToken();
 
     };
 

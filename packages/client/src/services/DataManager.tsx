@@ -1,5 +1,6 @@
 import type { IDataManager, DataModel, PlotDataModel } from '@future-sight/common';
 import { notification } from 'antd';
+import Utils from './Utils';
 
 export default class DataManager implements IDataManager {
   getBaseUrl() {
@@ -134,29 +135,21 @@ export default class DataManager implements IDataManager {
       let message = "";
       err.status = response.status;
       if (err.status == 401) {
-        const resp_obj = await response.json();
-        err.message = resp_obj.message;
+        // const resp_obj = await response.json();
+        // err.message = resp_obj.message;
+        err.message = "Server encountered an issue while attempting to load data";
         message = "Access denied to ressources.";
       } else {
         err.message = response.statusText;
       }
 
-      this.showNotif(message, err.message);
+      Utils.showNotif(message, err.message);
 
       throw err;
     } else {
       const resp_obj = await response.json();
       return resp_obj;
     }
-  }
-
-  // TODO add debounce
-  showNotif = (title, description) => {
-    return notification.error({
-      message: title,
-      description: description,
-      placement: 'top',
-    });
   }
 
 }
