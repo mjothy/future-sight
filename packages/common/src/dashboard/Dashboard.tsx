@@ -13,8 +13,8 @@ import Colorizer from "../hoc/colorizer/colorizer";
 import withColorizer from "../hoc/colorizer/withColorizer";
 import GetGeoJsonContextProvider from '../services/GetGeoJsonContextProvider';
 
-const DEFAULT_PREVIEW_WIDTH = 800;
-const DEFAULT_PREVIEW_HEIGHT = 450;
+const DEFAULT_PREVIEW_WIDTH = 600;
+const DEFAULT_PREVIEW_HEIGHT = 600;
 const DASHBOARD_PADDING = 10;
 const NAVBAR_HEIGHT = 60;
 
@@ -56,13 +56,26 @@ class Dashboard extends Component<DashboardProps, any> {
             // in this case, the captured image include additional space equal to the parent element height and width
             scrollX: -DASHBOARD_PADDING,
             scrollY: -(NAVBAR_HEIGHT + DASHBOARD_PADDING)
-        }).then(((canvas) => {
+        }).then(((canvas: HTMLCanvasElement) => {
             const dataURL = canvas.toDataURL();
-            return this.resizeDataURL(dataURL, DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT)
+            return this.resizeDataURL(dataURL, DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT, canvas.width, canvas.height)
         }));
     }
 
-    resizeDataURL = (datas, wantedWidth, wantedHeight) => {
+    resizeDataURL = (datas, wantedWidth, wantedHeight, canvasWidth, canvasHeight) => {
+        let trueWidth;
+        let trueHeight;
+        // scaling the canvas W & H to keep the aspect ratio and fit it in wanted W & H
+        if (canvasHeight < wantedHeight && canvasWidth < wantedWidth) {
+            trueHeight = canvasHeight;
+            trueWidth = canvasWidth
+        } else if (canvasHeight>canvasWidth) {
+            trueHeight = wantedHeight;
+            trueWidth = canvasWidth * (wantedWidth / canvasHeight)
+        } else {
+            trueHeight = canvasHeight * (wantedHeight / canvasWidth);
+            trueWidth = wantedWidth
+        }
         return new Promise<any>(async function (resolve, reject) {
             // We create an image to receive the Data URI
             const img = document.createElement('img');
@@ -74,10 +87,10 @@ class Dashboard extends Component<DashboardProps, any> {
                 const ctx = canvas.getContext('2d');
 
                 // We set the dimensions at the wanted size.
-                canvas.width = wantedWidth;
-                canvas.height = wantedHeight;
+                canvas.width = trueWidth;
+                canvas.height = trueHeight;
                 if (ctx) {
-                    ctx.drawImage(img, 0, 0, wantedWidth, wantedHeight);
+                    ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight, 0, 0, trueWidth, trueHeight);
                     const dataURI = canvas.toDataURL("image/jpeg");
                     resolve(dataURI);
                 } else {

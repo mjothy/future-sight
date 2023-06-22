@@ -23,7 +23,7 @@ class DataBlockView extends Component<any, any> {
       }
     }
 
-    // Check updatede plotData (we need to check this because component render before fetch finish)
+    // Check updated plotData (we need to check this because component render before fetch finish)
     if (this.props.timeseriesData?.length != nextProps.timeseriesData?.length) {
       shouldUpdate = true;
     }
