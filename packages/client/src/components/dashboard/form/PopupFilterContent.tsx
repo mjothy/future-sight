@@ -13,31 +13,48 @@ import { Component } from 'react';
 
 export default class PopupFilterContent extends Component<any, any> {
 
-  handleCheckedFilter = (selectedFilters: CheckboxValueType[]) => {
-    const dataStructure = JSON.parse(JSON.stringify(this.props.dataStructure));
+  constructor(props) {
+    super(props);
+    this.state = {
+      dataStructure: JSON.parse(JSON.stringify(this.props.dataStructure))
+    }
+  }
+  handleCheckedFilter = (newSelectedFilters: CheckboxValueType[]) => {
+    const dataStructure = JSON.parse(JSON.stringify(this.state.dataStructure));
+    const oldSelectedFilters = Object.keys(dataStructure).filter(key => dataStructure[key].isFilter);
     // tHE KEY can be: models/scenarios/regions/variables
     Object.keys(dataStructure).forEach((key) => {
-      if (selectedFilters.includes(key)) {
+      if (newSelectedFilters.includes(key)) {
         dataStructure[key].isFilter = true;
       } else {
         dataStructure[key].isFilter = false;
         dataStructure[key].selection = [];
       }
     });
-    this.props.updateDataStructure(dataStructure);
+    this.setState({ dataStructure });
+
+    const filtersToUpdate = newSelectedFilters.filter((filter: CheckboxValueType) => !oldSelectedFilters.includes(filter as string));
+    const filterToUpdate = filtersToUpdate?.length > 0 ? filtersToUpdate[0] : null;
+
+    if (filterToUpdate != null) {
+      const filtersToNotUpdate = newSelectedFilters.filter((filter: CheckboxValueType) => oldSelectedFilters.includes(filter as string));
+      this.props.updateDataStructure(dataStructure, filtersToNotUpdate);
+    } else {
+      this.props.updateDataStructure(dataStructure);
+    }
+
   };
 
   onChange = (type: string, selectedData: string[]) => {
-    const dataStructure = JSON.parse(JSON.stringify(this.props.dataStructure));
+    const dataStructure = JSON.parse(JSON.stringify(this.state.dataStructure));
     dataStructure[type].selection = selectedData;
-    this.props.updateDataStructure(dataStructure);
-
+    this.setState({ dataStructure });
   }
 
-  onDropdownVisibleChange = (type: string, e: any) => {
+  onDropdownVisibleChange = (filter: string, e: any) => {
     const isClosed = !e; // on input close, fetch options in other selected inputs (to track missing data)
     if (isClosed) {
-      this.props.updateOptionsData(type);
+      this.props.updateDataStructure(this.state.dataStructure, [filter]);
     }
   }
 
@@ -45,7 +62,8 @@ export default class PopupFilterContent extends Component<any, any> {
     return <SelectInput
       type={type}
       className={"width-90"}
-      value={this.props.dataStructure[type].selection}
+      loading={this.props.isFetching}
+      value={this.state.dataStructure[type].selection}
       options={this.props.optionsData[type]}
       onChange={this.onChange}
       isFetching={this.props.isFetching}
@@ -55,7 +73,7 @@ export default class PopupFilterContent extends Component<any, any> {
   }
 
   render() {
-    const selectedFilter = getSelectedFiltersLabels(this.props.dataStructure);
+    const selectedFilter = getSelectedFiltersLabels(this.state.dataStructure);
     return (
       <div>
         <Checkbox.Group

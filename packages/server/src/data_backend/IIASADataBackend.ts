@@ -14,13 +14,15 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
 
     getFilters = () => filters;
 
-    getDataFocus = async (dataFocusFilters: OptionsDataModel) => { // Normal filter
+    getDataFocus = async (dataFocusFilters: OptionsDataModel, filterIDs ?: string[]) => { // Normal filter
         const filteredValues = {};
-        const filters: FilterObject = this.getFilters();
-        const filterKeys = Object.keys(filters).filter(key => key != "categories"); // TODO delete filter
+        if (filterIDs == null) {
+            const filters: FilterObject = this.getFilters();
+            filterIDs = Object.keys(filters);
+        }
+        const filterKeys = filterIDs.filter(key => key != "categories"); // TODO delete filter
         const filter = new Filter({}, dataFocusFilters, undefined);
         for (const key of filterKeys) {
-
             const body = filter.getBody(key);
             const data = await this.patchPromise(filters[key].path, body);
             filteredValues[key] = data.map(element => element.name);

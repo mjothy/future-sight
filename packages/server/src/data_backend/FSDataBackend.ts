@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import IDataBackend from "../interfaces/IDataBackend ";
 import filters from "../configurations/filters.json";
+import { FilterObject, OptionsDataModel } from "@future-sight/common";
 
 export default class FSDataBackend implements IDataBackend {
     private readonly data: any[];
@@ -21,7 +22,7 @@ export default class FSDataBackend implements IDataBackend {
         })
     }
 
-    getDataFocus = (selectedData) => {
+    getDataFocus = (dataFocusFilters: OptionsDataModel, filterIDs?: string[]) => {
         const optionsData = {
             regions: [],
             variables: [],
@@ -30,14 +31,19 @@ export default class FSDataBackend implements IDataBackend {
             catagories: []
         };
 
-        // Filter data origin from IIASA Api
-        const keysIiasa = Object.values(this.getFilters()).filter((filter: any) => filter.origin == "iiasa").map((filter: any) => filter.id);
-        keysIiasa.forEach(option1 => {
+        if (filterIDs == null) {
+            const filters: FilterObject = this.getFilters();
+            filterIDs = Object.keys(filters);
+        }
+
+        const filterKeys = filterIDs.filter(key => key != "categories"); // TODO delete filter
+
+        filterKeys.forEach(option1 => {
             let dataUnion = this.getDataUnion();
-            keysIiasa.forEach(option2 => {
+            filterKeys.forEach(option2 => {
                 if (option1 != option2) {
-                    if (selectedData[option2].length > 0) {
-                        dataUnion = dataUnion.filter(raw => selectedData[option2].includes(raw[option2.slice(0, -1)]));
+                    if (dataFocusFilters[option2].length > 0) {
+                        dataUnion = dataUnion.filter(raw => dataFocusFilters[option2].includes(raw[option2.slice(0, -1)]));
                     }
                 }
             })

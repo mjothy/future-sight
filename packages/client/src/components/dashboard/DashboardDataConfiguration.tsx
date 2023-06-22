@@ -74,7 +74,7 @@ class DashboardDataConfiguration extends Component<
     if (block.blockType === "text") {
       return
     }
-    
+
     const config: ConfigurationModel | any = block.config;
     const metaData: BlockDataModel = config.metaData;
     const data: PlotDataModel[] = [];
@@ -160,6 +160,8 @@ class DashboardDataConfiguration extends Component<
         plotData[blockId] = [...data, ...res]
         this.setState({ allPlotData: allPlotData, plotData: plotData })
 
+      }).catch(err => {
+        console.log("TODO Handle error: ", err);
       });
   }
 

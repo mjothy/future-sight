@@ -1,5 +1,4 @@
 import type { IDataManager, DataModel, PlotDataModel } from '@future-sight/common';
-import { BlockDataModel } from "@future-sight/common";
 import { notification } from 'antd';
 
 export default class DataManager implements IDataManager {
@@ -122,41 +121,44 @@ export default class DataManager implements IDataManager {
 
 
   sendRequest = async (url, data?: any) => {
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
 
-      if (!response.ok) { // TODO add antd.notif
-        const err: any = new Error();
-        err.status = response.status;
-        if (err.status == 401) {
-          const resp_obj = await response.json();
-          err.message = resp_obj.message;
-        } else {
-          err.message = response.statusText;
-        }
-        throw err;
-      } else {
-        const resp_obj = await response.json();
-        return resp_obj;
-      }
-    } catch (err: any) { // TODO delete catch
+    if (!response.ok) { // TODO add antd.notif
+      const err: any = new Error();
       let message = "";
+      err.status = response.status;
       if (err.status == 401) {
+        const resp_obj = await response.json();
+        err.message = resp_obj.message;
         message = "Access denied to ressources.";
+      } else {
+        err.message = response.statusText;
       }
-      notification.error({
-        message: message,
-        description: err.message,
-        placement: 'top',
-      });
-      return []; // routing to login page
+
+      this.showNotif(message, err.message);
+
+      throw err;
+    } else {
+      const resp_obj = await response.json();
+      return resp_obj;
     }
   }
 
+  // TODO add debounce
+  showNotif = (title, description) => {
+    return notification.error({
+      message: title,
+      description: description,
+      placement: 'top',
+    });
+  }
+
 }
+
+

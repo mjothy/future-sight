@@ -11,9 +11,10 @@ export default interface IDataBackend {
     /**
      * Filter Data Focus
      * @param selectedData The data selected in data focus
+     * @param filterIDs Selected filtered
      * @returns filtered data (values)
      */
-    getDataFocus: (selectedData: any) => any | Promise<string[]>;
+    getDataFocus: (selectedData: any, filterIDs?: string[]) => any | Promise<string[]>;
     /**
      * Get data with timeseries to plot on graph
      * @param selectedData Selected values in data block

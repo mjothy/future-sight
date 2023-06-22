@@ -89,7 +89,8 @@ export default class ExpressServer {
     this.app.post('/api/dataFocus', async (req, res, next) => {
       try {
         const selectedData = req.body.data;
-        const optionsData = await this.dataProxy.getDataFocus(selectedData);
+        const filterIDs: string[] = req.body.filterIDs;
+        const optionsData = await this.dataProxy.getDataFocus(selectedData, filterIDs);
 
         // Get categories from file system
         // TODO add category to filter when request to iaasa is provided
