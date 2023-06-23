@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import { join } from 'path';
 import IPersistenceManager from '../interfaces/IPersistenceManager';
-import {DashboardModel, DataModel, OptionsDataModel} from '@future-sight/common';
+import { DashboardModel, DataModel, OptionsDataModel } from '@future-sight/common';
 import BrowseObject from '../models/BrowseObject';
 import IDataBackend from '../interfaces/IDataBackend ';
 import IConfigurationProvider from '../interfaces/IConfigurationProvider';
@@ -76,7 +76,12 @@ export default class ExpressServer {
         const response = await this.dataProxy.getTimeSeries(selectedData);
         res.status(200).send(response);
       } catch (error: any) {
-        res.status(error.status).send({ message: error.message });
+        if (error.status == 401) {
+          res.status(401).send({ message: error.message });
+        } else {
+          console.error(error);
+          res.status(error.status ? error.status : 500).send({ message: "Server error!!" });
+        }
       }
     });
 
@@ -98,7 +103,12 @@ export default class ExpressServer {
         res.send(optionsData);
       } catch (error: any) {
         console.error(error)
-        res.status(error.status).send({ message: error.message });
+        if (error.status == 401) {
+          res.status(401).send({ message: error.message });
+        } else {
+          console.error(error);
+          res.status(error.status ? error.status : 500).send({ message: "Server error!!" });
+        }
       }
 
     });
