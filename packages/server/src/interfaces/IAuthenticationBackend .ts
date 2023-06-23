@@ -1,7 +1,7 @@
 
 
 export interface IAuthenticationBackend {
-    getToken: () => string;
-    getRefreshToken: () => void;
+    initializeToken: () => Promise<void>;
+    refreshToken: () => Promise<boolean>;
     getConfig: () => ConfigSchema;
 }

@@ -38,7 +38,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
     splitOptions = (options) => {
         const treeData: any[] = [];
 
-        options.forEach((option) => {
+        options?.forEach((option) => {
             const values = option.split('|');
 
             let currentNode = treeData.find((node) => node.label === values[0]);
@@ -80,7 +80,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
             <div>
                 {menu}
                 {!this.props.isFetching && this.props.value.map(selectedValue => (
-                    !this.props.options.includes(selectedValue) && (
+                    !this.props.options?.includes(selectedValue) && (
                         <div key={selectedValue} style={{ color: 'red' }} className={"ant-select-item ant-select-item-option"}>
                             <div className='ant-select-item-option-content'>
                                 <ExclamationCircleOutlined /> {selectedValue}
@@ -96,11 +96,11 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         const { value, label, closable, onClose } = props;
         return (
             <Tag
-                color={this.props.options.includes(value) ? undefined : 'red'}
+                color={this.props.options?.includes(value) ? undefined : 'red'}
                 closable={this.props.isClosable}
                 onClose={onClose}
-                icon={this.props.options.includes(value) ? undefined : <ExclamationCircleOutlined />}
-                className={this.props.options.includes(value) ? 'ant-select-selection-item' : 'ant-select-selection-item data-missing-tag'}
+                icon={this.props.options?.includes(value) ? undefined : <ExclamationCircleOutlined />}
+                className={this.props.options?.includes(value) ? 'ant-select-selection-item' : 'ant-select-selection-item data-missing-tag'}
             >
                 <label className='ant-select-selection-item-content' style={VALUE_STYLE[value]}>{isShowValue ? value : label}</label>
             </Tag>
@@ -253,14 +253,18 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                     }
                     }
                     dropdownMatchSelectWidth={false}
-                    notFoundContent={(
+                    notFoundContent={(this.props.isFetching) ? (
                         <div>
-                            <ExclamationCircleOutlined />
-                            <p>This item does not exists for your filter selections.</p>
+                            <LoadingOutlined />
+                            <p>Fetching data</p>
+                        </div>
+                    ) : (
+                        <div>
+                            <ExclamationCircleOutlined /> This item does not exists for your filter selections.
                         </div>
                     )}
                 >
-                    {this.props.options.map((value) => (
+                    {this.props.options?.map((value) => (
                         <Option key={value} value={value}>
                             {value}
                         </Option>

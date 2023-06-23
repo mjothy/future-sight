@@ -197,7 +197,7 @@ export default class DataBlockEditor extends Component<any, any> {
           }
           modelChildren.push({
             title: scenario,
-            value: scenario,
+            value: `${model} - ${scenario}`,
             selectable: false,
             children: scenarioChildren.sort(this.sortByTitle)
           })

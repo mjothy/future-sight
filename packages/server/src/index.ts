@@ -51,7 +51,6 @@ const config = JSON.parse(config_file.toString());
 let dataBackend;
 const authentication = new IIASAAuthenticationBackend(config);
 if (config.origin_data == "IIASA") {
-  authentication.startRefreshing(); // to refresh token
   dataBackend = new IIASADataBackend(authentication);
 } else {
   dataBackend = new FSDataBackend(dataPath, dataUnionPath);
@@ -64,12 +63,16 @@ const redisClient = new RedisPersistenceManager(redisUrl);
 
 // Backend initialisation
 let auth;
-if (username && password) {
-  auth = basicAuth({
-    users: { [username]: password },
-    challenge: true,
-  });
+
+if (isProd) {
+  if (username && password) {
+    auth = basicAuth({
+      users: { [username]: password },
+      challenge: true,
+    });
+  }
 }
+
 const app = new ExpressServer(port, cookieKey, auth, clientPath, redisClient, dataBackend, fsConfProvider);
 
 // Startup

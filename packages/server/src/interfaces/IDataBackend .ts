@@ -1,4 +1,4 @@
-import { FilterObject, OptionsDataModel } from "@future-sight/common";
+import {DataModel, FilterObject, OptionsDataModel} from "@future-sight/common";
 import TimeSerieObject from "../models/TimeSerieObject";
 
 export default interface IDataBackend {
@@ -11,15 +11,16 @@ export default interface IDataBackend {
     /**
      * Filter Data Focus
      * @param selectedData The data selected in data focus
+     * @param filterIDs Selected filtered
      * @returns filtered data (values)
      */
-    getDataFocus: (selectedData: any) => any | Promise<string[]>;
+    getDataFocus: (selectedData: any, filterIDs?: string[]) => any | Promise<string[]>;
     /**
      * Get data with timeseries to plot on graph
      * @param selectedData Selected values in data block
      * @returns 
      */
-    getTimeSeries: (selectedData?: any) => any[] | Promise<any[]>; // TODO replace any by OptionsDataModel
+    getTimeSeries: (selectedData: DataModel[]) => any[] | Promise<any[]>; // TODO replace any by OptionsDataModel
     /**
      * Get filterd values in data block
      * @param filterId the filter id

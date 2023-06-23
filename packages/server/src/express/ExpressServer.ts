@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import { join } from 'path';
 import IPersistenceManager from '../interfaces/IPersistenceManager';
-import { DashboardModel, OptionsDataModel } from '@future-sight/common';
+import { DashboardModel, DataModel, OptionsDataModel } from '@future-sight/common';
 import BrowseObject from '../models/BrowseObject';
 import IDataBackend from '../interfaces/IDataBackend ';
 import IConfigurationProvider from '../interfaces/IConfigurationProvider';
@@ -71,9 +71,18 @@ export default class ExpressServer {
     });
 
     this.app.post('/api/plotData', async (req, res) => {
-      const selectedData: any = req.body;
-      const response = await this.dataProxy.getTimeSeries(selectedData);
-      res.status(200).send(response);
+      try {
+        const selectedData: DataModel[] = req.body;
+        const response = await this.dataProxy.getTimeSeries(selectedData);
+        res.status(200).send(response);
+      } catch (error: any) {
+        if (error.status == 401) {
+          res.status(401).send({ message: error.message });
+        } else {
+          console.error(error);
+          res.status(error.status ? error.status : 500).send({ message: "Server error!!" });
+        }
+      }
     });
 
     // We call dataFocus afer each combo-box closed
@@ -82,14 +91,26 @@ export default class ExpressServer {
     // 3- close models combo-box
     // 4- re-fetch filterd values of [variables, regions, scenarions]
     this.app.post('/api/dataFocus', async (req, res, next) => {
-      const selectedData = req.body.data;
-      const optionsData = await this.dataProxy.getDataFocus(selectedData);
+      try {
+        const selectedData = req.body.data;
+        const filterIDs: string[] = req.body.filterIDs;
+        const optionsData = await this.dataProxy.getDataFocus(selectedData, filterIDs);
 
-      // Get categories from file system
-      // TODO add category to filter when request to iaasa is provided
-      optionsData["categories"] = this.configurationProvider.getMetaIndicators();
+        // Get categories from file system
+        // TODO add category to filter when request to iaasa is provided
+        optionsData["categories"] = this.configurationProvider.getMetaIndicators();
 
-      res.send(optionsData);
+        res.send(optionsData);
+      } catch (error: any) {
+        console.error(error)
+        if (error.status == 401) {
+          res.status(401).send({ message: error.message });
+        } else {
+          console.error(error);
+          res.status(error.status ? error.status : 500).send({ message: "Server error!!" });
+        }
+      }
+
     });
 
     this.app.post('/api/filterOptions', async (req, res, next) => {
@@ -98,9 +119,13 @@ export default class ExpressServer {
         const optionsData = await this.dataProxy.getFilteredData(req.body.filterId, req.body.metaData, req.body.dataFocusFilters);
         optionsData["categories"] = this.configurationProvider.getMetaIndicators(); // TODO add categories to filter
         res.send(optionsData);
-      } catch (err) {
-        console.error(err);
-        next(err);
+      } catch (error: any) {
+        if (error.status == 401) {
+          res.status(401).send({ message: error.message });
+        } else {
+          console.error(error);
+          res.status(error.status ? error.status : 500).send({ message: "Server error!!" });
+        }
       }
     });
 

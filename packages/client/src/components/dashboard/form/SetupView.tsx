@@ -17,57 +17,61 @@ class SetupView extends Component<any, any> {
     this.state = {
       dataStructure: JSON.parse(JSON.stringify(this.props.dashboard.dataStructure)),
       visible: getSelectedFiltersLabels(this.props.dashboard.dataStructure).length <= 0,
-      isSubmit: false,
-      optionsData: { ...this.props.allData },
-      isFetching: true,
-      needToFetch: {
-        regions: false,
-        variables: false,
-        scenarios: false,
-        models: false
-      }
+      optionsData: new OptionsDataModel(),
+      optionsDataCache: new OptionsDataModel(),
+      isFetching: false,
+      filtersToNotUpdate: []
     };
   }
 
   async componentDidMount(): Promise<void> {
     const optionsData = await this.getOptionsData();
-    this.setState({ optionsData, isFetching: false });
+    if (optionsData != null) {
+      this.setState({ optionsData, isFetching: false, optionsDataCache: optionsData });
+    }
   }
 
   async componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): Promise<void> {
-    if (prevState.visible != this.state.visible && this.state.visible) {
-      const optionsData = await this.getOptionsData();
-      this.setState({ optionsData, isFetching: false });
-    }
-
     if (!_.isEqual(this.state.dataStructure, prevState.dataStructure)) {
-      const selectionDataStructure = Object.keys(this.state.dataStructure).filter(key => this.state.dataStructure[key].isFilter)
-      const selectionPrevDataStructure = Object.keys(prevState.dataStructure).filter(key => prevState.dataStructure[key].isFilter);
-      // If selection changed (input deselected)
-      if (selectionDataStructure.length < selectionPrevDataStructure.length) {
-        const optionsData = await this.getOptionsData();
+      const optionsData = await this.getOptionsData(this.state.filtersToNotUpdate); //Get options of other selected inputs (!= type)
+      if (optionsData != null) {
         this.setState({ optionsData, isFetching: false });
       }
     }
   }
 
-  getOptionsData = async () => {
+  getOptionsData = async (filtersToNotUpdate?: string[]) => {
+
     const data = new OptionsDataModel();
+    const filterIDs: string[] = [];
+
+    // set filterIDs: filters that need to update optionsData (fetch from server)
     Object.keys(this.state.dataStructure).forEach(option => {
       data[option] = this.state.dataStructure[option].selection;
+      if (this.state.dataStructure[option].isFilter && !filtersToNotUpdate?.includes(option)) {
+        filterIDs.push(option);
+      }
     })
-    this.setState({ isFetching: true })
-    const optionsData = await this.props.dataManager.fetchDataFocusOptions({
-      data
-    });
-    return optionsData;
-  }
+    if (filterIDs.length > 0) {
+      this.setState({ isFetching: true })
+      try {
+        const optionsData = await this.props.dataManager.fetchDataFocusOptions({
+          data,
+          filterIDs
+        });
+        if (filtersToNotUpdate != null && filtersToNotUpdate?.length > 0) {
+          filtersToNotUpdate.forEach(filter => { optionsData[filter] = this.state.optionsData[filter] })
+        }
+        return optionsData;
+      } catch (err) {
+        console.error(err);
+        return [];
+      }
+    } else {
+      return null
+    }
 
-  updateOptionsData = async (type) => {
-    const optionsData = await this.getOptionsData(); //TODO get options of other selected inputs (!= type)
-    this.setState({ optionsData, isFetching: false });
   }
-
 
   show = () => {
     this.setState({ visible: true })
@@ -75,27 +79,22 @@ class SetupView extends Component<any, any> {
 
   handleCancel = () => {
     this.setState({
-      isSubmit: false,
       visible: false,
+      isFetching: false,
       dataStructure: JSON.parse(JSON.stringify(this.props.dashboard.dataStructure)),
+      optionsData: this.state.optionsDataCache
     })
   }
 
-  updateDataStructure = (dataStructure) => {
-    this.setState({ dataStructure });
-  }
-
-  handleOk = () => {
-    // Check if there is an already selected filter
-    if (getSelectedFiltersLabels(this.props.dashboard.dataStructure).length > 0) {
-      this.setState({ isSubmit: true }, () => {
-        this.showConfirm()
-      })
-    } else {
-      this.setState({ visible: false });
-      this.updateDashboardDataStructure();
-    }
-
+  /**
+   * Update data structure state
+   * @param dataStructure new data structure
+   * @param filtersToNotUpdate filters that not need to be fetched 
+   */
+  updateDataStructure = (dataStructure, filtersToNotUpdate?: string[]) => {
+    this.setState({
+      dataStructure, filtersToNotUpdate
+    });
   }
 
   updateDashboardDataStructure = () => {
@@ -104,11 +103,12 @@ class SetupView extends Component<any, any> {
     this.props.updateDashboard(dashboard);
     this.setState({
       visible: false,
-      dataStructure: JSON.parse(JSON.stringify(dashboard.dataStructure))
+      dataStructure: JSON.parse(JSON.stringify(dashboard.dataStructure)),
+      optionsDataCache: this.state.optionsData
     })
   }
 
-  showConfirm = () => {
+  handleSubmit = () => {
     confirm({
       title: 'Do you Want to update the current filter?',
       content: 'If you are removing data from your filter, that will remove all blocks using them.',
@@ -126,7 +126,7 @@ class SetupView extends Component<any, any> {
       const dataStructureData = this.state.dataStructure[type].selection;
       const optionsData = this.state.optionsData[type];
 
-      const selected_in_options = dataStructureData.filter(value => optionsData.includes(value));
+      const selected_in_options = dataStructureData.filter(value => optionsData?.includes(value));
       return !(selected_in_options.length == dataStructureData.length)
     } else {
       let isMissing = false;
@@ -167,7 +167,7 @@ class SetupView extends Component<any, any> {
           footer={
             <div>
               <Button onClick={this.handleCancel}>Cancel</Button>
-              <Button type="primary" onClick={this.handleOk}>Submit</Button>
+              <Button type="primary" onClick={this.handleSubmit}>Submit</Button>
               {this.isDataMissing() && <p style={{ color: "#ff4d4f", margin: "5px 0" }}> <WarningOutlined /> There are missing data in your selection</p>}
 
 
@@ -178,11 +178,8 @@ class SetupView extends Component<any, any> {
             optionsLabel={this.props.optionsLabel}
             dataStructure={this.state.dataStructure}
             updateDataStructure={this.updateDataStructure}
-            handleOk={this.handleOk}
             optionsData={this.state.optionsData}
-            needToFetch={this.state.needToFetch}
             isFetching={this.state.isFetching}
-            updateOptionsData={this.updateOptionsData}
             isDataMissing={this.isDataMissing}
           />
         </Modal >

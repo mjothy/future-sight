@@ -128,10 +128,10 @@ class DataBlockView extends Component<any, any> {
           } else {
             Object.entries(stacks).forEach(([key, val]: any) => {
               const isExist = val.find(
-                  raw => dataElement.model == raw["models"] &&
-                      dataElement.variable == raw["variables"] &&
-                      dataElement.region == raw["regions"] &&
-                      dataElement.scenario == raw["scenarios"]
+                raw => dataElement.model == raw["models"] &&
+                  dataElement.variable == raw["variables"] &&
+                  dataElement.region == raw["regions"] &&
+                  dataElement.scenario == raw["scenarios"]
               )
               if (isExist) {
                 obj.stackgroup = key;
@@ -155,13 +155,13 @@ class DataBlockView extends Component<any, any> {
           // stack is array contains possible stacks [[{},{}], [{},{}]]
           Object.entries(stacks).forEach(([key, val]: any) => {
             const isExist = val.find(
-                raw => dataElement.model == raw["models"] &&
-                    dataElement.variable == raw["variables"] &&
-                    dataElement.region == raw["regions"] &&
-                    dataElement.scenario == raw["scenarios"]
+              raw => dataElement.model == raw["models"] &&
+                dataElement.variable == raw["variables"] &&
+                dataElement.region == raw["regions"] &&
+                dataElement.scenario == raw["scenarios"]
             )
             if (isExist) {
-              const nonStackIndex = indexKeys.filter(x => x !== configStyle.stack.value.slice(0,-1))
+              const nonStackIndex = indexKeys.filter(x => x !== configStyle.stack.value.slice(0, -1))
               const groupIndexName = nonStackIndex.map(idx => dataElement[idx]).join(" - ")
               obj.x = [xyDict.x, new Array(xyDict.x.length).fill(groupIndexName)]
             }
@@ -198,7 +198,7 @@ class DataBlockView extends Component<any, any> {
         + " - " + dataElement.variable
         + " - " + dataElement.scenario
         + " - " + dataElement.model
-        + " - V." + dataElement.version
+        + " - V." + dataElement.run?.version
     } else {
       const label: any[] = [];
       if (legend.Region && dataElement.region) {
@@ -213,8 +213,8 @@ class DataBlockView extends Component<any, any> {
       if (legend.Model && dataElement.model) {
         label.push(dataElement.model)
       }
-      if (legend.Version && dataElement.version) {
-        label.push("V. " + dataElement.version)
+      if (legend.Version && dataElement.run?.version) {
+        label.push("V. " + dataElement.run?.version)
       }
       return label.join(' - ')
     }

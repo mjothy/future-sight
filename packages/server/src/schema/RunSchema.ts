@@ -9,6 +9,7 @@ interface Run { // TODO rename RunSchema
         name?: string;
         name__in?: string[];
     };
+    id__in?: string[]
     is_default?: boolean
 }
 

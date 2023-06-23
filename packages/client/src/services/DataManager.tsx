@@ -1,24 +1,14 @@
 import type { IDataManager, DataModel, PlotDataModel } from '@future-sight/common';
-import { BlockDataModel } from "@future-sight/common";
+import { notification } from 'antd';
+import Utils from './Utils';
 
 export default class DataManager implements IDataManager {
   getBaseUrl() {
     return '/api';
   }
 
-  fetchPlotData = (data: DataModel[]): Promise<PlotDataModel[]> => {
-    return fetch(`${this.getBaseUrl()}/plotData`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((plotData) => {
-        return plotData;
-      })
-      .catch(console.error);
+  fetchPlotData = async (data: DataModel[]): Promise<PlotDataModel[]> => {
+    return await this.sendRequest(`api/plotData`, data);
   };
 
   getFilters = () => {
@@ -106,35 +96,13 @@ export default class DataManager implements IDataManager {
     return ["models", "scenarios", "variables", "regions"];
   };
 
-  fetchFilterOptions = (data) => {
-    return fetch(`api/filterOptions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        return data;
-      })
-      .catch(console.error);
+  fetchFilterOptions = async (data) => {
+    return await this.sendRequest(`api/filterOptions`, data);
   };
 
 
-  fetchDataFocusOptions = (data) => {
-    return fetch(`api/dataFocus`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        return data;
-      })
-      .catch(console.error);
+  fetchDataFocusOptions = async (data) => {
+    return await this.sendRequest(`api/dataFocus`, data);
   };
 
   fetchRegionsGeojson = (regions: string[]) => {
@@ -152,4 +120,38 @@ export default class DataManager implements IDataManager {
       .catch(console.error);
   };
 
+
+  sendRequest = async (url, data?: any) => {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) { // TODO add antd.notif
+      const err: any = new Error();
+      let message = "";
+      err.status = response.status;
+      if (err.status == 401) {
+        // const resp_obj = await response.json();
+        // err.message = resp_obj.message;
+        err.message = "Server encountered an issue while attempting to load data";
+        message = "Access denied to ressources.";
+      } else {
+        err.message = response.statusText;
+      }
+
+      Utils.showNotif(message, err.message);
+
+      throw err;
+    } else {
+      const resp_obj = await response.json();
+      return resp_obj;
+    }
+  }
+
 }
+
+
