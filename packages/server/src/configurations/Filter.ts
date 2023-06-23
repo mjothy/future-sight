@@ -1,7 +1,6 @@
 
 // TODO add interface
-// TODO add run Ids to variable and region body
-import {versionsModel} from "@future-sight/common/build/models/BlockDataModel";
+import { versionsModel } from "@future-sight/common/build/models/BlockDataModel";
 
 export default class Filter {
 
@@ -40,24 +39,22 @@ export default class Filter {
             requestBody.unit = { name__in: selectedData["units"] };
         }
 
-        if (Object.keys(selectedData["versions"] || {})?.length>0) {
+        if (Object.keys(selectedData["versions"] || {})?.length > 0) {
             requestBody.run = {
                 id__in: this.getRunIdsFromVersionsModel(selectedData["versions"])
             };
+        } else {
+            if (selectedData["scenarios"]?.length > 0) {
+                requestBody.run = {
+                    scenario: { name__in: selectedData["scenarios"] }
+                };
+            }
+            if (selectedData["models"]?.length > 0) {
+                requestBody.run = {
+                    model: { name__in: selectedData["models"] }
+                };
+            }
         }
-
-        if (selectedData["scenarios"]?.length > 0) {
-            requestBody.run = {
-                scenario: { name__in: selectedData["scenarios"] }
-            };
-        }
-
-        if (selectedData["models"]?.length > 0) {
-            requestBody.run = {
-                model: { name__in: selectedData["models"] }
-            };
-        }
-
         return requestBody;
 
     }
@@ -76,23 +73,24 @@ export default class Filter {
             requestBody.unit = { name__in: selectedData["units"] };
         }
 
-        if (Object.keys(selectedData["versions"] || {})?.length>0) {
+        if (Object.keys(selectedData["versions"] || {})?.length > 0) {
             requestBody.run = {
                 id__in: this.getRunIdsFromVersionsModel(selectedData["versions"])
             };
+        } else {
+            if (selectedData["scenarios"]?.length > 0) {
+                requestBody.run = {
+                    scenario: { name__in: selectedData["scenarios"] }
+                };
+            }
+
+            if (selectedData["models"]?.length > 0) {
+                requestBody.run = {
+                    model: { name__in: selectedData["models"] }
+                };
+            }
         }
 
-        if (selectedData["scenarios"]?.length > 0) {
-            requestBody.run = {
-                scenario: { name__in: selectedData["scenarios"] }
-            };
-        }
-
-        if (selectedData["models"]?.length > 0) {
-            requestBody.run = {
-                model: { name__in: selectedData["models"] }
-            };
-        }
 
         return requestBody;
     }
@@ -284,7 +282,7 @@ export default class Filter {
         return selectedData;
     }
 
-    getRunIdsFromVersionsModel = (versionsDict: versionsModel)=>{
+    getRunIdsFromVersionsModel = (versionsDict: versionsModel) => {
         const runIds: string[] = []
         Object.values(versionsDict).forEach(
             scenario => Object.values(scenario).forEach(
