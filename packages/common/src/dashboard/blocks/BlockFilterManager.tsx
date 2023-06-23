@@ -228,7 +228,7 @@ export default class BlockFilterManager extends Component<any, any> {
                     new Set<string>([...config.metaData.selectOrder, filterId])
                 );
                 dashboard.blocks[this.props.currentBlock.id].config.metaData.selectOrder = selectOrder
-                this.props.updateDashboard(dashboard);
+                await this.props.updateDashboard(dashboard);
             }
 
             // Check added and deleted options from selection
