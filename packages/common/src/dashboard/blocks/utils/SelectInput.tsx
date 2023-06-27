@@ -23,6 +23,7 @@ interface SelectOptionProps {
     className?: string;
     placeholder?: string;
     isClosable?: boolean;
+    regroupOrphans?: string;
 }
 
 const COLORS = ['red', 'blue', 'green', 'yellow'];
@@ -47,7 +48,21 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
             if (!currentNode) {
                 const checkable = (values.length === 1 || this.props.type == "categories"); // Set only Leafs as checkable
                 currentNode = { title: values[0], label: values[0], key: values[0], value: values[0], children: [], checkable };
-                treeData.push(currentNode);
+                if (values.length === 1 && this.props.regroupOrphans) {
+                    // Regroup orphan nodes under single parent if option enabled
+                    let orphanParent = treeData.find((node) => node.label === this.props.regroupOrphans)
+                    if(!orphanParent) {
+                        orphanParent = {
+                            title: this.props.regroupOrphans,
+                            label: this.props.regroupOrphans,
+                            key: this.props.regroupOrphans,
+                            value: this.props.regroupOrphans, children: [], checkable: false };
+                        treeData.push(orphanParent);
+                    }
+                    orphanParent.children.push(currentNode);
+                } else {
+                    treeData.push(currentNode);
+                }
             }
 
             // Set other element (children)
@@ -129,6 +144,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 tagRender={(props) => this.tagRender(props, true)}
                 treeCheckStrictly={true}
                 showCheckedStrategy={"SHOW_ALL"}
+                treeDefaultExpandedKeys={this.props.regroupOrphans ? [this.props.regroupOrphans] : undefined}
                 className={this.props.className}
                 onDropdownVisibleChange={(e) =>
                     this.props.onDropdownVisibleChange?.(this.props.type, e)

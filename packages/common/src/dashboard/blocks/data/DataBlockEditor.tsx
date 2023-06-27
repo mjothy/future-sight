@@ -99,6 +99,7 @@ export default class DataBlockEditor extends Component<any, any> {
               onClear={this.clearClick}
               onDropdownVisibleChange={this.props.onDropdownVisibleChange}
               isFetching={this.props.isFetching}
+              regroupOrphans={option==="regions" ? "Common regions" : undefined}
             />
           </Row>
         </div>
