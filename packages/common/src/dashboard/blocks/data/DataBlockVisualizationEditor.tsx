@@ -55,12 +55,6 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     this.updateBlockConfig({ configStyle: configStyle })
   };
 
-  onUseTimestepChange = (e) => {
-    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
-    configStyle.XAxis.useTimestep = e.target.checked;
-    this.updateBlockConfig({ configStyle: configStyle })
-  };
-
   onTimestepChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.XAxis.timestep = e;
@@ -362,20 +356,15 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
           </Col>
         </Row>
         <Row className="mb-10">
-          <Col span={2} className={'checkbox-col'}>
-            <Checkbox
-              onChange={this.onUseTimestepChange}
-              checked={configStyle.XAxis.useTimestep}
-            />
-          </Col>
-          <Col span={16} className={'checkbox-col-label'}>
+          <Col span={2} />
+          <Col span={18} className={'checkbox-col-label'}>
             <Select
               className="width-100"
               placeholder="Time step of X"
               value={configStyle.XAxis.timestep}
               onChange={this.onTimestepChange}
               allowClear
-              disabled={!configStyle.XAxis.useTimestep}
+              disabled={!configStyle.XAxis.useCustomRange}
             >
               {TIME_STEPS.map((timestep) => (
                 <Option key={timestep} value={timestep}>

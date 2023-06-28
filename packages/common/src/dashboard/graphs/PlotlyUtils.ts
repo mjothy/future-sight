@@ -100,7 +100,7 @@ export default class PlotlyUtils {
     }
 
     static addTimestep(data, XAxisConfig) {
-        if (XAxisConfig.useTimestep) {
+        if (XAxisConfig.useCustomRange) {
             const step = XAxisConfig.timestep;
             if (step != null) {
                 data.forEach(timeSerie => {
