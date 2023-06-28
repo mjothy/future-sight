@@ -1,19 +1,32 @@
 import {
+  BlockDataModel,
+  BlockModel,
+  ColorizerProvider,
   ComponentPropsWithDataManager,
+  ConfigurationModel,
   DataModel,
+  PlotDataModel,
   ReadOnlyDashboard,
+  Colorizer,
+  OptionsDataModel
 } from '@future-sight/common';
 import { Component } from 'react';
 import withDataManager from '../../services/withDataManager';
 import { RoutingProps } from '../app/Routing';
 import DashboardSelectionControl from './DashboardSelectionControl';
 import { getDraft, removeDraft } from '../drafts/DraftUtils';
+import Utils from '../../services/Utils';
+import { Spin } from 'antd';
+import * as _ from 'lodash';
+import {versionModel, versionsModel} from "@future-sight/common/build/models/BlockDataModel";
 
 export interface DashboardDataConfigurationProps
   extends ComponentPropsWithDataManager,
-    RoutingProps {
+  RoutingProps {
   readonly?: boolean;
 }
+
+const dataFilterKeys = ["model", "scenario", "variable", "region"]
 
 /**
  * To dispatch the data to all blocks of dashboard
@@ -22,113 +35,26 @@ class DashboardDataConfiguration extends Component<
   DashboardDataConfigurationProps,
   any
 > {
+  optionsLabel: string[] = [];
   constructor(props) {
     super(props);
+    this.optionsLabel = this.props.dataManager.getOptions();
     this.state = {
+      filters: {},
+      allData: new OptionsDataModel(),
       /**
        * Data (with timeseries from IASA API)
        */
-      data: [],
-      dashboardModelScenario: [],
+      allPlotData: {},
+      plotData: {},
     };
   }
-
-  /**
-   * Compare each { model, scenario } in a and b
-   * @param a the first array of { model, scenario }
-   * @param b the second array of { model, scenario }
-   * @returns whether a and b contain the same objects
-   */
-  modelScenarioIsEqual = (a: any[], b: any[]) => {
-    if (a.length != b.length) {
-      return false;
-    }
-    let i = 0; // a and b should keep the objects order
-    while (i < a.length) {
-      if (a[i].model !== b[i].model && a[i].scenario !== b[i].scenario) {
-        return false;
-      }
-      i++;
-    }
-    return true;
-  };
-
-  componentDidUpdate(
-    prevProps: Readonly<DashboardDataConfigurationProps>,
-    prevState: Readonly<any>,
-    snapshot?: any
-  ): void {
-    const shouldUpdate = !this.modelScenarioIsEqual(
-      prevState.dashboardModelScenario,
-      this.state.dashboardModelScenario
-    ); // A child updated the models and scenarios selected
-    if (shouldUpdate) {
-      this.fetchData();
-    }
-  }
-
-  /**
-   * Add the { model, scenario } selected by the user to the state
-   * @param selection the dashboard dataStructure
-   */
-  setDashboardModelScenario = (selection) => {
-    const modelScenarios: any[] = [];
-    Object.keys(selection).forEach((model) => {
-      Object.keys(selection[model]).forEach((scenario) => {
-        modelScenarios.push({ model, scenario });
-      });
-    });
-
-    this.setState({ dashboardModelScenario: modelScenarios });
-  };
-
-  /**
-   * Fetch the data missing from the state
-   */
-  fetchData = async () => {
-    try {
-      /**
-       * Find modelScenario in the state.data
-       * @param modelScenario the { model, scenario } to find
-       * @returns the object wrapping the data related to the modelScenario, or null if the modelScenario was not found
-       */
-      const findModelScenario = (modelScenario) => {
-        const element = this.state.data.find(
-          (dataElement) =>
-            dataElement.model === modelScenario.model &&
-            dataElement.scenario === modelScenario.scenario
-        );
-        return element ? element : null;
-      };
-
-      const missingData = this.state.dashboardModelScenario.filter(
-        (modelScenario) => {
-          return findModelScenario(modelScenario) === null;
-        }
-      );
-      const res = await this.props.dataManager.fetchPlotData(missingData);
-      this.setState((prev) => {
-        return { data: prev.data.concat(res) };
-      });
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  /**
-   *
-   * @param data [{model, scenario, variable, region}]
-   * @returns the fetched data from API with timeseries
-   */
-  getData = (data: DataModel[]) => {
-    return this.settingPlotData(data);
-  };
 
   saveData = async (id: string, image?: string) => {
     const data = getDraft(id);
     if (data) {
-      if(image) {
-        data.preview = image
+      if (image) {
+        data.preview = image;
       }
       try {
         const res = await this.props.dataManager.saveDashboard(data);
@@ -140,51 +66,139 @@ class DashboardDataConfiguration extends Component<
     }
   };
 
-  settingPlotData(data: DataModel[] = []) {
-    const plotData: any[] = [];
-    data.map((dataElement) => {
-      const existData = this.isDataExist(dataElement);
-      if (existData !== null) plotData.push(existData);
-    });
-
-    return plotData;
-  }
-
   /**
-   * To limit requests to IASA API, we verify if we have already fetched the element
-   * Check if this.data contains that element (already fetched by other block)
-   * @param reqData
-   * @returns Data element if it's exist (null if not)
+   * to dispatch data for diffrenet plots (based on block id)
+   * @param block the block
+   * @returns the fetched data from API with timeseries
    */
-  isDataExist = (reqData: DataModel) => {
-    const data = this.state.data;
-    const element = data.find(
-      (dataElement) =>
-        dataElement.model === reqData.model &&
-        dataElement.scenario === reqData.scenario &&
-        dataElement.variable === reqData.variable &&
-        dataElement.region === reqData.region
-    );
-    return element ? element : null;
+  blockData = (block: BlockModel): void => {
+    if (block.blockType === "text") {
+      return
+    }
+
+    const config: ConfigurationModel | any = block.config;
+    const metaData: BlockDataModel = config.metaData;
+    const data: PlotDataModel[] = [];
+    const missingData: DataModel[] = [];
+
+    // TODO add categories
+    if (
+      metaData.models &&
+      metaData.scenarios &&
+      metaData.variables &&
+      metaData.regions
+    ) {
+      metaData.models.forEach((model) => {
+        metaData.scenarios.forEach((scenario) => {
+          metaData.variables.forEach((variable) => {
+            metaData.regions.forEach((region) => {
+              if (metaData.versions[model]
+                && metaData.versions[model][scenario]
+                && metaData.versions[model][scenario].length > 0
+              ) {
+                for (const version of metaData.versions[model][scenario]) {
+                  const d = this.state.allPlotData[block.id]?.find(
+                    (e: PlotDataModel) =>
+                      e.model === model &&
+                      e.scenario === scenario &&
+                      e.variable === variable &&
+                      e.region === region &&
+                      e.run.id === version.id
+                  );
+                  if (d) {
+                    data.push(d);
+                  } else {
+                    missingData.push({ model, scenario, variable, region, run: version });
+                  }
+                }
+              } else {
+                const d = this.state.allPlotData[block.id]?.find(
+                  (e) =>
+                    e.model === model &&
+                    e.scenario === scenario &&
+                    e.variable === variable &&
+                    e.region === region
+                );
+                if (d) {
+                  data.push(d);
+                } else {
+                  missingData.push({ model, scenario, variable, region });
+                }
+              }
+            });
+          });
+        });
+      });
+    }
+
+    if (missingData.length > 0) {
+      this.retreiveAllTimeSeriesData(data, missingData, block.id);
+    } else {
+      const plotData = JSON.parse(JSON.stringify(this.state.plotData))
+      plotData[block.id] = [...data]
+      this.setState({ plotData: plotData })
+    }
   };
+
+  retreiveAllTimeSeriesData = (data: PlotDataModel[], missingData: DataModel[], blockId) => {
+    this.props.dataManager.fetchPlotData(missingData)
+      .then(res => {
+        // no new data to add to state.allPLotData, only update state.plotData
+        if (res.length == 0) {
+          const plotData = JSON.parse(JSON.stringify(this.state.plotData))
+          plotData[blockId] = data
+          this.setState({ plotData: plotData })
+          return
+        }
+
+        const allPlotData = JSON.parse(JSON.stringify(this.state.allPlotData))
+        if (allPlotData[blockId] != undefined) {
+          allPlotData[blockId].push(...res)
+        } else {
+          allPlotData[blockId] = [...res]
+        }
+        const plotData = JSON.parse(JSON.stringify(this.state.plotData))
+        plotData[blockId] = [...data, ...res]
+        this.setState({ allPlotData: allPlotData, plotData: plotData })
+
+      }).catch(err => {
+        console.log("TODO Handle error: ", err);
+      });
+  }
 
   render() {
     const { readonly } = this.props;
 
-    return readonly ? (
+    const toRender = (readonly ? (
       <ReadOnlyDashboard
-        getData={this.getData}
-        setDashboardModelScenario={this.setDashboardModelScenario}
+        shareButtonOnClickHandler={() => Utils.copyToClipboard()}
+        embedButtonOnClickHandler={() => Utils.copyToClipboard(undefined, "&embedded")}
+        blockData={this.blockData}
+        // filters={this.state.filters}
+        plotData={this.state.plotData}
+        optionsLabel={this.optionsLabel}
         {...this.props}
       />
     ) : (
       <DashboardSelectionControl
-        getData={this.getData}
         saveData={this.saveData}
-        setDashboardModelScenario={this.setDashboardModelScenario}
+        allData={this.state.allData}
+        plotData={this.state.plotData}
+        blockData={this.blockData}
+        optionsLabel={this.optionsLabel}
+
         {...this.props}
-      />
-    );
+      /> || <div className="dashboard">
+        <Spin className="centered" />
+      </div>)
+      // TODO handle error
+    )
+
+    return (
+      <ColorizerProvider colorizer={new Colorizer(dataFilterKeys, undefined, undefined, "region")}>
+        {toRender}
+      </ColorizerProvider>
+    )
   }
 }
 

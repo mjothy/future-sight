@@ -1,0 +1,15 @@
+.advanced-options-switch{
+    display: flex;
+    justify-content: right;
+    gap: 10px;
+}
+
+.warning-label{
+    color: rgba(0, 0, 0, 0.45);
+    font-weight: 400;
+}
+
+.version-tree-select{
+    margin-bottom: 10px!important;
+    width: 100%;
+}

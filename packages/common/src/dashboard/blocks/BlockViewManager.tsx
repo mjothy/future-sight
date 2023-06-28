@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import ControlBlockView from './control/ControlBlockView';
-import DataBlockView from './data/DataBlockView';
 import TextBlockView from './text/TextBlockView';
-
-
+import DataBlockTransfert from "./data/DataBlockTransfert";
 
 /**
  * Render the view of block in Grid Layout
@@ -19,12 +17,24 @@ export default class BlockViewManager extends Component<any, any> {
       : 'data';
 
     switch (blockType) {
-      case 'data':
-        return <DataBlockView {...this.props} />;
       case 'text':
-        return <TextBlockView {...this.props} />;
+        return <TextBlockView currentBlock={this.props.currentBlock} />;
+      case 'data':
+        return <DataBlockTransfert
+          currentBlock={this.props.currentBlock}
+          blockData={this.props.blockData}
+          plotData={this.props.plotData}
+          width={this.props.width}
+          height={this.props.height}
+          checkDeprecatedVersion={this.props.checkDeprecatedVersion}
+        />;
       case 'control':
-        return <ControlBlockView {...this.props} />;
+        return <ControlBlockView
+          dashboard={this.props.dashboard}
+          currentBlock={this.props.currentBlock}
+          optionsLabel={this.props.optionsLabel}
+          updateDashboard={this.props.updateDashboard}
+        />;
       default:
         return <p>Error !</p>;
     }

@@ -8,7 +8,8 @@ import './AppComponent.css';
 const AppComponent: React.FC = () => {
   // Embedded mode
   const [isEmbedded, setIsEmbedded] = useState(false);
-  const [enableSwitchEmbeddedMode, setEnableSwitchEmbeddedMode] =
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [enableSwitchFullscreenMode, setEnableSwitchFullscreenMode] =
     useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -18,8 +19,8 @@ const AppComponent: React.FC = () => {
     if (evt.key) {
       escPressed = evt.key === 'Escape' || evt.key === 'Esc';
     }
-    if (escPressed && isEmbedded) {
-      searchParams.delete('embedded');
+    if (escPressed && isFullscreen && !isEmbedded) {
+      searchParams.delete('fullscreen');
       setSearchParams(searchParams);
     }
   };
@@ -32,8 +33,14 @@ const AppComponent: React.FC = () => {
       setIsEmbedded(false);
     }
 
+    if (searchParams.get('fullscreen') !== null) {
+      setIsFullscreen(true);
+    } else {
+      setIsFullscreen(false);
+    }
+
     // Show a notification message
-    if (isEmbedded) {
+    if (isFullscreen && !isEmbedded) {
       notification.info({
         message: 'Press the Esc key to return to normal mode',
         placement: 'top',
@@ -50,12 +57,13 @@ const AppComponent: React.FC = () => {
 
   return (
     <>
-      {!isEmbedded && (
-        <Navbar enableSwitchEmbeddedMode={enableSwitchEmbeddedMode}/>
+      {!(isEmbedded || isFullscreen) && (
+        <Navbar enableSwitchFullscreenMode={enableSwitchFullscreenMode}/>
       )}
       <Routing
         isEmbedded={isEmbedded}
-        setEnableSwitchEmbeddedMode={setEnableSwitchEmbeddedMode}
+        isFullscreen={isFullscreen}
+        setEnableSwitchFullscreenMode={setEnableSwitchFullscreenMode}
       />
     </>
   );

@@ -1,90 +1,97 @@
-import {ColumnsType} from 'antd/lib/table';
-import React, {Component} from 'react';
-import BlockDataModel from '../../../models/BlockDataModel';
+import type { ColumnsType } from 'antd/lib/table';
+import React, { Component } from 'react';
 import BlockStyleModel from '../../../models/BlockStyleModel';
+import MapBlock from '../../graphs/MapBlock';
 import PlotlyGraph from '../../graphs/PlotlyGraph';
+import PlotlyUtils from '../../graphs/PlotlyUtils';
+import * as _ from 'lodash';
+import PlotDataModel from "../../../models/PlotDataModel";
+import withColorizer from "../../../hoc/colorizer/withColorizer";
+import { stackGroups } from '../utils/StackGraphs';
+import PieView from "./graphType/pie/PieView";
 
-export default class DataBlockView extends Component<any, any> {
+class DataBlockView extends Component<any, any> {
 
-  constructor(props) {
-    super(props);
+  shouldComponentUpdate(nextProps: Readonly<any>, nextState: Readonly<any>, nextContext: any): boolean {
+    let shouldUpdate = true;
+    const config1 = nextProps.currentBlock.config;
+    const config2 = this.props.currentBlock.config;
+    // Check configuration
+    if (this.props.width == nextProps.width && this.props.height == nextProps.height) {
+      if (_.isEqual(config1, config2)) {
+        shouldUpdate = false;
+      }
+    }
+
+    // Check updated plotData (we need to check this because component render before fetch finish)
+    if (this.props.timeseriesData?.length != nextProps.timeseriesData?.length) {
+      shouldUpdate = true;
+    }
+
+    return shouldUpdate;
   }
 
-  /**
-   * Getting the data to visualize on the graphf
-   * @returns Data with timeseries
-   */
-  getPlotData = () => {
-    // 2 options: if the block controlled or not
-    // if the models is control, it will take the data from his master
-    const { currentBlock } = this.props;
-    const metaData: BlockDataModel = currentBlock.config.metaData;
-    if (currentBlock.controlBlock !== '') {
-      const controlBlock =
-        this.props.blocks[currentBlock.controlBlock].config.metaData;
-      if (controlBlock.master['models'].isMaster)
-        metaData.models = controlBlock.master['models'].values;
-      if (controlBlock.master['variables'].isMaster)
-        metaData.variables = controlBlock.master['variables'].values;
-      if (controlBlock.master['regions'].isMaster)
-        metaData.regions = controlBlock.master['regions'].values;
-    }
-    const data: any[] = [];
-    if (metaData.models && metaData.variables && metaData.regions) {
-      Object.keys(metaData.models).map((model) => {
-        metaData.models[model].map((scenario) => {
-          metaData.variables.map((variable) => {
-            metaData.regions.map((region) => {
-              data.push({ model, scenario, variable, region });
-            });
-          });
-        });
-      });
 
-      return this.props.getData(data);
-    }
-  };
+  getPlotData = () => {
+    let data: PlotDataModel[] = this.props.timeseriesData;
+    data = PlotlyUtils.filterByCustomXRange(data, this.props.currentBlock.config.configStyle)
+    this.props.checkDeprecatedVersion(data, this.props.currentBlock)
+    return data
+  }
 
   /**
    * Preparing the fetched data to adapt plotly data OR antd table
    * @returns
    */
-  settingPlotData = () => {
-    const data: any[] = this.getPlotData();
-    const showData: any[] = [];
+  settingPlotData = (data: PlotDataModel[]) => {
+    const { currentBlock } = this.props;
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
+    const showData: any[] = [];
 
-    let plotData;
-    if (configStyle.graphType === 'table') {
-      plotData =  this.prepareTableData(data);
-    } else {
-      data.map((dataElement) => {
-        showData.push(this.preparePlotData(dataElement, configStyle));
-      });
-      plotData = showData;
+    let visualizeData: any = [];
+    switch (configStyle.graphType) {
+      case "table": {
+        visualizeData = this.prepareTableData(data);
+        break;
+      }
+      default: {
+        let stacks = [];
+        if (configStyle.stack && configStyle.stack.isStack && (configStyle.graphType === 'area' || configStyle.graphType === 'bar')) {
+          stacks = stackGroups(currentBlock.config.metaData, configStyle.stack.value);
+        }
+        const dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale);
+        const indexKeys = PlotlyUtils.getIndexKeys(data)
+
+        dataWithColor?.map((dataElement) => {
+          showData.push(this.preparePlotData(dataElement, configStyle, stacks, indexKeys));
+        });
+        visualizeData = showData;
+      }
     }
-    return {data: plotData, layout: this.prepareLayout(data)}
+
+    return { data: visualizeData, layout: this.prepareLayout(data) }
   }
 
-  prepareTableData = (data) => {
+
+  prepareTableData = (data: PlotDataModel[]) => {
     const columns: ColumnsType<any> = [
       { title: 'model', dataIndex: 'model' },
       { title: 'scenario', dataIndex: 'scenario' },
       { title: 'variable', dataIndex: 'variable' },
       { title: 'region', dataIndex: 'region' },
     ];
-    for (let year = 2005; year <= 2100; year = year + 5) {
-      columns.push({
-        title: year,
-        dataIndex: year,
-      });
-    }
+
     const values: any[] = [];
-    data.map((dataElement) => {
+    data?.map((dataElement) => {
       const obj = {};
-      dataElement.data.map((e) => {
+      dataElement.data?.map((e) => {
         obj[e.year] = e.value;
+        columns.push({
+          title: e.year,
+          dataIndex: e.year,
+        });
       });
+
       values.push({
         model: dataElement.model,
         scenario: dataElement.scenario,
@@ -97,14 +104,103 @@ export default class DataBlockView extends Component<any, any> {
     return { columns, values };
   }
 
-  getLegend = (dataElement, legend) => {
-    if (!legend) {
+  preparePlotData = (dataElement: PlotDataModel, configStyle: BlockStyleModel, stacks?: undefined[], indexKeys: string[] = []) => {
+    let obj;
+    const xyDict = this.getXY(dataElement);
+    switch (configStyle.graphType) {
+      case 'area':
+        obj = {
+          type: 'scatter',
+          fill: 'tonexty',
+          fillcolor: dataElement.color ? dataElement.color + "50" : null,
+          x: xyDict.x,
+          y: xyDict.y,
+          mode: "none",
+          name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend, configStyle.showLegend), this.props.width, "legendtext"),
+          showlegend: configStyle.showLegend,
+          hovertext: this.plotHoverText(dataElement),
+        };
+        if (configStyle.stack.isStack && stacks != null) {
+          // Add the current element to a stack (if it exist in stagGroups)
+          // stack is array contains possible stacks [[{},{}], [{},{}]]
+          if (stacks.length == 0) {
+            obj.stackgroup = 0;
+          } else {
+            Object.entries(stacks).forEach(([key, val]: any) => {
+              const isExist = val.find(
+                raw => dataElement.model == raw["models"] &&
+                  dataElement.variable == raw["variables"] &&
+                  dataElement.region == raw["regions"] &&
+                  dataElement.scenario == raw["scenarios"]
+              )
+              if (isExist) {
+                obj.stackgroup = key;
+              }
+            })
+          }
+        }
+        break;
+      case 'bar':
+        obj = {
+          type: configStyle.graphType,
+          x: xyDict.x,
+          y: xyDict.y,
+          name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend, configStyle.showLegend), this.props.width, "legendtext"),
+          showlegend: configStyle.showLegend,
+          hovertext: this.plotHoverText(dataElement),
+          marker: { color: dataElement.color || null }
+        };
+        if (configStyle.stack.isStack && stacks != null) {
+          // Add the current element to a stack (if it exist in stagGroups)
+          // stack is array contains possible stacks [[{},{}], [{},{}]]
+          Object.entries(stacks).forEach(([key, val]: any) => {
+            const isExist = val.find(
+              raw => dataElement.model == raw["models"] &&
+                dataElement.variable == raw["variables"] &&
+                dataElement.region == raw["regions"] &&
+                dataElement.scenario == raw["scenarios"]
+            )
+            if (isExist) {
+              const nonStackIndex = indexKeys.filter(x => x !== configStyle.stack.value.slice(0, -1))
+              const groupIndexName = nonStackIndex.map(idx => dataElement[idx]).join(" - ")
+              obj.x = [xyDict.x, new Array(xyDict.x.length).fill(groupIndexName)]
+            }
+          })
+        }
+        break;
+      case "box":
+        obj = {
+          type: configStyle.graphType,
+          y: xyDict.y,
+          name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend, configStyle.showLegend), this.props.width, "legendtext"),
+          showlegend: configStyle.showLegend,
+          hoverinfo: "y",
+          marker: { color: dataElement.color || null }
+        };
+        break;
+      default:
+        obj = {
+          type: configStyle.graphType,
+          x: xyDict.x,
+          y: xyDict.y,
+          name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend, configStyle.showLegend), this.props.width, "legendtext"),
+          showlegend: configStyle.showLegend,
+          hovertext: this.plotHoverText(dataElement),
+          marker: { color: dataElement.color || null }
+        };
+    }
+    return obj;
+  }
+
+  getLegend = (dataElement: PlotDataModel, legend, showLegend) => {
+    if (!showLegend) {
       return dataElement.region
-          + " - " + dataElement.variable
-          + " - " + dataElement.scenario
-          + " - " + dataElement.model
+        + " - " + dataElement.variable
+        + " - " + dataElement.scenario
+        + " - " + dataElement.model
+        + " - V." + dataElement.run?.version
     } else {
-      let label: any[] = [];
+      const label: any[] = [];
       if (legend.Region && dataElement.region) {
         label.push(dataElement.region)
       }
@@ -117,44 +213,18 @@ export default class DataBlockView extends Component<any, any> {
       if (legend.Model && dataElement.model) {
         label.push(dataElement.model)
       }
+      if (legend.Version && dataElement.run?.version) {
+        label.push("V. " + dataElement.run?.version)
+      }
       return label.join(' - ')
     }
   }
 
-  preparePlotData = (dataElement, configStyle: BlockStyleModel) => {
-    let obj;
-    switch (configStyle.graphType) {
-      case 'area':
-        obj = {
-          type: 'scatter',
-          fill: 'tozeroy',
-          x: this.getX(dataElement),
-          y: this.getY(dataElement),
-          mode: 'none',
-          name: this.getLegend(dataElement, configStyle.legend),
-          showlegend: configStyle.showLegend,
-          hovertext: this.plotHoverText(dataElement),
-        };
-        break;
-      default:
-        obj = {
-          type: configStyle.graphType,
-          x: this.getX(dataElement),
-          y: this.getY(dataElement),
-          name: this.getLegend(dataElement, configStyle.legend),
-          showlegend: configStyle.showLegend,
-          hovertext: this.plotHoverText(dataElement),
-        };
-    }
-
-    return obj;
-  }
-
-  plotHoverText = (dataElement) => {
+  plotHoverText = (dataElement: PlotDataModel) => {
     let textHover = '';
     const result: string[] = [];
 
-    dataElement.data.map((e) => {
+    dataElement.data?.map((e) => {
       textHover =
         dataElement.model +
         '/' +
@@ -172,78 +242,92 @@ export default class DataBlockView extends Component<any, any> {
   };
 
   /**
-   * Extract the x axis from data
-   * @param data The retreived data (from API)
-   * @returns Axis x (array of values)
+   * Extract the x and y axis from data
+   * @param dataElement The retrieved data (from API)
+   * @returns {x: x_array, y: y_array}
    */
-  getX = (data) => {
+  getXY = (dataElement: PlotDataModel) => {
     const x: any[] = [];
-    data.data.map((d) => {
+    const y: any[] = []
+    dataElement.data?.map((d) => {
       if (d.value !== "") {
         x.push(d.year)
-      }
-    });
-    return x;
-  };
-
-  /**
-   * Extract the y axis from data
-   * @param data The retreived data (from API)
-   * @returns Axis y (array of values)
-   */
-  getY = (data) => {
-    const y: any[] = [];
-    data.data.map((d) => {
-      if (d.value !== "") {
         y.push(d.value)
       }
     });
-    return y;
+    return { x, y };
   };
 
   prepareLayout = (data) => {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
-    return {
+
+    const layout = {
       YAxis: {
         title: {
-          text: this.getYAxisLabel(data)
+          text: PlotlyUtils.getLabel(this.getYAxisLabel(data), this.props.height, "ytitle"),
         },
-        rangemode: configStyle.YAxis.force0 ? "tozero" : "normal"
+        rangemode: configStyle.YAxis.force0 ? "tozero" : "normal",
+        automargin: true,
+        dragmode: "zoom",
+        mapbox: { style: "carto-positron", center: { lat: 38, lon: -90 }, zoom: 3 },
+        margin: { r: 0, t: 0, b: 0, l: 0 },
+        width: this.props.width,
+        height: this.props.height,
       }
     }
+
+    return layout
   }
 
-  getYAxisLabel = (data) => {
+  getYAxisLabel = (data: PlotDataModel[]) => {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
-    let labels = {}
-    for (let dataElement of data) {
+    const labels = {}
+    for (const dataElement of data) {
       labels[dataElement.variable] = dataElement.unit
     }
-    let label: any[] = []
-    for (let key of Object.keys(labels)) {
+    const label: any[] = []
+    for (const key of Object.keys(labels)) {
       let text;
       if (configStyle.YAxis.unit && configStyle.YAxis.label) {
-        text = key + " (" + labels[key] + ") "
+        text = key + "<br>" + labels[key]
       } else if (configStyle.YAxis.unit) {
         text = labels[key]
       } else if (configStyle.YAxis.label) {
         text = key
       }
-      if(text) {
+      if (text) {
         label.push(text)
       }
     }
     if (label.length > 0) {
-      let uniqueItems = [...new Set(label)]
-      return uniqueItems.join(" - ")
+      const uniqueItems = [...new Set(label)]
+      return uniqueItems.join("<br>")
     } else {
       return undefined;
     }
   }
 
   render() {
-    const {data, layout} = this.settingPlotData();
-    return <PlotlyGraph {...this.props} data={data} layout={layout} />;
+    const rawData = this.getPlotData()
+    const { data, layout } = this.settingPlotData(rawData);
+    switch (this.props.currentBlock.config.configStyle.graphType) {
+      case "pie": {
+        return <PieView
+          rawData={rawData}
+          currentBlock={this.props.currentBlock}
+          width={this.props.width}
+          height={this.props.height}
+        />
+      }
+      case "map": {
+        return <MapBlock {...this.props} data={data} layout={layout} />
+      }
+      default: {
+        return <PlotlyGraph {...this.props} data={data} layout={layout} />;
+      }
+    }
   }
 }
+
+export default withColorizer(DataBlockView)

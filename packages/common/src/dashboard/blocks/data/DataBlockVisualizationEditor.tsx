@@ -1,109 +1,182 @@
-import {AreaChartOutlined, BarChartOutlined, LineChartOutlined, TableOutlined} from '@ant-design/icons';
-import {Col, Input, Row, Select} from 'antd';
-import Checkbox from 'antd/es/checkbox';
-import {Component} from 'react';
+import { Component } from 'react';
+import PieVisualizationEditor from "./graphType/pie/PieVisualizationEditor";
+import {
+  AreaChartOutlined, BarChartOutlined, EnvironmentOutlined, LineChartOutlined, TableOutlined, PieChartOutlined,
+  ExclamationCircleOutlined, BoxPlotOutlined
+} from '@ant-design/icons';
+import { Col, Input, Row, Select, Checkbox, InputNumber } from 'antd';
+import PlotColorscalePicker from '../utils/PlotColorscalePicker';
+
 
 const { Option } = Select;
-const ATTRIBUTES = {
-  Region: {
-
-  },
-  Variable: {
-
-  },
-  Scenario: {
-
-  },
-  Model : {
-
-  }
-}
 
 const plotTypes = [
-  {type: 'line', label: 'Line', icon: <LineChartOutlined/>},
-  {type: 'bar', label: 'Bar', icon: <BarChartOutlined />},
-  {type: 'area', label: 'Area', icon: <AreaChartOutlined />},
-  {type: 'table', label: 'Table', icon: <TableOutlined />},
+  { type: 'line', label: 'Line', icon: <LineChartOutlined /> },
+  { type: 'bar', label: 'Bar', icon: <BarChartOutlined /> },
+  { type: 'area', label: 'Area', icon: <AreaChartOutlined /> },
+  { type: 'pie', label: 'Pie', icon: <PieChartOutlined /> },
+  { type: 'table', label: 'Table', icon: <TableOutlined /> },
+  { type: 'map', label: 'Map', icon: <EnvironmentOutlined /> },
+  { type: 'box', label: 'Boxplot', icon: <BoxPlotOutlined /> },
 ];
+
+const colorbarTitle = ['variable', 'unit'];
 
 export default class DataBlockVisualizationEditor extends Component<any, any> {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      configStyle :  this.props.currentBlock.config.configStyle
-    }
-  }
-
   onPlotTypeChange = (selectedType: string) => {
-    let configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.graphType = selectedType;
-    this.props.updateBlockStyleConfig(configStyle);
+    this.updateBlockConfig({ configStyle: configStyle })
   };
 
   onTitleChange = (e) => {
-    let configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.title.value = e.target.value;
-    this.props.updateBlockStyleConfig(configStyle);
+    this.updateBlockConfig({ configStyle: configStyle })
   };
 
   onTitleVisibilityChange = (e) => {
-    let configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.title.isVisible = e.target.checked;
-    this.props.updateBlockStyleConfig(configStyle);
+    this.updateBlockConfig({ configStyle: configStyle })
   };
 
   onLegendChange = (e) => {
-    let configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.showLegend = e.target.checked;
-    this.props.updateBlockStyleConfig(configStyle);
+    this.updateBlockConfig({ configStyle: configStyle })
+  };
+
+  onCustomRangeChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.XAxis.useCustomRange = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  };
+
+  onXRangeLeftChange = (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.XAxis.left = value;
+    this.updateBlockConfig({ configStyle: configStyle })
+  };
+
+  onXRangeRightChange = (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.XAxis.right = value;
+    this.updateBlockConfig({ configStyle: configStyle })
   };
 
   onLegendContentChange = (checkedValues) => {
-    let configStyle = structuredClone(this.props.currentBlock.config.configStyle);
-    configStyle.legend = {
-      Model: false,
-      Scenario: false,
-      Region: false,
-      Variable: false
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+
+    for (const key in configStyle.legend) {
+      configStyle.legend[key] = false
     }
-    for (let value of checkedValues) {
+    for (const value of checkedValues) {
       configStyle.legend[value] = true;
     }
-    this.props.updateBlockStyleConfig(configStyle);
+
+    this.updateBlockConfig({ configStyle: configStyle })
   };
 
   legendOptions = () => {
-    return Object.keys(ATTRIBUTES).map((att) => { return { "label": att, "value": att } });
+    const legendKeys = Object.keys(this.props.currentBlock.config.configStyle.legend)
+    return legendKeys.map((att) => { return { "label": att, "value": att } });
   }
 
   onYAxisLabelChange = (e) => {
-    let configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.YAxis.label = e.target.checked;
-    this.props.updateBlockStyleConfig(configStyle);
+    this.updateBlockConfig({ configStyle: configStyle })
   }
 
   onYAxisUnitChange = (e) => {
-    let configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.YAxis.unit = e.target.checked;
-    this.props.updateBlockStyleConfig(configStyle);
+    this.updateBlockConfig({ configStyle: configStyle })
   }
 
   onYAxisForceChange = (e) => {
-    let configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.YAxis.force0 = e.target.checked;
-    this.props.updateBlockStyleConfig(configStyle);
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onYAxisTickFormatChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.YAxis.percentage = e.target.checked ? "%" : undefined;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onStackCheckChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.stack.isStack = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onStackGroupByChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.stack.isGroupBy = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onStackValueChange = (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.stack.value = value;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  updateBlockConfig = (configStyle) => {
+    const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+    const config = dashboard.blocks[this.props.currentBlock.id].config;
+    dashboard.blocks[this.props.currentBlock.id].config = { ...config, ...configStyle };
+    this.props.updateDashboard(dashboard)
+  }
+
+  onColorbarChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.colorbar.isShow = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onColorbarTitleChange = (checkedValues) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.colorbar.title = {
+      variable: false,
+      unit: false
+    }
+    for (const value of checkedValues) {
+      configStyle.colorbar.title[value] = true;
+    }
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onReverse = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.colorbar.reverse = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  isShowGraphConfig = (block_type) => {
+    return block_type != "map" && block_type != "table";
+  }
+
+
+  isMap = (block_type) => {
+    return block_type == "map";
+  }
+
+  onColorsChange = colorscale => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.colorscale = colorscale;
+    this.updateBlockConfig({ configStyle: configStyle })
   }
 
   render() {
-    let configStyle = structuredClone(this.props.currentBlock.config.configStyle);
-    let legend = this.props.currentBlock.config.configStyle.legend;
-    let defaultLegendOptions : any[] = [];
-    for (let key of Object.keys(legend)) {
-      if (legend[key]) {
-        defaultLegendOptions.push(key);
-      }
-    }
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    const metaData = this.props.currentBlock.config.metaData;
+    const legend = this.props.currentBlock.config.configStyle.legend;
+    const defaultLegendOptions = Object.keys(legend).filter((key) => legend[key])
     return (
       <div>
         <h3>General</h3>
@@ -124,7 +197,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             </Select>
           </Col>
         </Row>
-        <Row>
+        <Row className="mb-10">
           <Col span={2} className={'checkbox-col'}>
             <Checkbox
               onChange={this.onTitleVisibilityChange}
@@ -139,64 +212,219 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             />
           </Col>
         </Row>
+
+        {configStyle.graphType === "pie" &&
+          <PieVisualizationEditor
+            optionsLabel={this.props.optionsLabel}
+            onStackValueChange={this.onStackValueChange}
+            updateBlockConfig={this.updateBlockConfig}
+            plotData={this.props.plotData}
+            currentBlock={this.props.currentBlock}
+          />
+        }
+
+
+        {["area", "bar"].includes(configStyle.graphType) &&
+          <>
+            <h3>{plotTypes.find(chart => chart.type == configStyle.graphType)?.label}</h3>
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onStackCheckChange}
+                  checked={configStyle.stack.isStack}
+                />
+              </Col>
+              <Col span={6} className={'checkbox-col-label'}>
+                <label>Stack by ... </label>
+              </Col>
+              <Col span={9} className={'checkbox-col-label'}>
+                <Select
+                  placeholder="Select"
+                  value={metaData[configStyle.stack.value]?.length > 1 ? configStyle.stack.value : null}
+                  onChange={this.onStackValueChange}
+                  notFoundContent={(
+                    <div>
+                      <ExclamationCircleOutlined />
+                      <p>Item not found.</p>
+                    </div>
+                  )}
+                  allowClear
+                  disabled={!configStyle.stack.isStack}
+                  dropdownMatchSelectWidth={false}
+                >
+                  {this.props.optionsLabel.map((value) => {
+                    if (metaData[value].length > 1) return (
+                      <Option key={value} value={value}>
+                        {value}
+                      </Option>
+                    )
+                  }
+                  )}
+                </Select>
+              </Col>
+            </Row>
+          </>
+        }
+
         <h3>Axis</h3>
-        <Row>
+        {this.isShowGraphConfig(configStyle.graphType) &&
+          <>
+            {configStyle.graphType === "bar" &&
+              <Row>
+                <Col span={2} className={'checkbox-col'}>
+                  <Checkbox
+                      onChange={this.onYAxisTickFormatChange}
+                      checked={configStyle.YAxis.percentage}
+                  />
+                </Col>
+                <Col span={16} className={'checkbox-col-label'}>
+                  <label>Normalize to percentage</label>
+                </Col>
+              </Row>
+            }
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onYAxisForceChange}
+                  checked={configStyle.YAxis.force0}
+                />
+              </Col>
+              <Col span={16} className={'checkbox-col-label'}>
+                <label>Range of Y axis to 0</label>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onYAxisLabelChange}
+                  checked={configStyle.YAxis.label}
+                />
+              </Col>
+              <Col span={16} className={'checkbox-col-label'}>
+                <label>Show Y Axis label</label>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onYAxisUnitChange}
+                  checked={configStyle.YAxis.unit}
+                />
+              </Col>
+              <Col span={16} className={'checkbox-col-label'}>
+                <label>Show Y Axis unit</label>
+              </Col>
+            </Row>
+          </>}
+        <Row className="mb-10">
           <Col span={2} className={'checkbox-col'}>
             <Checkbox
-                onChange={this.onYAxisForceChange}
-                checked={configStyle.YAxis.force0}
+              onChange={this.onCustomRangeChange}
+              checked={configStyle.XAxis.useCustomRange}
             />
           </Col>
           <Col span={16} className={'checkbox-col-label'}>
-            <label>Range of Y axis to 0</label>
+            <label>Custom X axis range</label>
           </Col>
         </Row>
-        <Row>
-          <Col span={2} className={'checkbox-col'}>
-            <Checkbox
-                onChange={this.onYAxisLabelChange}
-                checked={configStyle.YAxis.label}
-            />
-          </Col>
-          <Col span={16} className={'checkbox-col-label'}>
-            <label>Show Y Axis label</label>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={2} className={'checkbox-col'}>
-            <Checkbox
-                onChange={this.onYAxisUnitChange}
-                checked={configStyle.YAxis.unit}
-            />
-          </Col>
-          <Col span={16} className={'checkbox-col-label'}>
-            <label>Show Y Axis unit</label>
-          </Col>
-        </Row>
-        <h3>Legend</h3>
-        <Row>
-          <Col span={2} className={'checkbox-col'}>
-            <Checkbox
-              onChange={this.onLegendChange}
-              checked={configStyle.showLegend}
-            />
-          </Col>
-          <Col span={16} className={'checkbox-col-label'}>
-            <label>Show legend</label>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={2}/>
+        <Row className="mb-10">
+          <Col span={2} />
           <Col span={8}>
-            <label>Legend info: </label>
+            <InputNumber
+              className="width-100"
+              placeholder="Left"
+              onChange={this.onXRangeLeftChange}
+              value={configStyle.XAxis.left}
+              disabled={!configStyle.XAxis.useCustomRange}
+            />
+          </Col>
+          <Col span={8} className="ml-20">
+            <InputNumber
+              className="width-100"
+              placeholder="Right"
+              onChange={this.onXRangeRightChange}
+              value={configStyle.XAxis.right}
+              disabled={!configStyle.XAxis.useCustomRange}
+            />
           </Col>
         </Row>
-        <Row>
-          <Col span={2}/>
-          <Col>
-            <Checkbox.Group options={this.legendOptions()} defaultValue={defaultLegendOptions} onChange={this.onLegendContentChange} />
-          </Col>
-        </Row>
+
+        {this.isShowGraphConfig(configStyle.graphType) && configStyle.graphType != "pie" &&
+          <>
+            <h3>Legend</h3>
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onLegendChange}
+                  checked={configStyle.showLegend}
+                />
+              </Col>
+              <Col span={16} className={'checkbox-col-label'}>
+                <label>Show legend</label>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={2} />
+              <Col span={8}>
+                <label>Legend info: </label>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={2} />
+              <Col>
+                <Checkbox.Group options={this.legendOptions()} value={defaultLegendOptions} onChange={this.onLegendContentChange} />
+              </Col>
+            </Row>
+          </>}
+        {configStyle.graphType != "table" &&
+          <>
+            <h3>Colorscale</h3>
+            <Row>
+              <Col span={20}>
+                <PlotColorscalePicker currentBlock={this.props.currentBlock} filters={this.props.filters}
+                  onColorsChange={this.onColorsChange} />
+              </Col>
+            </Row>
+          </>
+        }
+        {this.isMap(configStyle.graphType) &&
+          <>
+            <h3>Colorbar</h3>
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onColorbarChange}
+                  checked={configStyle.colorbar.isShow}
+                />
+              </Col>
+              <Col span={16} className={'checkbox-col-label'}>
+                <label>Show colorbar</label>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onReverse}
+                  checked={configStyle.colorbar.reverse}
+                />
+              </Col>
+              <Col span={16} className={'checkbox-col-label'}>
+                <label>Reverse colorscale</label>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={1} />
+              <Col span={8}>
+                <label>Label: </label>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={2} />
+              <Col>
+                <Checkbox.Group options={colorbarTitle} value={Object.keys(configStyle.colorbar.title).filter(k => configStyle.colorbar.title[k])} onChange={this.onColorbarTitleChange} />
+              </Col>
+            </Row>
+          </>}
       </div>
     );
   }

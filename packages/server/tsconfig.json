@@ -4,9 +4,6 @@
     "module": "commonjs",
     "rootDir": "src",
     "outDir": "build",
-    "isolatedModules": false,
-    "jsx": "react-jsx"
-  },
-  "references": [{ "path": "../common" }],
-  "include": ["src"]
+    "isolatedModules": false
+  }
 }

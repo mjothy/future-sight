@@ -1,26 +1,29 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import path, { join } from 'path';
-
-import RedisClient from '../redis/RedisClient';
-import IDataProxy from './IDataProxy';
+import { join } from 'path';
+import IPersistenceManager from '../interfaces/IPersistenceManager';
+import { DashboardModel, DataModel, OptionsDataModel } from '@future-sight/common';
+import BrowseObject from '../models/BrowseObject';
+import IDataBackend from '../interfaces/IDataBackend ';
+import IConfigurationProvider from '../interfaces/IConfigurationProvider';
 
 export default class ExpressServer {
   private app: any;
   private readonly port: number;
   private readonly auth: any;
   private readonly clientPath: any;
-  private readonly dbClient: RedisClient;
-  private readonly dataProxy: IDataProxy;
-
+  private readonly dbClient: IPersistenceManager;
+  private readonly dataProxy: IDataBackend;
+  private readonly configurationProvider: IConfigurationProvider;
   constructor(
     port,
     cookieKey,
     auth,
     clientPath,
     dbClient,
-    dataProxy: IDataProxy
+    dataProxy: IDataBackend,
+    configurationProvider
   ) {
     this.app = express();
     this.port = port;
@@ -28,8 +31,9 @@ export default class ExpressServer {
     this.clientPath = clientPath;
     this.dbClient = dbClient;
     this.dataProxy = dataProxy;
-    this.app.use(bodyParser.json({limit: '50mb'}));
-    this.app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+    this.configurationProvider = configurationProvider;
+    this.app.use(bodyParser.json({ limit: '50mb' }));
+    this.app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
     if (auth) {
       this.app.use(this.auth);
     }
@@ -58,49 +62,81 @@ export default class ExpressServer {
       res.send(`Hello , From server`);
     });
 
-    this.app.post('/api/data', (req, res) => {
-      const body = req.body;
-      this.dataProxy.getData().map((e) => {
-        if (
-          e.model === body.model &&
-          e.scenario === body.scenario &&
-          e.region === body.region &&
-          e.variable === body.variable
-        ) {
-          res.status(200).send(e);
-        }
-      });
-      res.status(404).send([]);
+    // ===================
+    //   IIASA calls
+    // ===================
+
+    this.app.get('/api/filters', (req, res) => {
+      res.send(this.dataProxy.getFilters());
     });
 
-    this.app.post('/api/plotData', (req, res) => {
-      const body = req.body;
-      const response: any[] = [];
-      for (const reqData of body) {
-        const elements = this.dataProxy
-          .getData()
-          .filter(
-            (e) => e.model === reqData.model && e.scenario === reqData.scenario
-          );
-        if (elements) {
-          response.push(...elements);
+    this.app.post('/api/plotData', async (req, res) => {
+      try {
+        const selectedData: DataModel[] = req.body;
+        const response = await this.dataProxy.getTimeSeries(selectedData);
+        res.status(200).send(response);
+      } catch (error: any) {
+        if (error.status == 401) {
+          res.status(401).send({ message: error.message });
+        } else {
+          console.error(error);
+          res.status(error.status ? error.status : 500).send({ message: "Server error!!" });
         }
       }
-      res.status(200).send(response);
     });
 
-    this.app.get('/api/models', (req, res) => {
-      res.send(this.dataProxy.getModels());
+    // We call dataFocus afer each combo-box closed
+    // 1- user open combobox of models,
+    // 2- user select models = [model1,model2,...],
+    // 3- close models combo-box
+    // 4- re-fetch filterd values of [variables, regions, scenarions]
+    this.app.post('/api/dataFocus', async (req, res, next) => {
+      try {
+        const selectedData = req.body.data;
+        const filterIDs: string[] = req.body.filterIDs;
+        const optionsData = await this.dataProxy.getDataFocus(selectedData, filterIDs);
+
+        // Get categories from file system
+        // TODO add category to filter when request to iaasa is provided
+        optionsData["categories"] = this.configurationProvider.getMetaIndicators();
+
+        res.send(optionsData);
+      } catch (error: any) {
+        console.error(error)
+        if (error.status == 401) {
+          res.status(401).send({ message: error.message });
+        } else {
+          console.error(error);
+          res.status(error.status ? error.status : 500).send({ message: "Server error!!" });
+        }
+      }
+
     });
 
-    // Posts methods
+    this.app.post('/api/filterOptions', async (req, res, next) => {
+
+      try {
+        const optionsData = await this.dataProxy.getFilteredData(req.body.filterId, req.body.metaData, req.body.dataFocusFilters);
+        optionsData["categories"] = this.configurationProvider.getMetaIndicators(); // TODO add categories to filter
+        res.send(optionsData);
+      } catch (error: any) {
+        if (error.status == 401) {
+          res.status(401).send({ message: error.message });
+        } else {
+          console.error(error);
+          res.status(error.status ? error.status : 500).send({ message: "Server error!!" });
+        }
+      }
+    });
+
+    // ===================
+    //   Redis calls
+    // ===================
+
     this.app.post(`/api/dashboard/save`, async (req, res, next) => {
       try {
-        const id = await this.dbClient.getClient().incr('dashboards:id');
-        await this.dbClient
-          .getClient()
-          .json.set('dashboards', `.${id}`, req.body);
-        res.send(JSON.stringify({ id: id }));
+        const response = await this.dbClient.saveDashboard(req.body)
+        res.send(response);
       } catch (err) {
         console.error(err);
         next(err);
@@ -110,9 +146,7 @@ export default class ExpressServer {
     this.app.get(`/api/dashboards/:id`, async (req, res, next) => {
       try {
         const id = req.params.id;
-        const dashboard = await this.dbClient
-          .getClient()
-          .json.get('dashboards', { path: [`.${id}`] });
+        const dashboard = await this.dbClient.getDashboardById(id);
         res.send(dashboard);
       } catch (err) {
         console.error(err);
@@ -122,24 +156,7 @@ export default class ExpressServer {
 
     this.app.get(`/api/dashboards`, async (req, res, next) => {
       try {
-        const latestId = await this.dbClient.getClient().get('dashboards:id');
-        const idsToFetch = [latestId];
-        // Get the 5 last published dashboards
-        for (let i = 1; i < 5; i++) {
-          idsToFetch.push(latestId - i);
-        }
-        const dashboards: any[] = [];
-        for (let i = latestId; i > latestId - 5 ; i--) {
-          try {
-            const dashboard = await this.dbClient
-                .getClient()
-                .json.get('dashboards', { path: i.toString() });
-            dashboards.push(dashboard)
-          } catch (e) {
-            // no dashboard found for id
-          }
-        }
-
+        const dashboards: DashboardModel[] = await this.dbClient.getAllDashboards();
         res.send(dashboards);
       } catch (err) {
         console.error(err);
@@ -149,13 +166,8 @@ export default class ExpressServer {
 
     this.app.get('/api/browse/init', async (req, res, next) => {
       try {
-        const data = await this.dbClient
-          .getClient()
-          .json.mGet(['authors', 'tags'], '.');
-        // data is returned as: [ { author1: [], author2: [], ... }, { tag1: [], tag2: [], ... } ]
-        const authors = data[0];
-        const tags = data[1];
-        res.send({ authors, tags });
+        const response: BrowseObject = await this.dbClient.getBrowseData();
+        res.send(response);
       } catch (err) {
         console.error(err);
         next(err);
@@ -165,24 +177,27 @@ export default class ExpressServer {
     this.app.post('/api/browse', async (req, res, next) => {
       try {
         const { dashboards } = req.body;
-        const data = await this.dbClient
-          .getClient()
-          .json.get('dashboards', { path: dashboards.map(String) });
-        let results = {}
-        if (dashboards.length === 1) {
-          results[dashboards[0]] = data;
-        } else {
-          results = Object.entries(data).reduce(
-              (obj, [key, dashboard]) => Object.assign(obj, { [key]: dashboard }),
-              {}
-          );
-        }
-
-        res.send(results);
+        const response: { [id: number]: DashboardModel } = await this.dbClient.searchDashboard(dashboards)
+        res.send(response);
       } catch (err) {
         console.error(err);
         next(err);
       }
+    });
+
+
+    // ===================
+    //   System files
+    // ===================
+
+    this.app.get(`/api/categories`, (req, res) => {
+      res.send(this.configurationProvider.getMetaIndicators());
+    });
+
+    this.app.post(`/api/regionsGeojson`, async (req, res) => {
+      const regions = req.body.regions;
+      const geojson = this.configurationProvider.getGeojson(regions);
+      res.send(geojson);
     });
 
     // Serve the HTML page

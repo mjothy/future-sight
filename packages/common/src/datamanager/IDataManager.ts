@@ -1,11 +1,12 @@
 import DataModel from '../models/DataModel';
+import PlotDataModel from "../models/PlotDataModel";
 
 export default interface IDataManager {
   getBaseUrl: () => string;
 
-  fetchPlotData: (data: DataModel) => Promise<any>;
+  getFilters: () => any; // {[id: string]: FilterObject}
 
-  fetchModels: () => Promise<any>;
+  fetchPlotData: (data: DataModel[]) => Promise<PlotDataModel[]>;
 
   getDashboard: (id: string) => Promise<any>;
 
@@ -16,4 +17,12 @@ export default interface IDataManager {
   fetchBrowseInitData: () => Promise<any>;
 
   browseData: (data: any) => Promise<any>;
+
+  getOptions: () => any;
+
+  fetchFilterOptions: (data: any) => Promise<any>;
+
+  fetchDataFocusOptions: (data: any) => Promise<any>;
+
+  fetchRegionsGeojson: (regions: string[]) => Promise<any>;
 }

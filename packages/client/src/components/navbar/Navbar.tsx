@@ -4,6 +4,7 @@ import { Menu, Button } from 'antd';
 import {
   FullscreenOutlined,
   HomeOutlined,
+  InfoCircleOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
@@ -12,13 +13,13 @@ import './Navbar.css';
 import Logo from '../../assets/images/ECEMF_logo.png';
 
 interface NavbarProps {
-  enableSwitchEmbeddedMode: boolean;
+  enableSwitchFullscreenMode: boolean;
 }
 
 const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const switchEmbeddedMode = () => {
-    searchParams.append('embedded', '');
+  const switchFullscreenMode = () => {
+    searchParams.append('fullscreen', '');
     setSearchParams(searchParams);
   };
 
@@ -37,12 +38,12 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
           <Link to={'/'}>Home</Link>
         </Menu.Item>
 
-        {props.enableSwitchEmbeddedMode && (
+        {props.enableSwitchFullscreenMode && (
           <Menu.Item key="embedded" style={{ backgroundColor: '#001529' }}>
             <Button
               type="primary"
               icon={<FullscreenOutlined />}
-              onClick={switchEmbeddedMode}
+              onClick={switchFullscreenMode}
               style={{ backgroundColor: '#001529' }}
             >
               Full Screen Mode
@@ -56,6 +57,13 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
           style={{ backgroundColor: '#001529' }}
         >
           <Link to={'browse'}>Browse</Link>
+        </Menu.Item>
+        <Menu.Item
+            key="about"
+            icon={<InfoCircleOutlined />}
+            style={{ backgroundColor: '#001529' }}
+        >
+          <Link to={'about'}>About</Link>
         </Menu.Item>
       </Menu>
     </div>

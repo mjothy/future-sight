@@ -2,6 +2,38 @@
   object-fit: cover;
 }
 
+.preview-card{
+  width: 192px;
+}
+
+.preview-card .ant-card-meta-title {
+  overflow: auto;
+  text-overflow: unset;
+  scrollbar-width: thin;
+}
+
+.preview-card .ant-card-meta-title::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+
+  background-color: #eee; /* or add it to the track */
+}
+
+.preview-container::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+
+  background-color: #eee; /* or add it to the track */
+}
+.preview-card .ant-card-meta-title::-webkit-scrollbar-thumb {
+  background: #999;
+}
+
+.preview-container::-webkit-scrollbar-thumb {
+  background: #999;
+}
 .preview-container {
-  height: 22px;
+  display: flex;
+  overflow: auto;
+  scrollbar-width: thin;
 }

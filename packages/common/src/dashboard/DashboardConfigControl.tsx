@@ -4,11 +4,16 @@ import PropTypes from 'prop-types';
 import { DashboardProps } from './Dashboard';
 import BlockEditorManager from './blocks/BlockEditorManager';
 
+export interface DashboardConfigControlProps extends DashboardProps {
+  publishing: boolean
+  onPublish: () => void
+}
+
 /**
  * Show {Edit selected block} OR {Add new block}
  */
 export default class DashboardConfigControl extends Component<
-  DashboardProps,
+  DashboardConfigControlProps,
   any
 > {
   static propTypes = {
@@ -17,7 +22,7 @@ export default class DashboardConfigControl extends Component<
 
   render() {
     return this.props.blockSelectedId ? (
-      <BlockEditorManager {...this.props} />
+      <BlockEditorManager {...this.props} currentBlock={this.props.dashboard.blocks[this.props.blockSelectedId]} />
     ) : (
       <DashboardControl {...this.props} />
     );

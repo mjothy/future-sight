@@ -2,15 +2,29 @@ export default class BlockDataModel {
   /**
    * The key is the model name, and data is table lf scenarios
    */
-  models: { [id: string]: string[] } = {};
+  models: string[] = [];
+  scenarios: string[] = [];
   regions: string[] = [];
   variables: string[] = [];
+  versions: versionsModel = {};
+  hasDeprecatedVersion = false;
+  useVersion = false;
+  categories: string[] = []
+
+  /**
+   * Selection order
+   */
+  selectOrder: string[] = [];
 
   /**
    * If type of block is control
    */
   master = {
     models: {
+      isMaster: false,
+      values: [],
+    },
+    scenarios: {
       isMaster: false,
       values: [],
     },
@@ -22,5 +36,22 @@ export default class BlockDataModel {
       isMaster: false,
       values: [],
     },
+    categories: {
+      isMaster: false,
+      values: []
+    }
   };
+}
+
+
+export interface versionsModel {
+  [model: string]: {
+    [scenario: string]: versionModel[]
+  }
+}
+
+export interface versionModel{
+  id: string,
+  version: string,
+  [key: string]: any;
 }

@@ -12,6 +12,16 @@
     <link rel="manifest" href="manifest.json" />
     <link rel="stylesheet" href="style.css">
     <title>Future Sight</title>
+    <script>
+      // Ensure that the preserveDrawingBuffer property is set to true whenever getContext is called on a canvas element
+      HTMLCanvasElement.prototype.getContext = function(origFn) {
+        return function(type, attribs) {
+          attribs = attribs || {};
+          attribs.preserveDrawingBuffer = true;
+          return origFn.call(this, type, attribs);
+        };
+      }(HTMLCanvasElement.prototype.getContext);
+      </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

@@ -1,0 +1,11 @@
+.draft-preview{
+  width: 192px;
+}
+
+.draft-preview > .ant-card-actions > li > span:hover {
+  color: #ff4d4f;
+}
+
+.draft-preview .ant-card-body{
+  padding: 10px;
+}

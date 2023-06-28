@@ -185,7 +185,7 @@ class BrowseView extends React.Component<any, any> {
         </div>
         <div className="search-result">
           {Object.keys(dashboards).length > 0 && (
-            <PreviewGroup dashboards={dashboards} urlPrefix={'/view?id='} />
+            <PreviewGroup dashboards={Object.values(dashboards)} urlPrefix={'/view?id='} />
           )}
         </div>
       </>

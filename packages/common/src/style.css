@@ -1,0 +1,16 @@
+
+/* Color Picker css */
+.colorscaleDescription{
+  display: none;
+}
+
+.ant-tag .anticon{
+  display: flex;
+  align-items: center;
+}
+/* ant-tag-red */
+.data-missing-tag{
+  color: #cf1322;
+  background: #fff1f0 !important;
+  border-color: #ffa39e !important;
+} 

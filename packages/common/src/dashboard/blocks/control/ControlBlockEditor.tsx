@@ -1,148 +1,135 @@
-import { Button, Col, Row, Select } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { Button, Col, Divider, Row } from 'antd';
 import Checkbox from 'antd/es/checkbox';
 import { Component } from 'react';
-import DataBlockTableSelection from '../component/DataBlockTableSelection';
-
-const { Option } = Select;
+import BlockModel from '../../../models/BlockModel';
+import { getChildrens } from '../utils/BlockDataUtils';
+import SelectInput from '../utils/SelectInput';
 
 /**
  * The form in sidebar to add/edit control block
  */
 export default class ControlBlockEditor extends Component<any, any> {
-  variables: string[] = [];
-  regions: string[] = [];
 
-  constructor(props) {
-    super(props);
-    this.initialize();
+  onAddControlledBlock = () => {
+    this.props.addBlock('data', this.props.blockSelectedId);
+  };
+
+  onCheckChange = (option, e) => {
+
+    const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+    const parentBlock = JSON.parse(JSON.stringify(this.props.currentBlock));
+
+    // update current block config (metadata)
+    parentBlock.config.metaData.master[option].isMaster = e.target.checked;
+    this.props.optionsLabel.forEach(label => {
+      parentBlock.config.metaData.master[label].values = []; // clear selected data in control block view
+    })
+
+    if (!e.target.checked) {
+      parentBlock.config.metaData[option] = [];
+      parentBlock.config.metaData.selectOrder = parentBlock.config.metaData.selectOrder.filter(optionFilter => optionFilter !== option);
+    } else {
+      parentBlock.config.metaData.selectOrder.push(option)
+    }
+
+    dashboard.blocks[this.props.currentBlock.id].config = { ...parentBlock.config };
+
+    // Update children (this function is mutable)
+    this.updateChildsBlocks(dashboard, parentBlock);
+
+    this.props.updateDashboard(dashboard);
+  };
+
+  updateChildsBlocks = (dashboard, parentBlock) => {
+    const childrens = getChildrens(dashboard.blocks, parentBlock.id);
+    if (childrens.length > 0) {
+      childrens.map((child: BlockModel | any) => {
+        const configChild = child.config;
+        configChild.metaData.selectOrder = parentBlock.config.metaData.selectOrder;
+        this.props.optionsLabel.forEach(option => {
+          configChild.metaData[option] = [];
+        })
+        dashboard.blocks[child.id].config = { ...configChild };
+      });
+    }
   }
 
-  initialize = () => {
-    // Get all the data selected in setUp view (models, regions, variables)
-    const dataStructure = this.props.dashboard.dataStructure;
-    this.variables = [];
-    this.regions = [];
-    Object.keys(dataStructure).map((modelKey) => {
-      Object.keys(dataStructure[modelKey]).map((scenarioKey) => {
-        this.variables = [
-          ...this.variables,
-          ...dataStructure[modelKey][scenarioKey].variables,
-        ];
-        this.regions = [
-          ...this.regions,
-          ...dataStructure[modelKey][scenarioKey].regions,
-        ];
-      });
-    });
+  clearClick = (option, e) => {
 
-    // Show unique values
-    this.variables = [...new Set(this.variables)];
-    this.regions = [...new Set(this.regions)];
+    const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+    const parentBlock = JSON.parse(JSON.stringify(this.props.currentBlock));
+
+    // update data selected in block view)
+    parentBlock.config.metaData.master[option].isMaster = false;
+    this.props.optionsLabel.forEach(label => {
+      parentBlock.config.metaData.master[label].values = []; // clear selected data in control block view
+    })
+
+    parentBlock.config.metaData[option] = [];
+    parentBlock.config.metaData.selectOrder = parentBlock.config.metaData.selectOrder.filter(optionFilter => optionFilter !== option);
+
+    dashboard.blocks[this.props.currentBlock.id].config = { ...parentBlock.config };
+
+    // Update children (this function is mutable)
+    this.updateChildsBlocks(dashboard, parentBlock);
+
+    this.props.updateDashboard(dashboard);
+    this.props.setStaleFiltersFromSelectOrder(parentBlock.config.metaData.selectOrder)
+  };
+
+  onChange = (option, selectedData: string[]) => {
+    if (selectedData.length <= 0) {
+      this.clearClick(option, null);
+    } else {
+      this.props.onChange(option, selectedData);
+    }
+  }
+
+  selectDropDown = (option) => {
+    const metaData = this.props.currentBlock.config.metaData;
+
+    return (
+      <div className='mb-20' key={option}>
+        <Checkbox
+          onChange={(e) => this.onCheckChange(option, e)}
+          checked={metaData.master[option].isMaster}
+        >
+          <h4>{option}</h4>
+        </Checkbox>
+
+        {metaData.master[option].isMaster && <SelectInput
+          type={option}
+          className={"width-90"}
+          value={metaData[option]}
+          loading={this.props.isLoadingOptions[option]}
+          options={this.props.optionsData[option]}
+          onChange={this.onChange}
+          isClear={true}
+          onClear={this.clearClick}
+          onDropdownVisibleChange={this.props.onDropdownVisibleChange}
+          isFetching={this.props.isFetching}
+        />}
+      </div>
+    );
   };
 
   render() {
-    const metaData = this.props.currentBlock.config.metaData;
-
-    const onAddControlledBlock = () => {
-      this.props.addBlock('data', this.props.blockSelectedId);
-    };
-
-    const onShowTable = (e) => {
-      this.setState({ showTable: e.target.checked });
-      metaData.master['models'].isMaster = e.target.checked;
-      this.props.updateBlockMetaData({ master: metaData.master });
-    };
-
-    const onVariablesChange = (e) => {
-      metaData.master['variables'].isMaster = e.target.checked;
-      this.props.updateBlockMetaData({ master: metaData.master });
-    };
-
-    const onRegionsChange = (e) => {
-      metaData.master['regions'].isMaster = e.target.checked;
-      this.props.updateBlockMetaData({ master: metaData.master });
-    };
-
-    const variablesSelectionChange = (selectedVariables: string[]) => {
-      this.props.updateBlockMetaData({ variables: selectedVariables });
-    };
-
-    const regionsSelectionChange = (selectedRegions: string[]) => {
-      this.props.updateBlockMetaData({ regions: selectedRegions });
-    };
-
     return (
       <>
-        <div>
-          <Row className="mb-10">
-            <Col span={2} className={'checkbox-col'}>
-              <Checkbox
-                onChange={onShowTable}
-                checked={metaData.master['models'].isMaster}
-              />
-            </Col>
-            <Col span={16}>Control by Model/Scenario</Col>
-          </Row>
-          {metaData.master['models'].isMaster && (
-            <Row className="mb-10">
-              <Col span={24}>
-                <DataBlockTableSelection {...this.props} />
-              </Col>
-            </Row>
-          )}
-
-          <Row className="mb-10">
-            <Col span={2} className={'checkbox-col'}>
-              <Checkbox
-                onChange={onVariablesChange}
-                checked={metaData.master['variables'].isMaster}
-              />
-            </Col>
-            <Col span={16}>
-              <Select
-                key={metaData.variables.toString()}
-                mode="multiple"
-                className="width-100"
-                placeholder="Variables"
-                value={metaData.variables}
-                onChange={variablesSelectionChange}
-              >
-                {this.variables.map((variable) => (
-                  <Option key={variable} value={variable}>
-                    {variable}
-                  </Option>
-                ))}
-              </Select>
-            </Col>
-          </Row>
-          <Row className="mb-10">
-            <Col span={2} className={'checkbox-col'}>
-              <Checkbox
-                onChange={onRegionsChange}
-                checked={metaData.master['regions'].isMaster}
-              />
-            </Col>
-            <Col span={16} className={'checkbox-col-label'}>
-              <Select
-                key={metaData.regions.toString()}
-                mode="multiple"
-                className="width-100"
-                placeholder="Regions"
-                value={metaData.regions}
-                onChange={regionsSelectionChange}
-              >
-                {this.regions.map((region) => (
-                  <Option key={region} value={region}>
-                    {region}
-                  </Option>
-                ))}
-              </Select>
-            </Col>
-          </Row>
-        </div>
-        <div>
-          <Button onClick={onAddControlledBlock}>Add data block</Button>
-        </div>
+        <div>{this.props.optionsLabel.map((option) => this.selectDropDown(option))}</div>
+        <Divider />
+        <Row style={{ marginTop: "auto" }}>
+          <Col span={24}>
+            <Button
+              type="primary"
+              className="width-100"
+              onClick={this.onAddControlledBlock}
+            >
+              <PlusOutlined />Add linked data block
+            </Button>
+          </Col>
+        </Row>
       </>
     );
   }

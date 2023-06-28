@@ -1,21 +1,18 @@
-import {
-  IDataManager,
-  DataModel,
-} from '@future-sight/common';
+import type { IDataManager, DataModel, PlotDataModel } from '@future-sight/common';
+import { notification } from 'antd';
+import Utils from './Utils';
 
 export default class DataManager implements IDataManager {
   getBaseUrl() {
     return '/api';
   }
 
-  fetchPlotData = (data: DataModel) => {
-    return fetch(`${this.getBaseUrl()}/plotData`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
+  fetchPlotData = async (data: DataModel[]): Promise<PlotDataModel[]> => {
+    return await this.sendRequest(`api/plotData`, data);
+  };
+
+  getFilters = () => {
+    return fetch(`${this.getBaseUrl()}/filters`)
       .then((response) => response.json())
       .then((data) => {
         return data;
@@ -23,8 +20,14 @@ export default class DataManager implements IDataManager {
       .catch(console.error);
   };
 
-  fetchModels = () => {
-    return fetch(`${this.getBaseUrl()}/models`)
+  addDashboard = (data) => {
+    return fetch(`${this.getBaseUrl()}/dashboard`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
       .then((response) => response.json())
       .then((data) => {
         return data;
@@ -51,6 +54,7 @@ export default class DataManager implements IDataManager {
   };
 
   saveDashboard = async (data) => {
+    data.date = new Date()
     try {
       return await fetch(`${this.getBaseUrl()}/dashboard/save`, {
         method: 'POST',
@@ -87,4 +91,67 @@ export default class DataManager implements IDataManager {
       console.error(err);
     }
   };
+
+  getOptions = () => {
+    return ["models", "scenarios", "variables", "regions"];
+  };
+
+  fetchFilterOptions = async (data) => {
+    return await this.sendRequest(`api/filterOptions`, data);
+  };
+
+
+  fetchDataFocusOptions = async (data) => {
+    return await this.sendRequest(`api/dataFocus`, data);
+  };
+
+  fetchRegionsGeojson = (regions: string[]) => {
+    return fetch(`api/regionsGeojson`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(regions),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        return data;
+      })
+      .catch(console.error);
+  };
+
+
+  sendRequest = async (url, data?: any) => {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) { // TODO add antd.notif
+      const err: any = new Error();
+      let message = "";
+      err.status = response.status;
+      if (err.status == 401) {
+        // const resp_obj = await response.json();
+        // err.message = resp_obj.message;
+        err.message = "Server encountered an issue while attempting to load data";
+        message = "Access denied to ressources.";
+      } else {
+        err.message = response.statusText;
+      }
+
+      Utils.showNotif(message, err.message);
+
+      throw err;
+    } else {
+      const resp_obj = await response.json();
+      return resp_obj;
+    }
+  }
+
 }
+
+
