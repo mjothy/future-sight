@@ -63,7 +63,9 @@
             "left": null,
             "right": null,
             "default": null,
-            "useSlider": false
+            "useSlider": false,
+            "useTimestep": false,
+            "timestep": null
           },
           "legend": {
             "Model": false,

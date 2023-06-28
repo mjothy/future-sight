@@ -21,6 +21,7 @@ const plotTypes = [
 ];
 
 const colorbarTitle = ['variable', 'unit'];
+const TIME_STEPS = [5, 10, 15, 20]
 
 export default class DataBlockVisualizationEditor extends Component<any, any> {
 
@@ -51,6 +52,18 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   onCustomRangeChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.XAxis.useCustomRange = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  };
+
+  onUseTimestepChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.XAxis.useTimestep = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  };
+
+  onTimestepChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.XAxis.timestep = e;
     this.updateBlockConfig({ configStyle: configStyle })
   };
 
@@ -273,8 +286,8 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
               <Row>
                 <Col span={2} className={'checkbox-col'}>
                   <Checkbox
-                      onChange={this.onYAxisTickFormatChange}
-                      checked={configStyle.YAxis.percentage}
+                    onChange={this.onYAxisTickFormatChange}
+                    checked={configStyle.YAxis.percentage}
                   />
                 </Col>
                 <Col span={16} className={'checkbox-col-label'}>
@@ -346,6 +359,30 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
               value={configStyle.XAxis.right}
               disabled={!configStyle.XAxis.useCustomRange}
             />
+          </Col>
+        </Row>
+        <Row className="mb-10">
+          <Col span={2} className={'checkbox-col'}>
+            <Checkbox
+              onChange={this.onUseTimestepChange}
+              checked={configStyle.XAxis.useTimestep}
+            />
+          </Col>
+          <Col span={16} className={'checkbox-col-label'}>
+            <Select
+              className="width-100"
+              placeholder="Time step of X"
+              value={configStyle.XAxis.timestep}
+              onChange={this.onTimestepChange}
+              allowClear
+              disabled={!configStyle.XAxis.useTimestep}
+            >
+              {TIME_STEPS.map((timestep) => (
+                <Option key={timestep} value={timestep}>
+                  {timestep}
+                </Option>
+              ))}
+            </Select>
           </Col>
         </Row>
 

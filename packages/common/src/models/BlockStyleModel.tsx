@@ -47,6 +47,8 @@ export default class BlockStyleModel {
     right: null,
     default: null,
     useSlider: false,
+    useTimestep: false,
+    timestep: null
   };
   stack = {
     isStack: false,
