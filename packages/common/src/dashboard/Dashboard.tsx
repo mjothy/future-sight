@@ -25,6 +25,7 @@ export const withNavigation = (Comp: React.ComponentType) => {
 export interface DashboardProps extends ComponentPropsWithDataManager {
     dashboard: DashboardModel;
     addBlock: (blockType: string, masterBlockId?: string) => void;
+    copyBlock: (blockSelectedId: string) => void;
     blockSelectedId: string;
     updateSelectedBlock: (blockSelectedId: string) => void;
     saveDashboard: (callback: (idPermanent) => void, image?: string) => void;

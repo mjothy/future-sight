@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, Image, Space, Tag } from 'antd';
+import {Button, Card, Image, Space, Tag, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
-import { RightCircleTwoTone, ShareAltOutlined } from '@ant-design/icons';
+import {CopyOutlined, RightCircleTwoTone, ShareAltOutlined } from '@ant-design/icons';
 import Utils from '../services/Utils';
 import './Preview.css';
 
@@ -45,18 +45,16 @@ class Preview extends React.Component<any, any> {
     render() {
 
         const actions = [
-            /*<Tooltip key="copy"  title="Copy this dashboard in draft">
-              <CopyOutlined />
-            </Tooltip>,*/
-            <Link key="goto" to={this.props.urlPrefix + this.props.id}>
-                <Space>
-                    <RightCircleTwoTone key="share" />
-                    <div>Open</div>
-                </Space>
-            </Link>,
-            <Space className='delete-btn' onClick={() => Utils.copyToClipboard(this.props.urlPrefix + this.props.id)} key="share">
-                <ShareAltOutlined />
-            </Space>
+            <Tooltip key="copy"  title="Copy this dashboard in a new draft">
+                <CopyOutlined
+                    onClick={() => this.props.draftFromURLOnClick(this.props.urlPrefix + this.props.id)}
+                />
+            </Tooltip>,
+            <Tooltip key="share"  title="Copy URL to clipboard">
+                <ShareAltOutlined
+                    onClick={() => Utils.copyToClipboard(this.props.urlPrefix + this.props.id)}
+                />
+            </Tooltip>,
         ]
 
         return (
@@ -73,7 +71,13 @@ class Preview extends React.Component<any, any> {
                 actions={actions}
             >
                 <Card.Meta
-                    title={this.props.conf.userData.title}
+                    title={
+                        <Link key="goto" to={this.props.urlPrefix + this.props.id}>
+                            <Space>
+                                {this.props.conf.userData.title}
+                            </Space>
+                        </Link>
+                    }
                     description={this.getCardDescription()}
                 />
             </Card>

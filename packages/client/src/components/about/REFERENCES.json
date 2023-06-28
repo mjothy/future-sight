@@ -1,0 +1,12 @@
+{
+  "ARTELYS_SITE": "https://www.artelys.com/fr/",
+  "ECEMF_SITE": "https://www.ecemf.eu/",
+  "GRANT_SITE": "https://cordis.europa.eu/project/id/101022622",
+  "DATA_SITE": "https://data.ece.iiasa.ac.at/ecemf/#/workspaces",
+  "IIASA_SITE": "https://iiasa.ac.at/",
+  "LICENSE_SITE": "https://github.com/mjothy/future-sight/blob/master/LICENSE",
+  "GITHUB": "https://github.com/mjothy/future-sight",
+  "ARTELYS_MAIL" : "future-sight@artelys.com",
+  "ECEMF_MAIL" : "info@ecemf.eu",
+  "DISCOURSE" : "https://community.ecemf.eu"
+}

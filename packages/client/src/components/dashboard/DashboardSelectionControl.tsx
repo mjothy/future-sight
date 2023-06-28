@@ -81,6 +81,26 @@ export default class DashboardSelectionControl extends Component<
     this.setState({ blockSelectedId });
   };
 
+  copyBlock = (blockSelectedId: string) => {
+    const layoutItem = new LayoutModel((this.getLastId() + 1).toString());
+    const dashboard = this.state.dashboard;
+
+    const newBlock = Object.assign({}, this.state.dashboard.blocks[blockSelectedId])
+    newBlock.id = layoutItem.i
+    dashboard.blocks[layoutItem.i] = newBlock;
+    dashboard.layout = [layoutItem, ...dashboard.layout];
+
+    const state = {
+      dashboard: {
+        ...this.state.dashboard,
+        blocks: dashboard.blocks,
+        layout: dashboard.layout,
+      },
+      blockSelectedId: layoutItem.i
+    };
+    this.setState(state);
+  }
+
   updateDashboard = (dashboard: DashboardModel) => {
     const isUpdateDataStructure = compareDataStructure(this.state.dashboard.dataStructure, dashboard.dataStructure);
     if (isUpdateDataStructure) {
@@ -273,6 +293,7 @@ export default class DashboardSelectionControl extends Component<
       <DashboardView
         dashboard={this.state.dashboard}
         addBlock={this.addBlock}
+        copyBlock={this.copyBlock}
         blockSelectedId={this.state.blockSelectedId}
         updateSelectedBlock={this.updateSelectedBlock}
         updateDashboard={this.updateDashboard}

@@ -11,10 +11,11 @@ import { RoutingProps } from '../app/Routing';
 interface DashboardViewProps extends ComponentPropsWithDataManager, RoutingProps {
   dashboard: DashboardModel;
   addBlock: (blockType: string, masterBlockId?: string) => void;
+  copyBlock: (blockSelectedId: string) => void;
   blockSelectedId: string;
   updateSelectedBlock: (blockSelectedId: string) => void;
   saveDashboard: (callback: (idPermanent) => void, image?: string) => void;
-  deleteBlocks: (bockId: string[]) => void;
+  deleteBlocks: (blockId: string[]) => void;
   isDraft: boolean;
   readonly?: boolean;
   updateDashboard: (dashboard: DashboardModel) => void;

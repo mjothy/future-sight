@@ -4,6 +4,7 @@ import { Menu, Button } from 'antd';
 import {
   FullscreenOutlined,
   HomeOutlined,
+  InfoCircleOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
@@ -56,6 +57,13 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
           style={{ backgroundColor: '#001529' }}
         >
           <Link to={'browse'}>Browse</Link>
+        </Menu.Item>
+        <Menu.Item
+            key="about"
+            icon={<InfoCircleOutlined />}
+            style={{ backgroundColor: '#001529' }}
+        >
+          <Link to={'about'}>About</Link>
         </Menu.Item>
       </Menu>
     </div>

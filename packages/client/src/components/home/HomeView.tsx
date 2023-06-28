@@ -89,6 +89,7 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
               <PreviewGroup
                 dashboards={publishedDashboards}
                 urlPrefix={'/view?id='}
+                draftFromURLOnClick={draftFromURLOnClick}
               />
             </div>
           </>

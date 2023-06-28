@@ -5,6 +5,7 @@ import DashboardDataConfiguration from '../dashboard/DashboardDataConfiguration'
 import DraftsView from '../drafts/DraftsView';
 import DefaultLayout from './DefaultLayout';
 import BrowseView from '../browse/BrowseView';
+import AboutView from '../about/AboutView';
 
 export interface RoutingProps {
   isEmbedded: boolean;
@@ -19,6 +20,7 @@ export default class Routing extends React.Component<RoutingProps> {
         <Route element={<DefaultLayout />}>
           <Route path="drafts" element={<DraftsView />} />
           <Route path="browse" element={<BrowseView />} />
+          <Route path="about" element={<AboutView />} />
           <Route index element={<HomeView />} />
         </Route>
 

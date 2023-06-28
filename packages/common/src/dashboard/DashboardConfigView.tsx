@@ -2,7 +2,7 @@ import { Component } from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import BlockViewManager from './blocks/BlockViewManager';
 import PropTypes from 'prop-types';
-import { EditTwoTone, DragOutlined, WarningOutlined } from '@ant-design/icons';
+import { EditTwoTone, DragOutlined, WarningOutlined, CopyOutlined } from '@ant-design/icons';
 import { Button, Space } from 'antd';
 import './DashboardConfigView.css';
 import PlotDataModel from "../models/PlotDataModel";
@@ -176,6 +176,13 @@ class DashboardConfigView extends Component<any, any> {
         }
     };
 
+    onBlockCopy = (e, id) => {
+        e.preventDefault();
+        if (id) {
+            this.props.copyBlock(id);
+        }
+    };
+
     onWidthChange = (width, margin, cols, containerPadding) => {
         //  Update height to keep grid ratio to 16/9
         this.setState({ rowHeight: width / cols / GRID_RATIO });
@@ -255,14 +262,12 @@ class DashboardConfigView extends Component<any, any> {
                             className={'width-100 height-100 bg-white'}
                         >
                             {!this.props.readonly && (
-                                <Space style={{ position: "fixed", top: 1, right: 1, zIndex: 2 }}>
-                                    <div className="block-edit">
-                                        <Button size="small" icon={<EditTwoTone />}
+                                <Space className="block-actions" style={{ position: "fixed", top: 1, right: 1, zIndex: 2 }}>
+                                    {blocks[layout.i].blockType ==="data" && <Button size="small" icon={<CopyOutlined />} title="Copy this block"
+                                            onClick={(e) => this.onBlockCopy(e, layout.i)} />}
+                                    <Button size="small" icon={<DragOutlined />} title="Move this block"/>
+                                    <Button size="small" icon={<EditTwoTone />} title="Edit this block"
                                             onClick={(e) => this.onBlockClick(e, layout.i)} />
-                                    </div>
-                                    <div className="block-grab">
-                                        <Button size="small" icon={<DragOutlined />} />
-                                    </div>
                                 </Space>
                             )}
 
