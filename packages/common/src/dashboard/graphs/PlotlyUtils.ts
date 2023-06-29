@@ -95,14 +95,14 @@ export default class PlotlyUtils {
         return data
     }
 
-    static getAverageY(x, y) {
+    static getAverageY(y) {
         let sum;
         if (y?.length > 0) {
             sum = y?.reduce(function (a, b) {
                 return a + b;
             });
         }
-        const length_y = x?.length;
+        const length_y = y?.length;
 
         return sum != null && length_y != null ? sum / length_y : 0;
     }

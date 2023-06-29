@@ -242,9 +242,9 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         }
 
 
-        {["area", "bar"].includes(configStyle.graphType) &&
+        {["line", "area", "bar"].includes(configStyle.graphType) &&
           <>
-            <h3>{plotTypes.find(chart => chart.type == configStyle.graphType)?.label}</h3>
+            <h3>Stack</h3>
             <Row>
               <Col span={2} className={'checkbox-col'}>
                 <Checkbox
@@ -307,8 +307,9 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                       {agg}
                     </Option>
                   ))}
-                </Select>              </Col>
-              <Col span={8} className="ml-20">
+                </Select>
+              </Col>
+              {/* <Col span={8} className="ml-20">
                 <Select
                   placeholder="Select"
                   value={configStyle.aggregation.value}
@@ -332,7 +333,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                   }
                   )}
                 </Select>
-              </Col>
+              </Col> */}
             </Row>
           </>
         }

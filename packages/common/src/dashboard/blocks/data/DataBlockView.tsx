@@ -9,6 +9,7 @@ import PlotDataModel from "../../../models/PlotDataModel";
 import withColorizer from "../../../hoc/colorizer/withColorizer";
 import { stackGroups } from '../utils/StackGraphs';
 import PieView from "./graphType/pie/PieView";
+import { element } from 'prop-types';
 
 class DataBlockView extends Component<any, any> {
 
@@ -49,14 +50,14 @@ class DataBlockView extends Component<any, any> {
     const showData: any[] = [];
     let dataWithColor = [];
     let visualizeData: any = [];
+    let stacks = [];
     switch (configStyle.graphType) {
       case "table": {
         visualizeData = this.prepareTableData(data);
         break;
       }
       default: {
-        let stacks = [];
-        if (configStyle.stack && configStyle.stack.isStack && (configStyle.graphType === 'area' || configStyle.graphType === 'bar')) {
+        if (configStyle.stack && configStyle.stack.isStack && (configStyle.graphType == 'line' || configStyle.graphType === 'area' || configStyle.graphType === 'bar')) {
           stacks = stackGroups(currentBlock.config.metaData, configStyle.stack.value);
         }
         dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale);
@@ -68,7 +69,11 @@ class DataBlockView extends Component<any, any> {
         visualizeData = showData;
       }
     }
-
+    // TODO return lines aggregation
+    const aggLines = this.getAggregationLines(visualizeData, stacks.length);
+    if (aggLines.length > 0) {
+      visualizeData.push(...aggLines)
+    }
     return { data: visualizeData, layout: this.prepareLayout(dataWithColor) }
   }
 
@@ -120,25 +125,25 @@ class DataBlockView extends Component<any, any> {
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
         };
-        if (configStyle.stack.isStack && stacks != null) {
-          // Add the current element to a stack (if it exist in stagGroups)
-          // stack is array contains possible stacks [[{},{}], [{},{}]]
-          if (stacks.length == 0) {
-            obj.stackgroup = 0;
-          } else {
-            Object.entries(stacks).forEach(([key, val]: any) => {
-              const isExist = val.find(
-                raw => dataElement.model == raw["models"] &&
-                  dataElement.variable == raw["variables"] &&
-                  dataElement.region == raw["regions"] &&
-                  dataElement.scenario == raw["scenarios"]
-              )
-              if (isExist) {
-                obj.stackgroup = key;
-              }
-            })
-          }
-        }
+        // if (configStyle.stack.isStack && stacks != null) {
+        //   // Add the current element to a stack (if it exist in stagGroups)
+        //   // stack is array contains possible stacks [[{},{}], [{},{}]]
+        //   if (stacks.length == 0) {
+        //     obj.stackgroup = 0;
+        //   } else {
+        //     Object.entries(stacks).forEach(([key, val]: any) => {
+        //       const isExist = val.find(
+        //         raw => dataElement.model == raw["models"] &&
+        //           dataElement.variable == raw["variables"] &&
+        //           dataElement.region == raw["regions"] &&
+        //           dataElement.scenario == raw["scenarios"]
+        //       )
+        //       if (isExist) {
+        //         obj.stackgroup = key;
+        //       }
+        //     })
+        //   }
+        // }
         break;
       case 'bar':
         obj = {
@@ -150,23 +155,24 @@ class DataBlockView extends Component<any, any> {
           hovertext: this.plotHoverText(dataElement),
           marker: { color: dataElement.color || null },
         };
-        if (configStyle.stack.isStack && stacks != null) {
-          // Add the current element to a stack (if it exist in stagGroups)
-          // stack is array contains possible stacks [[{},{}], [{},{}]]
-          Object.entries(stacks).forEach(([key, val]: any) => {
-            const isExist = val.find(
-              raw => dataElement.model == raw["models"] &&
-                dataElement.variable == raw["variables"] &&
-                dataElement.region == raw["regions"] &&
-                dataElement.scenario == raw["scenarios"]
-            )
-            if (isExist) {
-              const nonStackIndex = indexKeys.filter(x => x !== configStyle.stack.value.slice(0, -1))
-              const groupIndexName = nonStackIndex.map(idx => dataElement[idx]).join(" - ")
-              obj.x = [xyDict.x, new Array(xyDict.x.length).fill(groupIndexName)]
-            }
-          })
-        }
+        // if (configStyle.stack.isStack && stacks != null) {
+        //   // Add the current element to a stack (if it exist in stagGroups)
+        //   // stack is array contains possible stacks [[{},{}], [{},{}]]
+        //   Object.entries(stacks).forEach(([key, val]: any) => {
+        //     const isExist = val.find(
+        //       raw => dataElement.model == raw["models"] &&
+        //         dataElement.variable == raw["variables"] &&
+        //         dataElement.region == raw["regions"] &&
+        //         dataElement.scenario == raw["scenarios"]
+        //     )
+        //     if (isExist) {
+        //       const nonStackIndex = indexKeys.filter(x => x !== configStyle.stack.value.slice(0, -1))
+        //       const groupIndexName = nonStackIndex.map(idx => dataElement[idx]).join(" - ")
+        //       obj.x = [xyDict.x, new Array(xyDict.x.length).fill(groupIndexName)]
+        //       obj.stackgroup = key;
+        //     }
+        //   })
+        // }
         break;
       case "box":
         obj = {
@@ -183,12 +189,39 @@ class DataBlockView extends Component<any, any> {
           type: configStyle.graphType,
           x: xyDict.x,
           y: xyDict.y,
+          fill: "none",
           name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend, configStyle.showLegend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
           marker: { color: dataElement.color || null }
         };
     }
+
+    if (configStyle.stack.isStack && stacks != null) {
+      // Add the current element to a stack (if it exist in stagGroups)
+      // stack is array contains possible stacks [[{},{}], [{},{}]]
+      if (stacks.length == 0) {
+        obj.stackgroup = 0;
+      } else {
+        Object.entries(stacks).forEach(([key, val]: any) => {
+          const isExist = val.find(
+            raw => dataElement.model == raw["models"] &&
+              dataElement.variable == raw["variables"] &&
+              dataElement.region == raw["regions"] &&
+              dataElement.scenario == raw["scenarios"]
+          )
+          if (isExist) {
+            if (configStyle.graphType == "bar") {
+              const nonStackIndex = indexKeys.filter(x => x !== configStyle.stack.value.slice(0, -1))
+              const groupIndexName = nonStackIndex.map(idx => dataElement[idx]).join(" - ")
+              obj.x = [xyDict.x, new Array(xyDict.x.length).fill(groupIndexName)]
+            }
+            obj.stackgroup = key;
+          }
+        })
+      }
+    }
+
     return obj;
   }
 
@@ -274,43 +307,69 @@ class DataBlockView extends Component<any, any> {
         width: this.props.width,
         height: this.props.height,
       },
-      shapes: this.getShapes(data)
+      // shapes: this.getAggregationLines(data)
     }
 
     return layout
   }
 
-  getShapes = (data) => {
+  getAggregationLines = (data, nbGroups) => {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
     const shapes: any = [];
-
     if (configStyle.aggregation.isAggregate && configStyle.aggregation.type != null && configStyle.aggregation.type != "") {
-      // 
-      const stacks = stackGroups(this.props.currentBlock.config.metaData, configStyle.aggregation.value);
-      // const stacks_data: any = [];
-      // this.props.currentBlock.config.metaData[configStyle.aggregation.value].forEach(value => {
-      //   const stack = data.filter(dataElement => dataElement[configStyle.aggregation.value.slice(0, -1)] == value)
-      //   stacks.push(stack);
-      // });
-      console.log("stacks: ", stacks);
-      data.forEach(dataElement => {
-        const xyDict = this.getXY(dataElement);
-        const aggregation_obj = {
-          type: 'line',
-          x0: xyDict.x[0],
-          y0: PlotlyUtils.getAverageY(xyDict.x, xyDict.y),
-          x1: xyDict.x[xyDict.x.length - 1],
-          y1: PlotlyUtils.getAverageY(xyDict.x, xyDict.y),
-          line: {
-            color: dataElement.color,
-            width: 2,
-            dash: 'dashdot'
+      if (configStyle.stack.isStack) {
+        if (nbGroups != 0) {
+
+          for (let i = 0; i < nbGroups; i++) {
+            const dataGroup = data.filter(element => element.stackgroup == i);
+            const aggregation_obj = this.getAggObjectOfGroup(dataGroup, configStyle);
+            if (aggregation_obj != null) {
+              shapes.push(aggregation_obj);
+            }
+          }
+        } else {
+          const aggregation_obj = this.getAggObjectOfGroup(data, configStyle);
+          if (aggregation_obj != null) {
+            shapes.push(aggregation_obj);
           }
         }
-        shapes.push(aggregation_obj);
-      });
+        return shapes;
+      }
+
+      for (let i = 0; i < data.length; i++) {
+        const aggregation_obj = this.getAggObjectOfGroup([data[i]], configStyle);
+        if (aggregation_obj != null) {
+          shapes.push(aggregation_obj);
+        }
+      }
+      return shapes;
     }
-    return shapes;
+    return [];
+
+  }
+
+  getAggObjectOfGroup = (dataGroup, configStyle) => {
+    let aggregation_obj: any = null;
+    if (dataGroup.length > 0) {
+      const y_agg_array = dataGroup.map(element => PlotlyUtils.getAverageY(element.y))
+      const y_agg = PlotlyUtils.getAverageY(y_agg_array);
+      const x = dataGroup[0].x;
+      aggregation_obj = {
+        x: [Math.min(...x), Math.max(...x)],
+        y: [y_agg, y_agg],
+        type: 'scatter',
+        mode: 'lines',
+        line: {
+          color: dataGroup[0].color,
+          width: 2,
+          dash: 'dashdot',
+        },
+        hovertext: y_agg,
+        name: configStyle.aggregation.type,
+        showlegend: false
+      }
+    }
+    return aggregation_obj;
   }
 
   getYAxisLabel = (data: PlotDataModel[]) => {
