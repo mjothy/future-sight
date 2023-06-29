@@ -47,7 +47,7 @@ class DataBlockView extends Component<any, any> {
     const { currentBlock } = this.props;
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
     const showData: any[] = [];
-
+    let dataWithColor = [];
     let visualizeData: any = [];
     switch (configStyle.graphType) {
       case "table": {
@@ -59,7 +59,7 @@ class DataBlockView extends Component<any, any> {
         if (configStyle.stack && configStyle.stack.isStack && (configStyle.graphType === 'area' || configStyle.graphType === 'bar')) {
           stacks = stackGroups(currentBlock.config.metaData, configStyle.stack.value);
         }
-        const dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale);
+        dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale);
         const indexKeys = PlotlyUtils.getIndexKeys(data)
 
         dataWithColor?.map((dataElement) => {
@@ -69,7 +69,7 @@ class DataBlockView extends Component<any, any> {
       }
     }
 
-    return { data: visualizeData, layout: this.prepareLayout(data) }
+    return { data: visualizeData, layout: this.prepareLayout(dataWithColor) }
   }
 
 
@@ -148,7 +148,7 @@ class DataBlockView extends Component<any, any> {
           name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend, configStyle.showLegend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
-          marker: { color: dataElement.color || null }
+          marker: { color: dataElement.color || null },
         };
         if (configStyle.stack.isStack && stacks != null) {
           // Add the current element to a stack (if it exist in stagGroups)
@@ -261,7 +261,7 @@ class DataBlockView extends Component<any, any> {
   prepareLayout = (data) => {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
-    const layout = {
+    const layout: any = {
       YAxis: {
         title: {
           text: PlotlyUtils.getLabel(this.getYAxisLabel(data), this.props.height, "ytitle"),
@@ -273,10 +273,44 @@ class DataBlockView extends Component<any, any> {
         margin: { r: 0, t: 0, b: 0, l: 0 },
         width: this.props.width,
         height: this.props.height,
-      }
+      },
+      shapes: this.getShapes(data)
     }
 
     return layout
+  }
+
+  getShapes = (data) => {
+    const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
+    const shapes: any = [];
+
+    if (configStyle.aggregation.isAggregate && configStyle.aggregation.type != null && configStyle.aggregation.type != "") {
+      // 
+      const stacks = stackGroups(this.props.currentBlock.config.metaData, configStyle.aggregation.value);
+      // const stacks_data: any = [];
+      // this.props.currentBlock.config.metaData[configStyle.aggregation.value].forEach(value => {
+      //   const stack = data.filter(dataElement => dataElement[configStyle.aggregation.value.slice(0, -1)] == value)
+      //   stacks.push(stack);
+      // });
+      console.log("stacks: ", stacks);
+      data.forEach(dataElement => {
+        const xyDict = this.getXY(dataElement);
+        const aggregation_obj = {
+          type: 'line',
+          x0: xyDict.x[0],
+          y0: PlotlyUtils.getAverageY(xyDict.x, xyDict.y),
+          x1: xyDict.x[xyDict.x.length - 1],
+          y1: PlotlyUtils.getAverageY(xyDict.x, xyDict.y),
+          line: {
+            color: dataElement.color,
+            width: 2,
+            dash: 'dashdot'
+          }
+        }
+        shapes.push(aggregation_obj);
+      });
+    }
+    return shapes;
   }
 
   getYAxisLabel = (data: PlotDataModel[]) => {
@@ -311,6 +345,7 @@ class DataBlockView extends Component<any, any> {
   render() {
     const rawData = this.getPlotData()
     const { data, layout } = this.settingPlotData(rawData);
+    console.log("layout: ", layout)
     switch (this.props.currentBlock.config.configStyle.graphType) {
       case "pie": {
         return <PieView

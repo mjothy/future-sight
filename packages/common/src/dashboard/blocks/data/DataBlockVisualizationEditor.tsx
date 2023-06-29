@@ -114,6 +114,18 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
+  onAggregateChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.aggregation.isAggregate = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onAggregationTypeChange = (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.aggregation.type = value;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
   onStackGroupByChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.stack.isGroupBy = e.target.checked;
@@ -123,6 +135,12 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   onStackValueChange = (value) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.stack.value = value;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onAggregateValueChange = (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.aggregation.value = value;
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
@@ -250,7 +268,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                   )}
                   allowClear
                   disabled={!configStyle.stack.isStack}
-                  dropdownMatchSelectWidth={false}
+                  dropdownMatchSelectWidth={true}
                 >
                   {this.props.optionsLabel.map((value) => {
                     if (metaData[value].length > 1) return (
@@ -266,6 +284,58 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
           </>
         }
 
+        {["line", "area", "bar"].includes(configStyle.graphType) &&
+          <>
+            <h3>Aggregation</h3>
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onAggregateChange}
+                  checked={configStyle.aggregation.isAggregate}
+                />
+              </Col>
+              <Col span={8}>
+                <Select
+                  className="width-100"
+                  placeholder="Type"
+                  value={configStyle.aggregation.type}
+                  onChange={this.onAggregationTypeChange}
+                  disabled={!configStyle.aggregation.isAggregate}
+                >
+                  {["Average"].map((agg) => (
+                    <Option key={agg} value={agg}>
+                      {agg}
+                    </Option>
+                  ))}
+                </Select>              </Col>
+              <Col span={8} className="ml-20">
+                <Select
+                  placeholder="Select"
+                  value={configStyle.aggregation.value}
+                  onChange={this.onAggregateValueChange}
+                  notFoundContent={(
+                    <div>
+                      <ExclamationCircleOutlined />
+                      <p>Item not found.</p>
+                    </div>
+                  )}
+                  allowClear
+                  disabled={!configStyle.aggregation.isAggregate}
+                  dropdownMatchSelectWidth={true}
+                >
+                  {this.props.optionsLabel.map((value) => {
+                    if (metaData[value].length > 1) return (
+                      <Option key={value} value={value}>
+                        {value}
+                      </Option>
+                    )
+                  }
+                  )}
+                </Select>
+              </Col>
+            </Row>
+          </>
+        }
         <h3>Axis</h3>
         {this.isShowGraphConfig(configStyle.graphType) &&
           <>
@@ -273,8 +343,8 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
               <Row>
                 <Col span={2} className={'checkbox-col'}>
                   <Checkbox
-                      onChange={this.onYAxisTickFormatChange}
-                      checked={configStyle.YAxis.percentage}
+                    onChange={this.onYAxisTickFormatChange}
+                    checked={configStyle.YAxis.percentage}
                   />
                 </Col>
                 <Col span={16} className={'checkbox-col-label'}>

@@ -53,6 +53,11 @@ export default class BlockStyleModel {
     isGroupBy: false,
     value: ''
   };
+  aggregation = {
+    isAggregate: false,
+    type: null,
+    value: ''
+  };
   pie = {
     isDonut: false,
     showPercent: true,

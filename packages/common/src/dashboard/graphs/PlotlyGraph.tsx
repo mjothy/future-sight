@@ -56,7 +56,8 @@ export default class PlotlyGraph extends Component<any, any> {
       dragmode: "zoom",
       mapbox: { style: "carto-positron", center: { lat: 38, lon: -90 }, zoom: 3 },
       barmode: configStyle.stack.isStack ? 'stack' : null,
-      barnorm: configStyle.YAxis.percentage ? "percent" : ""
+      barnorm: configStyle.YAxis.percentage ? "percent" : "",
+      shapes: this.props.layout?.shapes
     };
 
     if (configStyle.title.isVisible) {
@@ -73,8 +74,8 @@ export default class PlotlyGraph extends Component<any, any> {
       }
     }
 
-    if (this.props.currentBlock.config.configStyle.graphType == "box"){
-      layout["xaxis"]={
+    if (this.props.currentBlock.config.configStyle.graphType == "box") {
+      layout["xaxis"] = {
         showticklabels: false
       }
     }
