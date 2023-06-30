@@ -34,6 +34,7 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         const filteredValues = {};
         const filters: FilterObject = this.getFilters();
         const selectOrder = blockMetaData?.selectOrder;
+        const showNonDefaultRuns = blockMetaData?.showNonDefaultRuns;
 
         if (
             filterId === "versions"
@@ -61,7 +62,7 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
             }
         });
 
-        const filter = new Filter(selectedData, dataFocusFilters, selectOrder);
+        const filter = new Filter(selectedData, dataFocusFilters, selectOrder, showNonDefaultRuns);
 
         if (filterId == "versions") {
             const body = filter.getBody("runs");

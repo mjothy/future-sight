@@ -11,5 +11,6 @@ interface Run { // TODO rename RunSchema
     };
     id__in?: string[]
     is_default?: boolean
+    default_only?: boolean
 }
 

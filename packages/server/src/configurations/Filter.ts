@@ -7,9 +7,11 @@ export default class Filter {
     private body = {};
     private selectOrder?: string[];
     private dataFocusFilters?: any;
-    constructor(globalSelectedData, dataFocusFilters?: any, selectOrder?: string[]) {
+    private showNonDefaultRuns?: boolean;
+    constructor(globalSelectedData, dataFocusFilters?: any, selectOrder?: string[], showNonDefaultRuns?: boolean) {
         this.selectOrder = selectOrder;
         this.dataFocusFilters = dataFocusFilters;
+        this.showNonDefaultRuns = showNonDefaultRuns
         this.body = {
             "models": this.modelBody(globalSelectedData),
             "scenarios": this.scenarioBody(globalSelectedData),
@@ -31,6 +33,10 @@ export default class Filter {
 
         const requestBody: FilterSchema = {};
 
+        if (this.showNonDefaultRuns) {
+            requestBody.run = {default_only: false}
+        }
+
         if (selectedData["variables"]?.length > 0) {
             requestBody.variable = { name__in: selectedData["variables"] };
         }
@@ -41,16 +47,19 @@ export default class Filter {
 
         if (Object.keys(selectedData["versions"] || {})?.length > 0) {
             requestBody.run = {
+                default_only: false,
                 id__in: this.getRunIdsFromVersionsModel(selectedData["versions"])
             };
         } else {
             if (selectedData["scenarios"]?.length > 0) {
                 requestBody.run = {
+                    ...requestBody.run,
                     scenario: { name__in: selectedData["scenarios"] }
                 };
             }
             if (selectedData["models"]?.length > 0) {
                 requestBody.run = {
+                    ...requestBody.run,
                     model: { name__in: selectedData["models"] }
                 };
             }
@@ -65,6 +74,10 @@ export default class Filter {
         selectedData = this.addDataFocusToSelectedData(selectedData);
         const requestBody: FilterSchema = {};
 
+        if (this.showNonDefaultRuns) {
+            requestBody.run = {default_only: false}
+        }
+
         if (selectedData["regions"]?.length > 0) {
             requestBody.region = { name__in: selectedData["regions"] };
         }
@@ -75,22 +88,24 @@ export default class Filter {
 
         if (Object.keys(selectedData["versions"] || {})?.length > 0) {
             requestBody.run = {
+                default_only: false,
                 id__in: this.getRunIdsFromVersionsModel(selectedData["versions"])
             };
         } else {
             if (selectedData["scenarios"]?.length > 0) {
                 requestBody.run = {
+                    ...requestBody.run,
                     scenario: { name__in: selectedData["scenarios"] }
                 };
             }
 
             if (selectedData["models"]?.length > 0) {
                 requestBody.run = {
+                    ...requestBody.run,
                     model: { name__in: selectedData["models"] }
                 };
             }
         }
-
 
         return requestBody;
     }
@@ -101,6 +116,10 @@ export default class Filter {
         selectedData = this.addDataFocusToSelectedData(selectedData);
 
         const requestBody: FilterSchema = {};
+
+        if (this.showNonDefaultRuns) {
+            requestBody.run = {default_only: false}
+        }
 
         if (selectedData["regions"]?.length > 0) {
             requestBody.region = { name__in: selectedData["regions"] };
@@ -116,7 +135,8 @@ export default class Filter {
 
         if (selectedData["scenarios"]?.length > 0) {
             requestBody.run = {
-                scenario: { name__in: selectedData["scenarios"] }
+                ...requestBody.run,
+                scenario: { name__in: selectedData["scenarios"] },
             };
         }
 
@@ -131,7 +151,7 @@ export default class Filter {
         const filtersToApply = this.getFiltersToApply("versions", this.selectOrder);
         const selectedData = this.getSelectedDataOfFilter(globalSelectedData, filtersToApply);
 
-        const requestBody: FilterSchema = {};
+        const requestBody: FilterSchema = {default_only: false};
 
         if (selectedData["models"]?.length > 0) {
             requestBody.model = { name__in: selectedData["models"] }
@@ -151,6 +171,10 @@ export default class Filter {
 
         const requestBody: FilterSchema = {};
 
+        if (this.showNonDefaultRuns) {
+            requestBody.run = {default_only: false}
+        }
+
         if (selectedData["regions"]?.length > 0) {
             requestBody.region = { name__in: selectedData["regions"] };
         }
@@ -165,6 +189,7 @@ export default class Filter {
 
         if (selectedData["models"]?.length > 0) {
             requestBody.run = {
+                ...requestBody.run,
                 model: { name__in: selectedData["models"] }
             };
         }

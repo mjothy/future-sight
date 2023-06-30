@@ -253,8 +253,8 @@ export default class DataBlockEditor extends Component<any, any> {
     const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
     dashboard.blocks[this.props.currentBlock.id].config.configStyle.showDeprecatedVersionWarning = e.target.checked;
     this.props.updateDashboard(dashboard)
-
   }
+
 
   getDefaultTreeSelectValue = () => {
     const version_dict: versionsModel = this.props.currentBlock.config.metaData.versions
@@ -280,6 +280,18 @@ export default class DataBlockEditor extends Component<any, any> {
             <span>Advanced options</span>
             <Switch size="small" onChange={this.props.onUseVersionSwitched} checked={metaData.useVersion} />
           </span>
+
+          {metaData.useVersion && <Row>
+            <Col span={2} className={'checkbox-col'}>
+              <Checkbox
+                  onChange={this.props.onShowNonDefaultRuns}
+                  checked={metaData.showNonDefaultRuns}
+              />
+            </Col>
+            <Col span={22} className={'checkbox-col-label'}>
+              <label>Allow selection of filters without any default runs</label>
+            </Col>
+          </Row>}
 
           {/* show inputs if they are controlled */}
           {this.props.currentBlock.controlBlock !== '' && (

@@ -378,6 +378,20 @@ export default class BlockFilterManager extends Component<any, any> {
         return obligatory.length == 4
     }
 
+    onShowNonDefaultRuns= (e) => {
+        const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+        dashboard.blocks[this.props.currentBlock.id].config.metaData.showNonDefaultRuns = e.target.checked;
+        this.props.updateDashboard(dashboard)
+        // set every update to stale
+        this.setState({staleFilters: {
+                regions: true,
+                variables: true,
+                scenarios: true,
+                models: true
+            }
+        })
+    }
+
     render() {
         return this.props.currentBlock.blockType === 'data' ? (
             <DataBlockEditor
@@ -392,6 +406,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 setStaleFiltersFromSelectOrder={this.setStaleFiltersFromSelectOrder}
                 isAllSelected={this.isAllSelected}
                 isFetching={this.state.isFetching}
+                onShowNonDefaultRuns = {this.onShowNonDefaultRuns}
             />
         ) : (
             <ControlBlockEditor
