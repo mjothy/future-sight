@@ -51,8 +51,10 @@ const config = JSON.parse(config_file.toString());
 let dataBackend;
 const authentication = new IIASAAuthenticationBackend(config);
 if (config.origin_data == "IIASA") {
+  console.log("IIASA datasource");
   dataBackend = new IIASADataBackend(authentication);
 } else {
+  console.log("FS datasource");
   dataBackend = new FSDataBackend(dataPath, dataUnionPath);
 }
 
@@ -66,6 +68,7 @@ let auth;
 
 if (isProd) {
   if (username && password) {
+    console.log("Basic auth activated");
     auth = basicAuth({
       users: { [username]: password },
       challenge: true,

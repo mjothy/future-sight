@@ -10,7 +10,8 @@ import {
 import { Link } from 'react-router-dom';
 
 import './Navbar.css';
-import Logo from '../../assets/images/ECEMF_logo.png';
+import ECEMFLogo from '../../assets/images/ECEMF_logo.png';
+import Logo from "./Logo";
 
 interface NavbarProps {
   enableSwitchFullscreenMode: boolean;
@@ -27,7 +28,10 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
     <div className="navbar">
       <Menu theme="dark" mode="horizontal">
         <Menu.Item key="logo" className="logo-wrapper">
-          <img src={Logo} alt="Logo" />
+          <img src={ECEMFLogo} alt="Logo" />
+        </Menu.Item>
+        <Menu.Item key="logo" className="logo-wrapper">
+          <Logo light/>
         </Menu.Item>
 
         <Menu.Item
