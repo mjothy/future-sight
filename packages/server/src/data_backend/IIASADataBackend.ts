@@ -90,7 +90,7 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
             const body = Filter.getDatapointsBody(rawWithRun);
             const dataPoints = await this.patchPromise("/iamc/datapoints/", body);
             if (dataPoints?.length > 0) {
-                const timeSerie = this.prepareTimeSerie(rawWithRun, dataPoints);
+                const timeSerie = await this.prepareTimeSerie(rawWithRun, dataPoints);
                 timeSeries.push(timeSerie);
             }
         }
@@ -116,12 +116,13 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         return outputRaw;
     }
 
-    prepareTimeSerie = (raw: any, dataPoints: any) => {
+    prepareTimeSerie = async (raw: any, dataPoints: any) => {
         const timeSerie: TimeSerieObject = {
             ...raw,
             data: []
         };
-
+        const tsMeta = await this.patchPromise("/iamc/timeseries/" + dataPoints[0].time_series__id, undefined, true, "GET");
+        timeSerie.unit = tsMeta.parameters.unit
         // Order dataPoints
         dataPoints.sort((a, b) => a.step_year - b.step_year);
 

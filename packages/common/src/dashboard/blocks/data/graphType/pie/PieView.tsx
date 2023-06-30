@@ -64,7 +64,7 @@ class PieView extends Component<any, any> {
           colors: configStyle.colorscale
         },
         hovertemplate: `%{label} <br> %{value:.2f} ${dataWithColor[0].unit}  <extra></extra>`,
-        texttemplate: configStyle.pie.showPercent ? null : `%{value:.4s}`,
+        texttemplate: configStyle.pie.showPercent ? null : `%{value:.4s} ` + dataWithColor[0].unit,
         // hoverinfo: `label+value`,
         hole: configStyle.pie.isDonut ? .4 : null,
       })
