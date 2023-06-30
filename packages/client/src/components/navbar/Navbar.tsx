@@ -27,7 +27,7 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
   return (
     <div className="navbar">
       <Menu theme="dark" mode="horizontal">
-        <Menu.Item key="logo" className="logo-wrapper">
+        <Menu.Item key="ecemf-logo" className="logo-wrapper">
           <img src={ECEMFLogo} alt="Logo" />
         </Menu.Item>
         <Menu.Item key="logo" className="logo-wrapper">
