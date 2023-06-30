@@ -265,7 +265,7 @@ class DashboardConfigView extends Component<any, any> {
                                 <Space className="block-actions" style={{ position: "fixed", top: 1, right: 1, zIndex: 2 }}>
                                     {blocks[layout.i].blockType ==="data" && <Button size="small" icon={<CopyOutlined />} title="Copy this block"
                                             onClick={(e) => this.onBlockCopy(e, layout.i)} />}
-                                    <Button size="small" icon={<DragOutlined />} title="Move this block"/>
+                                    <Button className="block-grab" size="small" icon={<DragOutlined />} title="Move this block"/>
                                     <Button size="small" icon={<EditTwoTone />} title="Edit this block"
                                             onClick={(e) => this.onBlockClick(e, layout.i)} />
                                 </Space>
