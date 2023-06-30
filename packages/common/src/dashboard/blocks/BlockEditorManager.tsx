@@ -3,6 +3,7 @@ import { Button, Col, Popconfirm, Row, Tooltip, Tabs } from 'antd';
 import DataBlockVisualizationEditor from './data/DataBlockVisualizationEditor';
 import TextBlockEditor from './text/TextBlockEditor';
 import {
+  CopyOutlined,
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
@@ -79,6 +80,13 @@ export default class BlockEditorManager extends Component<any, any> {
     this.props.updateDashboard({ ...this.props.dashboard, ...blocksAndLayout });
   }
 
+  onBlockCopy = (e, id) => {
+    e.preventDefault();
+    if (id) {
+      this.props.copyBlock(id);
+    }
+  };
+
   render() {
 
     return (
@@ -91,7 +99,7 @@ export default class BlockEditorManager extends Component<any, any> {
           }
         >
           {this.hasTabs(this.props.currentBlock.blockType) && (
-            <Col span={22}>
+            <Col span={18}>
               <Tabs type="card" onChange={(activeKey) => this.tabsToggle(activeKey)}>
                 {this.tabsTypes.map((tab) => {
                   return (
@@ -107,7 +115,13 @@ export default class BlockEditorManager extends Component<any, any> {
               </Tabs>
             </Col>
           )}
-          <Col span={2}>
+          <Col span={3}>
+            {this.props.currentBlock.blockType ==="data" &&
+              <Button size="large" icon={<CopyOutlined />} title="Copy this block"
+                      onClick={(e) => this.onBlockCopy(e, this.props.blockSelectedId)} />
+            }
+          </Col>
+          <Col span={3}>
             <Popconfirm
               title="Are you sure you want to delete this block ?"
               onConfirm={this.onConfirm}
