@@ -241,7 +241,10 @@ export default class DashboardSelectionControl extends Component<
           }
           if (!metaData["versions"][model][scenario]) {
             isDashboardUpdated = true;
-            metaData["versions"][model][scenario] = [optionsData["versions"][model][scenario].default]
+            // Select default version or if no default version
+            metaData["versions"][model][scenario] = optionsData["versions"][model][scenario].default ?
+                [optionsData["versions"][model][scenario].default]:
+                [optionsData["versions"][model][scenario].values[0]]
           }
         }
       }
