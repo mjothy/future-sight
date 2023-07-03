@@ -13,18 +13,6 @@ class PieView extends Component<any, any> {
 
   constructor(props) {
     super(props);
-    this.state = {
-      selectedYear: this.props.currentBlock.config.configStyle.XAxis.default
-    }
-
-  }
-
-  componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): void {
-    if (this.props.currentBlock.config.configStyle.XAxis.default != prevProps.currentBlock.config.configStyle.XAxis.default) {
-      this.setState({
-        selectedYear: this.props.currentBlock.config.configStyle.XAxis.default
-      })
-    }
   }
 
   preparePieData = (data: PlotDataModel[]) => {
@@ -53,12 +41,12 @@ class PieView extends Component<any, any> {
           pieDataPerYear[datapoint.year].labels.push(dataElement[stackIndex])
         }
       }
-      const selectedYear = this.state.selectedYear;
-      const selectedData = selectedYear ? pieDataPerYear[selectedYear] : Object.values(pieDataPerYear)[0]
+      const defaultYear = this.props.currentBlock.config.configStyle.XAxis.default;
+      const defaultData = defaultYear ? pieDataPerYear[defaultYear] : Object.values(pieDataPerYear)[0]
       plotlyData.push({
         type: 'pie',
-        values: selectedData?.values || [],
-        labels: selectedData?.labels || [],
+        values: defaultData?.values || [],
+        labels: defaultData?.labels || [],
         marker: {
           colors: colors,
           // colors: configStyle.colorscale
@@ -111,8 +99,8 @@ class PieView extends Component<any, any> {
       let chartCount = 0
       const chartTotal = Object.keys(pieDataPerIndexValue).length
       for (const [idx, pieDataPerYear] of Object.entries(pieDataPerIndexValue)) {
-        const selectedYear = this.state.selectedYear;
-        const selectedData = selectedYear ? pieDataPerYear[selectedYear] : Object.values(pieDataPerYear)[0]
+        const defaultYear = this.props.currentBlock.config.configStyle.XAxis.default;
+        const defaultData = defaultYear ? pieDataPerYear[defaultYear] : Object.values(pieDataPerYear)[0]
         const blockRatio = this.props.width / this.props.height
         let grid = {}
         if (blockRatio <= 0.6) {
@@ -136,8 +124,8 @@ class PieView extends Component<any, any> {
         plotlyData.push({
           type: 'pie',
           name: idx,
-          values: selectedData?.values || [],
-          labels: selectedData?.labels || [],
+          values: defaultData?.values || [],
+          labels: defaultData?.labels || [],
           marker: {
             colors: colorsPerIndexValue[idx],
             // colors: configStyle.colorscale
@@ -246,7 +234,7 @@ class PieView extends Component<any, any> {
       sliderSteps.push(sliderStep)
     }
 
-    const defaultYear = this.state.selectedYear;
+    const defaultYear = this.props.currentBlock.config.configStyle.XAxis.default;
     const defaultYearIndex = defaultYear ? years.findIndex((year) => year === defaultYear) : 0
     const slidersLayout = [{
       active: defaultYearIndex,
@@ -257,14 +245,7 @@ class PieView extends Component<any, any> {
       },
       steps: sliderSteps,
     }]
-
     return { frames, slidersLayout }
-  }
-
-  onSliderChange = (e) => {
-    const active = e.slider.active;
-    const steps = e.slider.steps
-    this.setState({ selectedYear: steps[active].label })
   }
 
   render() {
@@ -272,7 +253,7 @@ class PieView extends Component<any, any> {
     const layout = this.preparePieLayout(preparedPieData.defaultPlotlyData);
     const { frames, slidersLayout } = this.getSlidersConfig(this.props.rawData, preparedPieData, layout)
 
-    return <PlotlyGraph {...this.props} data={preparedPieData.defaultPlotlyData} layout={layout} frames={frames} slidersLayout={slidersLayout} onSliderChange={this.onSliderChange} />;
+    return <PlotlyGraph {...this.props} data={preparedPieData.defaultPlotlyData} layout={layout} frames={frames} slidersLayout={slidersLayout}/>;
   }
 }
 
