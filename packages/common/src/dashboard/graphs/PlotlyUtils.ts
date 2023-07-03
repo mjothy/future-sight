@@ -119,4 +119,15 @@ export default class PlotlyUtils {
             return y_sorted[median];
         }
     }
+
+    static groupByYear = (data) => {
+        return data.reduce((groups, obj) => {
+            const { x } = obj;
+            if (!groups[x]) {
+                groups[x] = 0;
+            }
+            groups[x] += obj.y;
+            return groups;
+        }, {});
+    }
 }

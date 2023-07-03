@@ -80,7 +80,7 @@
           "aggregation": {
             "isAggregate": false,
             "type": null,
-            "value": ""
+            "label": ""
           },
           "pie": {
             "isDonut": false,

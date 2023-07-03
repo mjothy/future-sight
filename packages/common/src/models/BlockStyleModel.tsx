@@ -13,7 +13,7 @@ export default class BlockStyleModel {
     Scenario: false,
     Region: false,
     Variable: false,
-    Version: false
+    Version: false,
   };
   title = {
     value: 'Title',
@@ -56,7 +56,7 @@ export default class BlockStyleModel {
   aggregation = {
     isAggregate: false,
     type: null,
-    value: ''
+    label: ''
   };
   pie = {
     isDonut: false,

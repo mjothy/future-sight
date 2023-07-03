@@ -10,6 +10,16 @@ import PlotColorscalePicker from '../utils/PlotColorscalePicker';
 
 const { Option } = Select;
 
+const PLOTLY_AGGREGATION = [
+  {
+    value: 'sum',
+    label: 'Sum',
+  },
+  {
+    value: 'avg',
+    label: 'Average',
+  },
+]
 const plotTypes = [
   { type: 'line', label: 'Line', icon: <LineChartOutlined /> },
   { type: 'bar', label: 'Bar', icon: <BarChartOutlined /> },
@@ -123,6 +133,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   onAggregationTypeChange = (value) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.aggregation.type = value;
+    configStyle.aggregation.label = PLOTLY_AGGREGATION.find(element => element.value == value)?.label;
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
@@ -242,7 +253,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         }
 
 
-        {["line", "area", "bar"].includes(configStyle.graphType) &&
+        {["area", "bar"].includes(configStyle.graphType) &&
           <>
             <h3>Stack</h3>
             <Row>
@@ -301,13 +312,8 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                   value={configStyle.aggregation.type}
                   onChange={this.onAggregationTypeChange}
                   disabled={!configStyle.aggregation.isAggregate}
-                >
-                  {["Average"].map((agg) => (
-                    <Option key={agg} value={agg}>
-                      {agg}
-                    </Option>
-                  ))}
-                </Select>
+                  options={PLOTLY_AGGREGATION}
+                />
               </Col>
               {/* <Col span={8} className="ml-20">
                 <Select
