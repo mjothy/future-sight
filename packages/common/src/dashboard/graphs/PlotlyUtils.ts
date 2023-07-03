@@ -81,20 +81,18 @@ export default class PlotlyUtils {
         const XAxisConfig = configStyle.XAxis
         const data = JSON.parse(JSON.stringify(plotData))
 
+        if (XAxisConfig.useCustomRange && XAxisConfig.left && XAxisConfig.right) {
+            for (let i = 0; i < data.length; i++) {
+                const dataElement = data[i]
+                const dataPoints = [...dataElement.data]
+                dataElement.data = dataPoints.filter(
+                    (dataPoint) =>
+                        (XAxisConfig.left || 0) <= dataPoint.year &&
+                        dataPoint.year <= (XAxisConfig.right || 0))
+            }
+        }
+
         this.addTimestep(data, XAxisConfig);
-
-        if (!XAxisConfig.useCustomRange || !XAxisConfig.left || !XAxisConfig.right) {
-            return data
-        }
-
-        for (let i = 0; i < data.length; i++) {
-            const dataElement = data[i]
-            const dataPoints = [...dataElement.data]
-            dataElement.data = dataPoints.filter(
-                (dataPoint) =>
-                    (XAxisConfig.left || 0) <= dataPoint.year &&
-                    dataPoint.year <= (XAxisConfig.right || 0))
-        }
 
         return data
     }
