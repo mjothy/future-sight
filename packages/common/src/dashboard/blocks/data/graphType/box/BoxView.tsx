@@ -35,15 +35,13 @@ class BoxView extends Component<any, any> {
     const otherIndex = PlotlyUtils.getIndexKeys(data).filter(
         (index) => index !== stackIndex
     )
-    const dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, stackIndex) //TODO use only data instead of dataWithColor cuz pie chart take as colors all configStyle.colorscale
+    const dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, otherIndex)
     const plotlyData: Record<string, unknown>[] = []
 
     // Get data by year
     if (!configStyle.stack.isStack || otherIndex.length === 0) {
       const boxDataPerYear: BoxDataPerYearModel = {}
-      const colors: string[] = []
       for (const dataElement of dataWithColor) {
-        colors.push(dataElement.color)
         for (const datapoint of dataElement.data) {
           if (!boxDataPerYear[datapoint.year]) {
             boxDataPerYear[datapoint.year] = []
@@ -63,11 +61,11 @@ class BoxView extends Component<any, any> {
         type: 'box',
         x: x_box,
         y: y_box,
-        boxpoints: configStyle.showBoxPoints ? 'all' : 'Outliers'
-        // marker: {
-        //   // colors: colors,
-        //   colors: configStyle.colorscale
-        // },
+        boxpoints: configStyle.showBoxPoints ? 'all' : 'Outliers',
+        marker: {
+          // colors: colors,
+          colors: configStyle.colorscale
+        },
       })
       return {
         defaultPlotlyData: plotlyData,
@@ -76,7 +74,7 @@ class BoxView extends Component<any, any> {
     }
     else {
       const boxDataPerIndexValue: { [index: string]: BoxDataPerYearModel } = {}
-      const colorsPerIndexValue: { [index: string]: string[] } = {}
+      const colorPerIndexValue: { [index: string]: string } = {}
 
       for (const dataElement of dataWithColor) {
         const indexValue = otherIndex.length > 1
@@ -91,11 +89,10 @@ class BoxView extends Component<any, any> {
         // Define new pieChart if new indexValue introduced
         if (!boxDataPerIndexValue[indexValue]) {
           boxDataPerIndexValue[indexValue] = {}
-          colorsPerIndexValue[indexValue] = []
         }
 
         // Add color to index
-        colorsPerIndexValue[indexValue].push(dataElement.color)
+        colorPerIndexValue[indexValue] = dataElement.color
 
         // Add data per year
         const boxDataPerYear = boxDataPerIndexValue[indexValue]
@@ -120,11 +117,11 @@ class BoxView extends Component<any, any> {
           x: x_box,
           y: y_box,
           name: indexValue,
-          boxpoints: configStyle.showBoxPoints ? 'all' : 'Outliers'
-          // marker: {
-          //   // colors: colors,
-          //   colors: configStyle.colorscale
-          // },
+          boxpoints: configStyle.showBoxPoints ? 'all' : 'Outliers',
+          marker: {
+            color: colorPerIndexValue[indexValue],
+            colors: configStyle.colorscale
+          },
         })
       }
 
