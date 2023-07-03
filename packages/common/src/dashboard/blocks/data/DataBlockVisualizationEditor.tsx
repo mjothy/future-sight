@@ -6,6 +6,7 @@ import {
 } from '@ant-design/icons';
 import { Col, Input, Row, Select, Checkbox, InputNumber } from 'antd';
 import PlotColorscalePicker from '../utils/PlotColorscalePicker';
+import BoxVisualizationEditor from "./graphType/box/BoxVisualizationEditor";
 
 
 const { Option } = Select;
@@ -21,6 +22,7 @@ const plotTypes = [
 ];
 
 const colorbarTitle = ['variable', 'unit'];
+const TIME_STEPS = [5, 10, 15, 20]
 
 export default class DataBlockVisualizationEditor extends Component<any, any> {
 
@@ -51,6 +53,12 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   onCustomRangeChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.XAxis.useCustomRange = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  };
+
+  onTimestepChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.XAxis.timestep = e;
     this.updateBlockConfig({ configStyle: configStyle })
   };
 
@@ -223,6 +231,17 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
           />
         }
 
+        {configStyle.graphType === "box" &&
+            <BoxVisualizationEditor
+                optionsLabel={this.props.optionsLabel}
+                onStackValueChange={this.onStackValueChange}
+                onStackCheckChange={this.onStackCheckChange}
+                updateBlockConfig={this.updateBlockConfig}
+                plotData={this.props.plotData}
+                currentBlock={this.props.currentBlock}
+            />
+        }
+
 
         {["area", "bar"].includes(configStyle.graphType) &&
           <>
@@ -273,8 +292,8 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
               <Row>
                 <Col span={2} className={'checkbox-col'}>
                   <Checkbox
-                      onChange={this.onYAxisTickFormatChange}
-                      checked={configStyle.YAxis.percentage}
+                    onChange={this.onYAxisTickFormatChange}
+                    checked={configStyle.YAxis.percentage}
                   />
                 </Col>
                 <Col span={16} className={'checkbox-col-label'}>
@@ -352,8 +371,30 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             />
           </Col>
         </Row>
+        <Row className="mb-10">
+          <Col span={2} />
+          <Col span={18} className={'checkbox-col-label'}>
+            <Select
+              className="width-100"
+              placeholder="Time step of X"
+              value={configStyle.XAxis.timestep}
+              onChange={this.onTimestepChange}
+              allowClear
+              disabled={!configStyle.XAxis.useCustomRange}
+            >
+              {TIME_STEPS.map((timestep) => (
+                <Option key={timestep} value={timestep}>
+                  {timestep}
+                </Option>
+              ))}
+            </Select>
+          </Col>
+        </Row>
 
-        {this.isShowGraphConfig(configStyle.graphType) && configStyle.graphType != "pie" &&
+        {this.isShowGraphConfig(configStyle.graphType)
+            && configStyle.graphType != "pie"
+            && configStyle.graphType != "box"
+            &&
           <>
             <h3>Legend</h3>
             <Row>

@@ -9,6 +9,7 @@ import PlotDataModel from "../../../models/PlotDataModel";
 import withColorizer from "../../../hoc/colorizer/withColorizer";
 import { stackGroups } from '../utils/StackGraphs';
 import PieView from "./graphType/pie/PieView";
+import BoxView from "./graphType/box/BoxView";
 
 class DataBlockView extends Component<any, any> {
 
@@ -168,16 +169,6 @@ class DataBlockView extends Component<any, any> {
           })
         }
         break;
-      case "box":
-        obj = {
-          type: configStyle.graphType,
-          y: xyDict.y,
-          name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend, configStyle.showLegend), this.props.width, "legendtext"),
-          showlegend: configStyle.showLegend,
-          hoverinfo: "y",
-          marker: { color: dataElement.color || null }
-        };
-        break;
       default:
         obj = {
           type: configStyle.graphType,
@@ -318,6 +309,15 @@ class DataBlockView extends Component<any, any> {
           currentBlock={this.props.currentBlock}
           width={this.props.width}
           height={this.props.height}
+        />
+      }
+      case "box": {
+        return <BoxView
+            rawData={rawData}
+            currentBlock={this.props.currentBlock}
+            width={this.props.width}
+            height={this.props.height}
+            layout = {layout}
         />
       }
       case "map": {

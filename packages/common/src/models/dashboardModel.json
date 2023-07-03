@@ -63,7 +63,8 @@
             "left": null,
             "right": null,
             "default": null,
-            "useSlider": false
+            "useSlider": false,
+            "timestep": null
           },
           "legend": {
             "Model": false,
@@ -94,7 +95,6 @@
             "#bcbd22",
             "#17becf"
           ],
-
           "colorbar": {
             "isShow": true,
             "reverse": false,
@@ -102,7 +102,9 @@
               "variable": false,
               "unit": true
             }
-          }
+          },
+          "boxmode": "group",
+          "showBoxPoints": false
         },
         "metaData": {
           "models": [],
