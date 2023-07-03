@@ -95,7 +95,6 @@
             "#bcbd22",
             "#17becf"
           ],
-
           "colorbar": {
             "isShow": true,
             "reverse": false,
@@ -103,7 +102,9 @@
               "variable": false,
               "unit": true
             }
-          }
+          },
+          "boxmode": "group",
+          "showBoxPoints": false
         },
         "metaData": {
           "models": [],

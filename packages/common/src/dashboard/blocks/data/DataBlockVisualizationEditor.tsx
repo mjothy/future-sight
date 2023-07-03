@@ -6,6 +6,7 @@ import {
 } from '@ant-design/icons';
 import { Col, Input, Row, Select, Checkbox, InputNumber } from 'antd';
 import PlotColorscalePicker from '../utils/PlotColorscalePicker';
+import BoxVisualizationEditor from "./graphType/box/BoxVisualizationEditor";
 
 
 const { Option } = Select;
@@ -230,6 +231,17 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
           />
         }
 
+        {configStyle.graphType === "box" &&
+            <BoxVisualizationEditor
+                optionsLabel={this.props.optionsLabel}
+                onStackValueChange={this.onStackValueChange}
+                onStackCheckChange={this.onStackCheckChange}
+                updateBlockConfig={this.updateBlockConfig}
+                plotData={this.props.plotData}
+                currentBlock={this.props.currentBlock}
+            />
+        }
+
 
         {["area", "bar"].includes(configStyle.graphType) &&
           <>
@@ -379,7 +391,10 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
           </Col>
         </Row>
 
-        {this.isShowGraphConfig(configStyle.graphType) && configStyle.graphType != "pie" &&
+        {this.isShowGraphConfig(configStyle.graphType)
+            && configStyle.graphType != "pie"
+            && configStyle.graphType != "box"
+            &&
           <>
             <h3>Legend</h3>
             <Row>

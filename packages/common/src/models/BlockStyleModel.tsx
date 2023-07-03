@@ -59,7 +59,7 @@ export default class BlockStyleModel {
     showPercent: true,
     showSubtitle: true
   };
-
+  showBoxPoints = false;
   colorscale = [
     "#1f77b4",
     "#ff7f0e",
