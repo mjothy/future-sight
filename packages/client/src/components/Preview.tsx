@@ -47,7 +47,7 @@ class Preview extends React.Component<any, any> {
         const actions = [
             <Tooltip key="copy"  title="Copy this dashboard in a new draft">
                 <CopyOutlined
-                    onClick={() => this.props.draftFromURLOnClick(this.props.urlPrefix + this.props.id)}
+                    onClick={() => this.props.draftOnClick(this.props.id)}
                 />
             </Tooltip>,
             <Tooltip key="share"  title="Copy URL to clipboard">

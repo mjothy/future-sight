@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
-import { Button, Input, Modal, notification, Tag, Tooltip } from 'antd';
-import { UserOutlined, TagOutlined, EditFilled } from '@ant-design/icons';
+import { Button, Col, Input, Modal, notification, Row, Tag, Tooltip } from 'antd';
+import { UserOutlined, TagOutlined, EditFilled, MessageOutlined, WarningOutlined } from '@ant-design/icons';
 import UserDataModel from '../../models/UserDataModel';
 
 type NotificationType = 'success' | 'info' | 'warning' | 'error';
 
+const FORUM_ERROR = "Needs to be a valid ECEMF forum URL"
+const URL_REGEX = /https:\/\/[^\s/$.?#].[^\s]*$/
+const FORUM_PREFIX = "https://community.ecemf.eu/"
 /**
  * To set dashboard global information (title, author and tags)
  */
@@ -17,7 +20,8 @@ export default class DashboardGlobalInfo extends Component<any, any> {
       inputVisible: false,
       inputValue: '',
       isModalOpen: true,
-      userDataTemp: new UserDataModel()
+      userDataTemp: new UserDataModel(),
+      forumError: null
     };
   }
 
@@ -76,6 +80,17 @@ export default class DashboardGlobalInfo extends Component<any, any> {
     this.setState({ userDataTemp: userData });
   }
 
+  onForumChange = (e) => {
+    let value = e.target.value
+    if (value === "" || (value.startsWith(FORUM_PREFIX) && value.match(URL_REGEX))) {
+      const userData = { ...this.state.userDataTemp };
+      userData.forum = value;
+      this.setState({ userDataTemp: userData, forumError: null});
+    } else {
+      this.setState({ forumError: FORUM_ERROR})
+    }
+  }
+
   handleOk = () => {
     try {
       this.props.updateDashboard({ ...this.props.dashboard, userData: this.state.userDataTemp });
@@ -91,7 +106,6 @@ export default class DashboardGlobalInfo extends Component<any, any> {
 
   handleCancel = () => {
     this.setState({ userDataTemp: { ...this.props.dashboard.userData } }, () => this.props.closeGlobalInfoModal());
-    this.openNotificationWithIcon('warning', 'Update canceled', '')
   };
 
   openNotificationWithIcon = (type: NotificationType, title: string, msg: string) => {
@@ -131,6 +145,28 @@ export default class DashboardGlobalInfo extends Component<any, any> {
           onChange={(e) => this.onAuthorChange(e)}
           allowClear={true}
         />
+
+        <Row className='mt-20' justify="space-between">
+          <Col span={6}>
+            <span>ECEMF forum link: </span>
+          </Col>
+          <Col span={16}>
+            <Input
+                value={this.state.userDataTemp.forum}
+                name="forum"
+                prefix={this.state.forumError ?
+                    <Tooltip title={this.state.forumError}>
+                      <WarningOutlined />
+                    </Tooltip>
+                      : <MessageOutlined className="site-form-item-icon" />}
+                placeholder="https://community.ecemf.eu/..."
+                onChange={(e) => this.onForumChange(e)}
+                allowClear={true}
+                status={this.state.forumError ? "error" : undefined}
+            />
+          </Col>
+        </Row>
+
 
         <div className=" mt-20 tag-input-content">
           <TagOutlined className="site-form-item-icon" />

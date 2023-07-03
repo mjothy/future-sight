@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-extra-boolean-cast */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { LinkOutlined, PicCenterOutlined } from '@ant-design/icons';
+import { LinkOutlined, MessageOutlined, PicCenterOutlined } from '@ant-design/icons';
 import { Button, PageHeader, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
@@ -49,6 +49,45 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
         setDashboard({ ...updatedDashboard });
     };
 
+    const getExtras = () => {
+        const extras =  [
+            <Button
+                key="share"
+                type="default"
+                size="small"
+                icon={<LinkOutlined />}
+                onClick={props.shareButtonOnClickHandler}
+            >
+                Share
+            </Button>,
+            !props.isEmbedded && <Button
+                key="embed"
+                type="default"
+                size="small"
+                icon={<PicCenterOutlined />}
+                onClick={props.embedButtonOnClickHandler}
+            >
+                Embed
+            </Button>
+        ]
+        if(dashboard?.userData.forum) {
+            const forumLink = (
+                <a href={dashboard.userData.forum} target="_blank" rel="noopener noreferrer">
+                    <Button
+                        key="share"
+                        type="default"
+                        size="small"
+                        icon={<MessageOutlined />}
+                    >
+                        Forum discussion
+                    </Button>
+                </a>
+            )
+            extras.splice(0, 0 , forumLink)
+        }
+        return extras
+    }
+
 
     useEffect(() => {
         const locationState = location.state as LocationState;
@@ -75,7 +114,6 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
         : new Date(dashboard.date).toLocaleString(
             [],
             { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
-
     return (
         <div
             className="dashboard readonly"
@@ -90,34 +128,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                         ? `by ${dashboard.userData.author}`
                         : `by ${dashboard.userData.author}, published on ${publicationDate}`
                     }
-                    extra={[
-                        <Button
-                            key="share"
-                            type="default"
-                            size="small"
-                            icon={<LinkOutlined />}
-                            onClick={props.shareButtonOnClickHandler}
-                        >
-                            Share
-                        </Button>,
-                        !props.isEmbedded && <Button
-                            key="embed"
-                            type="default"
-                            size="small"
-                            icon={<PicCenterOutlined />}
-                            onClick={props.embedButtonOnClickHandler}
-                        >
-                            Embed
-                        </Button>,
-                        // <Button
-                        //   key="download"
-                        //   type="default"
-                        //   size="small"
-                        //   icon={<DownloadOutlined />}
-                        // >
-                        //   Download the data
-                        // </Button>,
-                    ]}
+                    extra={getExtras()}
                     avatar={{ alt: 'logo-short', shape: 'square', size: 'large' }}
                 />
             )}

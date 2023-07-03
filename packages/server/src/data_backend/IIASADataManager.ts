@@ -51,6 +51,7 @@ export default class IIASADataManager {
                 default:
                     err.message = "Server error!";
                     err.status = response.status;
+                    console.log(resp_obj)
                     throw err;
             }
         } catch (err: any) {

@@ -31,11 +31,10 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
     }
   };
 
-  const draftFromURLOnClick = () => {
-    const parse = new URL(draftFromURL).searchParams.get('id');
-    if (parse) {
+  const draftOnClick = (id) => {
+    if (id) {
       const dashboards = publishedDashboards as Array<DashboardModel | undefined>;
-      const dashboard = dashboards.find((d: any) => d.id == parse);
+      const dashboard = dashboards.find((d: any) => d.id == id);
       if (dashboard) {
         const uuid = createUUID();
         dashboard.id = uuid;
@@ -49,6 +48,11 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
       });
     }
   };
+
+  const draftFromURLOnClick = () => {
+    const parse = new URL(draftFromURL).searchParams.get('id');
+    return draftOnClick(parse)
+  }
 
   const newDraft = () => {
     const uuid = createUUID();
@@ -95,7 +99,7 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
               <PreviewGroup
                 dashboards={publishedDashboards}
                 urlPrefix={'/view?id='}
-                draftFromURLOnClick={draftFromURLOnClick}
+                draftOnClick={draftOnClick}
               />
             </div>
           </>
