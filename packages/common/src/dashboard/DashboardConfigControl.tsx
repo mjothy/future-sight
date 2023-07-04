@@ -6,7 +6,8 @@ import BlockEditorManager from './blocks/BlockEditorManager';
 
 export interface DashboardConfigControlProps extends DashboardProps {
   publishing: boolean
-  onPublish: () => void
+  onPublish: (username: string, password: string) => void,
+  checkUser: (username: string, password: string) => Promise<boolean>
 }
 
 /**

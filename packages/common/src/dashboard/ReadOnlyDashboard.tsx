@@ -1,8 +1,8 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-extra-boolean-cast */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { LinkOutlined, MessageOutlined, PicCenterOutlined } from '@ant-design/icons';
-import { Button, PageHeader, Spin } from 'antd';
+import {CheckCircleOutlined, LinkOutlined, MessageOutlined, PicCenterOutlined } from '@ant-design/icons';
+import { Button, PageHeader, Spin, Tag, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import ComponentPropsWithDataManager from '../datamanager/ComponentPropsWithDataManager';
@@ -114,6 +114,18 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
         : new Date(dashboard.date).toLocaleString(
             [],
             { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+
+    const getSubtitle = () => {
+        return <div style={{display: "inline-block"}}>
+            <span>by {dashboard?.userData.author}</span>
+            {dashboard?.verified && <Tooltip title="This user is a verified member of ECEMF">
+                    <Tag icon={<CheckCircleOutlined />} color="success">Verified</Tag>
+                </Tooltip>
+            }
+            {!!publicationDate && <span>, published on {publicationDate}</span>}
+        </div>
+    }
+
     return (
         <div
             className="dashboard readonly"
@@ -124,10 +136,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                     className="info-container"
                     backIcon={false}
                     title={dashboard.userData.title}
-                    subTitle={!publicationDate
-                        ? `by ${dashboard.userData.author}`
-                        : `by ${dashboard.userData.author}, published on ${publicationDate}`
-                    }
+                    subTitle={getSubtitle()}
                     extra={getExtras()}
                     avatar={{ alt: 'logo-short', shape: 'square', size: 'large' }}
                 />

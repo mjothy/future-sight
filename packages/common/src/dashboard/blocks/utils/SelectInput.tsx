@@ -133,6 +133,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
     treeSelect = () => {
         return <Input.Group compact>
             <TreeSelect
+                className={"fsselectinput " + this.props.className}
                 value={this.props.value}
                 loading={this.props.loading}
                 treeCheckable={true}
@@ -145,7 +146,6 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 treeCheckStrictly={true}
                 showCheckedStrategy={"SHOW_ALL"}
                 treeDefaultExpandedKeys={this.props.regroupOrphans ? [this.props.regroupOrphans] : undefined}
-                className={this.props.className}
                 onDropdownVisibleChange={(e) =>
                     this.props.onDropdownVisibleChange?.(this.props.type, e)
                 }

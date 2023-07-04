@@ -14,7 +14,7 @@ interface DashboardViewProps extends ComponentPropsWithDataManager, RoutingProps
   copyBlock: (blockSelectedId: string) => void;
   blockSelectedId: string;
   updateSelectedBlock: (blockSelectedId: string) => void;
-  saveDashboard: (callback: (idPermanent) => void, image?: string) => void;
+  saveDashboard: (username: string, password: string, callback: (idPermanent) => void, image?: string) => void;
   deleteBlocks: (blockId: string[]) => void;
   isDraft: boolean;
   readonly?: boolean;

@@ -4,7 +4,7 @@
   display: none;
 }
 
-.ant-tag .anticon{
+.fsselectinput .ant-tag .anticon{
   display: flex;
   align-items: center;
 }
@@ -13,4 +13,4 @@
   color: #cf1322;
   background: #fff1f0 !important;
   border-color: #ffa39e !important;
-} 
+}

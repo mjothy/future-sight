@@ -18,7 +18,7 @@ import {notification, Spin} from 'antd';
 export interface DashboardSelectionControlProps
   extends ComponentPropsWithDataManager,
   RoutingProps {
-  saveData: (id: string, image?: string) => Promise<any>;
+  saveData: (id: string, username: string, password: string, image?: string) => Promise<any>;
   allData: any;
   plotData: PlotDataModel[];
   blockData: (block: BlockModel) => void;
@@ -178,9 +178,9 @@ export default class DashboardSelectionControl extends Component<
     return blocksAndLayouts;
   };
 
-  saveData = async (callback?: (idPermanent) => void, image?: string) => {
+  saveData = async (username: string, password: string, callback?: (idPermanent) => void, image?: string) => {
     const { id } = this.state.dashboard;
-    const idPermanent = await this.props.saveData(id, image);
+    const idPermanent = await this.props.saveData(id, username, password, image);
     if (callback) {
       callback(idPermanent);
     }

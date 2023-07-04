@@ -1,24 +1,22 @@
 import {
   BlockDataModel,
   BlockModel,
+  Colorizer,
   ColorizerProvider,
   ComponentPropsWithDataManager,
   ConfigurationModel,
   DataModel,
+  OptionsDataModel,
   PlotDataModel,
-  ReadOnlyDashboard,
-  Colorizer,
-  OptionsDataModel
+  ReadOnlyDashboard
 } from '@future-sight/common';
-import { Component } from 'react';
+import {Component} from 'react';
 import withDataManager from '../../services/withDataManager';
-import { RoutingProps } from '../app/Routing';
+import {RoutingProps} from '../app/Routing';
 import DashboardSelectionControl from './DashboardSelectionControl';
-import { getDraft, removeDraft } from '../drafts/DraftUtils';
+import {getDraft, removeDraft} from '../drafts/DraftUtils';
 import Utils from '../../services/Utils';
-import { Spin } from 'antd';
-import * as _ from 'lodash';
-import {versionModel, versionsModel} from "@future-sight/common/build/models/BlockDataModel";
+import {Spin} from 'antd';
 
 export interface DashboardDataConfigurationProps
   extends ComponentPropsWithDataManager,
@@ -50,14 +48,14 @@ class DashboardDataConfiguration extends Component<
     };
   }
 
-  saveData = async (id: string, image?: string) => {
+  saveData = async (id: string, username: string, password: string, image?: string) => {
     const data = getDraft(id);
     if (data) {
       if (image) {
         data.preview = image;
       }
       try {
-        const res = await this.props.dataManager.saveDashboard(data);
+        const res = await this.props.dataManager.saveDashboard(data, username, password);
         removeDraft(id);
         return res.id;
       } catch (e) {

@@ -12,7 +12,7 @@ export default interface IDataManager {
 
   getDashboards: () => Promise<any>;
 
-  saveDashboard: (data: any) => Promise<any>;
+  saveDashboard: (data: any, username: string, password: string) => Promise<any>;
 
   fetchBrowseInitData: () => Promise<any>;
 
@@ -25,4 +25,7 @@ export default interface IDataManager {
   fetchDataFocusOptions: (data: any) => Promise<any>;
 
   fetchRegionsGeojson: (regions: string[]) => Promise<any>;
+
+  checkUser: (username: string, password: string) => Promise<boolean>
+
 }

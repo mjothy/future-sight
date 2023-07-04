@@ -76,7 +76,7 @@ if (isProd) {
   }
 }
 
-const app = new ExpressServer(port, cookieKey, auth, clientPath, redisClient, dataBackend, fsConfProvider);
+const app = new ExpressServer(port, cookieKey, auth, clientPath, redisClient, dataBackend, fsConfProvider, authentication);
 
 // Startup
 redisClient.startup().then((r) => {

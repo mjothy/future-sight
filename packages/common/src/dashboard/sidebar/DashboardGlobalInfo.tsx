@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Button, Col, Input, Modal, notification, Row, Tag, Tooltip } from 'antd';
-import { UserOutlined, TagOutlined, EditFilled, MessageOutlined, WarningOutlined } from '@ant-design/icons';
+import {Alert, Button, Col, Collapse, Input, Modal, notification, Row, Tag, Tooltip } from 'antd';
+import { UserOutlined, TagOutlined, EditFilled, MessageOutlined, WarningOutlined, CheckCircleTwoTone, ExclamationCircleTwoTone } from '@ant-design/icons';
 import UserDataModel from '../../models/UserDataModel';
 
 type NotificationType = 'success' | 'info' | 'warning' | 'error';
@@ -21,7 +21,10 @@ export default class DashboardGlobalInfo extends Component<any, any> {
       inputValue: '',
       isModalOpen: true,
       userDataTemp: new UserDataModel(),
-      forumError: null
+      forumError: null,
+      username: null,
+      password: null,
+      loggedIn: null
     };
   }
 
@@ -96,17 +99,42 @@ export default class DashboardGlobalInfo extends Component<any, any> {
       this.props.updateDashboard({ ...this.props.dashboard, userData: this.state.userDataTemp });
       this.props.closeGlobalInfoModal();
       this.props.onOk
-        ? this.props.onOk()
+        ? this.props.onOk(this.state.username, this.state.password)
         : this.openNotificationWithIcon('success', 'Update dashboard', 'Dashboard information updated successfully')
     } catch (e) {
       this.openNotificationWithIcon('error', 'Update dashboard', 'Error occured')
     }
-
   };
 
   handleCancel = () => {
     this.setState({ userDataTemp: { ...this.props.dashboard.userData } }, () => this.props.closeGlobalInfoModal());
   };
+
+  handleUserChange = (e) => {
+    let value = e.target.value;
+    this.setState({username: value});
+  };
+
+  handlePasswordChange = (e) => {
+    let value = e.target.value;
+    this.setState({password: value});
+  };
+
+  checkUser = () => {
+    const username = this.state.username;
+    const password = this.state.password;
+    if (!!username && !!password) {
+      this.props.checkUser(username, password).then((body) => {
+        if(body.ok) {
+          this.setState({loggedIn: true})
+        } else {
+          this.setState({loggedIn: false})
+        }
+      })
+    } else {
+      this.setState({loggedIn: null})
+    }
+  }
 
   openNotificationWithIcon = (type: NotificationType, title: string, msg: string) => {
     notification[type]({
@@ -145,30 +173,7 @@ export default class DashboardGlobalInfo extends Component<any, any> {
           onChange={(e) => this.onAuthorChange(e)}
           allowClear={true}
         />
-
-        <Row className='mt-20' justify="space-between">
-          <Col span={6}>
-            <span>ECEMF forum link: </span>
-          </Col>
-          <Col span={16}>
-            <Input
-                value={this.state.userDataTemp.forum}
-                name="forum"
-                prefix={this.state.forumError ?
-                    <Tooltip title={this.state.forumError}>
-                      <WarningOutlined />
-                    </Tooltip>
-                      : <MessageOutlined className="site-form-item-icon" />}
-                placeholder="https://community.ecemf.eu/..."
-                onChange={(e) => this.onForumChange(e)}
-                allowClear={true}
-                status={this.state.forumError ? "error" : undefined}
-            />
-          </Col>
-        </Row>
-
-
-        <div className=" mt-20 tag-input-content">
+        <div className="mt-20 tag-input-content">
           <TagOutlined className="site-form-item-icon" />
           <p>
             {this.state.userDataTemp.tags.map((tag, index) => {
@@ -205,6 +210,66 @@ export default class DashboardGlobalInfo extends Component<any, any> {
             )}
           </p>
         </div>
+        <Collapse className='mt-20'>
+          <Collapse.Panel header="Are you an ECEMF member ?" key="1">
+            <Row justify="space-between">
+              <Col span={4}>
+                <span>ECEMF forum link: </span>
+              </Col>
+              <Col span={18}>
+                <Input
+                    value={this.state.userDataTemp.forum}
+                    name="forum"
+                    prefix={this.state.forumError ?
+                        <Tooltip title={this.state.forumError}>
+                          <WarningOutlined />
+                        </Tooltip>
+                        : <MessageOutlined className="site-form-item-icon" />}
+                    placeholder="https://community.ecemf.eu/..."
+                    onChange={(e) => this.onForumChange(e)}
+                    allowClear={true}
+                    status={this.state.forumError ? "error" : undefined}
+                />
+              </Col>
+            </Row>
+            <Row className='mt-20'>
+              <Col >
+                <span>Scenario Explorer login (for verification mark)</span>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={10}>
+                <Input
+                    value={this.state.username}
+                    placeholder="Username"
+                    onChange={this.handleUserChange}
+                    onBlur={this.checkUser}
+                />
+              </Col>
+              <Col span={12}>
+                <Input.Password
+                    value={this.state.password}
+                    placeholder="Password"
+                    onChange={this.handlePasswordChange}
+                    onBlur={this.checkUser}
+                />
+              </Col>
+              <Col span={2} style={{textAlign: "center"}}>
+                {this.state.loggedIn != null && (
+                    this.state.loggedIn
+                        ?
+                        <Tooltip title="Successfully authenticated !">
+                          <CheckCircleTwoTone style={{ fontSize: '24px' }} twoToneColor="lime"/>
+                        </Tooltip>
+                        :
+                        <Tooltip title="Could not authenticate this user">
+                          <ExclamationCircleTwoTone style={{ fontSize: '24px' }} twoToneColor="red"/>
+                        </Tooltip>
+                )}
+              </Col>
+            </Row>
+          </Collapse.Panel>
+        </Collapse>
       </Modal>
 
     );
