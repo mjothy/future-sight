@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-extra-boolean-cast */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import {CheckCircleOutlined, LinkOutlined, MessageOutlined, PicCenterOutlined } from '@ant-design/icons';
+import {CheckCircleOutlined, DownCircleOutlined, LinkOutlined, MessageOutlined, PicCenterOutlined } from '@ant-design/icons';
 import { Button, PageHeader, Spin, Tag, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
@@ -10,6 +10,8 @@ import BlockModel from '../models/BlockModel';
 import DashboardModel from '../models/DashboardModel';
 import GetGeoJsonContextProvider from '../services/GetGeoJsonContextProvider';
 import DashboardConfigView from './DashboardConfigView';
+import { Parser } from '@json2csv/plainjs';
+import dashboardToCsv from "../services/dashboardToCsv";
 
 /*TODO Check that embedded and published view have the same purpose and always look ok,
 * For instance, do we want full width with scrolling when in published view
@@ -49,6 +51,21 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
         setDashboard({ ...updatedDashboard });
     };
 
+    const download = () => {
+        const opts = {};
+        const parser = new Parser(opts);
+        const csvJson = dashboardToCsv(props.plotData)
+        const csv = parser.parse(csvJson);
+
+        let uri = encodeURI(csv)
+        let link = document.createElement("a");
+        link.setAttribute('download', "data.csv");
+        link.href = 'data:text/csv;charset=utf-8,' + uri;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    }
+
     const getExtras = () => {
         const extras =  [
             <Button
@@ -68,6 +85,15 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                 onClick={props.embedButtonOnClickHandler}
             >
                 Embed
+            </Button>,
+            <Button
+                key="download"
+                type="default"
+                size="small"
+                icon={<DownCircleOutlined />}
+                onClick={download}
+            >
+                Download data
             </Button>
         ]
         if(dashboard?.userData.forum) {
