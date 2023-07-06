@@ -69,17 +69,12 @@ class DashboardDataConfiguration extends Component<
    * @param block the block
    * @returns the fetched data from API with timeseries
    */
-  blockData = (block: BlockModel): void => {
-    if (block.blockType === "text") {
-      return
-    }
-
+  blockData = (block: BlockModel): Promise<void> => {
     const config: ConfigurationModel | any = block.config;
     const metaData: BlockDataModel = config.metaData;
     const data: PlotDataModel[] = [];
     const missingData: DataModel[] = [];
 
-    // TODO add categories
     if (
       metaData.models &&
       metaData.scenarios &&
@@ -130,16 +125,16 @@ class DashboardDataConfiguration extends Component<
     }
 
     if (missingData.length > 0) {
-      this.retreiveAllTimeSeriesData(data, missingData, block.id);
+      return this.retreiveAllTimeSeriesData(data, missingData, block.id);
     } else {
       const plotData = JSON.parse(JSON.stringify(this.state.plotData))
       plotData[block.id] = [...data]
-      this.setState({ plotData: plotData })
+      return new Promise<void>((resolve) => this.setState({ plotData: plotData }, resolve))
     }
   };
 
   retreiveAllTimeSeriesData = (data: PlotDataModel[], missingData: DataModel[], blockId) => {
-    this.props.dataManager.fetchPlotData(missingData)
+    return this.props.dataManager.fetchPlotData(missingData)
       .then(res => {
         // no new data to add to state.allPLotData, only update state.plotData
         if (res.length == 0) {

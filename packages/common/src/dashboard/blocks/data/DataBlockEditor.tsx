@@ -5,8 +5,8 @@ import { ExclamationCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { getUnselectedInputOptions } from '../utils/BlockDataUtils';
 import BlockDataModel, { versionsModel } from "../../../models/BlockDataModel";
 import BlockStyleModel from "../../../models/BlockStyleModel";
+import './DataBlockEditor.css';
 
-require('./DataBlockEditor.css')
 
 /**
  * The form in sidebar to add/edit dara block
