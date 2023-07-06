@@ -40,6 +40,7 @@ export default class DataBlockEditor extends Component<any, any> {
   };
 
   onChange = (option, selectedData: string[]) => {
+    console.log("selectedData: ", selectedData)
     if (selectedData.length <= 0) {
       this.clearClick(option, null);
     } else {
@@ -93,13 +94,13 @@ export default class DataBlockEditor extends Component<any, any> {
               className={"width-90"}
               value={metaData[option]}
               options={this.props.optionsData[option]}
-              onChange={this.props.onChange}
+              onChange={this.onChange}
               loading={this.props.isLoadingOptions[option]}
               isClear={selected}
               onClear={this.clearClick}
               onDropdownVisibleChange={this.props.onDropdownVisibleChange}
               isFetching={this.props.isFetching}
-              regroupOrphans={option==="regions" ? "Common regions" : undefined}
+              regroupOrphans={option === "regions" ? "Common regions" : undefined}
             />
           </Row>
         </div>
@@ -284,8 +285,8 @@ export default class DataBlockEditor extends Component<any, any> {
           {metaData.useVersion && <Row>
             <Col span={2} className={'checkbox-col'}>
               <Checkbox
-                  onChange={this.props.onShowNonDefaultRuns}
-                  checked={metaData.showNonDefaultRuns}
+                onChange={this.props.onShowNonDefaultRuns}
+                checked={metaData.showNonDefaultRuns}
               />
             </Col>
             <Col span={22} className={'checkbox-col-label'}>
