@@ -9,7 +9,7 @@ import PlotDataModel from "../../../models/PlotDataModel";
 import withColorizer from "../../../hoc/colorizer/withColorizer";
 import { stackGroups } from '../utils/StackGraphs';
 import PieView from "./graphType/pie/PieView";
-import { element } from 'prop-types';
+import { StackGroupModel } from '../../../models/StackGroupModel';
 
 class DataBlockView extends Component<any, any> {
 
@@ -69,8 +69,10 @@ class DataBlockView extends Component<any, any> {
         visualizeData = showData;
       }
     }
-    if (configStyle.aggregation.isAggregate) {
-      const aggLines = this.getAggregationLines(visualizeData, stacks.length);
+    if (configStyle.aggregation.isAggregate && configStyle.aggregation.type != null) {
+      let stackGroups = visualizeData.map(data => data.stackgroup);
+      stackGroups = new Set(stackGroups);
+      const aggLines = this.getAggregationLines(visualizeData, stackGroups.size);
       if (aggLines.length > 0) {
         visualizeData.push(...aggLines)
       }
@@ -169,23 +171,26 @@ class DataBlockView extends Component<any, any> {
           marker: { color: dataElement.color || null },
         };
         if (configStyle.stack.isStack && stacks != null) {
-          // Add the current element to a stack (if it exist in stagGroups)
-          // stack is array contains possible stacks [[{},{}], [{},{}]]
-          Object.entries(stacks).forEach(([key, val]: any) => {
-            const isExist = val.find(
-              raw => dataElement.model == raw["models"] &&
-                dataElement.variable == raw["variables"] &&
-                dataElement.region == raw["regions"] &&
-                dataElement.scenario == raw["scenarios"]
-            )
-            if (isExist) {
-              const nonStackIndex = indexKeys.filter(x => x !== configStyle.stack.value.slice(0, -1))
-              const groupIndexName = nonStackIndex.map(idx => dataElement[idx]).join(" - ")
-              obj.x = [xyDict.x, new Array(xyDict.x.length).fill(groupIndexName)]
-              console.log("x(after): ", obj.x);
-              obj.stackgroup = key;
-            }
-          })
+          if (stacks.length == 0) {
+            obj.stackgroup = 0;
+          } else {
+            Object.entries(stacks).forEach(([key, val]: any) => {
+              const isExist = val.find(
+                raw => dataElement.model == raw["models"] &&
+                  dataElement.variable == raw["variables"] &&
+                  dataElement.region == raw["regions"] &&
+                  dataElement.scenario == raw["scenarios"]
+              )
+              if (isExist) {
+                if (stacks.length > 1) {
+                  const nonStackIndex = indexKeys.filter(x => x !== configStyle.stack.value.slice(0, -1))
+                  const groupIndexName = nonStackIndex.map(idx => dataElement[idx]).join(" - ")
+                  obj.x = [xyDict.x, new Array(xyDict.x.length).fill(groupIndexName)]
+                }
+                obj.stackgroup = key;
+              }
+            })
+          }
         }
         break;
       case "box":
@@ -304,40 +309,36 @@ class DataBlockView extends Component<any, any> {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
     let x: any = [];
     const y: any = [];
-    let x1: any = [];
     let groups = null;
     const graphs = ["line", "area", "bar"]; // TODO add box
     if (graphs.includes(configStyle.graphType)) {
-      if (!configStyle.stack.isStack || numberOfStacks == 0) {
+      if (!configStyle.stack.isStack) {
         data.forEach(graphelement => {
           x.push(...graphelement.x);
           y.push(...graphelement.y);
         });
         groups = x;
       } else { // is stack
-        // Sum each stack
-        const stackGroup = {};
-        let stackGroupSySum: any[] = [];
+        const stackGroup: StackGroupModel = {};
+        let stackGroupSySum: { [year: number]: number }[] = [];
         // Sum each groups
         for (let i = 0; i < numberOfStacks; i++) {
           data.forEach(dataElement => {
+            let x = dataElement.x;
+            if (dataElement.x[0].length > 1) { // We have 2 X axes in stack bar, so [[years], [stack_Xaxis]]
+              x = dataElement.x[0];
+            }
             if (dataElement.stackgroup == i) {
-              let x = dataElement.x;
-              if (dataElement.x[0].length > 1) {
-                x = dataElement.x[0];
-                x1 = [...x1, ...dataElement.x[1]];
-              }
               const result = x.map((value, index) => {
                 return { x: value, y: dataElement.y[index] };
               });
-              (stackGroup[i] = stackGroup[i] || []).push(...result)
+              (stackGroup[i] = stackGroup[i] || []).push(...result);
             }
           });
           stackGroupSySum = Object.values(stackGroup).map(element => PlotlyUtils.groupByYear(element));
         }
 
         switch (configStyle.graphType) {
-
           case "line": // no stacking for lines
             data.forEach(graphelement => {
               x.push(...graphelement.x);
@@ -358,13 +359,19 @@ class DataBlockView extends Component<any, any> {
               y.push(...Object.values(element));
             })
             groups = x;
-            x = [x, new Array(x.length).fill(configStyle.aggregation.type)];
+            if (numberOfStacks > 1) {
+              x = [x, new Array(x.length).fill(configStyle.aggregation.type)];
+            }
             break;
         }
       }
       return [{
         type: 'scatter',
+        barmode: 'stack',
         mode: 'lines+markers',
+        line: {
+          dash: 'dot'
+        },
         x: x,
         y: y,
         hoverText: configStyle.aggregation.type,

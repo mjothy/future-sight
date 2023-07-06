@@ -79,7 +79,6 @@ export default class PlotlyGraph extends Component<any, any> {
       }
     }
 
-    console.log("layout axis: ", this.props.data);
 
     return configStyle.graphType === 'table' && this.props.data.values.length > 0 ? (
       <Table

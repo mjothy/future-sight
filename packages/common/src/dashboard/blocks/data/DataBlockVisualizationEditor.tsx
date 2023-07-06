@@ -19,6 +19,10 @@ const PLOTLY_AGGREGATION = [
     value: 'avg',
     label: 'Average',
   },
+  {
+    value: 'median',
+    label: 'Median',
+  },
 ]
 const plotTypes = [
   { type: 'line', label: 'Line', icon: <LineChartOutlined /> },
@@ -297,7 +301,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
 
         {["line", "area", "bar"].includes(configStyle.graphType) &&
           <>
-            <h3>Aggregation</h3>
+            <h3>Calculations</h3>
             <Row>
               <Col span={2} className={'checkbox-col'}>
                 <Checkbox
