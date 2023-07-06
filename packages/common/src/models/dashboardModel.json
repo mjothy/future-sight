@@ -78,6 +78,11 @@
             "isGroupBy": false,
             "value": ""
           },
+          "aggregation": {
+            "isAggregate": false,
+            "type": null,
+            "label": ""
+          },
           "pie": {
             "isDonut": false,
             "showPercent": true,

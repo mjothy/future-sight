@@ -11,6 +11,20 @@ import BoxVisualizationEditor from "./graphType/box/BoxVisualizationEditor";
 
 const { Option } = Select;
 
+const PLOTLY_AGGREGATION = [
+  {
+    value: 'sum',
+    label: 'Sum',
+  },
+  {
+    value: 'avg',
+    label: 'Average',
+  },
+  {
+    value: 'median',
+    label: 'Median',
+  },
+]
 const plotTypes = [
   { type: 'line', label: 'Line', icon: <LineChartOutlined /> },
   { type: 'bar', label: 'Bar', icon: <BarChartOutlined /> },
@@ -122,6 +136,19 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
+  onAggregateChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.aggregation.isAggregate = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onAggregationTypeChange = (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.aggregation.type = value;
+    configStyle.aggregation.label = PLOTLY_AGGREGATION.find(element => element.value == value)?.label;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
   onStackGroupByChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.stack.isGroupBy = e.target.checked;
@@ -131,6 +158,12 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   onStackValueChange = (value) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.stack.value = value;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onAggregateValueChange = (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.aggregation.value = value;
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
@@ -245,7 +278,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
 
         {["area", "bar"].includes(configStyle.graphType) &&
           <>
-            <h3>{plotTypes.find(chart => chart.type == configStyle.graphType)?.label}</h3>
+            <h3>Stack</h3>
             <Row>
               <Col span={2} className={'checkbox-col'}>
                 <Checkbox
@@ -269,7 +302,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                   )}
                   allowClear
                   disabled={!configStyle.stack.isStack}
-                  dropdownMatchSelectWidth={false}
+                  dropdownMatchSelectWidth={true}
                 >
                   {this.props.optionsLabel.map((value) => {
                     if (metaData[value].length > 1) return (
@@ -285,6 +318,54 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
           </>
         }
 
+        {["line", "area", "bar"].includes(configStyle.graphType) &&
+          <>
+            <h3>Calculations</h3>
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onAggregateChange}
+                  checked={configStyle.aggregation.isAggregate}
+                />
+              </Col>
+              <Col span={8}>
+                <Select
+                  className="width-100"
+                  placeholder="Type"
+                  value={configStyle.aggregation.type}
+                  onChange={this.onAggregationTypeChange}
+                  disabled={!configStyle.aggregation.isAggregate}
+                  options={PLOTLY_AGGREGATION}
+                />
+              </Col>
+              {/* <Col span={8} className="ml-20">
+                <Select
+                  placeholder="Select"
+                  value={configStyle.aggregation.value}
+                  onChange={this.onAggregateValueChange}
+                  notFoundContent={(
+                    <div>
+                      <ExclamationCircleOutlined />
+                      <p>Item not found.</p>
+                    </div>
+                  )}
+                  allowClear
+                  disabled={!configStyle.aggregation.isAggregate}
+                  dropdownMatchSelectWidth={true}
+                >
+                  {this.props.optionsLabel.map((value) => {
+                    if (metaData[value].length > 1) return (
+                      <Option key={value} value={value}>
+                        {value}
+                      </Option>
+                    )
+                  }
+                  )}
+                </Select>
+              </Col> */}
+            </Row>
+          </>
+        }
         <h3>Axis</h3>
         {this.isShowGraphConfig(configStyle.graphType) &&
           <>

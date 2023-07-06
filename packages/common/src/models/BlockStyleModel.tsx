@@ -13,7 +13,7 @@ export default class BlockStyleModel {
     Scenario: false,
     Region: false,
     Variable: false,
-    Version: false
+    Version: false,
   };
   title = {
     value: 'Title',
@@ -53,6 +53,11 @@ export default class BlockStyleModel {
     isStack: false,
     isGroupBy: false,
     value: ''
+  };
+  aggregation = {
+    isAggregate: false,
+    type: null,
+    label: ''
   };
   pie = {
     isDonut: false,
