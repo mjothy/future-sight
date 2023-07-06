@@ -2,15 +2,19 @@ import React, {Component} from 'react';
 import DataBlockView from "./DataBlockView";
 import BlockDataModel from "../../../models/BlockDataModel";
 import ConfigurationModel from "../../../models/ConfigurationModel";
+import LoaderMask from "../utils/LoaderMask";
 
 class DataBlockTransfert extends Component<any, any> {
 
   constructor(props) {
     super(props);
+    this.state = {
+      loading: true
+    }
   }
 
   componentDidMount() {
-    this.props.blockData(this.props.currentBlock)
+    this.retrieveData();
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -19,8 +23,16 @@ class DataBlockTransfert extends Component<any, any> {
         !==
         JSON.stringify(this.getMetaData(prevProps.currentBlock))
     ) {
-      this.props.blockData(this.props.currentBlock)
+      this.retrieveData();
     }
+  }
+
+  retrieveData = () => {
+    this.setState({loading: true}, () => {
+      this.props.blockData(this.props.currentBlock).then(() => {
+        this.setState({loading: false});
+      })
+    })
   }
 
   getMetaData = (block) => {
@@ -34,13 +46,16 @@ class DataBlockTransfert extends Component<any, any> {
     if (!timeseriesData) {
       timeseriesData = []
     }
-    return <DataBlockView
+    return <>
+      <LoaderMask loading={this.state.loading}/>
+      <DataBlockView
         currentBlock={this.props.currentBlock}
         timeseriesData={timeseriesData}
         width={this.props.width}
         height={this.props.height}
         checkDeprecatedVersion={this.props.checkDeprecatedVersion}
-    />
+      />
+    </>
   }
 }
 
