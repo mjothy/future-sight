@@ -7,7 +7,6 @@ import { getBlock } from './utils/BlockDataUtils';
 import BlockDataModel, { versionsModel } from "../../models/BlockDataModel";
 import DashboardModel from "../../models/DashboardModel";
 import { getSelectedFiltersLabels } from './utils/DashboardUtils';
-import { notification } from 'antd';
 
 export default class BlockFilterManager extends Component<any, any> {
     constructor(props) {
@@ -323,7 +322,7 @@ export default class BlockFilterManager extends Component<any, any> {
         const version_dict: versionsModel = {};
 
         for (const rawValue of selectedValues) {
-            const { model, scenario, version } = JSON.parse(rawValue)
+            const {model, scenario, version} = JSON.parse(rawValue)
             // Initialise versions[model] and versions[model][scenario]if not exist
             !(model in version_dict) && (version_dict[model] = {});
             !(scenario in version_dict[model]) && (version_dict[model][scenario] = []);
@@ -341,7 +340,27 @@ export default class BlockFilterManager extends Component<any, any> {
         }
 
         dashboard.blocks[this.props.currentBlock.id].config.metaData.versions = state_version_dict;
-        this.props.updateDashboard(dashboard)
+
+        const selectOrder = this.props.currentBlock.config.metaData.selectOrder
+
+        // Update filters to stale
+        const staleFilters = {...this.state.staleFilters}
+
+        // -- Update filters with higher idx order than models and scenarios to stale
+        const maxIdxModelScenario = Math.max(selectOrder.indexOf("models"), selectOrder.indexOf("scenarios"))
+        for (const tempFilterId of selectOrder.slice(maxIdxModelScenario + 1)){
+            staleFilters[tempFilterId] = true
+        }
+
+        // -- Update unselected filter to stale
+        for (const tempFilterId of Object.keys(staleFilters).filter((x) => !selectOrder.includes(x))) {
+            staleFilters[tempFilterId] = true
+        }
+
+        this.setState({ staleFilters: staleFilters },
+            () => this.props.updateDashboard(dashboard)
+        )
+
     };
 
     updateChildsBlocks = (dashboard, controlBlockId) => {
