@@ -47,7 +47,6 @@ export default class BlockFilterManager extends Component<any, any> {
                 scenarios: false,
                 models: false
             },
-            isFetching: false,
             currentSelection: [] // When opening a selectInput, store its value here to compare when closing
         };
     }
@@ -113,7 +112,7 @@ export default class BlockFilterManager extends Component<any, any> {
             dataFocusFilters[filter] = this.props.dashboard.dataStructure[filter].selection;
         })
 
-        this.setState({ isLoadingOptions: { ...this.state.isLoadingOptions, [filterId]: true }, isFetching: true })
+        this.setState({ isLoadingOptions: { ...this.state.isLoadingOptions, [filterId]: true }})
         return this.props.dataManager.fetchFilterOptions({ filterId, metaData, dataFocusFilters })
             .then(res => {
                 let optionsData = JSON.parse(JSON.stringify(this.state.optionsData))
@@ -121,15 +120,13 @@ export default class BlockFilterManager extends Component<any, any> {
                 this.setState({
                     optionsData,
                     isLoadingOptions: { ...this.state.isLoadingOptions, [filterId]: false },
-                    isFetching: false
                 }, () => {
                     this.props.checkIfSelectedInOptions(this.state.optionsData, this.props.currentBlock)
                 })
             })
             .catch(err => {
                 this.setState({
-                    isLoadingOptions: { ...this.state.isLoadingOptions, [filterId]: false },
-                    isFetching: false
+                    isLoadingOptions: { ...this.state.isLoadingOptions, [filterId]: false }
                 });
             })
     }
@@ -322,7 +319,7 @@ export default class BlockFilterManager extends Component<any, any> {
         const version_dict: versionsModel = {};
 
         for (const rawValue of selectedValues) {
-            const {model, scenario, version} = JSON.parse(rawValue)
+            const { model, scenario, version } = JSON.parse(rawValue)
             // Initialise versions[model] and versions[model][scenario]if not exist
             !(model in version_dict) && (version_dict[model] = {});
             !(scenario in version_dict[model]) && (version_dict[model][scenario] = []);
@@ -344,11 +341,11 @@ export default class BlockFilterManager extends Component<any, any> {
         const selectOrder = this.props.currentBlock.config.metaData.selectOrder
 
         // Update filters to stale
-        const staleFilters = {...this.state.staleFilters}
+        const staleFilters = { ...this.state.staleFilters }
 
         // -- Update filters with higher idx order than models and scenarios to stale
         const maxIdxModelScenario = Math.max(selectOrder.indexOf("models"), selectOrder.indexOf("scenarios"))
-        for (const tempFilterId of selectOrder.slice(maxIdxModelScenario + 1)){
+        for (const tempFilterId of selectOrder.slice(maxIdxModelScenario + 1)) {
             staleFilters[tempFilterId] = true
         }
 
@@ -397,12 +394,13 @@ export default class BlockFilterManager extends Component<any, any> {
         return obligatory.length == 4
     }
 
-    onShowNonDefaultRuns= (e) => {
+    onShowNonDefaultRuns = (e) => {
         const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
         dashboard.blocks[this.props.currentBlock.id].config.metaData.showNonDefaultRuns = e.target.checked;
         this.props.updateDashboard(dashboard)
         // set every update to stale
-        this.setState({staleFilters: {
+        this.setState({
+            staleFilters: {
                 regions: true,
                 variables: true,
                 scenarios: true,
@@ -424,8 +422,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 onVersionSelected={this.onVersionSelected}
                 setStaleFiltersFromSelectOrder={this.setStaleFiltersFromSelectOrder}
                 isAllSelected={this.isAllSelected}
-                isFetching={this.state.isFetching}
-                onShowNonDefaultRuns = {this.onShowNonDefaultRuns}
+                onShowNonDefaultRuns={this.onShowNonDefaultRuns}
             />
         ) : (
             <ControlBlockEditor
@@ -436,7 +433,6 @@ export default class BlockFilterManager extends Component<any, any> {
                 onChange={this.onChange}
                 onDropdownVisibleChange={this.onDropdownVisibleChange}
                 setStaleFiltersFromSelectOrder={this.setStaleFiltersFromSelectOrder}
-                isFetching={this.state.isFetching}
             />
         );
     }

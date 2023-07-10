@@ -90,7 +90,6 @@ export default class DataBlockEditor extends Component<any, any> {
 
             <SelectInput
               type={option}
-              placeholder={option}
               className={"width-90"}
               value={metaData[option]}
               options={this.props.optionsData[option]}
@@ -99,7 +98,6 @@ export default class DataBlockEditor extends Component<any, any> {
               isClear={selected}
               onClear={this.clearClick}
               onDropdownVisibleChange={this.props.onDropdownVisibleChange}
-              isFetching={this.props.isFetching}
               regroupOrphans={option === "regions" ? "Common regions" : undefined}
             />
           </Row>

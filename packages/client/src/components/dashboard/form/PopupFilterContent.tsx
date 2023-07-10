@@ -66,7 +66,6 @@ export default class PopupFilterContent extends Component<any, any> {
       value={this.state.dataStructure[type].selection}
       options={this.props.optionsData[type]}
       onChange={this.onChange}
-      isFetching={this.props.isFetching}
       onDropdownVisibleChange={this.onDropdownVisibleChange}
       isClosable={true}
     />

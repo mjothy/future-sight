@@ -108,7 +108,6 @@ export default class ControlBlockEditor extends Component<any, any> {
           isClear={true}
           onClear={this.clearClick}
           onDropdownVisibleChange={this.props.onDropdownVisibleChange}
-          isFetching={this.props.isFetching}
         />}
       </div>
     );

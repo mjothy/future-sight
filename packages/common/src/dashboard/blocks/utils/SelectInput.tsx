@@ -3,8 +3,6 @@ import { Button, Input, Select, Tag, Tooltip, TreeSelect } from 'antd'
 import React, { Component } from 'react'
 const { Option } = Select;
 
-// TODO keep only loading (isFetching and loading have the same behaviour)
-// same for label and placeholder
 interface SelectOptionProps {
     /**
      * The data option, it could be models, scenarios , ...
@@ -19,9 +17,7 @@ interface SelectOptionProps {
     onDropdownVisibleChange?: (option: string, e: any) => void;
     onDeselect?: (type: string, selectedData: string[]) => void;
     loading?: boolean;
-    isFetching?: false;
     className?: string;
-    placeholder?: string;
     isClosable?: boolean;
     regroupOrphans?: string;
 }
@@ -51,12 +47,13 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 if (values.length === 1 && this.props.regroupOrphans) {
                     // Regroup orphan nodes under single parent if option enabled
                     let orphanParent = treeData.find((node) => node.label === this.props.regroupOrphans)
-                    if(!orphanParent) {
+                    if (!orphanParent) {
                         orphanParent = {
                             title: this.props.regroupOrphans,
                             label: this.props.regroupOrphans,
                             key: this.props.regroupOrphans,
-                            value: this.props.regroupOrphans, children: [], checkable: false };
+                            value: this.props.regroupOrphans, children: [], checkable: false
+                        };
                         treeData.push(orphanParent);
                     }
                     orphanParent.children.push(currentNode);
@@ -94,21 +91,12 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         return (
             <div>
                 {menu}
-                {!this.props.isFetching && this.props.value.map(selectedValue => (
-                    !this.props.options?.includes(selectedValue) && (
-                        <div key={selectedValue} style={{ color: 'red' }} className={"ant-select-item ant-select-item-option"}>
-                            <div className='ant-select-item-option-content'>
-                                <ExclamationCircleOutlined /> {selectedValue}
-                            </div>
-                        </div>
-                    )
-                ))}
             </div>
         );
     }
 
     tagRender = (props, isShowValue) => {
-        const { value, label, closable, onClose } = props;
+        const { value, label, onClose } = props;
         return (
             <Tag
                 color={this.props.options?.includes(value) ? undefined : 'red'}
@@ -141,7 +129,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 onChange={(selectedData: any[]) =>
                     this.props.onChange(this.props.type, selectedData.map((data: any) => data.value != null ? data.value : data))
                 }
-                treeData={this.splitOptions(this.props.options)}
+                treeData={this.props.loading ? undefined : this.splitOptions(this.props.options)}
                 tagRender={(props) => this.tagRender(props, true)}
                 treeCheckStrictly={true}
                 showCheckedStrategy={"SHOW_ALL"}
@@ -151,7 +139,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 }
                 onDeselect={(selectedData) => this.props.onDeselect?.(this.props.type, selectedData.map((data: any) => data.value))}
                 dropdownMatchSelectWidth={false}
-                notFoundContent={(this.props.isFetching) ? (
+                notFoundContent={(this.props.loading) ? (
                     <div>
                         <LoadingOutlined />
                         <p>Fetching data</p>
@@ -216,13 +204,13 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 }
                 tagRender={(props) => this.tagRender(props, false)} // false: show only the value of selected leaf
                 showCheckedStrategy={"SHOW_CHILD"}
-                className={this.props.className}
+                className={"fsselectinput " + this.props.className}
                 onDropdownVisibleChange={(e) =>
                     this.props.onDropdownVisibleChange?.(this.props.type, e)
                 }
                 onDeselect={(selectedData) => this.props.onDeselect?.(this.props.type, selectedData.map((data: any) => data.value))}
                 dropdownMatchSelectWidth={false}
-                notFoundContent={(this.props.isFetching) ? (
+                notFoundContent={(this.props.loading) ? (
                     <div>
                         <LoadingOutlined />
                         <p>Fetching data</p>
@@ -236,7 +224,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 onSearch={this.onSearch}
                 searchValue={this.state.searchValue}
             >
-                {this.renderTreeNodes(this.splitOptions(this.props.options))}
+                {this.props.loading ? undefined : this.renderTreeNodes(this.splitOptions(this.props.options))}
 
             </TreeSelect>
             {this.props.isClear && <Tooltip title="Clear">
@@ -254,7 +242,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
             <Input.Group compact>
                 <Select
                     mode="multiple"
-                    className={this.props.className}
+                    className={"fsselectinput " + this.props.className}
                     dropdownRender={this.dropdownRender} // TODO
                     tagRender={(props) => this.tagRender(props, true)} // TODO
                     placeholder={this.props.label || this.props.type}
@@ -269,7 +257,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                     }
                     }
                     dropdownMatchSelectWidth={false}
-                    notFoundContent={(this.props.isFetching) ? (
+                    notFoundContent={(this.props.loading) ? (
                         <div>
                             <LoadingOutlined />
                             <p>Fetching data</p>
@@ -280,7 +268,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                         </div>
                     )}
                 >
-                    {this.props.options?.map((value) => (
+                    {this.props.loading ? undefined : this.props.options?.map((value) => (
                         <Option key={value} value={value}>
                             {value}
                         </Option>
