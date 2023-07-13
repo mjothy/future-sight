@@ -70,7 +70,6 @@ export default class BlockFilterManager extends Component<any, any> {
         if (metadata["scenarios"].length > 0 && metadata["models"].length > 0) {
             this.updateFilterOptions("versions")
         }
-        this.updateMissingData();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -88,7 +87,6 @@ export default class BlockFilterManager extends Component<any, any> {
                     }
                 }
             )
-            this.updateMissingData();
         }
     }
 
@@ -112,7 +110,7 @@ export default class BlockFilterManager extends Component<any, any> {
             dataFocusFilters[filter] = this.props.dashboard.dataStructure[filter].selection;
         })
 
-        this.setState({ isLoadingOptions: { ...this.state.isLoadingOptions, [filterId]: true }})
+        this.setState({ isLoadingOptions: { ...this.state.isLoadingOptions, [filterId]: true } })
         return this.props.dataManager.fetchFilterOptions({ filterId, metaData, dataFocusFilters })
             .then(res => {
                 let optionsData = JSON.parse(JSON.stringify(this.state.optionsData))
@@ -122,6 +120,7 @@ export default class BlockFilterManager extends Component<any, any> {
                     isLoadingOptions: { ...this.state.isLoadingOptions, [filterId]: false },
                 }, () => {
                     this.props.checkIfSelectedInOptions(this.state.optionsData, this.props.currentBlock)
+                    this.updateMissingData();
                 })
             })
             .catch(err => {
@@ -278,11 +277,6 @@ export default class BlockFilterManager extends Component<any, any> {
                 ) {
                     this.updateFilterOptions("versions")
                 }
-            }
-
-            // Update missing data message
-            if (addedOptions.length > 0 || deletedOptions.length > 0) {
-                this.updateMissingData();
             }
         }
     };
