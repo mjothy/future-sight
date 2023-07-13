@@ -8,15 +8,15 @@ import {
   DataModel,
   OptionsDataModel,
   PlotDataModel,
-  ReadOnlyDashboard
+  ReadOnlyDashboard,
 } from '@future-sight/common';
-import {Component} from 'react';
+import { Component } from 'react';
 import withDataManager from '../../services/withDataManager';
-import {RoutingProps} from '../app/Routing';
+import { RoutingProps } from '../app/Routing';
 import DashboardSelectionControl from './DashboardSelectionControl';
-import {getDraft, removeDraft} from '../drafts/DraftUtils';
+import { getDraft, removeDraft } from '../drafts/DraftUtils';
 import Utils from '../../services/Utils';
-import {Spin} from 'antd';
+import { Spin } from 'antd';
 
 export interface DashboardDataConfigurationProps
   extends ComponentPropsWithDataManager,
@@ -69,12 +69,26 @@ class DashboardDataConfiguration extends Component<
    * @param block the block
    * @returns the fetched data from API with timeseries
    */
-  blockData = (block: BlockModel): Promise<void> => {
+  blockData = async (block: BlockModel, childBlocks?: BlockModel[]) => {
+    switch (block.blockType) {
+      case "data":
+        return this.getPlotData(block);
+      case "control":
+        if (childBlocks != null && childBlocks.length > 0) {
+          for (const child of childBlocks) {
+            await this.getPlotData(child);
+          }
+        }
+        return
+    }
+  };
+
+  getPlotData = (block: BlockModel) => {
     const config: ConfigurationModel | any = block.config;
     const metaData: BlockDataModel = config.metaData;
     const data: PlotDataModel[] = [];
     const missingData: DataModel[] = [];
-
+    // Check if type == control --> fin setState
     if (
       metaData.models &&
       metaData.scenarios &&
@@ -95,8 +109,8 @@ class DashboardDataConfiguration extends Component<
                       e.model === model &&
                       e.scenario === scenario &&
                       e.variable === variable &&
-                      e.region === region &&
-                      e.run.id === version.id
+                      e.region === region
+                    // && e.run.id === version.id
                   );
                   if (d) {
                     data.push(d);

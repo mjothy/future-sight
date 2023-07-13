@@ -1,7 +1,5 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import DataBlockView from "./DataBlockView";
-import BlockDataModel from "../../../models/BlockDataModel";
-import ConfigurationModel from "../../../models/ConfigurationModel";
 import LoaderMask from "../utils/LoaderMask";
 
 class DataBlockTransfert extends Component<any, any> {
@@ -18,27 +16,27 @@ class DataBlockTransfert extends Component<any, any> {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if(
-        JSON.stringify(this.getMetaData(this.props.currentBlock))
-        !==
-        JSON.stringify(this.getMetaData(prevProps.currentBlock))
-    ) {
-      this.retrieveData();
+    if (JSON.stringify(this.props.getMetaData(this.props.currentBlock)) !== JSON.stringify(this.props.getMetaData(prevProps.currentBlock))) {
+      if (this.props.parentBlock != null) {
+        if (JSON.stringify(this.props.getMetaData(this.props.parentBlock)) === JSON.stringify(this.props.getMetaData(prevProps.parentBlock))) {
+          this.retrieveData(); // When dataBlock update its data (No controlled filteres)
+        } else {
+          this.setState({ loading: true })
+        }
+      } else {
+        this.retrieveData();
+      }
+    } else if (this.state.loading) {
+      this.setState({ loading: false })
     }
   }
 
   retrieveData = () => {
-    this.setState({loading: true}, () => {
+    this.setState({ loading: true }, () => {
       this.props.blockData(this.props.currentBlock).then(() => {
-        this.setState({loading: false});
+        this.setState({ loading: false });
       })
     })
-  }
-
-  getMetaData = (block) => {
-    const config: ConfigurationModel | any = block.config;
-    const metaData: BlockDataModel = config.metaData;
-    return metaData
   }
 
   render() {
@@ -47,7 +45,7 @@ class DataBlockTransfert extends Component<any, any> {
       timeseriesData = []
     }
     return <>
-      <LoaderMask loading={this.state.loading}/>
+      <LoaderMask loading={this.state.loading} />
       <DataBlockView
         currentBlock={this.props.currentBlock}
         timeseriesData={timeseriesData}

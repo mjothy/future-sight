@@ -1,14 +1,24 @@
-import { Col, Row, Select } from 'antd';
+import { Col, Row } from 'antd';
 import { Component } from 'react';
-import BlockModel from '../../../models/BlockModel';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 import { getChildrens } from '../utils/BlockDataUtils';
 import * as _ from 'lodash';
 import SelectInput from '../utils/SelectInput';
+import ConfigurationModel from '../../../models/ConfigurationModel';
 require('./ControlBlockView.css')
-const { Option } = Select;
 
 export default class ControlBlockView extends Component<any, any> {
+
+  componentDidUpdate(prevProps, prevState) {
+    if (JSON.stringify(this.props.getMetaData(this.props.currentBlock)) !== JSON.stringify(this.props.getMetaData(prevProps.currentBlock))) {
+      this.retrieveData();
+    }
+  }
+
+  retrieveData = () => {
+    const childrens: any[] = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id);
+    this.props.blockData(this.props.currentBlock, childrens);
+  }
 
   shouldComponentUpdate(nextProps: Readonly<any>, nextState: Readonly<any>, nextContext: any): boolean {
     let shouldUpdate = true;
@@ -33,11 +43,12 @@ export default class ControlBlockView extends Component<any, any> {
     dashboard.blocks[this.props.currentBlock.id].config = { ...config };
 
     // Update children
-    const childrens = getChildrens(dashboard.blocks, this.props.currentBlock.id);
+    const childrens: any[] = getChildrens(dashboard.blocks, this.props.currentBlock.id);
 
     if (childrens.length > 0) {
-      childrens.map((child: BlockModel | any) => {
-        const configChild = child.config;
+      // childrens.map((child: BlockModel | any) => 
+      for (const child of childrens) {
+        const configChild: ConfigurationModel = child.config;
         this.props.optionsLabel.map((option) => {
           const isMaster = config.metaData.master[option].isMaster;
           if (isMaster) {
@@ -46,7 +57,7 @@ export default class ControlBlockView extends Component<any, any> {
             dashboard.blocks[child.id].config = { ...configChild };
           }
         });
-      });
+      }
     }
 
     this.props.updateDashboard(dashboard)
