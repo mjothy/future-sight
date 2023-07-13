@@ -83,11 +83,11 @@ class DataBlockView extends Component<any, any> {
 
 
   prepareTableData = (data: PlotDataModel[]) => {
-    const columns: ColumnsType<any> = [
-      { title: 'model', dataIndex: 'model' },
-      { title: 'scenario', dataIndex: 'scenario' },
-      { title: 'variable', dataIndex: 'variable' },
-      { title: 'region', dataIndex: 'region' },
+    const columns_list = [
+      'model',
+      'scenario',
+      'variable',
+      'region'
     ];
 
     const values: any[] = [];
@@ -95,10 +95,9 @@ class DataBlockView extends Component<any, any> {
       const obj = {};
       dataElement.data?.map((e) => {
         obj[e.year] = e.value;
-        columns.push({
-          title: e.year,
-          dataIndex: e.year,
-        });
+        if (!columns_list.includes(e.year)){
+          columns_list.push(e.year)
+        }
       });
 
       values.push({
@@ -109,6 +108,12 @@ class DataBlockView extends Component<any, any> {
         ...obj,
       });
     });
+
+    const columns = columns_list.map(col => {
+      return {
+        title: col, dataIndex: col
+      }
+    })
 
     return { columns, values };
   }

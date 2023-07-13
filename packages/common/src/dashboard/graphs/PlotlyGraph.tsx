@@ -81,11 +81,11 @@ export default class PlotlyGraph extends Component<any, any> {
     return configStyle.graphType === 'table' && this.props.data.values.length > 0 ? (
       <Table
         // Make the height 100% of the div (not working)
-        style={{ minHeight: '100%' }}
+        // style={{ minHeight: '100%' }}
         columns={this.props.data.columns}
         dataSource={this.props.data.values}
         pagination={false}
-        scroll={{ x: 3000, y: this.props.height - 40 }}
+        scroll={{ x: 3000, y: this.props.height - 37 }}
         bordered
       />
     ) : (
