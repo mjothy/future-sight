@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import ControlBlockView from './control/ControlBlockView';
 import TextBlockView from './text/TextBlockView';
 import DataBlockTransfert from "./data/DataBlockTransfert";
-import { getChildrens } from './utils/BlockDataUtils';
 import ConfigurationModel from '../../models/ConfigurationModel';
 import BlockDataModel from '../../models/BlockDataModel';
 
@@ -38,6 +37,7 @@ export default class BlockViewManager extends Component<any, any> {
           height={this.props.height}
           checkDeprecatedVersion={this.props.checkDeprecatedVersion}
           getMetaData={this.getMetaData}
+          loadingControlBlock={this.props.loadingControlBlock[this.props.currentBlock.controlBlock]}
         />;
       case 'control':
         return <ControlBlockView
@@ -47,6 +47,7 @@ export default class BlockViewManager extends Component<any, any> {
           updateDashboard={this.props.updateDashboard}
           blockData={this.props.blockData}
           getMetaData={this.getMetaData}
+          updateLoadingControlBlock={this.props.updateLoadingControlBlock}
         />;
       default:
         return <p>Error !</p>;

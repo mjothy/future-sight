@@ -16,8 +16,12 @@ export default class ControlBlockView extends Component<any, any> {
   }
 
   retrieveData = () => {
-    const childrens: any[] = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id);
-    this.props.blockData(this.props.currentBlock, childrens);
+    this.props.updateLoadingControlBlock(this.props.currentBlock.id, true).then(() => {
+      const childrens: any[] = getChildrens(this.props.dashboard.blocks, this.props.currentBlock.id);
+      this.props.blockData(this.props.currentBlock, childrens).then(() => {
+        this.props.updateLoadingControlBlock(this.props.currentBlock.id, false)
+      })
+    })
   }
 
   shouldComponentUpdate(nextProps: Readonly<any>, nextState: Readonly<any>, nextContext: any): boolean {

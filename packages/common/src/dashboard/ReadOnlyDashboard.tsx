@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-extra-boolean-cast */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import {CheckCircleOutlined, DownCircleOutlined, LinkOutlined, MessageOutlined, PicCenterOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, DownCircleOutlined, LinkOutlined, MessageOutlined, PicCenterOutlined } from '@ant-design/icons';
 import { Button, PageHeader, Spin, Tag, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
@@ -29,6 +29,8 @@ interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
     blockData: (block: BlockModel) => void;
     optionsLabel: string[]
     plotData: any[];
+    updateLoadingControlBlock: (id, status) => Promise<void>;
+    loadingControlBlock: any;
 }
 
 type LocationState = { dashboard: DashboardModel };
@@ -67,7 +69,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
     }
 
     const getExtras = () => {
-        const extras =  [
+        const extras = [
             <Button
                 key="share"
                 type="default"
@@ -96,7 +98,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                 Download data
             </Button>
         ]
-        if(dashboard?.userData.forum) {
+        if (dashboard?.userData.forum) {
             const forumLink = (
                 <a href={dashboard.userData.forum} target="_blank" rel="noopener noreferrer">
                     <Button
@@ -109,7 +111,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                     </Button>
                 </a>
             )
-            extras.splice(0, 0 , forumLink)
+            extras.splice(0, 0, forumLink)
         }
         return extras
     }
@@ -142,11 +144,11 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
             { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 
     const getSubtitle = () => {
-        return <div style={{display: "inline-block"}}>
+        return <div style={{ display: "inline-block" }}>
             <span>by {dashboard?.userData.author}</span>
             {dashboard?.verified && <Tooltip title="This user is a verified member of ECEMF">
-                    <Tag icon={<CheckCircleOutlined />} color="success">Verified</Tag>
-                </Tooltip>
+                <Tag icon={<CheckCircleOutlined />} color="success">Verified</Tag>
+            </Tooltip>
             }
             {!!publicationDate && <span>, published on {publicationDate}</span>}
         </div>
@@ -185,6 +187,8 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                             blockData={props.blockData}
                             optionsLabel={props.optionsLabel}
                             plotData={props.plotData}
+                            updateLoadingControlBlock={props.updateLoadingControlBlock}
+                            loadingControlBlock={props.loadingControlBlock}
                         />
                     </GetGeoJsonContextProvider>
                 )}

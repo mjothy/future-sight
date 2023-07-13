@@ -45,6 +45,9 @@ class DashboardDataConfiguration extends Component<
        */
       allPlotData: {},
       plotData: {},
+      loadingControlBlock: {
+
+      }
     };
   }
 
@@ -109,8 +112,8 @@ class DashboardDataConfiguration extends Component<
                       e.model === model &&
                       e.scenario === scenario &&
                       e.variable === variable &&
-                      e.region === region
-                    // && e.run.id === version.id
+                      e.region === region &&
+                      e.run.id === version.id
                   );
                   if (d) {
                     data.push(d);
@@ -145,6 +148,16 @@ class DashboardDataConfiguration extends Component<
       plotData[block.id] = [...data]
       return new Promise<void>((resolve) => this.setState({ plotData: plotData }, resolve))
     }
+  };
+
+  updateLoadingControlBlock = (id, status) => {
+    return new Promise<void>((resolve) => {
+      const loadingControlBlock = { ...this.state.loadingControlBlock };
+      loadingControlBlock[id] = status;
+      this.setState({ loadingControlBlock }, () => {
+        resolve();
+      });
+    });
   };
 
   retreiveAllTimeSeriesData = (data: PlotDataModel[], missingData: DataModel[], blockId) => {
@@ -184,6 +197,8 @@ class DashboardDataConfiguration extends Component<
         // filters={this.state.filters}
         plotData={this.state.plotData}
         optionsLabel={this.optionsLabel}
+        updateLoadingControlBlock={this.updateLoadingControlBlock}
+        loadingControlBlock={this.state.loadingControlBlock}
         {...this.props}
       />
     ) : (
@@ -193,7 +208,8 @@ class DashboardDataConfiguration extends Component<
         plotData={this.state.plotData}
         blockData={this.blockData}
         optionsLabel={this.optionsLabel}
-
+        updateLoadingControlBlock={this.updateLoadingControlBlock}
+        loadingControlBlock={this.state.loadingControlBlock}
         {...this.props}
       /> || <div className="dashboard">
         <Spin className="centered" />

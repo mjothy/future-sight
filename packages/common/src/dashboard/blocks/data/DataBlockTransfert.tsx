@@ -7,7 +7,8 @@ class DataBlockTransfert extends Component<any, any> {
   constructor(props) {
     super(props);
     this.state = {
-      loading: true
+      loading: true,
+      firstLoad: true
     }
   }
 
@@ -20,21 +21,17 @@ class DataBlockTransfert extends Component<any, any> {
       if (this.props.parentBlock != null) {
         if (JSON.stringify(this.props.getMetaData(this.props.parentBlock)) === JSON.stringify(this.props.getMetaData(prevProps.parentBlock))) {
           this.retrieveData(); // When dataBlock update its data (No controlled filteres)
-        } else {
-          this.setState({ loading: true })
         }
       } else {
         this.retrieveData();
       }
-    } else if (this.state.loading) {
-      this.setState({ loading: false })
     }
   }
 
   retrieveData = () => {
     this.setState({ loading: true }, () => {
       this.props.blockData(this.props.currentBlock).then(() => {
-        this.setState({ loading: false });
+        this.setState({ loading: false, firstLoad: false });
       })
     })
   }
@@ -44,8 +41,9 @@ class DataBlockTransfert extends Component<any, any> {
     if (!timeseriesData) {
       timeseriesData = []
     }
+
     return <>
-      <LoaderMask loading={this.state.loading} />
+      <LoaderMask loading={this.state.firstLoad ? this.state.loading : (this.props.loadingControlBlock != null ? this.props.loadingControlBlock : this.state.loading)} />
       <DataBlockView
         currentBlock={this.props.currentBlock}
         timeseriesData={timeseriesData}
