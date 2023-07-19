@@ -194,8 +194,6 @@ export default class DashboardSelectionControl extends Component<
   */
   checkIfSelectedInOptions = (optionsData, block: BlockModel) => {
     let optionsLabel = [...this.props.optionsLabel];
-    const dashboard = { ...this.state.dashboard };
-    const config = block.config as ConfigurationModel;
     const metaData = JSON.parse(JSON.stringify(((block.config) as ConfigurationModel).metaData));
     let isDashboardUpdated = false;
     const missingData = {}
@@ -241,7 +239,7 @@ export default class DashboardSelectionControl extends Component<
           if (!metaData["versions"][model]) {
             (metaData["versions"][model] = {});
           }
-          if (!metaData["versions"][model][scenario]) {
+          if (!metaData["versions"][model][scenario] || metaData["versions"][model][scenario].length===0) {
             isDashboardUpdated = true;
             // Select default version or if no default version
             metaData["versions"][model][scenario] = optionsData["versions"][model][scenario].default ?
