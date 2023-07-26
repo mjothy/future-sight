@@ -124,11 +124,7 @@ export default class ControlBlockView extends Component<any, any> {
         ) : undefined
         }
 
-        {Object.keys(metaData.master).map((option) => {
-          if (metaData.master[option].isMaster) {
-            return this.selectDropDown(option);
-          }
-        })}
+        {metaData.selectOrder.map((option) => this.selectDropDown(option))}
       </div>
     );
   }
