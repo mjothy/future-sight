@@ -43,7 +43,7 @@ export default class PlotlyGraph extends Component<any, any> {
       height: this.props.height,
       legend: {
         // x: -0.25,
-        orientation: "h",
+        orientation: this.props.layout.orientation || "h",
       },
       autosize: false,
       margin: this.getMargins(),
@@ -58,10 +58,11 @@ export default class PlotlyGraph extends Component<any, any> {
       barmode: configStyle.stack.isStack ? 'stack' : null,
       barnorm: configStyle.YAxis.percentage ? "percent" : "",
       boxmode: "group",
+      xaxis:{automargin: true}
     };
 
     if (configStyle.graphType == "box"){
-      layout["xaxis"] = {"type": "category"}
+      layout["xaxis"]["type"] ="category"
     }
 
     if (configStyle.title.isVisible) {

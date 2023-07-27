@@ -52,6 +52,8 @@ class DataBlockView extends Component<any, any> {
     let dataWithColor = [];
     let visualizeData: any = [];
     let stacks = [];
+    let indexStackBy: string | undefined = undefined
+
     switch (configStyle.graphType) {
       case "table": {
         visualizeData = this.prepareTableData(data);
@@ -60,8 +62,10 @@ class DataBlockView extends Component<any, any> {
       default: {
         if (configStyle.stack && configStyle.stack.isStack && (configStyle.graphType === 'area' || configStyle.graphType === 'bar')) {
           stacks = stackGroups(currentBlock.config.metaData, configStyle.stack.value);
+          indexStackBy = configStyle.stack.value?.slice(0, -1)
         }
-        dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale);
+
+        dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, indexStackBy);
         const indexKeys = PlotlyUtils.getIndexKeys(data)
 
         dataWithColor?.map((dataElement) => {
@@ -180,6 +184,8 @@ class DataBlockView extends Component<any, any> {
           if (stacks.length == 0) {
             obj.stackgroup = 0;
           } else {
+            const indexStackBy = configStyle.stack.value.slice(0, -1)
+            // Find which stack dataElement belongs to
             Object.entries(stacks).forEach(([key, val]: any) => {
               const isExist = val.find(
                 raw => dataElement.model == raw["models"] &&
@@ -189,11 +195,12 @@ class DataBlockView extends Component<any, any> {
               )
               if (isExist) {
                 if (stacks.length > 1) {
-                  const nonStackIndex = indexKeys.filter(x => x !== configStyle.stack.value.slice(0, -1))
+                  const nonStackIndex = indexKeys.filter(x => x !== indexStackBy)
                   const groupIndexName = nonStackIndex.map(idx => dataElement[idx]).join(" - ")
-                  obj.x = [xyDict.x, new Array(xyDict.x.length).fill(groupIndexName)]
+                  obj.x = [xyDict.x, new Array(xyDict.x.length).fill(groupIndexName)] // TODO change groupIndexName to stackIndexName
                 }
                 obj.stackgroup = key;
+                // obj.legendgroup = dataElement[indexStackBy];
               }
             })
           }
@@ -296,6 +303,10 @@ class DataBlockView extends Component<any, any> {
         width: this.props.width,
         height: this.props.height,
       }
+    }
+
+    if (configStyle.graphType == "bar" && configStyle.stack.isStack && !!configStyle.stack.value){
+      layout["orientation"] = "v"
     }
 
     return layout
