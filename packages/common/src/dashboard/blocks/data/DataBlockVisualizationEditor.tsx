@@ -489,19 +489,24 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                 <label>Show legend</label>
               </Col>
             </Row>
-            <Row>
-              <Col span={2} />
-              <Col span={8}>
-                <label>Legend info: </label>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={2} />
-              <Col>
-                <Checkbox.Group options={this.legendOptions()} value={defaultLegendOptions} onChange={this.onLegendContentChange} />
-              </Col>
-            </Row>
-          </>}
+
+            {!(
+                configStyle.graphType == "bar" && configStyle.stack.isStack && !!configStyle.stack.value
+            ) &&  <>
+                <Row>
+                  <Col span={2}/>
+                  <Col span={8}>
+                    <label>Legend info: </label>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={2} />
+                  <Col>
+                  <Checkbox.Group options={this.legendOptions()} value={defaultLegendOptions} onChange={this.onLegendContentChange} />
+                  </Col>
+                </Row>
+              </>
+            }          </>}
         {configStyle.graphType != "table" &&
           <>
             <h3>Colorscale</h3>

@@ -74,6 +74,22 @@ class DataBlockView extends Component<any, any> {
         visualizeData = showData;
       }
     }
+
+    // stacked grouped bar chart unified legend
+    if (configStyle.graphType == "bar" && configStyle.stack.isStack && !!configStyle.stack.value && stacks.length>1){
+      //only keep one legend group visible at a time
+      const shownLegendName: Record<any, any>[] = []
+      visualizeData.forEach((element)=> {
+          // @ts-ignore
+        if (shownLegendName.includes(element["name"])){
+            element.showlegend = false
+          } else {
+            element.showlegend = configStyle.showLegend
+          shownLegendName.push(element["name"])
+          }
+      })
+    }
+
     if (configStyle.aggregation.isAggregate && configStyle.aggregation.type != null) {
       let stackGroups = visualizeData.map(data => data.stackgroup);
       stackGroups = new Set(stackGroups);
@@ -82,7 +98,7 @@ class DataBlockView extends Component<any, any> {
         visualizeData.push(...aggLines)
       }
     }
-    return { data: visualizeData, layout: this.prepareLayout(dataWithColor) }
+    return { data: visualizeData, layout: this.prepareLayout(dataWithColor, stacks) }
   }
 
 
@@ -198,9 +214,10 @@ class DataBlockView extends Component<any, any> {
                   const nonStackIndex = indexKeys.filter(x => x !== indexStackBy)
                   const groupIndexName = nonStackIndex.map(idx => dataElement[idx]).join(" - ")
                   obj.x = [xyDict.x, new Array(xyDict.x.length).fill(groupIndexName)] // TODO change groupIndexName to stackIndexName
+                  obj.name = dataElement[indexStackBy];
+                  obj.legendgroup = dataElement[indexStackBy];
                 }
                 obj.stackgroup = key;
-                // obj.legendgroup = dataElement[indexStackBy];
               }
             })
           }
@@ -287,7 +304,7 @@ class DataBlockView extends Component<any, any> {
     return { x, y };
   };
 
-  prepareLayout = (data) => {
+  prepareLayout = (data, stacks: any[]) => {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
 
     const layout: any = {
@@ -305,7 +322,7 @@ class DataBlockView extends Component<any, any> {
       }
     }
 
-    if (configStyle.graphType == "bar" && configStyle.stack.isStack && !!configStyle.stack.value){
+    if (configStyle.graphType == "bar" && configStyle.stack.isStack && !!configStyle.stack.value && stacks.length>1){
       layout["orientation"] = "v"
     }
 
