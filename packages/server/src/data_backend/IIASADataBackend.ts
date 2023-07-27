@@ -88,8 +88,12 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         for (const raw of selectedData) {
             const rawWithRun = await this.getRawWithRun(raw);
             const body = Filter.getDatapointsBody(rawWithRun);
-            const dataPoints = await this.patchPromise("/iamc/datapoints/", body);
-            if (dataPoints?.length > 0) {
+            const params = new URLSearchParams({
+                table: "true",
+                join_parameters: "true"
+            });
+            const dataPoints = await this.patchPromise("/iamc/datapoints/?"+params, body);
+            if (dataPoints["data"].length > 0) {
                 const timeSerie = await this.prepareTimeSerie(rawWithRun, dataPoints);
                 timeSeries.push(timeSerie);
             }
@@ -121,15 +125,19 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
             ...raw,
             data: []
         };
-        const tsMeta = await this.patchPromise("/iamc/timeseries/" + dataPoints[0].time_series__id, undefined, true, "GET");
-        timeSerie.unit = tsMeta.parameters.unit
+        const valueIndex = dataPoints["columns"].indexOf("value")
+        const yearIndex = dataPoints["columns"].indexOf("step_year")
+        const unitIndex = dataPoints["columns"].indexOf("unit")
+        let data: [any] = dataPoints["data"]
         // Order dataPoints
-        dataPoints.sort((a, b) => a.step_year - b.step_year);
+        data = data.sort((a, b) => a[yearIndex] - b[yearIndex]);
 
-        dataPoints.forEach(point => {
-            timeSerie.data.push({ value: point.value, year: point.step_year });
+        data.forEach(point => {
+            timeSerie.data.push({ value: point[valueIndex], year: point[yearIndex] });
         })
-
+        if(data.length > 0) {
+            timeSerie.unit = data[0][unitIndex]
+        }
         return timeSerie;
     }
 

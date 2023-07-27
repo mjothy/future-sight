@@ -20,14 +20,7 @@ export default class BlockFilterManager extends Component<any, any> {
             /**
              * Data options in dropDown Inputs
              */
-            optionsData: {
-                regions: metadata["regions"],
-                variables: metadata["variables"],
-                scenarios: metadata["scenarios"],
-                models: metadata["models"],
-                categories: metadata["categories"],
-                versions: this.initVersionOptions(metadata["versions"])
-            },
+            optionsData: this.initOptionsData(metadata),
             missingData: {
                 regions: [],
                 variables: [],
@@ -65,6 +58,25 @@ export default class BlockFilterManager extends Component<any, any> {
         return tempVersions
     }
 
+    initOptionsData = (metadata) => {
+        const optionsData = {
+            regions: metadata["regions"],
+            variables: metadata["variables"],
+            scenarios: metadata["scenarios"],
+            models: metadata["models"],
+            categories: metadata["categories"],
+            versions: this.initVersionOptions(metadata["versions"])
+        }
+
+        const id = this.props.currentBlock.controlBlock;
+        if (id != null && id != '') { // Control dataBlock
+            const controlBlockMetaData = this.props.dashboard.blocks[id].config.metaData;
+            const masterKeys = Object.keys(controlBlockMetaData.master).filter((key) => controlBlockMetaData.master[key].isMaster);
+            masterKeys.forEach(key => optionsData[key] = controlBlockMetaData[key]);
+        }
+
+        return optionsData;
+    }
     componentDidMount() {
         const metadata = this.props.currentBlock.config.metaData
         if (metadata["scenarios"].length > 0 && metadata["models"].length > 0) {
