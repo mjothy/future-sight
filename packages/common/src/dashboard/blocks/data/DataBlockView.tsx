@@ -354,10 +354,6 @@ class DataBlockView extends Component<any, any> {
         // x = [x, new Array(x.length).fill(configStyle.aggregation.type)];
       }
 
-      console.log("groups2: ", groups);
-      console.log("groups2 x: ", x);
-      console.log("groups2 y: ", y);
-
       return [{
         type: 'scatter',
         barmode: 'stack',
