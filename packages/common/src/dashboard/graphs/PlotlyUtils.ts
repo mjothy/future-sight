@@ -11,7 +11,7 @@ export default class PlotlyUtils {
      * @returns year[]
      */
     static getYears = (dataArray: PlotDataModel[]) => {
-        let concatYear:string[] = [];
+        let concatYear: string[] = [];
         for (const dataElement of dataArray) {
             concatYear = [...concatYear, ...dataElement.data.map((element) => element.year)]
         }
@@ -120,14 +120,18 @@ export default class PlotlyUtils {
         }
     }
 
-     static groupByYear = (data) => {
-            return data.reduce((groups, obj) => {
-                const { x } = obj;
-                if (!groups[x]) {
-                    groups[x] = 0;
-                }
-                groups[x] += obj.y;
-                return groups;
-            }, {});
-        }
+    static groupByYear = (data) => {
+        return data.reduce((groups, obj) => {
+            const { x, y } = obj;
+            const existingGroup = groups.find((group) => group.x === x);
+
+            if (existingGroup) {
+                existingGroup.y += y;
+            } else {
+                groups.push({ x, y });
+            }
+
+            return groups;
+        }, []);
+    };
 }

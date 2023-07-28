@@ -114,7 +114,7 @@ class DataBlockView extends Component<any, any> {
       const obj = {};
       dataElement.data?.map((e) => {
         obj[e.year] = e.value;
-        if (!columns_list.includes(e.year)){
+        if (!columns_list.includes(e.year)) {
           columns_list.push(e.year)
         }
       });
@@ -335,20 +335,25 @@ class DataBlockView extends Component<any, any> {
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle;
     let x: any = [];
     const y: any = [];
-    let groups = null;
+    let groups: any = null;
+    let stackGroupSySum: { x, y }[] = [];
     const graphs = ["line", "area", "bar"]; // TODO add box
     if (graphs.includes(configStyle.graphType)) {
-      if (!configStyle.stack.isStack) {
-        data.forEach(graphelement => {
-          x.push(...graphelement.x);
-          y.push(...graphelement.y);
+      // Sum each groups
+      if (numberOfStacks == 1) {
+        data.forEach(dataElement => {
+          let x = dataElement.x;
+          if (dataElement.x[0].length > 1) { // We have 2 X axes in stack bar, so [[years], [stack_Xaxis]]
+            x = dataElement.x[0];
+          }
+          const result = x.map((value, index) => {
+            return { x: value, y: dataElement.y[index] };
+          });
+          stackGroupSySum = [...stackGroupSySum, ...result]
         });
-        groups = x;
-      } else { // is stack
-        const stackGroup: StackGroupModel = {};
-        let stackGroupSySum: { [year: number]: number }[] = [];
-        // Sum each groups
+      } else {
         for (let i = 0; i < numberOfStacks; i++) {
+          let stackGroup: any[] = [];
           data.forEach(dataElement => {
             let x = dataElement.x;
             if (dataElement.x[0].length > 1) { // We have 2 X axes in stack bar, so [[years], [stack_Xaxis]]
@@ -358,39 +363,27 @@ class DataBlockView extends Component<any, any> {
               const result = x.map((value, index) => {
                 return { x: value, y: dataElement.y[index] };
               });
-              (stackGroup[i] = stackGroup[i] || []).push(...result);
+              stackGroup = [...stackGroup, ...result]
             }
           });
-          stackGroupSySum = Object.values(stackGroup).map(element => PlotlyUtils.groupByYear(element));
-        }
-
-        switch (configStyle.graphType) {
-          case "line": // no stacking for lines
-            data.forEach(graphelement => {
-              x.push(...graphelement.x);
-              y.push(...graphelement.y);
-            });
-            groups = x;
-            break;
-          case 'area':
-            stackGroupSySum.forEach(element => {
-              x.push(...Object.keys(element).map(Number));
-              y.push(...Object.values(element));
-            })
-            groups = x;
-            break;
-          case 'bar':
-            stackGroupSySum.forEach(element => {
-              x.push(...Object.keys(element).map(Number));
-              y.push(...Object.values(element));
-            })
-            groups = x;
-            if (numberOfStacks > 1) {
-              x = [x, new Array(x.length).fill(configStyle.aggregation.type)];
-            }
-            break;
+          const groupByYear = PlotlyUtils.groupByYear(stackGroup);
+          stackGroupSySum = [...stackGroupSySum, ...groupByYear];
         }
       }
+
+      stackGroupSySum.sort((a, b) => a.x - b.x);
+
+      stackGroupSySum.forEach(element => {
+        x.push(element.x);
+        y.push(element.y);
+      })
+      groups = x;
+      if (configStyle.stack.isStack && configStyle.graphType == "bar" && numberOfStacks > 1) {
+        const years: number[] = Array.from(new Set<number>(x)).sort();
+        x = [years, new Array(years.length).fill(configStyle.aggregation.type)];
+        // x = [x, new Array(x.length).fill(configStyle.aggregation.type)];
+      }
+
       return [{
         type: 'scatter',
         barmode: 'stack',
@@ -460,11 +453,11 @@ class DataBlockView extends Component<any, any> {
       }
       case "box": {
         return <BoxView
-            rawData={rawData}
-            currentBlock={this.props.currentBlock}
-            width={this.props.width}
-            height={this.props.height}
-            layout = {layout}
+          rawData={rawData}
+          currentBlock={this.props.currentBlock}
+          width={this.props.width}
+          height={this.props.height}
+          layout={layout}
         />
       }
       case "map": {
