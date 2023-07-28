@@ -110,15 +110,6 @@ export default class PopupFilterContent extends Component<any, any> {
               </Checkbox>
               {selectedFilter.includes('models') && this.selectInput('models')}
             </div>
-            <div className="mt-20">
-              <Checkbox value={'categories'}>
-                <TagOutlined />
-                Categories(optional)&nbsp;
-                {/* TODO uncomment  */}
-                {/* <label className='no-data'> {this.props.isDataMissing("categories") ? <><ExclamationCircleOutlined /> Data missing</> : ''}</label> */}
-              </Checkbox>
-              {selectedFilter.includes('categories') && this.selectInput('categories')}
-            </div>
           </Space>
         </Checkbox.Group>
       </div>
