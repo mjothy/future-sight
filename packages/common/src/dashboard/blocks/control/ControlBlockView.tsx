@@ -77,6 +77,7 @@ export default class ControlBlockView extends Component<any, any> {
         <h4 className="control-block-subtitle"> {optionLabel}: </h4>
         <SelectInput
           type={option}
+          isClosable={true}
           label={optionLabel}
           className={"control-block-select"}
           value={metaData.master[option].values}
