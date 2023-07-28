@@ -80,7 +80,6 @@ class DataBlockView extends Component<any, any> {
       //only keep one legend group visible at a time
       const shownLegendName: Record<any, any>[] = []
       visualizeData.forEach((element)=> {
-          // @ts-ignore
         if (shownLegendName.includes(element["name"])){
             element.showlegend = false
           } else {
@@ -210,12 +209,15 @@ class DataBlockView extends Component<any, any> {
                   dataElement.scenario == raw["scenarios"]
               )
               if (isExist) {
+
+                if (stacks.length>0){
+                  obj.name = dataElement[indexStackBy];
+                  obj.legendgroup = dataElement[indexStackBy];
+                }
                 if (stacks.length > 1) {
                   const nonStackIndex = indexKeys.filter(x => x !== indexStackBy)
                   const groupIndexName = nonStackIndex.map(idx => dataElement[idx]).join(" - ")
                   obj.x = [xyDict.x, new Array(xyDict.x.length).fill(groupIndexName)] // TODO change groupIndexName to stackIndexName
-                  obj.name = dataElement[indexStackBy];
-                  obj.legendgroup = dataElement[indexStackBy];
                 }
                 obj.stackgroup = key;
               }
@@ -322,7 +324,7 @@ class DataBlockView extends Component<any, any> {
       }
     }
 
-    if (configStyle.graphType == "bar" && configStyle.stack.isStack && !!configStyle.stack.value && stacks.length>1){
+    if (configStyle.graphType == "bar" && configStyle.stack.isStack){
       layout["orientation"] = "v"
     }
 
