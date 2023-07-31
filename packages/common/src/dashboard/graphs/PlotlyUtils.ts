@@ -120,18 +120,42 @@ export default class PlotlyUtils {
         }
     }
 
-    static groupByYear = (data) => {
+    static ySumByYear = (data) => {
         return data.reduce((groups, obj) => {
             const { x, y } = obj;
             const existingGroup = groups.find((group) => group.x === x);
 
             if (existingGroup) {
-                existingGroup.y += y;
+                existingGroup.y = Number(existingGroup.y) + Number(y);
             } else {
-                groups.push({ x, y });
+                groups.push({ x, y: Number(y) });
             }
 
             return groups;
         }, []);
     };
+
+    static getAggregation(arr, type): number {
+        let result = 0;
+        switch (type) {
+            case "sum":
+                arr.forEach((element) => {
+                    result += element;
+                });
+                return result;
+
+            case "avg":
+                arr.forEach((element) => {
+                    result += element;
+                });
+                return result / arr.length;
+
+            case "median":
+                const mid = Math.floor(arr.length / 2),
+                    nums = [...arr].sort((a, b) => a - b);
+                return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
+
+            default: return result;
+        }
+    }
 }
