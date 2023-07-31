@@ -370,7 +370,7 @@ class DataBlockView extends Component<any, any> {
     let y: any = [];
     let stackGroupSySum: { x, y }[] = [];
     const graphs = ["line", "area", "bar"];
-    const isTwoXAxis: boolean = configStyle.graphType == "bar" && configStyle.stack.value != '' && configStyle.stack.value != null;
+    let isTwoXAxis = false;
 
     if (graphs.includes(configStyle.graphType)) {
       if (!configStyle.stack.isStack || configStyle.graphType == "line") {
@@ -412,7 +412,8 @@ class DataBlockView extends Component<any, any> {
           let iStackGroup: any[] = [];
           data.forEach(dataElement => {
             let years = dataElement.x;
-            if (isTwoXAxis && i != undefined) {// x = [[...years], [...]]
+            isTwoXAxis = Array.isArray(dataElement.x[0]);
+            if (isTwoXAxis) {// x = [[...years], [...]]
               years = dataElement.x[0];
             }
             if (dataElement.stackgroup == i) {
