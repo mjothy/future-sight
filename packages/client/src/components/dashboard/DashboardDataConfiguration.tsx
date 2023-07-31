@@ -44,6 +44,7 @@ class DashboardDataConfiguration extends Component<
        * Data (with timeseries from IASA API)
        */
       allPlotData: {},
+      missingData: {},
       plotData: {},
       loadingControlBlock: {
 
@@ -118,7 +119,22 @@ class DashboardDataConfiguration extends Component<
                   if (d) {
                     data.push(d);
                   } else {
-                    missingData.push({ model, scenario, variable, region, run: version });
+
+                    if (version == null) {
+                      console.log("debug 1: ", this.state.missingData);
+                      console.log("debug 2: ", block);
+                    }
+                    const noNeedToFetch = this.state.missingData[block.id]?.find(
+                      (e: PlotDataModel) =>
+                        e.model === model &&
+                        e.scenario === scenario &&
+                        e.variable === variable &&
+                        e.region === region &&
+                        e.run?.id === version.id
+                    );
+                    if (noNeedToFetch == null) {
+                      missingData.push({ model, scenario, variable, region, run: version });
+                    }
                   }
                 }
               } else {
@@ -132,7 +148,16 @@ class DashboardDataConfiguration extends Component<
                 if (d) {
                   data.push(d);
                 } else {
-                  missingData.push({ model, scenario, variable, region });
+                  const noNeedToFetch = this.state.missingData[block.id]?.find(
+                    (e: PlotDataModel) =>
+                      e.model === model &&
+                      e.scenario === scenario &&
+                      e.variable === variable &&
+                      e.region === region
+                  );
+                  if (noNeedToFetch == null) {
+                    missingData.push({ model, scenario, variable, region });
+                  }
                 }
               }
             });
@@ -163,12 +188,35 @@ class DashboardDataConfiguration extends Component<
   retreiveAllTimeSeriesData = (data: PlotDataModel[], missingData: DataModel[], blockId) => {
     return this.props.dataManager.fetchPlotData(missingData)
       .then(res => {
+        const missingDataState = { ... this.state.missingData };
         // no new data to add to state.allPLotData, only update state.plotData
         if (res.length == 0) {
           const plotData = JSON.parse(JSON.stringify(this.state.plotData))
           plotData[blockId] = data
-          this.setState({ plotData: plotData })
+          if (missingDataState[blockId] != undefined) {
+            missingDataState[blockId].push(...missingData)
+          } else {
+            missingDataState[blockId] = [...missingData]
+          }
+          this.setState({ plotData: plotData, missingData: missingDataState })
           return
+        }
+
+        if (res.length < missingData.length) {
+          const unfetchedData = missingData.filter(element => !res.find(
+            (e: PlotDataModel) =>
+              e.model === element.model &&
+              e.scenario === element.scenario &&
+              e.variable === element.variable &&
+              e.region === element.region &&
+              e.run?.id === element.run?.id
+          ))
+
+          if (missingDataState[blockId] != undefined) {
+            missingDataState[blockId].push(...unfetchedData)
+          } else {
+            missingDataState[blockId] = [...unfetchedData]
+          }
         }
 
         const allPlotData = JSON.parse(JSON.stringify(this.state.allPlotData))
@@ -179,7 +227,7 @@ class DashboardDataConfiguration extends Component<
         }
         const plotData = JSON.parse(JSON.stringify(this.state.plotData))
         plotData[blockId] = [...data, ...res]
-        this.setState({ allPlotData: allPlotData, plotData: plotData })
+        this.setState({ allPlotData: allPlotData, plotData: plotData, missingData: missingDataState })
 
       }).catch(err => {
         console.log("TODO Handle error: ", err);

@@ -73,11 +73,15 @@ class DataBlockView extends Component<any, any> {
       }
     }
 
+
     let aggLine: any = null;
     if (configStyle.aggregation.isAggregate && configStyle.aggregation.type != null) {
-      let stackGroups = visualizeData.map(data => data.stackgroup);
-      stackGroups = new Set(stackGroups);
-      aggLine = this.getAggregationLine(visualizeData, Array.from(stackGroups));
+      const graphs = ["line", "area", "bar"];
+      if (graphs.includes(configStyle.graphType)) {
+        let stackGroups = visualizeData.map(data => data.stackgroup);
+        stackGroups = new Set(stackGroups);
+        aggLine = this.getAggregationLine(visualizeData, Array.from(stackGroups));
+      }
     }
 
     if (configStyle.graphType == "bar" && configStyle.stack.isStack && !!configStyle.stack.value && stacks.length > 1) {
@@ -369,91 +373,86 @@ class DataBlockView extends Component<any, any> {
     let x: any = [];
     let y: any = [];
     let stackGroupSySum: { x, y }[] = [];
-    const graphs = ["line", "area", "bar"];
     let isTwoXAxis = false;
 
-    if (graphs.includes(configStyle.graphType)) {
-      if (!configStyle.stack.isStack || configStyle.graphType == "line") {
-        data.forEach(dataElement => {
-          const result = dataElement.x.map((value, index) => {
-            return { x: value, y: dataElement.y[index] };
-          });
-          stackGroupSySum = [...stackGroupSySum, ...result]
+    if (!configStyle.stack.isStack || configStyle.graphType == "line") {
+      data.forEach(dataElement => {
+        const result = dataElement.x.map((value, index) => {
+          return { x: value, y: dataElement.y[index] };
         });
-        stackGroupSySum.sort((a, b) => a.x - b.x);
+        stackGroupSySum = [...stackGroupSySum, ...result]
+      });
+      stackGroupSySum.sort((a, b) => a.x - b.x);
 
-        stackGroupSySum.forEach(element => {
-          x.push(element.x);
-          y.push(Number(element.y));
-        })
+      stackGroupSySum.forEach(element => {
+        x.push(element.x);
+        y.push(Number(element.y));
+      })
 
-        return {
-          type: 'scatter',
-          x: x,
-          y: y,
-          mode: 'lines+markers',
-          line: {
-            dash: 'dot'
-          },
-          showlegend: configStyle.showLegend,
-          marker: { color: "black" },
-          name: configStyle.aggregation.label,
-          transforms: [{
-            type: 'aggregate',
-            groups: x,
-            aggregations: [
-              { target: 'y', func: configStyle.aggregation.type, enabled: true },
-            ]
-          }]
-        }
+      return {
+        type: 'scatter',
+        x: x,
+        y: y,
+        mode: 'lines+markers',
+        line: {
+          dash: 'dot'
+        },
+        showlegend: configStyle.showLegend,
+        marker: { color: "black" },
+        name: configStyle.aggregation.label,
+        transforms: [{
+          type: 'aggregate',
+          groups: x,
+          aggregations: [
+            { target: 'y', func: configStyle.aggregation.type, enabled: true },
+          ]
+        }]
+      }
 
-      } else {
-        for (const i of numberOfStacks) {
-          let iStackGroup: any[] = [];
-          data.forEach(dataElement => {
-            let years = dataElement.x;
-            isTwoXAxis = Array.isArray(dataElement.x[0]);
-            if (isTwoXAxis) {// x = [[...years], [...]]
-              years = dataElement.x[0];
-            }
-            if (dataElement.stackgroup == i) {
-              const result = years.map((value, index) => {
-                return { x: value, y: Number(dataElement.y[index]) };
-              });
-              iStackGroup = [...iStackGroup, ...result]
-            }
-          });
-          const groupByYear = PlotlyUtils.ySumByYear(iStackGroup);
-          stackGroupSySum = [...stackGroupSySum, ...groupByYear];
-        }
+    } else {
+      for (const i of numberOfStacks) {
+        let iStackGroup: any[] = [];
+        data.forEach(dataElement => {
+          let years = dataElement.x;
+          isTwoXAxis = Array.isArray(dataElement.x[0]);
+          if (isTwoXAxis) {// x = [[...years], [...]]
+            years = dataElement.x[0];
+          }
+          if (dataElement.stackgroup == i) {
+            const result = years.map((value, index) => {
+              return { x: value, y: Number(dataElement.y[index]) };
+            });
+            iStackGroup = [...iStackGroup, ...result]
+          }
+        });
+        const groupByYear = PlotlyUtils.ySumByYear(iStackGroup);
+        stackGroupSySum = [...stackGroupSySum, ...groupByYear];
+      }
 
-        const aggLineDara: { x: number, y: number }[] = [];
-        x = stackGroupSySum.map(e => e.x);
-        const years: number[] = Array.from(new Set<number>(x)).sort();
-        years.forEach(year => {
-          const dataYear = stackGroupSySum.filter(e => e.x == year).map(e => e.y);
-          aggLineDara.push({ x: year, y: PlotlyUtils.getAggregation(dataYear, configStyle.aggregation.type) });
-        })
-        x = aggLineDara.map(e => e.x);
-        y = aggLineDara.map(e => e.y);
+      const aggLineDara: { x: number, y: number }[] = [];
+      x = stackGroupSySum.map(e => e.x);
+      const years: number[] = Array.from(new Set<number>(x)).sort();
+      years.forEach(year => {
+        const dataYear = stackGroupSySum.filter(e => e.x == year).map(e => e.y);
+        aggLineDara.push({ x: year, y: PlotlyUtils.getAggregation(dataYear, configStyle.aggregation.type) });
+      })
+      x = aggLineDara.map(e => e.x);
+      y = aggLineDara.map(e => e.y);
 
 
-        return {
-          type: 'scatter',
-          x: isTwoXAxis ? [x, new Array(x.length).fill(configStyle.aggregation.type)] : x,
-          y: y,
-          mode: 'lines+markers',
-          line: {
-            dash: 'dot'
-          },
-          showlegend: configStyle.showLegend,
-          marker: { color: "black" },
-          name: configStyle.aggregation.label
-        }
+      return {
+        type: 'scatter',
+        x: isTwoXAxis ? [x, new Array(x.length).fill(configStyle.aggregation.type)] : x,
+        y: y,
+        mode: 'lines+markers',
+        line: {
+          dash: 'dot'
+        },
+        showlegend: configStyle.showLegend,
+        marker: { color: "black" },
+        name: configStyle.aggregation.label
       }
     }
-
-    return null;
   }
 
   getYAxisLabel = (data: PlotDataModel[]) => {
