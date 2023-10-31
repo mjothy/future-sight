@@ -10,25 +10,25 @@
 
 <!-- vscode-markdown-toc -->
 
-- 2. [Installation](#Installation)
-- 3. [About FutureSight](#AboutFutureSight)
-- 4. [Team](#Team)
-- 5. [Documentation](#Documentation)
-  - 5.1. [Directory Structure](#DirectoryStructure)
-  - 5.2. [Developpement stack tools](#Developpementstacktools)
-    - 5.2.1. [Typescript](#Typescript)
-    - 5.2.2. [Node js](#Nodejs)
-    - 5.2.3. [Express](#Express)
-    - 5.2.4. [React](#React)
-    - 5.2.5. [Yarn](#Yarn)
-    - 5.2.6. [Yarn Workspaces](#YarnWorkspaces)
-    - 5.2.7. [Docker](#Docker)
-    - 5.2.8. [Plotly](#Plotly)
-    - 5.2.9. [Redis](#Redis)
-    - 5.2.10. [Craco-less](#Craco-less)
-- 6. [Interfaces](#Interfaces)
-- 7. [Acknowledgements](#Acknowledgements)
-- 8. [Licence](#Licence)
+2.  [Installation](#Installation)
+3.  [About FutureSight](#AboutFutureSight)
+4.  [Team](#Team)
+5.  [Documentation](#Documentation)
+    5.1. [Directory Structure](#DirectoryStructure)
+    5.2. [Developpement stack tools](#Developpementstacktools)
+    5.2.1. [Typescript](#Typescript)
+    5.2.2. [Node js](#Nodejs)
+    5.2.3. [Express](#Express)
+    5.2.4. [React](#React)
+    5.2.5. [Yarn](#Yarn)
+    5.2.6. [Yarn Workspaces](#YarnWorkspaces)
+    5.2.7. [Docker](#Docker)
+    5.2.8. [Plotly](#Plotly)
+    5.2.9. [Redis](#Redis)
+    5.2.10. [Craco-less](#Craco-less)
+6.  [Interfaces](#Interfaces)
+7.  [Acknowledgements](#Acknowledgements)
+8.  [Licence](#Licence)
 
 ## 2. <a name='Installation'></a>Installation
 
@@ -94,8 +94,11 @@ A number of features are accessible:
 - Possibility to create a new dashboard from an existing one
 - A list of the latest dashboards created in the app to provide potential ideas to new users
 - Possibility to search for published dashboard in the database
+- Filtering data on blocs based on user selections
 
-Creating and configuring dashboards provides a wide selection of features. The first dashboard setup is configuring the metadata by selecting scenarios, models, variables, and regions. This metadata will be used to create visualization data blocks. The user can then select and filter the data that will be used within these data blocks.
+Creating and configuring dashboards provides a wide selection of features. The first dashboard setup is configuring the metadata by selecting scenarios, models, variables, and regions to use in the dashboard.
+This metadata will be used to create visualization data blocks. The user can then select and filter the data that will be used within these data blocks.
+Dashboard setup include also the definition of author name, title, and tags, which can be used to find a specific publication.
 The dashboard configuration panel can be used to add visualization blocks to the dashboard. Three types of visualization blocks are available:
 
 - **Data block**: A block that displays data as a graph (line, bar, pie, map, box) or table
@@ -135,7 +138,7 @@ This webapp is developed by a team from [Artelys](https://www.artelys.com/fr/) n
 3. [common/](./packages/common/)
    A workspace that includes common logic to be imported from other workspaces (client and server). Common includes all the code of dashboard, and it exports the Dashboard component, making it accessible for use by other workspaces or applications. The main classes in this workspace include:
    - [Dashboard](./packages/common/src/dashboard/Dashboard.tsx): The dashboard component is responsible for initiating a dashboard or publishing it.
-   - [DashboardConfigView](./packages/common/src/dashboard/DashboardConfigView.tsx): Responsible for managing the dashboard grid layout.
+   - [DashboardConfigView](./packages/common/src/dashboard/DashboardConfigView.tsx): Responsible for managing the dashboard grid layout. Out dashboard view using [React-Grid-Layout](https://github.com/react-grid-layout/react-grid-layout), which is a grid layout system that is responsive and supports breakpoints.
 
 ### 5.2. <a name='Developpementstacktools'></a>Developpement stack tools
 
@@ -152,7 +155,7 @@ All packages are structured as [Yarn Workspaces](#yarn-workspaces) and written i
 
 #### 5.2.3. <a name='Express'></a>Express
 
-[Express](https://expressjs.com/) is a backend web application framework for Node.js, It is designed for building web applications and APIs. It has been called the de facto standard server framework for Node.js.
+[Express](https://expressjs.com/) is a back end web application framework for building RESTful APIs with Node.js.
 
 #### 5.2.4. <a name='React'></a>React
 
@@ -189,7 +192,7 @@ All packages are structured as [Yarn Workspaces](#yarn-workspaces) and written i
 
 #### 5.2.10. <a name='Craco-less'></a>Craco-less
 
-[Craco-less](https://github.com/DocSpring/craco-less) Create React App Configuration Override. CRACO is a tool that allows you to configure your Create React App without ejecting.
+[Craco-less](https://github.com/DocSpring/craco-less) Create React App Configuration Override. CRACO is a tool that allows you to configure your Create React App without ejecting, it offers a high degree of flexibility in customizing configurations.
 
 ## 6. <a name='Interfaces'></a> ✨ Interfaces
 
