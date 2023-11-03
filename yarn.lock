@@ -2420,6 +2420,20 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
+"@json2csv/formatters@^7.0.1":
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/@json2csv/formatters/-/formatters-7.0.1.tgz#c025f0795f9bbab480de77e2248ab593987296b9"
+  integrity sha512-eCmYKIIoFDXUB0Fotet2RmcoFTtNLXLmSV7j6aEQH/D2GiO749Uan3ts03PtAhXpE11QghxBjS0toXom8VQNBw==
+
+"@json2csv/plainjs@^7.0.1":
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/@json2csv/plainjs/-/plainjs-7.0.1.tgz#361d849f04a2a5013c7880738f08b6bc193c24eb"
+  integrity sha512-UAdaZwahrUeYhMYYilJwDsRfE7wDRsmGMsszYH67j8FLD5gZitqG38RXpUgHEH0s6YjsY8iKYWeEQ19WILncFA==
+  dependencies:
+    "@json2csv/formatters" "^7.0.1"
+    "@streamparser/json" "^0.0.15"
+    lodash.get "^4.4.2"
+
 "@lerna/add@4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@lerna/add/-/add-4.0.0.tgz#c36f57d132502a57b9e7058d1548b7a565ef183f"
@@ -3528,6 +3542,11 @@
   integrity sha512-MZPUxrmFubI36XS1DI3qmI0YdN1gks62JtFZvxR67ljjSNCeK6U08Zx4msEWOXuofgqUt6zPHSi1H9fbjR/NRA==
   dependencies:
     "@sinonjs/commons" "^1.7.0"
+
+"@streamparser/json@^0.0.15":
+  version "0.0.15"
+  resolved "https://registry.yarnpkg.com/@streamparser/json/-/json-0.0.15.tgz#405fbe94877ce0cbd3cf650b4d9186a0ec6acd0a"
+  integrity sha512-6oikjkMTYAHGqKmcC9leE4+kY4Ch4eiTImXUN/N4d2bNGBYs0LJ/tfxmpvF5eExSU7iiPlV9jYlADqvj3NWA3Q==
 
 "@surma/rollup-plugin-off-main-thread@^1.1.1":
   version "1.4.2"
@@ -13294,6 +13313,11 @@ lodash.debounce@^4.0.8:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
   integrity sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==
+
+lodash.get@^4.4.2:
+  version "4.4.2"
+  resolved "https://registry.yarnpkg.com/lodash.get/-/lodash.get-4.4.2.tgz#2d177f652fa31e939b4438d5341499dfa3825e99"
+  integrity sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==
 
 lodash.isequal@^4.0.0:
   version "4.5.0"

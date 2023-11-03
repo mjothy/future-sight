@@ -13,15 +13,21 @@ export default class IIASAAuthenticationBackend implements IAuthenticationBacken
 
     getConfig = () => this.config;
 
-    initializeToken = async () => {
+    initializeToken = async (username = this.config.username, password = this.config.password) => {
+        const {access, refresh}= await this.queryToken(username, password)
+        process.env["access_token"] = access;
+        process.env["refresh_token"] = refresh;
+    }
+
+    queryToken = async (username = this.config.username, password = this.config.password) => {
         const options = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                username: this.config.username,
-                password: this.config.password
+                username: username,
+                password: password
             })
         };
 
@@ -32,9 +38,10 @@ export default class IIASAAuthenticationBackend implements IAuthenticationBacken
 
         switch (response.status) {
             case 200:
-                process.env["access_token"] = data.access;
-                process.env["refresh_token"] = data.refresh;
-                break;
+                return {
+                    access: data.access,
+                    refresh: data.refresh
+                }
             case 401:
                 err.message = response.statusText + ": " + data.detail
                 err.status = 401;
@@ -69,9 +76,7 @@ export default class IIASAAuthenticationBackend implements IAuthenticationBacken
         // For the first request -> process.env["refresh_token"] == null
         await this.initializeToken();
         return true; // No error had been thrown by this.initializeToken();
-
     };
-
 }
 
 // Access token

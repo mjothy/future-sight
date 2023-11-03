@@ -6,10 +6,25 @@ import {
 } from '@ant-design/icons';
 import { Col, Input, Row, Select, Checkbox, InputNumber } from 'antd';
 import PlotColorscalePicker from '../utils/PlotColorscalePicker';
+import BoxVisualizationEditor from "./graphType/box/BoxVisualizationEditor";
 
 
 const { Option } = Select;
 
+const PLOTLY_AGGREGATION = [
+  {
+    value: 'sum',
+    label: 'Sum',
+  },
+  {
+    value: 'avg',
+    label: 'Average',
+  },
+  {
+    value: 'median',
+    label: 'Median',
+  },
+]
 const plotTypes = [
   { type: 'line', label: 'Line', icon: <LineChartOutlined /> },
   { type: 'bar', label: 'Bar', icon: <BarChartOutlined /> },
@@ -21,6 +36,7 @@ const plotTypes = [
 ];
 
 const colorbarTitle = ['variable', 'unit'];
+const TIME_STEPS = [5, 10, 15, 20]
 
 export default class DataBlockVisualizationEditor extends Component<any, any> {
 
@@ -51,6 +67,12 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   onCustomRangeChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.XAxis.useCustomRange = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  };
+
+  onTimestepChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.XAxis.timestep = e;
     this.updateBlockConfig({ configStyle: configStyle })
   };
 
@@ -114,6 +136,19 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
+  onAggregateChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.aggregation.isAggregate = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onAggregationTypeChange = (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.aggregation.type = value;
+    configStyle.aggregation.label = PLOTLY_AGGREGATION.find(element => element.value == value)?.label;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
   onStackGroupByChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.stack.isGroupBy = e.target.checked;
@@ -123,6 +158,12 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   onStackValueChange = (value) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.stack.value = value;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  onAggregateValueChange = (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.aggregation.value = value;
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
@@ -223,10 +264,21 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
           />
         }
 
+        {configStyle.graphType === "box" &&
+            <BoxVisualizationEditor
+                optionsLabel={this.props.optionsLabel}
+                onStackValueChange={this.onStackValueChange}
+                onStackCheckChange={this.onStackCheckChange}
+                updateBlockConfig={this.updateBlockConfig}
+                plotData={this.props.plotData}
+                currentBlock={this.props.currentBlock}
+            />
+        }
+
 
         {["area", "bar"].includes(configStyle.graphType) &&
           <>
-            <h3>{plotTypes.find(chart => chart.type == configStyle.graphType)?.label}</h3>
+            <h3>Stack</h3>
             <Row>
               <Col span={2} className={'checkbox-col'}>
                 <Checkbox
@@ -250,7 +302,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                   )}
                   allowClear
                   disabled={!configStyle.stack.isStack}
-                  dropdownMatchSelectWidth={false}
+                  dropdownMatchSelectWidth={true}
                 >
                   {this.props.optionsLabel.map((value) => {
                     if (metaData[value].length > 1) return (
@@ -266,6 +318,54 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
           </>
         }
 
+        {["line", "area", "bar"].includes(configStyle.graphType) &&
+          <>
+            <h3>Calculations</h3>
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                  onChange={this.onAggregateChange}
+                  checked={configStyle.aggregation.isAggregate}
+                />
+              </Col>
+              <Col span={8}>
+                <Select
+                  className="width-100"
+                  placeholder="Type"
+                  value={configStyle.aggregation.type}
+                  onChange={this.onAggregationTypeChange}
+                  disabled={!configStyle.aggregation.isAggregate}
+                  options={PLOTLY_AGGREGATION}
+                />
+              </Col>
+              {/* <Col span={8} className="ml-20">
+                <Select
+                  placeholder="Select"
+                  value={configStyle.aggregation.value}
+                  onChange={this.onAggregateValueChange}
+                  notFoundContent={(
+                    <div>
+                      <ExclamationCircleOutlined />
+                      <p>Item not found.</p>
+                    </div>
+                  )}
+                  allowClear
+                  disabled={!configStyle.aggregation.isAggregate}
+                  dropdownMatchSelectWidth={true}
+                >
+                  {this.props.optionsLabel.map((value) => {
+                    if (metaData[value].length > 1) return (
+                      <Option key={value} value={value}>
+                        {value}
+                      </Option>
+                    )
+                  }
+                  )}
+                </Select>
+              </Col> */}
+            </Row>
+          </>
+        }
         <h3>Axis</h3>
         {this.isShowGraphConfig(configStyle.graphType) &&
           <>
@@ -273,8 +373,8 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
               <Row>
                 <Col span={2} className={'checkbox-col'}>
                   <Checkbox
-                      onChange={this.onYAxisTickFormatChange}
-                      checked={configStyle.YAxis.percentage}
+                    onChange={this.onYAxisTickFormatChange}
+                    checked={configStyle.YAxis.percentage}
                   />
                 </Col>
                 <Col span={16} className={'checkbox-col-label'}>
@@ -282,39 +382,43 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                 </Col>
               </Row>
             }
-            <Row>
-              <Col span={2} className={'checkbox-col'}>
-                <Checkbox
-                  onChange={this.onYAxisForceChange}
-                  checked={configStyle.YAxis.force0}
-                />
-              </Col>
-              <Col span={16} className={'checkbox-col-label'}>
-                <label>Range of Y axis to 0</label>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={2} className={'checkbox-col'}>
-                <Checkbox
+            {configStyle.graphType !== "pie" &&
+              <>
+                <Row>
+                  <Col span={2} className={'checkbox-col'}>
+                    <Checkbox
+                        onChange={this.onYAxisForceChange}
+                        checked={configStyle.YAxis.force0}
+                    />
+                  </Col>
+                  <Col span={16} className={'checkbox-col-label'}>
+                    <label>Range of Y axis to 0</label>
+                  </Col>
+                </Row>
+                  <Row>
+                  <Col span={2} className={'checkbox-col'}>
+                  <Checkbox
                   onChange={this.onYAxisLabelChange}
                   checked={configStyle.YAxis.label}
-                />
-              </Col>
-              <Col span={16} className={'checkbox-col-label'}>
-                <label>Show Y Axis label</label>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={2} className={'checkbox-col'}>
-                <Checkbox
-                  onChange={this.onYAxisUnitChange}
-                  checked={configStyle.YAxis.unit}
-                />
-              </Col>
-              <Col span={16} className={'checkbox-col-label'}>
-                <label>Show Y Axis unit</label>
-              </Col>
-            </Row>
+                  />
+                  </Col>
+                  <Col span={16} className={'checkbox-col-label'}>
+                  <label>Show Y Axis label</label>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={2} className={'checkbox-col'}>
+                    <Checkbox
+                      onChange={this.onYAxisUnitChange}
+                      checked={configStyle.YAxis.unit}
+                    />
+                  </Col>
+                  <Col span={16} className={'checkbox-col-label'}>
+                    <label>Show Y Axis unit</label>
+                  </Col>
+                </Row>
+              </>
+            }
           </>}
         <Row className="mb-10">
           <Col span={2} className={'checkbox-col'}>
@@ -348,8 +452,30 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             />
           </Col>
         </Row>
+        <Row className="mb-10">
+          <Col span={2} />
+          <Col span={18} className={'checkbox-col-label'}>
+            <Select
+              className="width-100"
+              placeholder="Time step of X"
+              value={configStyle.XAxis.timestep}
+              onChange={this.onTimestepChange}
+              allowClear
+              disabled={!configStyle.XAxis.useCustomRange}
+            >
+              {TIME_STEPS.map((timestep) => (
+                <Option key={timestep} value={timestep}>
+                  {timestep}
+                </Option>
+              ))}
+            </Select>
+          </Col>
+        </Row>
 
-        {this.isShowGraphConfig(configStyle.graphType) && configStyle.graphType != "pie" &&
+        {this.isShowGraphConfig(configStyle.graphType)
+            && configStyle.graphType != "pie"
+            && configStyle.graphType != "box"
+            &&
           <>
             <h3>Legend</h3>
             <Row>
@@ -363,19 +489,24 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                 <label>Show legend</label>
               </Col>
             </Row>
-            <Row>
-              <Col span={2} />
-              <Col span={8}>
-                <label>Legend info: </label>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={2} />
-              <Col>
-                <Checkbox.Group options={this.legendOptions()} value={defaultLegendOptions} onChange={this.onLegendContentChange} />
-              </Col>
-            </Row>
-          </>}
+
+            {!(
+                configStyle.graphType == "bar" && configStyle.stack.isStack && !!configStyle.stack.value
+            ) &&  <>
+                <Row>
+                  <Col span={2}/>
+                  <Col span={8}>
+                    <label>Legend info: </label>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={2} />
+                  <Col>
+                  <Checkbox.Group options={this.legendOptions()} value={defaultLegendOptions} onChange={this.onLegendContentChange} />
+                  </Col>
+                </Row>
+              </>
+            }          </>}
         {configStyle.graphType != "table" &&
           <>
             <h3>Colorscale</h3>

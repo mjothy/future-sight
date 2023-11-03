@@ -7,6 +7,7 @@ import { DashboardModel, DataModel, OptionsDataModel } from '@future-sight/commo
 import BrowseObject from '../models/BrowseObject';
 import IDataBackend from '../interfaces/IDataBackend ';
 import IConfigurationProvider from '../interfaces/IConfigurationProvider';
+import {IAuthenticationBackend} from "../interfaces/IAuthenticationBackend ";
 
 export default class ExpressServer {
   private app: any;
@@ -16,6 +17,7 @@ export default class ExpressServer {
   private readonly dbClient: IPersistenceManager;
   private readonly dataProxy: IDataBackend;
   private readonly configurationProvider: IConfigurationProvider;
+  private readonly authentication: IAuthenticationBackend;
   constructor(
     port,
     cookieKey,
@@ -23,7 +25,8 @@ export default class ExpressServer {
     clientPath,
     dbClient,
     dataProxy: IDataBackend,
-    configurationProvider
+    configurationProvider,
+    authentication: IAuthenticationBackend
   ) {
     this.app = express();
     this.port = port;
@@ -32,6 +35,7 @@ export default class ExpressServer {
     this.dbClient = dbClient;
     this.dataProxy = dataProxy;
     this.configurationProvider = configurationProvider;
+    this.authentication = authentication;
     this.app.use(bodyParser.json({ limit: '50mb' }));
     this.app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
     if (auth) {
@@ -60,6 +64,19 @@ export default class ExpressServer {
 
     this.app.get('/api', (req, res) => {
       res.send(`Hello , From server`);
+    });
+
+    this.app.post('/api/checkUser', async (req, res) => {
+      let username = req.body.username;
+      let password = req.body.password;
+      let ok: boolean;
+      try {
+        let {access, refresh} = await this.authentication.queryToken(username, password);
+        ok = !!access && !!refresh
+      } catch {
+        ok = false
+      }
+      res.status(200).send({ok: ok});
     });
 
     // ===================
@@ -135,7 +152,22 @@ export default class ExpressServer {
 
     this.app.post(`/api/dashboard/save`, async (req, res, next) => {
       try {
-        const response = await this.dbClient.saveDashboard(req.body)
+        const dashboard = req.body.dashboard;
+        const username = req.body.username;
+        const password = req.body.password;
+        if (!!username && !!password) {
+          try {
+            const authResponse = await this.authentication.queryToken(username, password);
+            if(!!authResponse.access && !!authResponse.refresh) {
+              dashboard.verified = true
+            } else {
+              dashboard.verified = false
+            }
+          } catch {
+            dashboard.verified = false
+          }
+        }
+        const response = await this.dbClient.saveDashboard(dashboard)
         res.send(response);
       } catch (err) {
         console.error(err);

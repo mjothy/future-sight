@@ -28,7 +28,7 @@ export interface DashboardProps extends ComponentPropsWithDataManager {
     copyBlock: (blockSelectedId: string) => void;
     blockSelectedId: string;
     updateSelectedBlock: (blockSelectedId: string) => void;
-    saveDashboard: (callback: (idPermanent) => void, image?: string) => void;
+    saveDashboard: (username, password, callback: (idPermanent) => void, image?: string) => void;
     isEmbedded?: boolean;
     isFullscreen?: boolean;
     readonly?: boolean;
@@ -102,8 +102,8 @@ class Dashboard extends Component<DashboardProps, any> {
         })
     }
 
-    save = (image?: string) => {
-        this.props.saveDashboard((idPermanent) => {
+    save = (username: string, password: string, image?: string) => {
+        this.props.saveDashboard(username, password, (idPermanent) => {
             this.setState({ publishing: false });
             notification.success({
                 message: 'The dashboard has been correctly published',
@@ -116,7 +116,7 @@ class Dashboard extends Component<DashboardProps, any> {
     }
 
 
-    onPublish = () => {
+    onPublish = (username, password) => {
         this.setState({
             publishing: true,
             readonly: true
@@ -126,16 +126,18 @@ class Dashboard extends Component<DashboardProps, any> {
             const timer = setInterval(() => {
                 //run some other function
                 this.makeAndResizePreview(dashboard).then((dataURL) => {
-                    this.save(dataURL);
+                    this.save(username, password, dataURL);
                 });
                 clearInterval(timer);
             }, 200);
         } else {
-            this.save()
+            this.save(username, password)
         }
     };
 
-
+    checkUser = async (username: string, password: string) => {
+        return await this.props.dataManager.checkUser(username, password);
+    }
 
     render() {
         return (
@@ -160,6 +162,7 @@ class Dashboard extends Component<DashboardProps, any> {
                     <DashboardConfigControl
                         publishing={this.state.publishing}
                         onPublish={this.onPublish}
+                        checkUser={this.checkUser}
                         {...this.props}
                     />
                 </Sidebar>

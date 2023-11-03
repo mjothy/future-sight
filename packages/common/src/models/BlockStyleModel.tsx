@@ -13,7 +13,7 @@ export default class BlockStyleModel {
     Scenario: false,
     Region: false,
     Variable: false,
-    Version: false
+    Version: false,
   };
   title = {
     value: 'Title',
@@ -47,18 +47,24 @@ export default class BlockStyleModel {
     right: null,
     default: null,
     useSlider: false,
+    timestep: null
   };
   stack = {
     isStack: false,
     isGroupBy: false,
     value: ''
   };
+  aggregation = {
+    isAggregate: false,
+    type: null,
+    label: ''
+  };
   pie = {
     isDonut: false,
     showPercent: true,
     showSubtitle: true
   };
-
+  showBoxPoints = false;
   colorscale = [
     "#1f77b4",
     "#ff7f0e",

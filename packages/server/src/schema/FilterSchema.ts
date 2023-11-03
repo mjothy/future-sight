@@ -21,5 +21,6 @@ interface FilterSchema {
         name__in?: string[];
     };
     year__in?: number[];
+    default_only?: boolean;
 }
 

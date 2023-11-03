@@ -16,9 +16,14 @@ export default class ControlBlockEditor extends Component<any, any> {
   };
 
   onCheckChange = (option, e) => {
-
     const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
     const parentBlock = JSON.parse(JSON.stringify(this.props.currentBlock));
+    const index = parentBlock.config.metaData.selectOrder.indexOf(option);
+    // 
+    let staleSelectOrder = [...parentBlock.config.metaData.selectOrder];
+    if (index >= 0) {
+      staleSelectOrder = [...parentBlock.config.metaData.selectOrder].slice(0, index);
+    }
 
     // update current block config (metadata)
     parentBlock.config.metaData.master[option].isMaster = e.target.checked;
@@ -39,6 +44,8 @@ export default class ControlBlockEditor extends Component<any, any> {
     this.updateChildsBlocks(dashboard, parentBlock);
 
     this.props.updateDashboard(dashboard);
+
+    this.props.setStaleFiltersFromSelectOrder(staleSelectOrder)
   };
 
   updateChildsBlocks = (dashboard, parentBlock) => {
@@ -59,6 +66,13 @@ export default class ControlBlockEditor extends Component<any, any> {
 
     const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
     const parentBlock = JSON.parse(JSON.stringify(this.props.currentBlock));
+    const index = parentBlock.config.metaData.selectOrder.indexOf(option);
+    // 
+    let staleSelectOrder = [...parentBlock.config.metaData.selectOrder];
+    if (index >= 0) {
+      staleSelectOrder = [...parentBlock.config.metaData.selectOrder].slice(0, index);
+      console.log("newSelectOrder: ", staleSelectOrder);
+    }
 
     // update data selected in block view)
     parentBlock.config.metaData.master[option].isMaster = false;
@@ -75,7 +89,8 @@ export default class ControlBlockEditor extends Component<any, any> {
     this.updateChildsBlocks(dashboard, parentBlock);
 
     this.props.updateDashboard(dashboard);
-    this.props.setStaleFiltersFromSelectOrder(parentBlock.config.metaData.selectOrder)
+
+    this.props.setStaleFiltersFromSelectOrder(staleSelectOrder)
   };
 
   onChange = (option, selectedData: string[]) => {
@@ -108,7 +123,6 @@ export default class ControlBlockEditor extends Component<any, any> {
           isClear={true}
           onClear={this.clearClick}
           onDropdownVisibleChange={this.props.onDropdownVisibleChange}
-          isFetching={this.props.isFetching}
         />}
       </div>
     );

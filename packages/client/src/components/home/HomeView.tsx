@@ -8,6 +8,7 @@ import './HomeView.css';
 import { createUUID, getDrafts, setDraft } from '../drafts/DraftUtils';
 import Footer from '../footer/Footer';
 import PreviewGroup from '../PreviewGroup';
+import Logo from "../navbar/Logo";
 
 const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
   const [draftFromURL, setDraftFromURL] = useState('');
@@ -30,11 +31,10 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
     }
   };
 
-  const draftFromURLOnClick = () => {
-    const parse = new URL(draftFromURL).searchParams.get('id');
-    if (parse) {
+  const draftOnClick = (id) => {
+    if (id) {
       const dashboards = publishedDashboards as Array<DashboardModel | undefined>;
-      const dashboard = dashboards.find((d: any) => d.id == parse);
+      const dashboard = dashboards.find((d: any) => d.id == id);
       if (dashboard) {
         const uuid = createUUID();
         dashboard.id = uuid;
@@ -49,6 +49,11 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
     }
   };
 
+  const draftFromURLOnClick = () => {
+    const parse = new URL(draftFromURL).searchParams.get('id');
+    return draftOnClick(parse)
+  }
+
   const newDraft = () => {
     const uuid = createUUID();
     setDraft(uuid, DashboardModel.fromDraft(uuid));
@@ -58,7 +63,10 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
   return (
     <>
       <div className="home-view-wrapper">
-        <h2>Welcome to FutureSight!</h2>
+        <div className="home-logo">
+          <Logo/>
+        </div>
+        <span><i>The ECEMF data visualization tool</i></span>
         <div className="create-container">
           <div className="drafts">
             <Button type="primary" onClick={newDraft}>
@@ -66,30 +74,32 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
             </Button>
             {getDraftsElement()}
           </div>
+        </div>
+        <Divider />
+        <div className="create-container">
           <Input.Group style={{ display: 'flex', flexDirection: 'row' }}>
             <Button
-              type="primary"
-              disabled={!draftFromURL}
-              onClick={draftFromURLOnClick}
+                type="primary"
+                disabled={!draftFromURL}
+                onClick={draftFromURLOnClick}
             >
               Start from another Dashboard
             </Button>
             <Input
-              placeholder="https://..."
-              value={draftFromURL}
-              onChange={(e) => setDraftFromURL(e.target.value)}
+                placeholder="https://..."
+                value={draftFromURL}
+                onChange={(e) => setDraftFromURL(e.target.value)}
             />
           </Input.Group>
         </div>
         {publishedDashboards && Object.keys(publishedDashboards).length > 0 && (
           <>
-            <Divider />
             <h3>Latest submissions</h3>
             <div className="previews-container">
               <PreviewGroup
                 dashboards={publishedDashboards}
                 urlPrefix={'/view?id='}
-                draftFromURLOnClick={draftFromURLOnClick}
+                draftOnClick={draftOnClick}
               />
             </div>
           </>

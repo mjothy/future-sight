@@ -66,7 +66,6 @@ export default class PopupFilterContent extends Component<any, any> {
       value={this.state.dataStructure[type].selection}
       options={this.props.optionsData[type]}
       onChange={this.onChange}
-      isFetching={this.props.isFetching}
       onDropdownVisibleChange={this.onDropdownVisibleChange}
       isClosable={true}
     />
@@ -110,15 +109,6 @@ export default class PopupFilterContent extends Component<any, any> {
                 Models&nbsp;<label className='no-data'> {this.props.isDataMissing("models") ? <><ExclamationCircleOutlined /> Data missing</> : ''}</label>
               </Checkbox>
               {selectedFilter.includes('models') && this.selectInput('models')}
-            </div>
-            <div className="mt-20">
-              <Checkbox value={'categories'}>
-                <TagOutlined />
-                Categories(optional)&nbsp;
-                {/* TODO uncomment  */}
-                {/* <label className='no-data'> {this.props.isDataMissing("categories") ? <><ExclamationCircleOutlined /> Data missing</> : ''}</label> */}
-              </Checkbox>
-              {selectedFilter.includes('categories') && this.selectInput('categories')}
             </div>
           </Space>
         </Checkbox.Group>

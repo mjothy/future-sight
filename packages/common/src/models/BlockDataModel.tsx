@@ -9,6 +9,7 @@ export default class BlockDataModel {
   versions: versionsModel = {};
   hasDeprecatedVersion = false;
   useVersion = false;
+  showNonDefaultRuns=false;
   categories: string[] = []
 
   /**

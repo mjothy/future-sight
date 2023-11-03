@@ -43,7 +43,7 @@ export default class PlotlyGraph extends Component<any, any> {
       height: this.props.height,
       legend: {
         // x: -0.25,
-        orientation: "h",
+        orientation: this.props.layout.orientation || "h",
       },
       autosize: false,
       margin: this.getMargins(),
@@ -56,8 +56,14 @@ export default class PlotlyGraph extends Component<any, any> {
       dragmode: "zoom",
       mapbox: { style: "carto-positron", center: { lat: 38, lon: -90 }, zoom: 3 },
       barmode: configStyle.stack.isStack ? 'stack' : null,
-      barnorm: configStyle.YAxis.percentage ? "percent" : ""
+      barnorm: configStyle.YAxis.percentage ? "percent" : "",
+      boxmode: "group",
+      xaxis:{automargin: true}
     };
+
+    if (configStyle.graphType == "box"){
+      layout["xaxis"]["type"] ="category"
+    }
 
     if (configStyle.title.isVisible) {
       layout = {
@@ -73,20 +79,14 @@ export default class PlotlyGraph extends Component<any, any> {
       }
     }
 
-    if (this.props.currentBlock.config.configStyle.graphType == "box"){
-      layout["xaxis"]={
-        showticklabels: false
-      }
-    }
-
     return configStyle.graphType === 'table' && this.props.data.values.length > 0 ? (
       <Table
         // Make the height 100% of the div (not working)
-        style={{ minHeight: '100%' }}
+        // style={{ minHeight: '100%' }}
         columns={this.props.data.columns}
         dataSource={this.props.data.values}
         pagination={false}
-        scroll={{ x: 3000, y: this.props.height - 40 }}
+        scroll={{ x: 3000, y: this.props.height - 37 }}
         bordered
       />
     ) : (

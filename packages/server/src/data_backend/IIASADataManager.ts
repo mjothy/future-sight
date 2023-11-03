@@ -14,20 +14,22 @@ export default class IIASADataManager {
     /**
      * Patch request
      * @param url filter path
-     * @param body The body of url options 
+     * @param body The body of url options
      * @param refresh Enable refreshing token for the first time if token is invalide or expired (set to true)
+     * @param method http method
      * @returns Promise
      */
-    patchPromise = async (url, body?: any, refresh = true) => {
+    patchPromise = async (url, body?: any, refresh = true, method = "PATCH") => {
         const fullUrl = this.getUrlBase(url);
         const options = {
-            method: 'PATCH',
+            method: method,
             headers: {
                 'Authorization': 'Bearer ' + process.env["access_token"],
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(body)
         };
+        console.log("IIASA - request - " + method + " " + url)
         try {
             const response = await fetch(fullUrl, options);
             const resp_obj = await response.json();
@@ -49,6 +51,7 @@ export default class IIASADataManager {
                 default:
                     err.message = "Server error!";
                     err.status = response.status;
+                    console.log(resp_obj)
                     throw err;
             }
         } catch (err: any) {

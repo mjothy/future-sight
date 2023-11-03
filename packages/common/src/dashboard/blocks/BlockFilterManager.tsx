@@ -7,7 +7,6 @@ import { getBlock } from './utils/BlockDataUtils';
 import BlockDataModel, { versionsModel } from "../../models/BlockDataModel";
 import DashboardModel from "../../models/DashboardModel";
 import { getSelectedFiltersLabels } from './utils/DashboardUtils';
-import { notification } from 'antd';
 
 export default class BlockFilterManager extends Component<any, any> {
     constructor(props) {
@@ -21,14 +20,7 @@ export default class BlockFilterManager extends Component<any, any> {
             /**
              * Data options in dropDown Inputs
              */
-            optionsData: {
-                regions: metadata["regions"],
-                variables: metadata["variables"],
-                scenarios: metadata["scenarios"],
-                models: metadata["models"],
-                categories: metadata["categories"],
-                versions: this.initVersionOptions(metadata["versions"])
-            },
+            optionsData: this.initOptionsData(metadata),
             missingData: {
                 regions: [],
                 variables: [],
@@ -48,7 +40,6 @@ export default class BlockFilterManager extends Component<any, any> {
                 scenarios: false,
                 models: false
             },
-            isFetching: false,
             currentSelection: [] // When opening a selectInput, store its value here to compare when closing
         };
     }
@@ -67,12 +58,30 @@ export default class BlockFilterManager extends Component<any, any> {
         return tempVersions
     }
 
+    initOptionsData = (metadata) => {
+        const optionsData = {
+            regions: metadata["regions"],
+            variables: metadata["variables"],
+            scenarios: metadata["scenarios"],
+            models: metadata["models"],
+            categories: metadata["categories"],
+            versions: this.initVersionOptions(metadata["versions"])
+        }
+
+        const id = this.props.currentBlock.controlBlock;
+        if (id != null && id != '') { // Control dataBlock
+            const controlBlockMetaData = this.props.dashboard.blocks[id].config.metaData;
+            const masterKeys = Object.keys(controlBlockMetaData.master).filter((key) => controlBlockMetaData.master[key].isMaster);
+            masterKeys.forEach(key => optionsData[key] = controlBlockMetaData[key]);
+        }
+
+        return optionsData;
+    }
     componentDidMount() {
         const metadata = this.props.currentBlock.config.metaData
         if (metadata["scenarios"].length > 0 && metadata["models"].length > 0) {
             this.updateFilterOptions("versions")
         }
-        this.updateMissingData();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -90,7 +99,6 @@ export default class BlockFilterManager extends Component<any, any> {
                     }
                 }
             )
-            this.updateMissingData();
         }
     }
 
@@ -114,7 +122,7 @@ export default class BlockFilterManager extends Component<any, any> {
             dataFocusFilters[filter] = this.props.dashboard.dataStructure[filter].selection;
         })
 
-        this.setState({ isLoadingOptions: { ...this.state.isLoadingOptions, [filterId]: true }, isFetching: true })
+        this.setState({ isLoadingOptions: { ...this.state.isLoadingOptions, [filterId]: true } })
         return this.props.dataManager.fetchFilterOptions({ filterId, metaData, dataFocusFilters })
             .then(res => {
                 let optionsData = JSON.parse(JSON.stringify(this.state.optionsData))
@@ -122,15 +130,14 @@ export default class BlockFilterManager extends Component<any, any> {
                 this.setState({
                     optionsData,
                     isLoadingOptions: { ...this.state.isLoadingOptions, [filterId]: false },
-                    isFetching: false
                 }, () => {
                     this.props.checkIfSelectedInOptions(this.state.optionsData, this.props.currentBlock)
+                    this.updateMissingData();
                 })
             })
             .catch(err => {
                 this.setState({
-                    isLoadingOptions: { ...this.state.isLoadingOptions, [filterId]: false },
-                    isFetching: false
+                    isLoadingOptions: { ...this.state.isLoadingOptions, [filterId]: false }
                 });
             })
     }
@@ -283,11 +290,6 @@ export default class BlockFilterManager extends Component<any, any> {
                     this.updateFilterOptions("versions")
                 }
             }
-
-            // Update missing data message
-            if (addedOptions.length > 0 || deletedOptions.length > 0) {
-                this.updateMissingData();
-            }
         }
     };
 
@@ -341,7 +343,27 @@ export default class BlockFilterManager extends Component<any, any> {
         }
 
         dashboard.blocks[this.props.currentBlock.id].config.metaData.versions = state_version_dict;
-        this.props.updateDashboard(dashboard)
+
+        const selectOrder = this.props.currentBlock.config.metaData.selectOrder
+
+        // Update filters to stale
+        const staleFilters = { ...this.state.staleFilters }
+
+        // -- Update filters with higher idx order than models and scenarios to stale
+        const maxIdxModelScenario = Math.max(selectOrder.indexOf("models"), selectOrder.indexOf("scenarios"))
+        for (const tempFilterId of selectOrder.slice(maxIdxModelScenario + 1)) {
+            staleFilters[tempFilterId] = true
+        }
+
+        // -- Update unselected filter to stale
+        for (const tempFilterId of Object.keys(staleFilters).filter((x) => !selectOrder.includes(x))) {
+            staleFilters[tempFilterId] = true
+        }
+
+        this.setState({ staleFilters: staleFilters },
+            () => this.props.updateDashboard(dashboard)
+        )
+
     };
 
     updateChildsBlocks = (dashboard, controlBlockId) => {
@@ -378,6 +400,21 @@ export default class BlockFilterManager extends Component<any, any> {
         return obligatory.length == 4
     }
 
+    onShowNonDefaultRuns = (e) => {
+        const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+        dashboard.blocks[this.props.currentBlock.id].config.metaData.showNonDefaultRuns = e.target.checked;
+        this.props.updateDashboard(dashboard)
+        // set every update to stale
+        this.setState({
+            staleFilters: {
+                regions: true,
+                variables: true,
+                scenarios: true,
+                models: true
+            }
+        })
+    }
+
     render() {
         return this.props.currentBlock.blockType === 'data' ? (
             <DataBlockEditor
@@ -391,7 +428,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 onVersionSelected={this.onVersionSelected}
                 setStaleFiltersFromSelectOrder={this.setStaleFiltersFromSelectOrder}
                 isAllSelected={this.isAllSelected}
-                isFetching={this.state.isFetching}
+                onShowNonDefaultRuns={this.onShowNonDefaultRuns}
             />
         ) : (
             <ControlBlockEditor
@@ -402,7 +439,6 @@ export default class BlockFilterManager extends Component<any, any> {
                 onChange={this.onChange}
                 onDropdownVisibleChange={this.onDropdownVisibleChange}
                 setStaleFiltersFromSelectOrder={this.setStaleFiltersFromSelectOrder}
-                isFetching={this.state.isFetching}
             />
         );
     }

@@ -63,7 +63,8 @@
             "left": null,
             "right": null,
             "default": null,
-            "useSlider": false
+            "useSlider": false,
+            "timestep": null
           },
           "legend": {
             "Model": false,
@@ -76,6 +77,11 @@
             "isStack": false,
             "isGroupBy": false,
             "value": ""
+          },
+          "aggregation": {
+            "isAggregate": false,
+            "type": null,
+            "label": ""
           },
           "pie": {
             "isDonut": false,
@@ -94,7 +100,6 @@
             "#bcbd22",
             "#17becf"
           ],
-
           "colorbar": {
             "isShow": true,
             "reverse": false,
@@ -102,7 +107,9 @@
               "variable": false,
               "unit": true
             }
-          }
+          },
+          "boxmode": "group",
+          "showBoxPoints": false
         },
         "metaData": {
           "models": [],
@@ -113,6 +120,7 @@
           "versions": {},
           "useVersion": false,
           "hasDeprecatedVersion": false,
+          "showNonDefaultRuns": false,
           "selectOrder": [],
           "master": {
             "models": {

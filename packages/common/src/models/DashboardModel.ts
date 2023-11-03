@@ -25,4 +25,5 @@ export default class DashboardModel {
   layout: LayoutModel[] = [];
   blocks: { [id: string]: BlockModel } = {};
   date?: Date | string;
+  verified?: boolean
 }

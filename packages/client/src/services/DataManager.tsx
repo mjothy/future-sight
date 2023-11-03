@@ -1,5 +1,4 @@
-import type { IDataManager, DataModel, PlotDataModel } from '@future-sight/common';
-import { notification } from 'antd';
+import type {DataModel, IDataManager, PlotDataModel} from '@future-sight/common';
 import Utils from './Utils';
 
 export default class DataManager implements IDataManager {
@@ -53,15 +52,20 @@ export default class DataManager implements IDataManager {
       .catch(console.error);
   };
 
-  saveDashboard = async (data) => {
+  saveDashboard = async (data, username: string, password: string) => {
     data.date = new Date()
+    const body = {
+      dashboard: data,
+      username: username,
+      password: password
+    };
     try {
       return await fetch(`${this.getBaseUrl()}/dashboard/save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(body),
       }).then((response) => response.json());
     } catch (err) {
       console.error(err);
@@ -130,15 +134,13 @@ export default class DataManager implements IDataManager {
       body: JSON.stringify(data),
     });
 
-    if (!response.ok) { // TODO add antd.notif
+    if (!response.ok) {
       const err: any = new Error();
       let message = "";
       err.status = response.status;
       if (err.status == 401) {
-        // const resp_obj = await response.json();
-        // err.message = resp_obj.message;
-        err.message = "Server encountered an issue while attempting to load data";
-        message = "Access denied to ressources.";
+        err.message = "Server encountered an issue";
+        message = "Error";
       } else {
         err.message = response.statusText;
       }
@@ -147,11 +149,13 @@ export default class DataManager implements IDataManager {
 
       throw err;
     } else {
-      const resp_obj = await response.json();
-      return resp_obj;
+      return await response.json();
     }
   }
 
+  checkUser = async (username: string, password: string) => {
+    return await this.sendRequest("api/checkUser", {username, password});
+  }
 }
 
 

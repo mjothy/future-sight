@@ -1,14 +1,14 @@
 import {
   BlockDataModel,
   BlockModel,
+  Colorizer,
   ColorizerProvider,
   ComponentPropsWithDataManager,
   ConfigurationModel,
   DataModel,
+  OptionsDataModel,
   PlotDataModel,
   ReadOnlyDashboard,
-  Colorizer,
-  OptionsDataModel
 } from '@future-sight/common';
 import { Component } from 'react';
 import withDataManager from '../../services/withDataManager';
@@ -17,8 +17,6 @@ import DashboardSelectionControl from './DashboardSelectionControl';
 import { getDraft, removeDraft } from '../drafts/DraftUtils';
 import Utils from '../../services/Utils';
 import { Spin } from 'antd';
-import * as _ from 'lodash';
-import {versionModel, versionsModel} from "@future-sight/common/build/models/BlockDataModel";
 
 export interface DashboardDataConfigurationProps
   extends ComponentPropsWithDataManager,
@@ -46,18 +44,22 @@ class DashboardDataConfiguration extends Component<
        * Data (with timeseries from IASA API)
        */
       allPlotData: {},
+      missingData: {},
       plotData: {},
+      loadingControlBlock: {
+
+      }
     };
   }
 
-  saveData = async (id: string, image?: string) => {
+  saveData = async (id: string, username: string, password: string, image?: string) => {
     const data = getDraft(id);
     if (data) {
       if (image) {
         data.preview = image;
       }
       try {
-        const res = await this.props.dataManager.saveDashboard(data);
+        const res = await this.props.dataManager.saveDashboard(data, username, password);
         removeDraft(id);
         return res.id;
       } catch (e) {
@@ -71,17 +73,26 @@ class DashboardDataConfiguration extends Component<
    * @param block the block
    * @returns the fetched data from API with timeseries
    */
-  blockData = (block: BlockModel): void => {
-    if (block.blockType === "text") {
-      return
+  blockData = async (block: BlockModel, childBlocks?: BlockModel[]) => {
+    switch (block.blockType) {
+      case "data":
+        return this.getPlotData(block);
+      case "control":
+        if (childBlocks != null && childBlocks.length > 0) {
+          for (const child of childBlocks) {
+            await this.getPlotData(child);
+          }
+        }
+        return
     }
+  };
 
+  getPlotData = (block: BlockModel) => {
     const config: ConfigurationModel | any = block.config;
     const metaData: BlockDataModel = config.metaData;
     const data: PlotDataModel[] = [];
     const missingData: DataModel[] = [];
-
-    // TODO add categories
+    // Check if type == control --> fin setState
     if (
       metaData.models &&
       metaData.scenarios &&
@@ -108,7 +119,22 @@ class DashboardDataConfiguration extends Component<
                   if (d) {
                     data.push(d);
                   } else {
-                    missingData.push({ model, scenario, variable, region, run: version });
+
+                    if (version == null) {
+                      console.log("debug 1: ", this.state.missingData);
+                      console.log("debug 2: ", block);
+                    }
+                    const noNeedToFetch = this.state.missingData[block.id]?.find(
+                      (e: PlotDataModel) =>
+                        e.model === model &&
+                        e.scenario === scenario &&
+                        e.variable === variable &&
+                        e.region === region &&
+                        e.run?.id === version.id
+                    );
+                    if (noNeedToFetch == null) {
+                      missingData.push({ model, scenario, variable, region, run: version });
+                    }
                   }
                 }
               } else {
@@ -122,7 +148,16 @@ class DashboardDataConfiguration extends Component<
                 if (d) {
                   data.push(d);
                 } else {
-                  missingData.push({ model, scenario, variable, region });
+                  const noNeedToFetch = this.state.missingData[block.id]?.find(
+                    (e: PlotDataModel) =>
+                      e.model === model &&
+                      e.scenario === scenario &&
+                      e.variable === variable &&
+                      e.region === region
+                  );
+                  if (noNeedToFetch == null) {
+                    missingData.push({ model, scenario, variable, region });
+                  }
                 }
               }
             });
@@ -132,23 +167,56 @@ class DashboardDataConfiguration extends Component<
     }
 
     if (missingData.length > 0) {
-      this.retreiveAllTimeSeriesData(data, missingData, block.id);
+      return this.retreiveAllTimeSeriesData(data, missingData, block.id);
     } else {
       const plotData = JSON.parse(JSON.stringify(this.state.plotData))
       plotData[block.id] = [...data]
-      this.setState({ plotData: plotData })
+      return new Promise<void>((resolve) => this.setState({ plotData: plotData }, resolve))
     }
   };
 
+  updateLoadingControlBlock = (id, status) => {
+    return new Promise<void>((resolve) => {
+      const loadingControlBlock = { ...this.state.loadingControlBlock };
+      loadingControlBlock[id] = status;
+      this.setState({ loadingControlBlock }, () => {
+        resolve();
+      });
+    });
+  };
+
   retreiveAllTimeSeriesData = (data: PlotDataModel[], missingData: DataModel[], blockId) => {
-    this.props.dataManager.fetchPlotData(missingData)
+    return this.props.dataManager.fetchPlotData(missingData)
       .then(res => {
+        const missingDataState = { ... this.state.missingData };
         // no new data to add to state.allPLotData, only update state.plotData
         if (res.length == 0) {
           const plotData = JSON.parse(JSON.stringify(this.state.plotData))
           plotData[blockId] = data
-          this.setState({ plotData: plotData })
+          if (missingDataState[blockId] != undefined) {
+            missingDataState[blockId].push(...missingData)
+          } else {
+            missingDataState[blockId] = [...missingData]
+          }
+          this.setState({ plotData: plotData, missingData: missingDataState })
           return
+        }
+
+        if (res.length < missingData.length) {
+          const unfetchedData = missingData.filter(element => !res.find(
+            (e: PlotDataModel) =>
+              e.model === element.model &&
+              e.scenario === element.scenario &&
+              e.variable === element.variable &&
+              e.region === element.region &&
+              e.run?.id === element.run?.id
+          ))
+
+          if (missingDataState[blockId] != undefined) {
+            missingDataState[blockId].push(...unfetchedData)
+          } else {
+            missingDataState[blockId] = [...unfetchedData]
+          }
         }
 
         const allPlotData = JSON.parse(JSON.stringify(this.state.allPlotData))
@@ -159,7 +227,7 @@ class DashboardDataConfiguration extends Component<
         }
         const plotData = JSON.parse(JSON.stringify(this.state.plotData))
         plotData[blockId] = [...data, ...res]
-        this.setState({ allPlotData: allPlotData, plotData: plotData })
+        this.setState({ allPlotData: allPlotData, plotData: plotData, missingData: missingDataState })
 
       }).catch(err => {
         console.log("TODO Handle error: ", err);
@@ -177,6 +245,8 @@ class DashboardDataConfiguration extends Component<
         // filters={this.state.filters}
         plotData={this.state.plotData}
         optionsLabel={this.optionsLabel}
+        updateLoadingControlBlock={this.updateLoadingControlBlock}
+        loadingControlBlock={this.state.loadingControlBlock}
         {...this.props}
       />
     ) : (
@@ -186,7 +256,8 @@ class DashboardDataConfiguration extends Component<
         plotData={this.state.plotData}
         blockData={this.blockData}
         optionsLabel={this.optionsLabel}
-
+        updateLoadingControlBlock={this.updateLoadingControlBlock}
+        loadingControlBlock={this.state.loadingControlBlock}
         {...this.props}
       /> || <div className="dashboard">
         <Spin className="centered" />

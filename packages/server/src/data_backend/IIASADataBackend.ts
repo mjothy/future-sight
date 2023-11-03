@@ -34,6 +34,7 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         const filteredValues = {};
         const filters: FilterObject = this.getFilters();
         const selectOrder = blockMetaData?.selectOrder;
+        const showNonDefaultRuns = blockMetaData?.showNonDefaultRuns;
 
         if (
             filterId === "versions"
@@ -61,7 +62,7 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
             }
         });
 
-        const filter = new Filter(selectedData, dataFocusFilters, selectOrder);
+        const filter = new Filter(selectedData, dataFocusFilters, selectOrder, showNonDefaultRuns);
 
         if (filterId == "versions") {
             const body = filter.getBody("runs");
@@ -87,9 +88,13 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         for (const raw of selectedData) {
             const rawWithRun = await this.getRawWithRun(raw);
             const body = Filter.getDatapointsBody(rawWithRun);
-            const dataPoints = await this.patchPromise("/iamc/datapoints/", body);
-            if (dataPoints?.length > 0) {
-                const timeSerie = this.prepareTimeSerie(rawWithRun, dataPoints);
+            const params = new URLSearchParams({
+                table: "true",
+                join_parameters: "true"
+            });
+            const dataPoints = await this.patchPromise("/iamc/datapoints/?"+params, body);
+            if (dataPoints["data"].length > 0) {
+                const timeSerie = await this.prepareTimeSerie(rawWithRun, dataPoints);
                 timeSeries.push(timeSerie);
             }
         }
@@ -115,19 +120,24 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         return outputRaw;
     }
 
-    prepareTimeSerie = (raw: any, dataPoints: any) => {
+    prepareTimeSerie = async (raw: any, dataPoints: any) => {
         const timeSerie: TimeSerieObject = {
             ...raw,
             data: []
         };
-
+        const valueIndex = dataPoints["columns"].indexOf("value")
+        const yearIndex = dataPoints["columns"].indexOf("step_year")
+        const unitIndex = dataPoints["columns"].indexOf("unit")
+        let data: [any] = dataPoints["data"]
         // Order dataPoints
-        dataPoints.sort((a, b) => a.step_year - b.step_year);
+        data = data.sort((a, b) => a[yearIndex] - b[yearIndex]);
 
-        dataPoints.forEach(point => {
-            timeSerie.data.push({ value: point.value, year: point.step_year });
+        data.forEach(point => {
+            timeSerie.data.push({ value: point[valueIndex], year: point[yearIndex] });
         })
-
+        if(data.length > 0) {
+            timeSerie.unit = data[0][unitIndex]
+        }
         return timeSerie;
     }
 

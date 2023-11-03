@@ -176,13 +176,6 @@ class DashboardConfigView extends Component<any, any> {
         }
     };
 
-    onBlockCopy = (e, id) => {
-        e.preventDefault();
-        if (id) {
-            this.props.copyBlock(id);
-        }
-    };
-
     onWidthChange = (width, margin, cols, containerPadding) => {
         //  Update height to keep grid ratio to 16/9
         this.setState({ rowHeight: width / cols / GRID_RATIO });
@@ -192,9 +185,9 @@ class DashboardConfigView extends Component<any, any> {
      * Check if fetched data has any deprecated version, and update metadata if has one
      */
     checkDeprecatedVersion = (data: PlotDataModel[], currentBlock) => {
-        const hasDeprecatedVersion = !data.every((plotData)=> plotData.is_default)
+        const hasDeprecatedVersion = !data.every((plotData) => plotData.is_default)
 
-        if(hasDeprecatedVersion !== currentBlock.config.metaData.hasDeprecatedVersion){
+        if (hasDeprecatedVersion !== currentBlock.config.metaData.hasDeprecatedVersion) {
             const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
             dashboard.blocks[currentBlock.id].config.metaData.hasDeprecatedVersion = hasDeprecatedVersion
             this.props.updateDashboard(dashboard)
@@ -202,15 +195,15 @@ class DashboardConfigView extends Component<any, any> {
     }
 
     getDeprecatedWarning = (block) => {
-        if(block.blockType !== "data") {
+        if (block.blockType !== "data") {
             return
-        }else {
+        } else {
             if (block.config.metaData.hasDeprecatedVersion
                 && block.config.configStyle.showDeprecatedVersionWarning) {
                 return (
-                    <Space style={{position: "fixed", top: 1, left: 1, zIndex: 2}}>
+                    <Space style={{ position: "fixed", top: 1, left: 1, zIndex: 2 }}>
                         <p className={"warning-deprecated-versions"}>
-                            <WarningOutlined/> Deprecated versions
+                            <WarningOutlined /> Deprecated versions
                         </p>
                     </Space>
                 )
@@ -263,11 +256,9 @@ class DashboardConfigView extends Component<any, any> {
                         >
                             {!this.props.readonly && (
                                 <Space className="block-actions" style={{ position: "fixed", top: 1, right: 1, zIndex: 2 }}>
-                                    {blocks[layout.i].blockType ==="data" && <Button size="small" icon={<CopyOutlined />} title="Copy this block"
-                                            onClick={(e) => this.onBlockCopy(e, layout.i)} />}
-                                    <Button size="small" icon={<DragOutlined />} title="Move this block"/>
+                                    <Button className="block-grab" size="small" icon={<DragOutlined />} title="Move this block" />
                                     <Button size="small" icon={<EditTwoTone />} title="Edit this block"
-                                            onClick={(e) => this.onBlockClick(e, layout.i)} />
+                                        onClick={(e) => this.onBlockClick(e, layout.i)} />
                                 </Space>
                             )}
 
@@ -291,6 +282,8 @@ class DashboardConfigView extends Component<any, any> {
                                 optionsLabel={this.props.optionsLabel}
                                 updateDashboard={this.props.updateDashboard}
                                 checkDeprecatedVersion={this.checkDeprecatedVersion}
+                                updateLoadingControlBlock={this.props.updateLoadingControlBlock}
+                                loadingControlBlock={this.props.loadingControlBlock}
                             />
                         </div>
                     </div>

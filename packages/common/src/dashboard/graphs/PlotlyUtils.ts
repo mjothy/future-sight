@@ -1,5 +1,6 @@
 import PlotDataModel from "../../models/PlotDataModel";
 import BlockStyleModel from "../../models/BlockStyleModel";
+import { table } from "console";
 
 const DEFAULT_FONT_SIZE = 10;
 
@@ -10,9 +11,9 @@ export default class PlotlyUtils {
      * @returns year[]
      */
     static getYears = (dataArray: PlotDataModel[]) => {
-        let concatYear:string[] = [];
+        let concatYear: string[] = [];
         for (const dataElement of dataArray) {
-            concatYear = [...concatYear, ...dataElement.data.map((element)=>element.year)]
+            concatYear = [...concatYear, ...dataElement.data.map((element) => element.year)]
         }
         return [...new Set(concatYear)]
     }
@@ -21,8 +22,8 @@ export default class PlotlyUtils {
      * Get index used in this data array. Can be one filterKey or a combination of filterKeys
      * @returns filterKey[]
      */
-    static getIndexKeys = (data: PlotDataModel[], filterKeys=["model", "scenario", "variable", "region"]) => {
-        if (data.length === 0) {return []}
+    static getIndexKeys = (data: PlotDataModel[], filterKeys = ["model", "scenario", "variable", "region"]) => {
+        if (data.length === 0) { return [] }
 
         const filtersValues = {}
         for (const dataElement of data) {
@@ -80,18 +81,81 @@ export default class PlotlyUtils {
         const XAxisConfig = configStyle.XAxis
         const data = JSON.parse(JSON.stringify(plotData))
 
-        if(!XAxisConfig.useCustomRange || !XAxisConfig.left || !XAxisConfig.right){
-            return data
+        if (XAxisConfig.useCustomRange && XAxisConfig.left && XAxisConfig.right) {
+            for (let i = 0; i < data.length; i++) {
+                const dataElement = data[i]
+                const dataPoints = [...dataElement.data]
+                dataElement.data = dataPoints.filter(
+                    (dataPoint) =>
+                        (XAxisConfig.left || 0) <= dataPoint.year &&
+                        dataPoint.year <= (XAxisConfig.right || 0))
+            }
         }
 
-        for (let i = 0; i < data.length; i++) {
-            const dataElement = data[i]
-            const dataPoints = [...dataElement.data]
-            dataElement.data = dataPoints.filter(
-                (dataPoint) =>
-                    (XAxisConfig.left||0) <= dataPoint.year &&
-                    dataPoint.year<= (XAxisConfig.right||0))
-        }
+        this.addTimestep(data, XAxisConfig);
+
         return data
+    }
+
+    static addTimestep(data, XAxisConfig) {
+        if (XAxisConfig.useCustomRange) {
+            const step = XAxisConfig.timestep;
+            if (step != null) {
+                data.forEach(timeSerie => {
+                    const years = timeSerie.data.map(e => e.year)
+                    const years_step: number[] = [];
+                    if (years.length > 0) {
+                        const min = years[0];
+                        const max = years[years.length - 1]
+                        for (let i = min; i <= max; i = i + step) {
+                            years_step.push(i);
+                        }
+                    }
+
+                    if (years_step.length > 0) {
+                        timeSerie.data = timeSerie.data.filter(e => years_step.includes(e.year));
+                    }
+                })
+            }
+        }
+    }
+
+    static ySumByYear = (data) => {
+        return data.reduce((groups, obj) => {
+            const { x, y } = obj;
+            const existingGroup = groups.find((group) => group.x === x);
+
+            if (existingGroup) {
+                existingGroup.y = Number(existingGroup.y) + Number(y);
+            } else {
+                groups.push({ x, y: Number(y) });
+            }
+
+            return groups;
+        }, []);
+    };
+
+    static getAggregation(arr, type): number {
+        let result = 0;
+        switch (type) {
+            case "sum":
+                arr.forEach((element) => {
+                    result += element;
+                });
+                return result;
+
+            case "avg":
+                arr.forEach((element) => {
+                    result += element;
+                });
+                return result / arr.length;
+
+            case "median":
+                const mid = Math.floor(arr.length / 2),
+                    nums = [...arr].sort((a, b) => a - b);
+                return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
+
+            default: return result;
+        }
     }
 }

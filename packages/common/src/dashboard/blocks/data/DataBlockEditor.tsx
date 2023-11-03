@@ -5,8 +5,8 @@ import { ExclamationCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { getUnselectedInputOptions } from '../utils/BlockDataUtils';
 import BlockDataModel, { versionsModel } from "../../../models/BlockDataModel";
 import BlockStyleModel from "../../../models/BlockStyleModel";
+import './DataBlockEditor.css';
 
-require('./DataBlockEditor.css')
 
 /**
  * The form in sidebar to add/edit dara block
@@ -40,6 +40,7 @@ export default class DataBlockEditor extends Component<any, any> {
   };
 
   onChange = (option, selectedData: string[]) => {
+    console.log("selectedData: ", selectedData)
     if (selectedData.length <= 0) {
       this.clearClick(option, null);
     } else {
@@ -89,17 +90,15 @@ export default class DataBlockEditor extends Component<any, any> {
 
             <SelectInput
               type={option}
-              placeholder={option}
               className={"width-90"}
               value={metaData[option]}
               options={this.props.optionsData[option]}
-              onChange={this.props.onChange}
+              onChange={this.onChange}
               loading={this.props.isLoadingOptions[option]}
               isClear={selected}
               onClear={this.clearClick}
               onDropdownVisibleChange={this.props.onDropdownVisibleChange}
-              isFetching={this.props.isFetching}
-              regroupOrphans={option==="regions" ? "Common regions" : undefined}
+              regroupOrphans={option === "regions" ? "Common regions" : undefined}
             />
           </Row>
         </div>
@@ -185,7 +184,7 @@ export default class DataBlockEditor extends Component<any, any> {
         const modelChildren: any[] = []
         for (const scenario of Object.keys(versionOptions[model])) {
           const scenarioChildren: any[] = []
-          const defaultVersion = versionOptions[model][scenario].default.id
+          const defaultVersion = versionOptions[model][scenario].default?.id || ""
           for (const version of versionOptions[model][scenario].values) {
             const title = version.id == defaultVersion
               ? `${version.version} (default)`
@@ -253,8 +252,8 @@ export default class DataBlockEditor extends Component<any, any> {
     const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
     dashboard.blocks[this.props.currentBlock.id].config.configStyle.showDeprecatedVersionWarning = e.target.checked;
     this.props.updateDashboard(dashboard)
-
   }
+
 
   getDefaultTreeSelectValue = () => {
     const version_dict: versionsModel = this.props.currentBlock.config.metaData.versions
@@ -280,6 +279,18 @@ export default class DataBlockEditor extends Component<any, any> {
             <span>Advanced options</span>
             <Switch size="small" onChange={this.props.onUseVersionSwitched} checked={metaData.useVersion} />
           </span>
+
+          {metaData.useVersion && <Row>
+            <Col span={2} className={'checkbox-col'}>
+              <Checkbox
+                onChange={this.props.onShowNonDefaultRuns}
+                checked={metaData.showNonDefaultRuns}
+              />
+            </Col>
+            <Col span={22} className={'checkbox-col-label'}>
+              <label>Allow selection of filters without any default runs</label>
+            </Col>
+          </Row>}
 
           {/* show inputs if they are controlled */}
           {this.props.currentBlock.controlBlock !== '' && (

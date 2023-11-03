@@ -13,7 +13,7 @@ export default class PreviewGroup extends React.Component<any, any> {
         Object.values(this.props.dashboards).forEach((dashboard: DashboardModel | any) => {
             bucket.push(
                 <Col key={i}>
-                    <Preview key={dashboard.id} id={dashboard.id} conf={dashboard} urlPrefix={this.props.urlPrefix} draftFromURLOnClick={this.props.draftFromURLOnClick}/>
+                    <Preview key={dashboard.id} id={dashboard.id} conf={dashboard} urlPrefix={this.props.urlPrefix} draftOnClick={this.props.draftOnClick}/>
                 </Col>
             )
             if (i % 6 === 0) {
