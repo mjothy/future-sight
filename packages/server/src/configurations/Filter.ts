@@ -196,16 +196,15 @@ export default class Filter {
         return requestBody;
     }
 
-    static getDatapointsBody = (raw) => {
+    static getDatapointsBody = (plotData) => {
         const requestBody: FilterSchema = {};
 
-        requestBody.run = { id: raw["run"]?.id != null ? raw["run"]?.id : -1 }
-        requestBody.region = { name: raw["region"] };
-        requestBody.variable = { name: raw["variable"] };
-
-        if (raw["unit"] != null) {
-            requestBody.unit = { name: raw["unit"] };
+        if(plotData.runs?.length <= 0  || plotData.regions?.length <= 0 || plotData.variables?.length <= 0){
+            return null;
         }
+        requestBody.run = { id__in: plotData.runs}
+        requestBody.region = { name__in: plotData.regions};
+        requestBody.variable = { name__in: plotData.variables };
 
         return requestBody;
     }

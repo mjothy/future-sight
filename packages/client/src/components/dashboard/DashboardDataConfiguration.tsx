@@ -119,11 +119,6 @@ class DashboardDataConfiguration extends Component<
                   if (d) {
                     data.push(d);
                   } else {
-
-                    if (version == null) {
-                      console.log("debug 1: ", this.state.missingData);
-                      console.log("debug 2: ", block);
-                    }
                     const noNeedToFetch = this.state.missingData[block.id]?.find(
                       (e: PlotDataModel) =>
                         e.model === model &&
@@ -137,29 +132,7 @@ class DashboardDataConfiguration extends Component<
                     }
                   }
                 }
-              } else {
-                const d = this.state.allPlotData[block.id]?.find(
-                  (e) =>
-                    e.model === model &&
-                    e.scenario === scenario &&
-                    e.variable === variable &&
-                    e.region === region
-                );
-                if (d) {
-                  data.push(d);
-                } else {
-                  const noNeedToFetch = this.state.missingData[block.id]?.find(
-                    (e: PlotDataModel) =>
-                      e.model === model &&
-                      e.scenario === scenario &&
-                      e.variable === variable &&
-                      e.region === region
-                  );
-                  if (noNeedToFetch == null) {
-                    missingData.push({ model, scenario, variable, region });
-                  }
-                }
-              }
+              } // To get datapoints, we need run to be != null
             });
           });
         });
@@ -186,6 +159,7 @@ class DashboardDataConfiguration extends Component<
   };
 
   retreiveAllTimeSeriesData = (data: PlotDataModel[], missingData: DataModel[], blockId) => {
+    // TODO à revoir
     return this.props.dataManager.fetchPlotData(missingData)
       .then(res => {
         const missingDataState = { ... this.state.missingData };
