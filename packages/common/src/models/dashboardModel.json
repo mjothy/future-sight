@@ -119,7 +119,6 @@
           "categories": [],
           "versions": {},
           "useVersion": false,
-          "hasDeprecatedVersion": false,
           "showNonDefaultRuns": false,
           "selectOrder": [],
           "master": {

@@ -35,7 +35,6 @@ class DataBlockView extends Component<any, any> {
   getPlotData = () => {
     let data: PlotDataModel[] = this.props.timeseriesData;
     data = PlotlyUtils.filterByCustomXRange(data, this.props.currentBlock.config.configStyle)
-    this.props.checkDeprecatedVersion(data, this.props.currentBlock)
     return data
   }
 
