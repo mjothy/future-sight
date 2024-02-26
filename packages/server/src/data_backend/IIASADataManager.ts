@@ -24,7 +24,7 @@ export default class IIASADataManager {
         const options = {
             method: method,
             headers: {
-                'Authorization': 'Bearer ' + process.env["access_token"],
+                // 'Authorization': 'Bearer ' + process.env["access_token"], // TODO
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(body)
@@ -38,7 +38,7 @@ export default class IIASADataManager {
 
             switch (response.status) {
                 case 200:
-                    return resp_obj;
+                    return resp_obj.results;
                 case 401:
                     err.message = resp_obj.error_name + ": " + resp_obj.message;
                     err.status = 401;
