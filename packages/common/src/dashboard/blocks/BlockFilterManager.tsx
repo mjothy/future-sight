@@ -240,35 +240,7 @@ export default class BlockFilterManager extends Component<any, any> {
             }
 
             // Check added and deleted options from selection
-            const addedOptions = config.metaData[filterId].filter((x) => !this.state.currentSelection.includes(x))
-            const deletedOptions = this.state.currentSelection.filter((x) => !config.metaData[filterId].includes(x))
-
-            if (deletedOptions.length > 0) {
-                // Update unselected filter to stale
-                const staleFilters = { ...this.state.staleFilters }
-                for (const tempFilterId of Object.keys(staleFilters).filter((x) => !selectOrder.includes(x))) {
-                    staleFilters[tempFilterId] = true
-                }
-                this.setState({ staleFilters: staleFilters })
-
-                // Update cascade all higher idx filters
-                const selectOrderIndex = selectOrder.indexOf(filterId)
-
-                for (const tempFilterId of selectOrder.slice(selectOrderIndex + 1)) {
-                    await this.updateFilterOptions(tempFilterId)
-                }
-
-                // Update versions if model or scenario modified
-                const updatedFilters = selectOrder.slice(selectOrderIndex)
-                if (
-                    ["models", "scenarios"].some(item => updatedFilters.includes(item))
-                    && ["models", "scenarios"].every(item => selectOrder.includes(item))
-                ) {
-                    this.updateFilterOptions("versions")
-                }
-
-            } else if (addedOptions.length > 0) {
-                // Update higher idx and unselected filter to stale
+            if (config.metaData[filterId].length != this.state.currentSelection.length) {
                 const staleFilters = { ...this.state.staleFilters }
                 const selectOrderIndex = selectOrder.indexOf(filterId)
 
@@ -277,19 +249,26 @@ export default class BlockFilterManager extends Component<any, any> {
                     staleFilters[tempFilterId] = true
                 }
 
-                // - unselected filters
+                // Update unselected filter to stale
                 for (const tempFilterId of Object.keys(staleFilters).filter((x) => !selectOrder.includes(x))) {
                     staleFilters[tempFilterId] = true
                 }
                 this.setState({ staleFilters: staleFilters })
 
-                // update versions if model or scenario modified
+                // Update versions if model or scenario modified
+                const updatedFilters = selectOrder.slice(selectOrderIndex)
                 if (
-                    ["models", "scenarios"].includes(filterId)
+                    ["models", "scenarios"].some(item => updatedFilters.includes(item))
                     && ["models", "scenarios"].every(item => selectOrder.includes(item))
                 ) {
-                    this.updateFilterOptions("versions")
+                    await this.updateFilterOptions("versions")
+                    // TODO update currentBlock.metadata.versions
                 }
+
+                /*for (const tempFilterId of selectOrder.slice(selectOrderIndex + 1)) {
+                    await this.updateFilterOptions(tempFilterId)
+                }*/
+
             }
         }
     };
@@ -343,6 +322,8 @@ export default class BlockFilterManager extends Component<any, any> {
             }
         }
 
+        // TODO replace state_version_dict by version_dict: to update versions by only the selected versions
+        // TODO update current_block.metaData.version of dashboard by the same value of optionsData.version (they are not synchroniszed)
         dashboard.blocks[this.props.currentBlock.id].config.metaData.versions = state_version_dict;
 
         const selectOrder = this.props.currentBlock.config.metaData.selectOrder
