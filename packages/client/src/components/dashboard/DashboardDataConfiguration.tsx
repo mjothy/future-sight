@@ -41,10 +41,12 @@ class DashboardDataConfiguration extends Component<
       filters: {},
       allData: new OptionsDataModel(),
       /**
-       * Data (with timeseries from IASA API)
+       * Data (with timeseries from IASA API) - All plotData timeseries already fetched (selected and deselected values) for current block
        */
       allPlotData: {},
-      missingData: {},
+      /**
+       * PlotData of selected values in metaData of current block
+       */
       plotData: {},
       loadingControlBlock: {
 
@@ -91,7 +93,7 @@ class DashboardDataConfiguration extends Component<
     const config: ConfigurationModel | any = block.config;
     const metaData: BlockDataModel = config.metaData;
     const data: PlotDataModel[] = [];
-    const missingData: DataModel[] = [];
+    const toFetchPlotData: DataModel[] = [];
     // Check if type == control --> fin setState
     if (
       metaData.models &&
@@ -119,17 +121,7 @@ class DashboardDataConfiguration extends Component<
                   if (d) {
                     data.push(d);
                   } else {
-                    const noNeedToFetch = this.state.missingData[block.id]?.find(
-                      (e: PlotDataModel) =>
-                        e.model === model &&
-                        e.scenario === scenario &&
-                        e.variable === variable &&
-                        e.region === region &&
-                        e.run?.id === version.id
-                    );
-                    if (noNeedToFetch == null) {
-                      missingData.push({ model, scenario, variable, region, run: version });
-                    }
+                    toFetchPlotData.push({ model, scenario, variable, region, run: version });
                   }
                 }
               } // To get datapoints, we need run to be != null
@@ -139,8 +131,8 @@ class DashboardDataConfiguration extends Component<
       });
     }
 
-    if (missingData.length > 0) {
-      return this.retreiveAllTimeSeriesData(data, missingData, block.id);
+    if (toFetchPlotData.length > 0) {
+      return this.retreiveAllTimeSeriesData(data, toFetchPlotData, block.id);
     } else {
       const plotData = JSON.parse(JSON.stringify(this.state.plotData))
       plotData[block.id] = [...data]
@@ -158,40 +150,9 @@ class DashboardDataConfiguration extends Component<
     });
   };
 
-  retreiveAllTimeSeriesData = (data: PlotDataModel[], missingData: DataModel[], blockId) => {
-    // TODO à revoir
-    return this.props.dataManager.fetchPlotData(missingData)
+  retreiveAllTimeSeriesData = (data: PlotDataModel[], toFetchPlotData: DataModel[], blockId) => {
+    return this.props.dataManager.fetchPlotData(toFetchPlotData)
       .then(res => {
-        const missingDataState = { ... this.state.missingData };
-        // no new data to add to state.allPLotData, only update state.plotData
-        if (res.length == 0) {
-          const plotData = JSON.parse(JSON.stringify(this.state.plotData))
-          plotData[blockId] = data
-          if (missingDataState[blockId] != undefined) {
-            missingDataState[blockId].push(...missingData)
-          } else {
-            missingDataState[blockId] = [...missingData]
-          }
-          this.setState({ plotData: plotData, missingData: missingDataState })
-          return
-        }
-
-        if (res.length < missingData.length) {
-          const unfetchedData = missingData.filter(element => !res.find(
-            (e: PlotDataModel) =>
-              e.model === element.model &&
-              e.scenario === element.scenario &&
-              e.variable === element.variable &&
-              e.region === element.region &&
-              e.run?.id === element.run?.id
-          ))
-
-          if (missingDataState[blockId] != undefined) {
-            missingDataState[blockId].push(...unfetchedData)
-          } else {
-            missingDataState[blockId] = [...unfetchedData]
-          }
-        }
 
         const allPlotData = JSON.parse(JSON.stringify(this.state.allPlotData))
         if (allPlotData[blockId] != undefined) {
@@ -201,7 +162,7 @@ class DashboardDataConfiguration extends Component<
         }
         const plotData = JSON.parse(JSON.stringify(this.state.plotData))
         plotData[blockId] = [...data, ...res]
-        this.setState({ allPlotData: allPlotData, plotData: plotData, missingData: missingDataState })
+        this.setState({ plotData, allPlotData})
 
       }).catch(err => {
         console.log("TODO Handle error: ", err);

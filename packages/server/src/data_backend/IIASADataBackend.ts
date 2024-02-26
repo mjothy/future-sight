@@ -89,9 +89,9 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         const regions = selectedData.map(obj => obj.region);
         const variables = selectedData.map(obj => obj.variable);
         const body = Filter.getDatapointsBody({
-            runs: runIds,
-            regions,
-            variables
+            runs: Array.from(new Set(runIds)),
+            regions: Array.from(new Set(regions)),
+            variables: Array.from(new Set(variables))
         });
 
         if(body != null){
