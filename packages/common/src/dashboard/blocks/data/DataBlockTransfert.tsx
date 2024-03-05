@@ -49,7 +49,6 @@ class DataBlockTransfert extends Component<any, any> {
         timeseriesData={timeseriesData}
         width={this.props.width}
         height={this.props.height}
-        checkDeprecatedVersion={this.props.checkDeprecatedVersion}
       />
     </>
   }

@@ -35,7 +35,6 @@ export default class BlockViewManager extends Component<any, any> {
           plotData={this.props.plotData}
           width={this.props.width}
           height={this.props.height}
-          checkDeprecatedVersion={this.props.checkDeprecatedVersion}
           getMetaData={this.getMetaData}
           loadingControlBlock={this.props.loadingControlBlock[this.props.currentBlock.controlBlock]}
         />;

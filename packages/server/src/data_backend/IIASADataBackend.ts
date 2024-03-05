@@ -72,7 +72,7 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         } else {
             const body = filter.getBody(filterId);
             const data = await this.patchPromise(filters[filterId].path, body);
-            filteredValues[filterId] = data.map(element => element.name);
+            filteredValues[filterId] = data?.map(element => element.name);
         }
 
         // Return only data in dataFocus (if exist);
@@ -85,59 +85,65 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
 
     getTimeSeries = async (selectedData: DataModel[]) => {
         const timeSeries: TimeSerieObject[] = [];
-        for (const raw of selectedData) {
-            const rawWithRun = await this.getRawWithRun(raw);
-            const body = Filter.getDatapointsBody(rawWithRun);
+        const runIds = selectedData.map(obj => obj.run?.id);
+        const regions = selectedData.map(obj => obj.region);
+        const variables = selectedData.map(obj => obj.variable);
+        const body = Filter.getDatapointsBody({
+            runs: Array.from(new Set(runIds)),
+            regions: Array.from(new Set(regions)),
+            variables: Array.from(new Set(variables))
+        });
+
+        if(body != null){
             const params = new URLSearchParams({
                 table: "true",
-                join_parameters: "true"
+                join_parameters: "true",
+                join_runs: "true"
             });
             const dataPoints = await this.patchPromise("/iamc/datapoints/?"+params, body);
-            if (dataPoints["data"].length > 0) {
-                const timeSerie = await this.prepareTimeSerie(rawWithRun, dataPoints);
+
+            for (const row of selectedData) {
+                const timeSerie = await this.prepareTimeSerie(row, dataPoints);
                 timeSeries.push(timeSerie);
             }
         }
+
         return timeSeries;
-
     }
 
-    // TODO getting runs could probably be optimized if we use multiple timeseries with same scenario model
-    // Here call /runs for each timeserie instead of each combination of scenario model
-    getRawWithRun = async (raw: DataModel) => {
-        const body = Filter.getRunBody(raw);
-        const data = await this.patchPromise("/runs/", body);
-        const runDefault = data.find(run => run.is_default);
-        const outputRaw: PlotDataModel = JSON.parse(JSON.stringify(raw))
-
-        if (Object.keys(raw).includes("run")) {
-            // Check if run is default when provided
-            outputRaw.is_default = outputRaw.run.id == runDefault?.id
-        } else {
-            outputRaw.run = runDefault;
-            outputRaw.is_default = true;
-        }
-        return outputRaw;
-    }
-
-    prepareTimeSerie = async (raw: any, dataPoints: any) => {
+    prepareTimeSerie = async (row: any, dataPoints: any) => {
         const timeSerie: TimeSerieObject = {
-            ...raw,
+            ...row,
             data: []
         };
-        const valueIndex = dataPoints["columns"].indexOf("value")
-        const yearIndex = dataPoints["columns"].indexOf("step_year")
-        const unitIndex = dataPoints["columns"].indexOf("unit")
-        let data: [any] = dataPoints["data"]
-        // Order dataPoints
-        data = data.sort((a, b) => a[yearIndex] - b[yearIndex]);
 
-        data.forEach(point => {
-            timeSerie.data.push({ value: point[valueIndex], year: point[yearIndex] });
-        })
-        if(data.length > 0) {
-            timeSerie.unit = data[0][unitIndex]
+        const modelIndex = dataPoints["columns"].indexOf("model")
+        const scenarioIndex = dataPoints["columns"].indexOf("scenario")
+        const versionIndex = dataPoints["columns"].indexOf("version")
+        const regionIndex = dataPoints["columns"].indexOf("region")
+        const variableIndex = dataPoints["columns"].indexOf("variable")
+
+        let data: [any] = dataPoints["data"].filter(element => element[modelIndex] == row.model && element[scenarioIndex]==row.scenario 
+            && element[versionIndex]==row.run?.version 
+            && element[regionIndex] == row.region 
+            && element[variableIndex] == row.variable) // Filter to get values of current row
+
+        if(data?.length > 0){
+            const valueIndex = dataPoints["columns"].indexOf("value")
+            const yearIndex = dataPoints["columns"].indexOf("step_year")
+            const unitIndex = dataPoints["columns"].indexOf("unit")
+
+            // Order dataPoints
+            data = data.sort((a, b) => a[yearIndex] - b[yearIndex]);
+
+            data.forEach(point => {
+                timeSerie.data.push({ value: point[valueIndex], year: point[yearIndex] });
+            })
+            if(data.length > 0) {
+                timeSerie.unit = data[0][unitIndex]
+            }
         }
+
         return timeSerie;
     }
 

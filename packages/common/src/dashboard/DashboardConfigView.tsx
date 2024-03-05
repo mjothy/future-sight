@@ -184,21 +184,15 @@ class DashboardConfigView extends Component<any, any> {
     /**
      * Check if fetched data has any deprecated version, and update metadata if has one
      */
-    checkDeprecatedVersion = (data: PlotDataModel[], currentBlock) => {
-        const hasDeprecatedVersion = !data.every((plotData) => plotData.is_default)
-
-        if (hasDeprecatedVersion !== currentBlock.config.metaData.hasDeprecatedVersion) {
-            const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
-            dashboard.blocks[currentBlock.id].config.metaData.hasDeprecatedVersion = hasDeprecatedVersion
-            this.props.updateDashboard(dashboard)
-        }
+    checkDeprecatedVersion = (data: PlotDataModel[]) => {
+        return !data?.every((plotData) => plotData.run.is_default);
     }
 
     getDeprecatedWarning = (block) => {
         if (block.blockType !== "data") {
             return
         } else {
-            if (block.config.metaData.hasDeprecatedVersion
+            if (this.checkDeprecatedVersion(this.props.plotData[block.id])
                 && block.config.configStyle.showDeprecatedVersionWarning) {
                 return (
                     <Space style={{ position: "fixed", top: 1, left: 1, zIndex: 2 }}>
@@ -281,7 +275,6 @@ class DashboardConfigView extends Component<any, any> {
                                 plotData={this.props.plotData}
                                 optionsLabel={this.props.optionsLabel}
                                 updateDashboard={this.props.updateDashboard}
-                                checkDeprecatedVersion={this.checkDeprecatedVersion}
                                 updateLoadingControlBlock={this.props.updateLoadingControlBlock}
                                 loadingControlBlock={this.props.loadingControlBlock}
                             />
