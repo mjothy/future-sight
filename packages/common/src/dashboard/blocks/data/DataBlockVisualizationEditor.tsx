@@ -36,7 +36,7 @@ const plotTypes = [
 ];
 
 const colorbarTitle = ['variable', 'unit'];
-const TIME_STEPS = [5, 10, 15, 20]
+const TIME_STEPS = [2, 5, 10, 15, 20]
 
 export default class DataBlockVisualizationEditor extends Component<any, any> {
 

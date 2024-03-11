@@ -81,43 +81,45 @@ export default class PlotlyUtils {
         const XAxisConfig = configStyle.XAxis
         const data = JSON.parse(JSON.stringify(plotData))
 
-        if (XAxisConfig.useCustomRange && XAxisConfig.left && XAxisConfig.right) {
-            for (let i = 0; i < data.length; i++) {
-                const dataElement = data[i]
-                const dataPoints = [...dataElement.data]
-                dataElement.data = dataPoints.filter(
-                    (dataPoint) =>
-                        (XAxisConfig.left || 0) <= dataPoint.year &&
-                        dataPoint.year <= (XAxisConfig.right || 0))
+        if (XAxisConfig.useCustomRange) {
+            const left = XAxisConfig.left;
+            const right = XAxisConfig.right;
+            if(left || right){
+                for (let i = 0; i < data.length; i++) {
+                    const dataElement = data[i]
+                    const dataPoints = [...dataElement.data]
+                    dataElement.data = dataPoints.filter(
+                        (dataPoint) =>
+                            (XAxisConfig.left ?? dataPoint.year) <= dataPoint.year &&
+                            dataPoint.year <= (XAxisConfig.right ?? dataPoint.year))
+                }
             }
+
+            if (XAxisConfig.timestep != null) {
+                this.addTimestep(data, XAxisConfig.timestep, left, right);
+            }
+
         }
-
-        this.addTimestep(data, XAxisConfig);
-
         return data
     }
 
-    static addTimestep(data, XAxisConfig) {
-        if (XAxisConfig.useCustomRange) {
-            const step = XAxisConfig.timestep;
-            if (step != null) {
-                data.forEach(timeSerie => {
-                    const years = timeSerie.data.map(e => e.year)
-                    const years_step: number[] = [];
-                    if (years.length > 0) {
-                        const min = years[0];
-                        const max = years[years.length - 1]
-                        for (let i = min; i <= max; i = i + step) {
-                            years_step.push(i);
-                        }
-                    }
+    static addTimestep(data, step, yearLeft, yearRight) {
 
-                    if (years_step.length > 0) {
-                        timeSerie.data = timeSerie.data.filter(e => years_step.includes(e.year));
-                    }
-                })
+        data.forEach(timeSerie => {
+            const years = timeSerie.data.map(e => e.year)
+            const years_step: number[] = [];
+            if (years.length > 0) {
+                const min = yearLeft ?? years[0];
+                const max = yearRight ?? years[years.length - 1]
+                for (let i = min; i <= max; i = i + step) {
+                    years_step.push(i);
+                }
             }
-        }
+
+            if (years_step.length > 0) {
+                timeSerie.data = timeSerie.data.filter(e => years_step.includes(e.year));
+            }
+        })
     }
 
     static ySumByYear = (data) => {
