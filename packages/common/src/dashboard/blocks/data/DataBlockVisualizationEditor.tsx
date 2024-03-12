@@ -213,6 +213,24 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
+  onYAxisCustomRangeChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.YAxis.useCustomRange = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  };
+
+  private onYRangeMinChange = (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.YAxis.min = value;
+    this.updateBlockConfig({ configStyle: configStyle })
+  };
+
+  private onYRangeMaxChange= (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.YAxis.max = value;
+    this.updateBlockConfig({ configStyle: configStyle })
+  };
+
   render() {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     const metaData = this.props.currentBlock.config.metaData;
@@ -420,6 +438,38 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
               </>
             }
           </>}
+        <Row className="mb-10">
+          <Col span={2} className={'checkbox-col'}>
+            <Checkbox
+                onChange={this.onYAxisCustomRangeChange}
+                checked={configStyle.YAxis.useCustomRange}
+            />
+          </Col>
+          <Col span={16} className={'checkbox-col-label'}>
+            <label>Custom Y axis range</label>
+          </Col>
+        </Row>
+        <Row className="mb-10">
+          <Col span={2} />
+          <Col span={8}>
+            <InputNumber
+                className="width-100"
+                placeholder="Left"
+                onChange={this.onYRangeMinChange}
+                value={configStyle.YAxis.min}
+                disabled={!configStyle.YAxis.useCustomRange}
+            />
+          </Col>
+          <Col span={8} className="ml-20">
+            <InputNumber
+                className="width-100"
+                placeholder="Right"
+                onChange={this.onYRangeMaxChange}
+                value={configStyle.YAxis.max}
+                disabled={!configStyle.YAxis.useCustomRange}
+            />
+          </Col>
+        </Row>
         <Row className="mb-10">
           <Col span={2} className={'checkbox-col'}>
             <Checkbox

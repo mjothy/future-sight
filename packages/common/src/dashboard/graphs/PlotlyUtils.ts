@@ -122,6 +122,32 @@ export default class PlotlyUtils {
         })
     }
 
+    /**
+     * Show only data points between max and min selected values (min and max are configurable)
+     * @param plotData data with time series {model, scenario, ... , data:{year, value}}
+     * @param configStyle plot configuration
+     */
+    static filterByCustomYRange = (plotData: PlotDataModel[], configStyle: BlockStyleModel) => {
+        const YAxisConfig = configStyle.YAxis
+        const data = JSON.parse(JSON.stringify(plotData))
+
+        if (YAxisConfig.useCustomRange) {
+            const min = YAxisConfig.min;
+            const max = YAxisConfig.max;
+            if(min || max){
+                for (let i = 0; i < data.length; i++) {
+                    const dataElement = data[i]
+                    const dataPoints = [...dataElement.data]
+                    dataElement.data = dataPoints.filter(
+                        (dataPoint) =>
+                            (YAxisConfig.min ?? dataPoint.value) <= dataPoint.value &&
+                            dataPoint.value <= (YAxisConfig.max ?? dataPoint.value))
+                }
+            }
+        }
+        return data
+    }
+
     static ySumByYear = (data) => {
         return data.reduce((groups, obj) => {
             const { x, y } = obj;

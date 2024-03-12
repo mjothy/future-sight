@@ -6,7 +6,10 @@ export default class BlockStyleModel {
     label: false,
     unit: false,
     force0: false,
-    percentage: false
+    percentage: false,
+    useCustomRange: false,
+    min: null,
+    max: null
   };
   legend = {
     Model: false,
