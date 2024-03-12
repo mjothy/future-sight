@@ -62,7 +62,7 @@ class DataBlockView extends Component<any, any> {
           indexStackBy = configStyle.stack.value?.slice(0, -1)
         }
 
-        dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, indexStackBy);
+        dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, [indexStackBy]);
         const indexKeys = PlotlyUtils.getIndexKeys(data)
 
         dataWithColor?.map((dataElement) => {
