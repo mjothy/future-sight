@@ -157,13 +157,23 @@ class DataBlockView extends Component<any, any> {
     ];
 
     const values: any[] = [];
+    // Generate years of column
+    let years_columns = data.reduce((acc, dataElement) => {
+      const years_de = dataElement.data.map(e => e.year) || [];
+      // @ts-ignore
+      return acc.concat(years_de);
+    }, []);
+
+    const years_set = new Set(years_columns);
+    years_columns = Array.from(years_set);
+    years_columns.sort((a, b) => a - b);
+
     data?.map((dataElement) => {
       const obj = {};
-      dataElement.data?.map((e) => {
-        obj[e.year] = e.value;
-        if (!columns_list.includes(e.year)) {
-          columns_list.push(e.year)
-        }
+
+      years_columns.map((year:string) => {
+        const dataPoint = dataElement.data?.find(e => e.year == year);
+        obj[year] = dataPoint ? Number(dataPoint.value).toFixed(2): "-";
       });
 
       values.push({
@@ -175,13 +185,17 @@ class DataBlockView extends Component<any, any> {
       });
     });
 
-    const columns = columns_list.map(col => {
+    const columns1 = columns_list.map((col, idx) => {
+        return {
+          title: col, dataIndex: col, width: 200, align:'center'
+        }
+    });
+    const columns2 = years_columns.map((col, idx) => {
       return {
-        title: col, dataIndex: col
+        title: col, dataIndex: col, width: 60, align:'center'
       }
-    })
-
-    return { columns, values };
+    });
+    return { columns: columns1.concat(columns2, [{title: "", dataIndex: "extra", width: 30, align:'center'}]), values }; // the extra column to add empty space at the end of table
   }
 
   preparePlotData = (dataElement: PlotDataModel, configStyle: BlockStyleModel, stacks?: undefined[], indexKeys: string[] = []) => {
