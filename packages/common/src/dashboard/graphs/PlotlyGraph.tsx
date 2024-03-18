@@ -86,7 +86,7 @@ export default class PlotlyGraph extends Component<any, any> {
         columns={this.props.data.columns}
         dataSource={this.props.data.values}
         pagination={false}
-        scroll={{ x: 3000, y: this.props.height - 37 }}
+        scroll={{y: this.props.height - 37 }}
         bordered
       />
     ) : (
