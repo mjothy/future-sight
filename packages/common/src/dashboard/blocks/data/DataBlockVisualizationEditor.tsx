@@ -514,7 +514,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             </Row>
 
             {!(
-                configStyle.graphType == "bar" && configStyle.stack.isStack && !!configStyle.stack.value
+                configStyle.graphType == "bar" && (configStyle.stack.isStack || configStyle.stack.isGroupBy) && !!configStyle.stack.value
             ) &&  <>
                 <Row>
                   <Col span={2}/>
