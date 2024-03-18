@@ -25,7 +25,7 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         for (const key of filterKeys) {
             const body = filter.getBody(key);
             const data = await this.patchPromise(filters[key].path, body);
-            filteredValues[key] = data.map(element => element.name);
+            filteredValues[key] = data?.map(element => element.name);
         }
         return filteredValues;
     };

@@ -24,7 +24,7 @@ export default class IIASADataManager {
         const options = {
             method: method,
             headers: {
-                // 'Authorization': 'Bearer ' + process.env["access_token"], // TODO
+                'Authorization': 'Bearer ' + process.env["access_token"],
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(body)

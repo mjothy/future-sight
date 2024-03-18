@@ -6,7 +6,7 @@ import PlotlyUtils from '../../graphs/PlotlyUtils';
 import * as _ from 'lodash';
 import PlotDataModel from "../../../models/PlotDataModel";
 import withColorizer from "../../../hoc/colorizer/withColorizer";
-import { stackGroups } from '../utils/StackGraphs';
+import {groupByGroups, stackGroups} from '../utils/StackGraphs';
 import PieView from "./graphType/pie/PieView";
 import BoxView from "./graphType/box/BoxView";
 
@@ -63,8 +63,18 @@ class DataBlockView extends Component<any, any> {
           indexStackBy = configStyle.stack.value?.slice(0, -1)
         }
 
-        dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, indexStackBy);
+        if (configStyle.stack && configStyle.stack.isGroupBy && (configStyle.graphType === 'area' || configStyle.graphType === 'bar')) {
+          stacks = groupByGroups(currentBlock.config.metaData, configStyle.stack.value);
+          indexStackBy = configStyle.stack.value?.slice(0, -1)
+        }
+
         const indexKeys = PlotlyUtils.getIndexKeys(data)
+        let otherIndexes:any = indexKeys.filter(i => i !== indexStackBy)
+        if(otherIndexes.length <= 0){
+          otherIndexes = undefined
+        }
+        const colorIndex = configStyle.stack.isGroupBy ? (otherIndexes) : (indexStackBy ? [indexStackBy]: undefined);// if groupBy, 
+        dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, colorIndex);
 
         dataWithColor?.map((dataElement) => {
           showData.push(this.preparePlotData(dataElement, configStyle, stacks, indexKeys));
@@ -84,7 +94,7 @@ class DataBlockView extends Component<any, any> {
       }
     }
 
-    if (configStyle.graphType == "bar" && configStyle.stack.isStack && !!configStyle.stack.value && stacks.length > 1) {
+    if (configStyle.graphType == "bar" && (configStyle.stack.isStack || configStyle.stack.isGroupBy ) && !!configStyle.stack.value && stacks.length > 1) {
 
       // Separate visualizeData into years to bypass plotly limitation on sorting multicategory xaxis
 
@@ -202,7 +212,7 @@ class DataBlockView extends Component<any, any> {
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
         };
-        if (configStyle.stack.isStack && stacks != null) {
+        if ((configStyle.stack.isStack || configStyle.stack.isGroupBy) && stacks != null) {
           // Add the current element to a stack (if it exist in stagGroups)
           // stack is array contains possible stacks [[{},{}], [{},{}]]
           if (stacks.length == 0) {
@@ -232,7 +242,7 @@ class DataBlockView extends Component<any, any> {
           hovertext: this.plotHoverText(dataElement),
           marker: { color: dataElement.color || null },
         };
-        if (configStyle.stack.isStack && stacks != null) {
+        if ((configStyle.stack.isStack || configStyle.stack.isGroupBy) && stacks != null) {
           if (stacks.length == 0) {
             obj.stackgroup = 0;
           } else {
@@ -247,14 +257,26 @@ class DataBlockView extends Component<any, any> {
               )
               if (isExist) {
 
-                if (stacks.length > 0) {
-                  obj.name = dataElement[indexStackBy];
-                  obj.legendgroup = dataElement[indexStackBy];
-                }
-                if (stacks.length > 1) {
-                  const nonStackIndex = indexKeys.filter(x => x !== indexStackBy)
-                  const groupIndexName = nonStackIndex.map(idx => dataElement[idx]).join(" - ")
-                  obj.x = [xyDict.x, new Array(xyDict.x.length).fill(groupIndexName)] // TODO change groupIndexName to stackIndexName
+                if(configStyle.stack.isStack){
+                  if (stacks.length > 0) {
+                    obj.name = dataElement[indexStackBy];
+                    obj.legendgroup = dataElement[indexStackBy];
+                  }
+                  if (stacks.length > 1) {
+                    const nonStackIndex = indexKeys.filter(x => x !== indexStackBy)
+                    const groupIndexName = nonStackIndex.map(idx => dataElement[idx]).join(" - ")
+                    obj.x = [xyDict.x, new Array(xyDict.x.length).fill(groupIndexName)] // TODO change groupIndexName to stackIndexName
+                  }
+                } else  if(configStyle.stack.isGroupBy){
+                  if (stacks.length > 0) {
+                    const nonStackIndex = indexKeys.filter(x => x !== indexStackBy)
+                    const groupIndexName = nonStackIndex.map(idx => dataElement[idx]).join(" - ")
+                    obj.name = groupIndexName;
+                    obj.legendgroup = groupIndexName;
+                  }
+                  if (stacks.length > 1) {
+                    obj.x = [xyDict.x, new Array(xyDict.x.length).fill(dataElement[indexStackBy])]
+                  }
                 }
                 obj.stackgroup = key;
               }
@@ -361,7 +383,7 @@ class DataBlockView extends Component<any, any> {
       }
     }
 
-    if (configStyle.graphType == "bar" && configStyle.stack.isStack) {
+    if (configStyle.graphType == "bar" && (configStyle.stack.isStack || configStyle.stack.isGroupBy)) {
       layout["orientation"] = "v"
     }
 
@@ -375,7 +397,7 @@ class DataBlockView extends Component<any, any> {
     let stackGroupSySum: { x, y }[] = [];
     let isTwoXAxis = false;
 
-    if (!configStyle.stack.isStack || configStyle.graphType == "line") {
+    if ((!configStyle.stack.isStack && !configStyle.stack.isGroupBy) || configStyle.graphType == "line") {
       data.forEach(dataElement => {
         const result = dataElement.x.map((value, index) => {
           return { x: value, y: dataElement.y[index] };

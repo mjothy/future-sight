@@ -55,7 +55,7 @@ export default class PlotlyGraph extends Component<any, any> {
       annotations: this.props.layout.annotations,
       dragmode: "zoom",
       mapbox: { style: "carto-positron", center: { lat: 38, lon: -90 }, zoom: 3 },
-      barmode: configStyle.stack.isStack ? 'stack' : null,
+      barmode: (configStyle.stack.isStack || configStyle.stack.isGroupBy) ? 'stack' : null,
       barnorm: configStyle.YAxis.percentage ? "percent" : "",
       boxmode: "group",
       xaxis:{automargin: true}

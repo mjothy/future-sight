@@ -133,6 +133,9 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   onStackCheckChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.stack.isStack = e.target.checked;
+    if(e.target.checked && configStyle.stack.isGroupBy){
+      configStyle.stack.isGroupBy = false;
+    }
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
@@ -146,12 +149,6 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.aggregation.type = value;
     configStyle.aggregation.label = PLOTLY_AGGREGATION.find(element => element.value == value)?.label;
-    this.updateBlockConfig({ configStyle: configStyle })
-  }
-
-  onStackGroupByChange = (e) => {
-    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
-    configStyle.stack.isGroupBy = e.target.checked;
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
@@ -212,6 +209,21 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     configStyle.colorscale = colorscale;
     this.updateBlockConfig({ configStyle: configStyle })
   }
+  private onGroupByCheckChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.stack.isGroupBy = e.target.checked;
+    if(e.target.checked && configStyle.stack.isStack) {
+      configStyle.stack.isStack = false;
+    }
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  private onGroupByValueChange = (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.stack.value = value;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
 
   onYAxisCustomRangeChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
@@ -276,6 +288,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
           <PieVisualizationEditor
             optionsLabel={this.props.optionsLabel}
             onStackValueChange={this.onStackValueChange}
+            onGroupByCheckChange={this.onGroupByCheckChange}
             updateBlockConfig={this.updateBlockConfig}
             plotData={this.props.plotData}
             currentBlock={this.props.currentBlock}
@@ -287,6 +300,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                 optionsLabel={this.props.optionsLabel}
                 onStackValueChange={this.onStackValueChange}
                 onStackCheckChange={this.onStackCheckChange}
+                onGroupByCheckChange={this.onGroupByCheckChange}
                 updateBlockConfig={this.updateBlockConfig}
                 plotData={this.props.plotData}
                 currentBlock={this.props.currentBlock}
@@ -295,45 +309,54 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
 
 
         {["area", "bar"].includes(configStyle.graphType) &&
-          <>
-            <h3>Stack</h3>
-            <Row>
-              <Col span={2} className={'checkbox-col'}>
-                <Checkbox
-                  onChange={this.onStackCheckChange}
-                  checked={configStyle.stack.isStack}
-                />
-              </Col>
-              <Col span={6} className={'checkbox-col-label'}>
-                <label>Stack by ... </label>
-              </Col>
-              <Col span={9} className={'checkbox-col-label'}>
-                <Select
-                  placeholder="Select"
-                  value={metaData[configStyle.stack.value]?.length > 1 ? configStyle.stack.value : null}
-                  onChange={this.onStackValueChange}
-                  notFoundContent={(
-                    <div>
-                      <ExclamationCircleOutlined />
-                      <p>Item not found.</p>
-                    </div>
-                  )}
-                  allowClear
-                  disabled={!configStyle.stack.isStack}
-                  dropdownMatchSelectWidth={true}
-                >
-                  {this.props.optionsLabel.map((value) => {
-                    if (metaData[value].length > 1) return (
-                      <Option key={value} value={value}>
-                        {value}
-                      </Option>
-                    )
-                  }
-                  )}
-                </Select>
-              </Col>
-            </Row>
-          </>
+            <>
+              <h3>Stack/Group</h3>
+              <Row className="mb-10">
+                <Col span={2} className={'checkbox-col'}>
+                  <Checkbox
+                      onChange={this.onStackCheckChange}
+                      checked={configStyle.stack.isStack}
+                  />
+                </Col>
+                <Col span={3} className={'checkbox-col-label'}>
+                  <label>Stack</label>
+                </Col>
+                <Col span={2} className={'checkbox-col'}>
+                  <Checkbox
+                      onChange={this.onGroupByCheckChange}
+                      checked={configStyle.stack.isGroupBy}
+                  />
+                </Col>
+                <Col span={3} className={'checkbox-col-label'}>
+                  <label>Group</label>
+                </Col>
+                <Col span={9} className={'checkbox-col-label'}>
+                  <Select
+                      placeholder="Select"
+                      value={metaData[configStyle.stack.value]?.length > 1 ? configStyle.stack.value : null}
+                      onChange={this.onStackValueChange}
+                      notFoundContent={(
+                          <div>
+                            <ExclamationCircleOutlined/>
+                            <p>Item not found.</p>
+                          </div>
+                      )}
+                      allowClear
+                      disabled={!configStyle.stack.isStack && !configStyle.stack.isGroupBy}
+                      dropdownMatchSelectWidth={true}
+                  >
+                    {this.props.optionsLabel.map((value) => {
+                          if (metaData[value].length > 1) return (
+                              <Option key={value} value={value}>
+                                {value}
+                              </Option>
+                          )
+                        }
+                    )}
+                  </Select>
+                </Col>
+              </Row>
+            </>
         }
 
         {["line", "area", "bar"].includes(configStyle.graphType) &&
@@ -541,7 +564,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             </Row>
 
             {!(
-                configStyle.graphType == "bar" && configStyle.stack.isStack && !!configStyle.stack.value
+                configStyle.graphType == "bar" && (configStyle.stack.isStack || configStyle.stack.isGroupBy) && !!configStyle.stack.value
             ) &&  <>
                 <Row>
                   <Col span={2}/>
