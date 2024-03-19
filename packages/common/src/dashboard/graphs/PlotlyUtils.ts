@@ -82,21 +82,21 @@ export default class PlotlyUtils {
         const data = JSON.parse(JSON.stringify(plotData))
 
         if (XAxisConfig.useCustomRange) {
-            const left = XAxisConfig.left;
-            const right = XAxisConfig.right;
-            if(left || right){
+            const left = XAxisConfig.left ?? 0;
+            const right = XAxisConfig.right ?? 0;
+            if(left > 1900 && right >= left){
                 for (let i = 0; i < data.length; i++) {
                     const dataElement = data[i]
                     const dataPoints = [...dataElement.data]
                     dataElement.data = dataPoints.filter(
                         (dataPoint) =>
-                            (XAxisConfig.left ?? dataPoint.year) <= dataPoint.year &&
-                            dataPoint.year <= (XAxisConfig.right ?? dataPoint.year))
+                            left <= dataPoint.year &&
+                            dataPoint.year <= right)
                 }
             }
 
             if (XAxisConfig.timestep != null) {
-                this.addTimestep(data, XAxisConfig.timestep, left, right);
+                this.addTimestep(data, XAxisConfig.timestep, left > 1900 ? left : null, (left > 1900 && right >= left) ? right : null);
             }
 
         }
@@ -134,14 +134,14 @@ export default class PlotlyUtils {
         if (YAxisConfig.useCustomRange) {
             const min = YAxisConfig.min;
             const max = YAxisConfig.max;
-            if(min || max){
+            if(min && max){
                 for (let i = 0; i < data.length; i++) {
                     const dataElement = data[i]
                     const dataPoints = [...dataElement.data]
                     dataElement.data = dataPoints.filter(
                         (dataPoint) =>
-                            (YAxisConfig.min ?? dataPoint.value) <= dataPoint.value &&
-                            dataPoint.value <= (YAxisConfig.max ?? dataPoint.value))
+                            min <= dataPoint.value &&
+                            dataPoint.value <= max)
                 }
             }
         }

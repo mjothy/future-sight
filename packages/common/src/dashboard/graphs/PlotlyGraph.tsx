@@ -50,7 +50,10 @@ export default class PlotlyGraph extends Component<any, any> {
       font: {
         size: 10,
       },
-      yaxis: { ...this.props.layout.YAxis },
+      yaxis: {
+        ...this.props.layout.YAxis,
+        range: (configStyle.YAxis.useCustomRange && configStyle.YAxis.min && configStyle.YAxis.max) ? [configStyle.YAxis.min, configStyle.YAxis.max] : null
+      },
       grid: { ...this.props.layout.grid },
       annotations: this.props.layout.annotations,
       dragmode: "zoom",
@@ -58,11 +61,18 @@ export default class PlotlyGraph extends Component<any, any> {
       barmode: (configStyle.stack.isStack || configStyle.stack.isGroupBy) ? 'stack' : null,
       barnorm: configStyle.YAxis.percentage ? "percent" : "",
       boxmode: "group",
-      xaxis:{automargin: true}
+      xaxis:{
+        automargin: true
+      }
     };
 
-    if (configStyle.graphType == "box"){
+if (configStyle.graphType == "box"){
       layout["xaxis"]["type"] ="category"
+      // TODO add range
+      /* layout["xaxis"]["tickmode"] = "array"
+      const years: any = [];
+      for (let i = configStyle.XAxis.left; i <= configStyle.XAxis.right; i += configStyle.XAxis.timestep) years.push(i);
+      layout["xaxis"]["tickvals"] =years */
     }
 
     if (configStyle.title.isVisible) {

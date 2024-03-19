@@ -200,7 +200,7 @@ class DataBlockView extends Component<any, any> {
 
   preparePlotData = (dataElement: PlotDataModel, configStyle: BlockStyleModel, stacks?: undefined[], indexKeys: string[] = []) => {
     let obj;
-    const xyDict = this.getXY(dataElement);
+    const xyDict = this.getXY(dataElement, configStyle);
     switch (configStyle.graphType) {
       case 'line':
         obj = {
@@ -367,15 +367,26 @@ class DataBlockView extends Component<any, any> {
    * @param dataElement The retrieved data (from API)
    * @returns {x: x_array, y: y_array}
    */
-  getXY = (dataElement: PlotDataModel) => {
+  getXY = (dataElement: PlotDataModel, configStyle) => {
+    const XAxisConfig = configStyle.XAxis
+    const step = XAxisConfig.timestep ? XAxisConfig.timestep : 1;
     const x: any[] = [];
-    const y: any[] = []
-    dataElement.data?.map((d) => {
-      if (d.value !== "") {
-        x.push(d.year)
-        y.push(d.value)
+    const y: any[] = [];
+    if(XAxisConfig.useCustomRange && XAxisConfig.left > 1900 && XAxisConfig.right >= XAxisConfig.left){
+      for (let year = XAxisConfig.left; year <= XAxisConfig.right; year = year + step) {
+        x.push(year);
+        const obj = dataElement.data?.find(e => e.year == year);
+        y.push(obj ? obj.value : null);
       }
-    });
+    } else {
+      dataElement.data?.map((d) => {
+        if (d.value !== "") {
+          x.push(d.year)
+          y.push(d.value)
+        }
+      });
+    }
+
     return { x, y };
   };
 
