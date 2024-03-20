@@ -66,6 +66,7 @@ class BoxView extends Component<any, any> {
           // colors: colors,
           colors: configStyle.colorscale
         },
+        hovertemplate: `(%{x}, %{y})`
       })
       return {
         defaultPlotlyData: plotlyData,
@@ -128,6 +129,7 @@ class BoxView extends Component<any, any> {
             color: colorPerIndexValue[indexValue],
             colors: configStyle.colorscale
           },
+          hovertemplate: `(%{x}, %{y})`
         })
       }
 
