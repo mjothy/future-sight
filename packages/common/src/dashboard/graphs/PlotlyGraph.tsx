@@ -28,6 +28,23 @@ export default class PlotlyGraph extends Component<any, any> {
     }
   }
 
+  getMaxValue(data) {
+
+    const y = data.reduce((arr, obj) => {
+      return arr.concat(obj.y);
+    }, []);
+
+    return Math.max(...y);
+  }
+
+  getMinValue(data) {
+    const y = data.reduce((arr, obj) => {
+      return arr.concat(obj.y);
+    }, []);
+
+    return Math.min(...y);
+  }
+
   render() {
     const { currentBlock } = this.props;
     const configStyle = currentBlock.config.configStyle
@@ -38,56 +55,60 @@ export default class PlotlyGraph extends Component<any, any> {
       showlegend: configStyle.showLegend,
       showTitle: false,
     };
-    let layout: any = {
-      width: this.props.width,
-      height: this.props.height,
-      legend: {
-        // x: -0.25,
-        orientation: this.props.layout.orientation || "h",
-      },
-      autosize: false,
-      margin: this.getMargins(),
-      font: {
-        size: 10,
-      },
-      yaxis: {
-        ...this.props.layout.YAxis,
-        range: (configStyle.YAxis.useCustomRange && configStyle.YAxis.min && configStyle.YAxis.max) ? [configStyle.YAxis.min, configStyle.YAxis.max] : null
-      },
-      grid: { ...this.props.layout.grid },
-      annotations: this.props.layout.annotations,
-      dragmode: "zoom",
-      mapbox: { style: "carto-positron", center: { lat: 38, lon: -90 }, zoom: 3 },
-      barmode: (configStyle.stack.isStack || configStyle.stack.isGroupBy) ? 'stack' : null,
-      barnorm: configStyle.YAxis.percentage ? "percent" : "",
-      boxmode: "group",
-      xaxis:{
-        automargin: true
-      }
-    };
-
-if (configStyle.graphType == "box"){
-      layout["xaxis"]["type"] ="category"
-      // TODO add range
-      /* layout["xaxis"]["tickmode"] = "array"
-      const years: any = [];
-      for (let i = configStyle.XAxis.left; i <= configStyle.XAxis.right; i += configStyle.XAxis.timestep) years.push(i);
-      layout["xaxis"]["tickvals"] =years */
-    }
-
-    if (configStyle.title.isVisible) {
-      layout = {
-        ...layout,
-        title: configStyle.title.value,
+    let layout: any = {};
+    if(configStyle.graphType !== 'table'){
+      layout =     {
+        width: this.props.width,
+        height: this.props.height,
+        legend: {
+          // x: -0.25,
+          orientation: this.props.layout.orientation || "h",
+        },
+        autosize: false,
+        margin: this.getMargins(),
+        font: {
+          size: 10,
+        },
+        yaxis: {
+          ...this.props.layout.YAxis,
+          range: (configStyle.YAxis.useCustomRange && (configStyle.YAxis.min || configStyle.YAxis.max)) ? [configStyle.YAxis.min ?? this.getMinValue(this.props.data), configStyle.YAxis.max ?? this.getMaxValue(this.props.data)] : null
+        },
+        grid: { ...this.props.layout.grid },
+        annotations: this.props.layout.annotations,
+        dragmode: "zoom",
+        mapbox: { style: "carto-positron", center: { lat: 38, lon: -90 }, zoom: 3 },
+        barmode: (configStyle.stack.isStack || configStyle.stack.isGroupBy) ? 'stack' : null,
+        barnorm: configStyle.YAxis.percentage ? "percent" : "",
+        boxmode: "group",
+        xaxis:{
+          automargin: true
+        }
       };
-    }
 
-    if (this.props.slidersLayout && configStyle.XAxis.useSlider) {
-      layout = {
-        sliders: this.props.slidersLayout,
-        ...layout
+      if (configStyle.graphType == "box"){
+        layout["xaxis"]["type"] ="category"
+        // TODO add range
+        /* layout["xaxis"]["tickmode"] = "array"
+        const years: any = [];
+        for (let i = configStyle.XAxis.left; i <= configStyle.XAxis.right; i += configStyle.XAxis.timestep) years.push(i);
+        layout["xaxis"]["tickvals"] =years */
+      }
+
+      if (configStyle.title.isVisible) {
+        layout = {
+          ...layout,
+          title: configStyle.title.value,
+        };
+      }
+
+      if (this.props.slidersLayout && configStyle.XAxis.useSlider) {
+        layout = {
+          sliders: this.props.slidersLayout,
+          ...layout
+        }
       }
     }
+
 
     return configStyle.graphType === 'table' && this.props.data.values.length > 0 ? (
       <Table
