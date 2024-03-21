@@ -62,6 +62,7 @@ class BoxView extends Component<any, any> {
         x: x_box,
         y: y_box,
         boxpoints: configStyle.showBoxPoints ? 'all' : 'Outliers',
+        name: "",
         marker: {
           // colors: colors,
           colors: configStyle.colorscale

@@ -124,6 +124,8 @@ export default class PlotlyUtils {
 
     /**
      * Show only data points between max and min selected values (min and max are configurable)
+     * for plotly plots, this part is implemented using range attribute in plot layout config
+     * This methode is useful only for type=table
      * @param plotData data with time series {model, scenario, ... , data:{year, value}}
      * @param configStyle plot configuration
      */
@@ -134,14 +136,14 @@ export default class PlotlyUtils {
         if (YAxisConfig.useCustomRange) {
             const min = YAxisConfig.min;
             const max = YAxisConfig.max;
-            if(min && max){
+            if(min || max){
                 for (let i = 0; i < data.length; i++) {
                     const dataElement = data[i]
                     const dataPoints = [...dataElement.data]
                     dataElement.data = dataPoints.filter(
                         (dataPoint) =>
-                            min <= dataPoint.value &&
-                            dataPoint.value <= max)
+                            (min || dataPoint.value) <= dataPoint.value &&
+                            dataPoint.value <= (max || dataPoint.value))
                 }
             }
         }
