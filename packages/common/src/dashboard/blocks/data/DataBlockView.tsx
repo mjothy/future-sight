@@ -208,6 +208,7 @@ class DataBlockView extends Component<any, any> {
           mode: "lines+markers",
           x: xyDict.x,
           y: xyDict.y,
+          connectgaps: true,
           name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend, configStyle.showLegend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
@@ -444,6 +445,7 @@ class DataBlockView extends Component<any, any> {
         line: {
           dash: 'dot'
         },
+        connectgaps: true,
         showlegend: configStyle.showLegend,
         marker: { color: "black" },
         name: configStyle.aggregation.label,

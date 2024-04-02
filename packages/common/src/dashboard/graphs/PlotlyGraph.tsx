@@ -28,21 +28,21 @@ export default class PlotlyGraph extends Component<any, any> {
     }
   }
 
-  getMaxValue(data) {
+  getMaxValue(data, axis) {
 
-    const y = data.reduce((arr, obj) => {
-      return arr.concat(obj.y);
+    const values = data.reduce((arr, obj) => {
+      return arr.concat(obj[axis]);
     }, []);
 
-    return Math.max(...y);
+    return Math.max(...values);
   }
 
-  getMinValue(data) {
-    const y = data.reduce((arr, obj) => {
-      return arr.concat(obj.y);
+  getMinValue(data, axis) {
+    const values = data.reduce((arr, obj) => {
+      return arr.concat(obj[axis]);
     }, []);
 
-    return Math.min(...y);
+    return Math.min(...values);
   }
 
   render() {
@@ -71,7 +71,7 @@ export default class PlotlyGraph extends Component<any, any> {
         },
         yaxis: {
           ...this.props.layout.YAxis,
-          range: (configStyle.YAxis.useCustomRange && (configStyle.YAxis.min || configStyle.YAxis.max)) ? [configStyle.YAxis.min ?? this.getMinValue(this.props.data), configStyle.YAxis.max ?? this.getMaxValue(this.props.data)] : null
+          range: (configStyle.YAxis.useCustomRange && (configStyle.YAxis.min || configStyle.YAxis.max)) ? [configStyle.YAxis.min ?? this.getMinValue(this.props.data,"y"), configStyle.YAxis.max ?? this.getMaxValue(this.props.data,"y")] : null
         },
         grid: { ...this.props.layout.grid },
         annotations: this.props.layout.annotations,
