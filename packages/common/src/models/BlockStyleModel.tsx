@@ -3,8 +3,8 @@ export default class BlockStyleModel {
   showLegend = false;
   showDeprecatedVersionWarning = true;
   YAxis = {
-    label: false,
-    unit: false,
+    label: true,
+    unit: true,
     force0: false,
     percentage: false,
     useCustomRange: false,
