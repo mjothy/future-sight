@@ -18,6 +18,7 @@ export default class BlockStyleModel {
     Variable: false,
     Version: false,
   };
+  legendPosition = 'bottom';
   title = {
     value: 'Title',
     isVisible: true,

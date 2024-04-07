@@ -4,13 +4,14 @@ import {
   AreaChartOutlined, BarChartOutlined, EnvironmentOutlined, LineChartOutlined, TableOutlined, PieChartOutlined,
   ExclamationCircleOutlined, BoxPlotOutlined
 } from '@ant-design/icons';
-import { Col, Input, Row, Select, Checkbox, InputNumber } from 'antd';
+import {Col, Input, Row, Select, Checkbox, InputNumber, Radio} from 'antd';
 import PlotColorscalePicker from '../utils/PlotColorscalePicker';
 import BoxVisualizationEditor from "./graphType/box/BoxVisualizationEditor";
 
 
 const { Option } = Select;
 
+const POSITIONS = ["top", "right", "bottom", "left" ];
 const PLOTLY_AGGREGATION = [
   {
     value: 'sum',
@@ -101,9 +102,19 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     this.updateBlockConfig({ configStyle: configStyle })
   };
 
+  onLegendPositionChange = (checkedValue) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.legendPosition = checkedValue.target.value ? checkedValue.target.value : "bottom";
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
   legendOptions = () => {
     const legendKeys = Object.keys(this.props.currentBlock.config.configStyle.legend)
     return legendKeys.map((att) => { return { "label": att, "value": att } });
+  }
+
+  legendPositions = () => {
+    return POSITIONS.map((att) => { return { "label": att, "value": att } });
   }
 
   onYAxisLabelChange = (e) => {
@@ -578,6 +589,17 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                   <Checkbox.Group options={this.legendOptions()} value={defaultLegendOptions} onChange={this.onLegendContentChange} />
                   </Col>
                 </Row>
+              <Row>
+                <Col span={2}/>
+                <Col span={8}>
+                  <label>Legend position: </label>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <Radio.Group options={this.legendPositions()} value={configStyle.legendPosition} onChange={this.onLegendPositionChange} />
+                </Col>
+              </Row>
               </>
             }          </>}
         {configStyle.graphType != "table" &&

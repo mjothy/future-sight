@@ -60,16 +60,15 @@ export default class PlotlyGraph extends Component<any, any> {
       layout =     {
         width: this.props.width,
         height: this.props.height,
-        legend: {
-          // x: -0.25,
-          orientation: this.props.layout.orientation || "h",
-        },
-        autosize: false,
+        legend: this.getLegend(configStyle.legendPosition),
         margin: this.getMargins(),
         font: {
           size: 10,
         },
         yaxis: {
+          margin:{
+            l: 20,
+          },
           ...this.props.layout.YAxis,
           range: (configStyle.YAxis.useCustomRange && (configStyle.YAxis.min || configStyle.YAxis.max)) ? [configStyle.YAxis.min ?? this.getMinValue(this.props.data,"y"), configStyle.YAxis.max ?? this.getMaxValue(this.props.data,"y")] : null
         },
@@ -97,7 +96,9 @@ export default class PlotlyGraph extends Component<any, any> {
       if (configStyle.title.isVisible) {
         layout = {
           ...layout,
-          title: configStyle.title.value,
+          title: {
+            text: configStyle.title.value
+          },
         };
       }
 
@@ -130,5 +131,30 @@ export default class PlotlyGraph extends Component<any, any> {
         onSliderChange={this.props.onSliderChange}
       />
     );
+  }
+
+  // TODO update left and top
+  private getLegend(position = "bottom") {
+    switch (position)
+    {
+      case "bottom": return  {
+        orientation: 'h',
+
+      }
+      case "top": return  {
+        orientation: 'h',
+        y: 1
+      }
+      case "right": return  {
+        orientation: 'v',
+        y:1
+      }
+      case "left": return  {
+        orientation: 'v',
+        x: -0.5,
+        y: 1
+      }
+    }
+
   }
 }

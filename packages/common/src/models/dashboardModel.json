@@ -76,6 +76,7 @@
             "Variable": false,
             "Version": false
           },
+          "legendPosition": "bottom",
           "stack": {
             "isStack": false,
             "isGroupBy": false,
