@@ -150,7 +150,10 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                 <Tag icon={<CheckCircleOutlined />} color="success">Verified</Tag>
             </Tooltip>
             }
-            {!!publicationDate && <span>, published on {publicationDate}</span>}
+            {!!publicationDate && <span>, {<Tooltip placement="bottom" title={"published on " + publicationDate}>
+                published on {publicationDate}
+            </Tooltip>
+            }   </span>}
         </div>
     }
 
@@ -163,8 +166,10 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                 <PageHeader
                     className="info-container"
                     backIcon={false}
-                    title={dashboard.userData.title}
-                    subTitle={getSubtitle()}
+                    title={<Tooltip placement="bottom" title={dashboard.userData.title}>
+                        {dashboard.userData.title}
+                    </Tooltip>
+                    }                    subTitle={getSubtitle()}
                     extra={getExtras()}
                     avatar={{ alt: 'logo-short', shape: 'square', size: 'large' }}
                 />
