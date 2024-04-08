@@ -1,7 +1,13 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-extra-boolean-cast */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { CheckCircleOutlined, DownCircleOutlined, LinkOutlined, MessageOutlined, PicCenterOutlined } from '@ant-design/icons';
+import {
+    CheckCircleOutlined,
+    DownloadOutlined,
+    LinkOutlined,
+    MessageOutlined,
+    PicCenterOutlined
+} from '@ant-design/icons';
 import { Button, PageHeader, Spin, Tag, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
@@ -92,11 +98,9 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                 key="download"
                 type="default"
                 size="small"
-                icon={<DownCircleOutlined />}
+                icon={<DownloadOutlined />}
                 onClick={download}
-            >
-                Download data
-            </Button>
+            />
         ]
         if (dashboard?.userData.forum) {
             const forumLink = (
