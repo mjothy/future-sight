@@ -11,7 +11,7 @@ import BoxVisualizationEditor from "./graphType/box/BoxVisualizationEditor";
 
 const { Option } = Select;
 
-const POSITIONS = ["top", "right", "bottom", "left" ];
+const POSITIONS = ["top", "bottom", "left", "right" ];
 const PLOTLY_AGGREGATION = [
   {
     value: 'sum',
@@ -589,21 +589,25 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                   <Checkbox.Group options={this.legendOptions()} value={defaultLegendOptions} onChange={this.onLegendContentChange} />
                   </Col>
                 </Row>
-              <Row>
-                <Col span={2}/>
-                <Col span={8}>
-                  <label>Legend position: </label>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Radio.Group options={this.legendPositions()} value={configStyle.legendPosition} onChange={this.onLegendPositionChange} />
-                </Col>
-              </Row>
+
               </>
-            }          </>}
+            }
+            </>
+        }
+
         {configStyle.graphType != "table" &&
           <>
+            <Row>
+              <Col span={2}/>
+              <Col span={8}>
+                <label>Legend position: </label>
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <Radio.Group options={this.legendPositions()} value={configStyle.legendPosition} onChange={this.onLegendPositionChange} />
+              </Col>
+            </Row>
             <h3>Colorscale</h3>
             <Row>
               <Col span={20}>
