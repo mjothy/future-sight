@@ -31,10 +31,9 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({ dataManager }) => {
     }
   };
 
-  const draftOnClick = (id) => {
+  const draftOnClick = async (id) => {
     if (id) {
-      const dashboards = publishedDashboards as Array<DashboardModel | undefined>;
-      const dashboard = dashboards.find((d: any) => d.id == id);
+      const dashboard = await dataManager.getDashboard(id);
       if (dashboard) {
         const uuid = createUUID();
         dashboard.id = uuid;

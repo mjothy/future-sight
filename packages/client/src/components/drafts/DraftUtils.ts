@@ -1,6 +1,24 @@
 import { v1 as uuidv1 } from 'uuid';
+import {notification} from "antd";
 
 const DRAFTS = "drafts"
+
+/*const draftOnClick = async (id, getDashboard) => {
+    if (id) {
+        const dashboard = await getDashboard(id);
+        if (dashboard) {
+            const uuid = createUUID();
+            dashboard.id = uuid;
+            setDraft(uuid, dashboard);
+            window.location.href= 'draft?id=' + uuid;
+        }
+    } else {
+        notification.error({
+            message: 'Could not find the dashboard',
+            description: 'Please check the url',
+        });
+    }
+};*/
 
 export function setDrafts(drafts) {
     localStorage.setItem(DRAFTS, JSON.stringify(drafts))
