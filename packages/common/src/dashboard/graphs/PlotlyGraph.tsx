@@ -137,7 +137,7 @@ export default class PlotlyGraph extends Component<any, any> {
     }
 
     // TODO update left and top
-    private getLegend(position = "bottom") {
+    private getLegend(position = "right") {
 
         switch (position) {
             case"bottom":
