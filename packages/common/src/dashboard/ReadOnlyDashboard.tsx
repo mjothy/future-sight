@@ -4,7 +4,7 @@
 import {
     CheckCircleOutlined,
     DownloadOutlined,
-    LinkOutlined,
+    LinkOutlined, MailOutlined,
     MessageOutlined,
     PicCenterOutlined
 } from '@ant-design/icons';
@@ -110,12 +110,23 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                         type="default"
                         size="small"
                         icon={<MessageOutlined />}
-                    >
-                        Forum discussion
-                    </Button>
+                    />
                 </a>
             )
             extras.splice(0, 0, forumLink)
+        }
+        if (dashboard?.userData.mail) {
+            const mailTo = (
+                <a href={"mailto:"+dashboard.userData.mail}>
+                    <Button
+                        key="mail"
+                        type="default"
+                        size="small"
+                        icon={<MailOutlined />}
+                    />
+                </a>
+            )
+            extras.splice(0, 0, mailTo)
         }
         return extras
     }

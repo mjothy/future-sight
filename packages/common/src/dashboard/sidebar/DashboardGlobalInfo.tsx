@@ -1,6 +1,15 @@
 import React, { Component } from 'react';
 import {Alert, Button, Col, Collapse, Input, Modal, notification, Row, Tag, Tooltip } from 'antd';
-import { UserOutlined, TagOutlined, EditFilled, MessageOutlined, WarningOutlined, CheckCircleTwoTone, ExclamationCircleTwoTone } from '@ant-design/icons';
+import {
+  UserOutlined,
+  TagOutlined,
+  EditFilled,
+  MessageOutlined,
+  WarningOutlined,
+  CheckCircleTwoTone,
+  ExclamationCircleTwoTone,
+  MailOutlined
+} from '@ant-design/icons';
 import UserDataModel from '../../models/UserDataModel';
 
 type NotificationType = 'success' | 'info' | 'warning' | 'error';
@@ -8,6 +17,8 @@ type NotificationType = 'success' | 'info' | 'warning' | 'error';
 const FORUM_ERROR = "Needs to be a valid ECEMF forum URL"
 const URL_REGEX = /https:\/\/[^\s/$.?#].[^\s]*$/
 const FORUM_PREFIX = "https://community.ecemf.eu/"
+const MAIL_ERROR = "Needs to be a valid mail"
+const MAIL_REGEX = /\S+@\S+\.\S+/
 /**
  * To set dashboard global information (title, author and tags)
  */
@@ -22,6 +33,7 @@ export default class DashboardGlobalInfo extends Component<any, any> {
       isModalOpen: true,
       userDataTemp: new UserDataModel(),
       forumError: null,
+      mailError: null,
       username: null,
       password: null,
       loggedIn: null
@@ -84,18 +96,33 @@ export default class DashboardGlobalInfo extends Component<any, any> {
   }
 
   onForumChange = (e) => {
-    let value = e.target.value
+    let value = e.target.value;
+    const userData = { ...this.state.userDataTemp };
+    userData.forum = value;
     if (value === "" || (value.startsWith(FORUM_PREFIX) && value.match(URL_REGEX))) {
-      const userData = { ...this.state.userDataTemp };
-      userData.forum = value;
       this.setState({ userDataTemp: userData, forumError: null});
     } else {
-      this.setState({ forumError: FORUM_ERROR})
+      this.setState({userDataTemp: userData, forumError: FORUM_ERROR})
+    }
+  }
+
+  onMailChange = (e) => {
+    let value = e.target.value
+    const userData = { ...this.state.userDataTemp };
+    userData.mail = value;
+    if (value === null || value === "" || value.match(MAIL_REGEX)) {
+      this.setState({ userDataTemp: userData, mailError: null});
+    } else {
+      this.setState({ userDataTemp: userData, mailError: MAIL_ERROR})
     }
   }
 
   handleOk = () => {
     try {
+      if(this.state.mailError || this.state.forumError){
+        this.openNotificationWithIcon('error', 'Error', 'Invalid information');
+        return;
+      }
       this.props.updateDashboard({ ...this.props.dashboard, userData: this.state.userDataTemp });
       this.props.closeGlobalInfoModal();
       this.props.onOk
@@ -107,7 +134,7 @@ export default class DashboardGlobalInfo extends Component<any, any> {
   };
 
   handleCancel = () => {
-    this.setState({ userDataTemp: { ...this.props.dashboard.userData } }, () => this.props.closeGlobalInfoModal());
+    this.setState({ userDataTemp: { ...this.props.dashboard.userData }, forumError: null, mailError: null }, () => this.props.closeGlobalInfoModal());
   };
 
   handleUserChange = (e) => {
@@ -229,6 +256,26 @@ export default class DashboardGlobalInfo extends Component<any, any> {
                     onChange={(e) => this.onForumChange(e)}
                     allowClear={true}
                     status={this.state.forumError ? "error" : undefined}
+                />
+              </Col>
+            </Row>
+            <Row justify="space-between">
+              <Col span={4}>
+                <span>Mail to: </span>
+              </Col>
+              <Col span={18}>
+                <Input
+                    value={this.state.userDataTemp.mail}
+                    name="Mail"
+                    prefix={this.state.mailError ?
+                        <Tooltip title={this.state.mailError}>
+                          <WarningOutlined />
+                        </Tooltip>
+                        : <MailOutlined className="site-form-item-icon" />}
+                    placeholder="model@testmail.com"
+                    onChange={(e) => this.onMailChange(e)}
+                    allowClear={true}
+                    status={this.state.mailError ? "error" : undefined}
                 />
               </Col>
             </Row>

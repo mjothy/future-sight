@@ -131,7 +131,6 @@ export default class PlotlyGraph extends Component<any, any> {
                         config={config}
                         frames={this.props.frames}
                         onSliderChange={this.props.onSliderChange}
-                        style={{width: "100%", height: "100%"}}
                     />
                 )
             }</>
