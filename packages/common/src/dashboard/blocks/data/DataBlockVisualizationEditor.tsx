@@ -104,7 +104,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
 
   onLegendPositionChange = (checkedValue) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
-    configStyle.legendPosition = checkedValue.target.value ? checkedValue.target.value : "bottom";
+    configStyle.legendPosition = checkedValue.target.value ? checkedValue.target.value : "right";
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
