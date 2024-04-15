@@ -36,6 +36,7 @@ class DataBlockView extends Component<any, any> {
     let data: PlotDataModel[] = this.props.timeseriesData;
     data = PlotlyUtils.filterByCustomXRange(data, this.props.currentBlock.config.configStyle)
     data = PlotlyUtils.filterByCustomYRange(data, this.props.currentBlock.config.configStyle)
+    data = data.filter(element => element.data?.length > 0); // IMPORTANT: to not add plot for scenarios without data
     return data
   }
 
