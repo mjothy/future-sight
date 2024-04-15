@@ -1,6 +1,12 @@
 export default class LayoutModel {
-  constructor(id: string) {
+  constructor(id: string, layoutModel ?: LayoutModel) {
     this.i = id;
+    if(layoutModel != null){
+      this.w = layoutModel.w;
+      this.h = layoutModel.h;
+      this.x = layoutModel.x;
+      this.y = layoutModel.y;
+    }
   }
   w = 4;
   h = 4;

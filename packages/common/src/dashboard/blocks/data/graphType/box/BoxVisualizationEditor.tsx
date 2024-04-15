@@ -31,8 +31,17 @@ export default class BoxVisualizationEditor extends Component<any, any> {
                             checked={configStyle.stack.isStack}
                         />
                     </Col>
-                    <Col span={6} className={'checkbox-col-label'}>
-                        <label>Stack by ... </label>
+                    <Col span={3} className={'checkbox-col-label'}>
+                        <label>Stack</label>
+                    </Col>
+                    <Col span={2} className={'checkbox-col'}>
+                        <Checkbox
+                            onChange={this.props.onGroupByCheckChange}
+                            checked={configStyle.stack.isGroupBy}
+                        />
+                    </Col>
+                    <Col span={3} className={'checkbox-col-label'}>
+                        <label>Group</label>
                     </Col>
                     <Col span={9} className={'checkbox-col-label'}>
                         <Select
@@ -46,7 +55,7 @@ export default class BoxVisualizationEditor extends Component<any, any> {
                                 </div>
                             )}
                             allowClear
-                            disabled={!configStyle.stack.isStack}
+                            disabled={!configStyle.stack.isStack && !configStyle.stack.isGroupBy}
                             dropdownMatchSelectWidth={false}
                         >
                             {this.props.optionsLabel.map((value) => {

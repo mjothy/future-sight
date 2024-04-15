@@ -1,7 +1,13 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-extra-boolean-cast */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { CheckCircleOutlined, DownCircleOutlined, LinkOutlined, MessageOutlined, PicCenterOutlined } from '@ant-design/icons';
+import {
+    CheckCircleOutlined,
+    DownloadOutlined,
+    LinkOutlined, MailOutlined,
+    MessageOutlined,
+    PicCenterOutlined
+} from '@ant-design/icons';
 import { Button, PageHeader, Spin, Tag, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
@@ -92,11 +98,9 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                 key="download"
                 type="default"
                 size="small"
-                icon={<DownCircleOutlined />}
+                icon={<DownloadOutlined />}
                 onClick={download}
-            >
-                Download data
-            </Button>
+            />
         ]
         if (dashboard?.userData.forum) {
             const forumLink = (
@@ -106,12 +110,23 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                         type="default"
                         size="small"
                         icon={<MessageOutlined />}
-                    >
-                        Forum discussion
-                    </Button>
+                    />
                 </a>
             )
             extras.splice(0, 0, forumLink)
+        }
+        if (dashboard?.userData.mail) {
+            const mailTo = (
+                <a href={"mailto:"+dashboard.userData.mail}>
+                    <Button
+                        key="mail"
+                        type="default"
+                        size="small"
+                        icon={<MailOutlined />}
+                    />
+                </a>
+            )
+            extras.splice(0, 0, mailTo)
         }
         return extras
     }
@@ -150,7 +165,10 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                 <Tag icon={<CheckCircleOutlined />} color="success">Verified</Tag>
             </Tooltip>
             }
-            {!!publicationDate && <span>, published on {publicationDate}</span>}
+            {!!publicationDate && <span>, {<Tooltip placement="bottom" title={"published on " + publicationDate}>
+                published on {publicationDate}
+            </Tooltip>
+            }   </span>}
         </div>
     }
 
@@ -163,8 +181,10 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                 <PageHeader
                     className="info-container"
                     backIcon={false}
-                    title={dashboard.userData.title}
-                    subTitle={getSubtitle()}
+                    title={<Tooltip placement="bottom" title={dashboard.userData.title}>
+                        {dashboard.userData.title}
+                    </Tooltip>
+                    }                    subTitle={getSubtitle()}
                     extra={getExtras()}
                     avatar={{ alt: 'logo-short', shape: 'square', size: 'large' }}
                 />

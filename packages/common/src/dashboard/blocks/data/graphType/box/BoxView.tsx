@@ -35,11 +35,11 @@ class BoxView extends Component<any, any> {
     const otherIndex = PlotlyUtils.getIndexKeys(data).filter(
         (index) => index !== stackIndex
     )
-    const dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, otherIndex)
+    let dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, otherIndex)
     const plotlyData: Record<string, unknown>[] = []
 
     // Get data by year
-    if (!configStyle.stack.isStack || otherIndex.length === 0) {
+    if ((!configStyle.stack.isStack && !configStyle.stack.isGroupBy)|| otherIndex.length === 0) {
       const boxDataPerYear: BoxDataPerYearModel = {}
       for (const dataElement of dataWithColor) {
         for (const datapoint of dataElement.data) {
@@ -62,10 +62,12 @@ class BoxView extends Component<any, any> {
         x: x_box,
         y: y_box,
         boxpoints: configStyle.showBoxPoints ? 'all' : 'Outliers',
+        name: "",
         marker: {
           // colors: colors,
           colors: configStyle.colorscale
         },
+        hovertemplate: `(%{x}, %{y})`
       })
       return {
         defaultPlotlyData: plotlyData,
@@ -73,18 +75,24 @@ class BoxView extends Component<any, any> {
       }
     }
     else {
+      if(configStyle.stack.isGroupBy){
+        dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, [stackIndex])
+      }
       const boxDataPerIndexValue: { [index: string]: BoxDataPerYearModel } = {}
       const colorPerIndexValue: { [index: string]: string } = {}
 
       for (const dataElement of dataWithColor) {
-        const indexValue = otherIndex.length > 1
-            ? otherIndex.reduce((acc, filterType, idx, arr) => {
-              if (idx === arr.length - 1) {
-                return acc + dataElement[filterType]
-              }
-              return acc + dataElement[filterType] + " - "
-            }, "")
-            : dataElement[otherIndex[0]]
+        const indexValue = configStyle.stack.isGroupBy ? dataElement[stackIndex] :
+            (
+                otherIndex.length > 1
+                ? otherIndex.reduce((acc, filterType, idx, arr) => {
+                  if (idx === arr.length - 1) {
+                    return acc + dataElement[filterType]
+                  }
+                  return acc + dataElement[filterType] + " - "
+                }, "")
+                : dataElement[otherIndex[0]]
+            )
 
         // Define new pieChart if new indexValue introduced
         if (!boxDataPerIndexValue[indexValue]) {
@@ -122,6 +130,7 @@ class BoxView extends Component<any, any> {
             color: colorPerIndexValue[indexValue],
             colors: configStyle.colorscale
           },
+          hovertemplate: `(%{x}, %{y})`
         })
       }
 

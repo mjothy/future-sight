@@ -53,10 +53,13 @@
             }
           },
           "YAxis": {
-            "label": false,
-            "unit": false,
+            "label": true,
+            "unit": true,
             "force0": false,
-            "percentage": false
+            "percentage": false,
+            "useCustomRange": false,
+            "min": null,
+            "max": null
           },
           "XAxis": {
             "useCustomRange": false,
@@ -73,6 +76,7 @@
             "Variable": false,
             "Version": false
           },
+          "legendPosition": "right",
           "stack": {
             "isStack": false,
             "isGroupBy": false,

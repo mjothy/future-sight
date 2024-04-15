@@ -84,8 +84,9 @@ export default class DashboardSelectionControl extends Component<
   };
 
   copyBlock = (blockSelectedId: string) => {
-    const layoutItem = new LayoutModel((this.getLastId() + 1).toString());
     const dashboard = this.state.dashboard;
+    const layout = dashboard.layout.find(l => l.i === blockSelectedId);
+    const layoutItem = new LayoutModel((this.getLastId() + 1).toString(), layout);
 
     const newBlock = Object.assign({}, this.state.dashboard.blocks[blockSelectedId])
     newBlock.id = layoutItem.i
