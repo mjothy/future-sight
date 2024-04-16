@@ -3,6 +3,7 @@ import { Form, Col, Row, Button, Alert, Select } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import './BrowseView.css';
 import withDataManager from '../../services/withDataManager';
+import withDraftManager from '../../services/withDraftManager';
 import withForm from '../../services/withForm';
 import PreviewGroup from '../PreviewGroup';
 
@@ -185,7 +186,9 @@ class BrowseView extends React.Component<any, any> {
         </div>
         <div className="search-result">
           {Object.keys(dashboards).length > 0 && (
-            <PreviewGroup dashboards={Object.values(dashboards)} urlPrefix={'/view?id='} />
+            <PreviewGroup dashboards={Object.values(dashboards)}
+                          urlPrefix={'/view?id='} draftOnClick={this.props.draftManager.draftOnClick}
+                          dataManager={this.props.dataManager}/>
           )}
         </div>
       </>
@@ -193,4 +196,4 @@ class BrowseView extends React.Component<any, any> {
   }
 }
 
-export default withForm(withDataManager(BrowseView));
+export default withForm(withDataManager(withDraftManager(BrowseView)));
