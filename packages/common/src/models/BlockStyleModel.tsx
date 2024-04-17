@@ -69,6 +69,7 @@ export default class BlockStyleModel {
     showSubtitle: true
   };
   showBoxPoints = false;
+  disableMultiSelect = true;
   colorscale = [
     "#1f77b4",
     "#ff7f0e",

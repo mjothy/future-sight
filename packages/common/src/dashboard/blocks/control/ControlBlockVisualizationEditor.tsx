@@ -1,7 +1,8 @@
-import { Col, Input, Row } from 'antd';
+import { Col, Input, Row, Tooltip} from 'antd';
 import Checkbox from 'antd/es/checkbox';
 import { Component } from 'react';
 import BlockStyleModel from '../../../models/BlockStyleModel';
+import {InfoCircleOutlined} from "@ant-design/icons";
 
 export default class ControlBlockVisualizationEditor extends Component<any, any> {
   configStyle: BlockStyleModel = new BlockStyleModel();
@@ -66,33 +67,75 @@ export default class ControlBlockVisualizationEditor extends Component<any, any>
     )
   }
 
+  onEnableMultiselectChecked = (e) => {
+    const metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
+    //const configStyle = JSON.parse(JSON.stringify(this.props.currentBlock.config.configStyle));
+
+    this.configStyle.disableMultiSelect = e.target.checked;
+
+    if(e.target.checked){
+      Object.keys(metaData.master).forEach(option => {
+        if(metaData.master[option].values?.length>0) {
+          metaData.master[option].values = metaData.master[option].values.slice(0, 1);
+        }
+      })
+    }
+    this.updateBlockConfig({ configStyle: this.configStyle, metaData })
+  }
+
   render() {
     this.configStyle = JSON.parse(JSON.stringify(this.props.currentBlock.config.configStyle));
 
     return (
-      <div>
-        <h3>Title</h3>
-        <Row className="mb-10">
-          <Col span={2} className={'checkbox-col'}>
-            <Checkbox
-              onChange={this.onTitleVisibilityChange}
-              checked={this.configStyle.title.isVisible}
-            />
-          </Col>
-          <Col span={16}>
-            <Input
-              placeholder="Title"
-              value={this.configStyle.title.value}
-              onChange={this.onTitleChange}
-            />
-          </Col>
-        </Row>
+        <div>
 
-        <h3>Custom labels</h3>
-        {Object.keys(this.configStyle.subtitle).map((filterType) => {
-          return this.getInputSubtitle(filterType)
-        })}
-      </div>
+          <div className="mb-10">
+            <h3>Title</h3>
+            <Row>
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                    onChange={this.onTitleVisibilityChange}
+                    checked={this.configStyle.title.isVisible}
+                />
+              </Col>
+              <Col span={16}>
+                <Input
+                    placeholder="Title"
+                    value={this.configStyle.title.value}
+                    onChange={this.onTitleChange}
+                />
+              </Col>
+            </Row>
+          </div>
+
+          <div className="mb-10">
+            <h3>Data selection option</h3>
+            <Row>
+
+              <Col span={2} className={'checkbox-col'}>
+                <Checkbox
+                    onChange={this.onEnableMultiselectChecked}
+                    checked={this.configStyle.disableMultiSelect}
+                />
+              </Col>
+              <Col span={16}>
+                Enable single-value selection &nbsp;
+                <Tooltip placement="top" title={"User can select only one item in the control block of the dashboard.\n" +
+                    "Attention: This action may change your selection if more than one item is currently selected."}>
+                  <InfoCircleOutlined />
+                </Tooltip>
+              </Col>
+            </Row>
+          </div>
+
+          <div className="mb-10">
+            <h3>Custom labels</h3>
+            {Object.keys(this.configStyle.subtitle).map((filterType) => {
+              return this.getInputSubtitle(filterType)
+            })}
+          </div>
+
+        </div>
     );
   }
 }

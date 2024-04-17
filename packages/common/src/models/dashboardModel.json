@@ -113,7 +113,8 @@
             }
           },
           "boxmode": "group",
-          "showBoxPoints": false
+          "showBoxPoints": false,
+          "disableMultiSelect": true
         },
         "metaData": {
           "models": [],

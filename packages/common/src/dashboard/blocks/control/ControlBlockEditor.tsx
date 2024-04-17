@@ -71,7 +71,6 @@ export default class ControlBlockEditor extends Component<any, any> {
     let staleSelectOrder = [...parentBlock.config.metaData.selectOrder];
     if (index >= 0) {
       staleSelectOrder = [...parentBlock.config.metaData.selectOrder].slice(0, index);
-      console.log("newSelectOrder: ", staleSelectOrder);
     }
 
     // update data selected in block view)

@@ -20,6 +20,7 @@ interface SelectOptionProps {
     className?: string;
     isClosable?: boolean;
     regroupOrphans?: string;
+    disableMultiSelect?: boolean;
 }
 
 const COLORS = ['red', 'blue', 'green', 'yellow'];
@@ -114,6 +115,14 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         this.setState({ searchValue });
     }
 
+    onChange = (selectedData: string[]) => {
+        let data = selectedData;
+        if(this.props.disableMultiSelect && data.length > 0){
+            data = data.slice(-1);
+        }
+        this.props.onChange(this.props.type, data.map((element: any) => element.value != null ? element.value : element));// when TreeSelect selecteData is object {value, key}
+    }
+
     /**
      * Customize TreeSelect component
      * @returns TreeSelect
@@ -126,9 +135,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 loading={this.props.loading}
                 treeCheckable={true}
                 placeholder={this.props.label || this.props.type}
-                onChange={(selectedData: any[]) =>
-                    this.props.onChange(this.props.type, selectedData.map((data: any) => data.value != null ? data.value : data))
-                }
+                onChange={this.onChange}
                 treeData={this.props.loading ? undefined : this.splitOptions(this.props.options)}
                 tagRender={(props) => this.tagRender(props, true)}
                 treeCheckStrictly={true}
@@ -195,13 +202,12 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
     treeSelectLeafOnly = () => {
         return <Input.Group compact>
             <TreeSelect
+                treeDataSimpleMode={ this.props.disableMultiSelect }
                 value={this.props.value}
                 loading={this.props.loading}
                 treeCheckable={true}
                 placeholder={this.props.label || this.props.type}
-                onChange={(selectedData: any[]) =>
-                    this.props.onChange(this.props.type, selectedData.map((data: any) => data.value != null ? data.value : data))
-                }
+                onChange={this.onChange}
                 tagRender={(props) => this.tagRender(props, false)} // false: show only the value of selected leaf
                 showCheckedStrategy={"SHOW_CHILD"}
                 className={"fsselectinput " + this.props.className}
@@ -241,16 +247,14 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         return (
             <Input.Group compact>
                 <Select
-                    mode="multiple"
+                    mode={"multiple"}
                     className={"fsselectinput " + this.props.className}
                     dropdownRender={this.dropdownRender} // TODO
                     tagRender={(props) => this.tagRender(props, true)} // TODO
                     placeholder={this.props.label || this.props.type}
                     value={this.props.value}
                     loading={this.props.loading}
-                    onChange={(selectedData) => {
-                        return this.props.onChange(this.props.type, selectedData)
-                    }}
+                    onChange={this.onChange}
                     // on close: save data
                     onDropdownVisibleChange={(e) => {
                         return this.props.onDropdownVisibleChange?.(this.props.type, e)
