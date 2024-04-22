@@ -411,6 +411,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 setStaleFiltersFromSelectOrder={this.setStaleFiltersFromSelectOrder}
                 isAllSelected={this.isAllSelected}
                 onShowNonDefaultRuns={this.onShowNonDefaultRuns}
+                initVersionOptions={this.initVersionOptions}
             />
         ) : (
             <ControlBlockEditor

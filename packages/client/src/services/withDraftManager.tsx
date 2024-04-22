@@ -17,7 +17,6 @@ const withDraftManager = (Component) => {
             this.setState({draftFromURL: newValue});
         }
         draftOnClick = async (id) => {
-            console.log("enter here");
             if (id) {
                 const dashboard = await this.props.dataManager.getDashboard(id);
                 if (dashboard) {
