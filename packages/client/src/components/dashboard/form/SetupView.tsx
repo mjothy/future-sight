@@ -16,7 +16,7 @@ class SetupView extends Component<any, any> {
     super(props);
     this.state = {
       dataStructure: JSON.parse(JSON.stringify(this.props.dashboard.dataStructure)),
-      visible: getSelectedFiltersLabels(this.props.dashboard.dataStructure).length <= 0,
+      visible: false,
       optionsData: new OptionsDataModel(),
       optionsDataCache: new OptionsDataModel(),
       isFetching: false,
@@ -157,7 +157,7 @@ class SetupView extends Component<any, any> {
           </Button>
         </div>
         <Modal
-          title="Choose the data to focus on:"
+          title="Filter all data in the dashboard by :"
           visible={this.state.visible}
           closable={false}
           maskClosable={false}
