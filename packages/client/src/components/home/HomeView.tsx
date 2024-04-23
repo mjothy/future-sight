@@ -7,6 +7,7 @@ import Footer from '../footer/Footer';
 import PreviewGroup from '../PreviewGroup';
 import Logo from "../navbar/Logo";
 import withDraftManager from "../../services/withDraftManager";
+import {Content} from "antd/lib/layout/layout";
 
 const HomeView: React.FC<ComponentPropsWithDataManager> = ({dataManager, draftManager}) => {
     const [publishedDashboards, setPublishedDashboards] = useState({});
@@ -19,10 +20,14 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({dataManager, draftMa
     return (
         <>
             <div className="home-view-wrapper">
-                <div className="home-logo">
-                    <Logo/>
+                <Content>
+                <div className={"home-header"}>
+                    <div className="home-logo">
+                        <Logo/>
+                    </div>
+                    <span><i>The ECEMF data visualization tool</i></span>
                 </div>
-                <span><i>The ECEMF data visualization tool</i></span>
+
                 <div className="create-container">
                     <div className="drafts">
                         <Button type="primary" onClick={draftManager.newDraft}>
@@ -31,7 +36,6 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({dataManager, draftMa
                         {draftManager.getDraftsElement()}
                     </div>
                 </div>
-                <Divider/>
                 <div className="create-container">
                     <Input.Group style={{display: 'flex', flexDirection: 'row'}}>
                         <Button
@@ -48,6 +52,7 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({dataManager, draftMa
                         />
                     </Input.Group>
                 </div>
+                    <Divider/>
                 {publishedDashboards && Object.keys(publishedDashboards).length > 0 && (
                     <>
                         <h3>Latest submissions</h3>
@@ -60,6 +65,7 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({dataManager, draftMa
                         </div>
                     </>
                 )}
+                </Content>
             </div>
             <Footer/>
         </>

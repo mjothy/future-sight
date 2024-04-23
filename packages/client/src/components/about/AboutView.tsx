@@ -83,7 +83,7 @@ export default class AboutView extends React.Component<any, any>{
         return (
             <>
                 <div className="home-view-wrapper">
-                    <Content style={{ padding: '50px', overflowY: "auto"}}>
+                    <Content>
                         <Card >
                             <h1>About</h1>
                             {this.intro()}
