@@ -105,12 +105,15 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
         if (dashboard?.userData.forum) {
             const forumLink = (
                 <a href={dashboard.userData.forum} target="_blank" rel="noopener noreferrer">
-                    <Button
-                        key="share"
-                        type="default"
-                        size="small"
-                        icon={<MessageOutlined />}
-                    />
+
+                    <Tooltip title={`Forum discussion (${dashboard.userData.forum})`}>
+                        <Button
+                            key="share"
+                            type="default"
+                            size="small"
+                            icon={<MessageOutlined />}
+                        />
+                    </Tooltip>
                 </a>
             )
             extras.splice(0, 0, forumLink)
