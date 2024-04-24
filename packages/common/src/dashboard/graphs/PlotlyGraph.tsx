@@ -90,15 +90,6 @@ export default class PlotlyGraph extends Component<any, any> {
                 }
             };
 
-            if (configStyle.graphType == "box") {
-                layout["xaxis"]["type"] = "category"
-                // TODO add range
-                /* layout["xaxis"]["tickmode"] = "array"
-                const years: any = [];
-                for (let i = configStyle.XAxis.left; i <= configStyle.XAxis.right; i += configStyle.XAxis.timestep) years.push(i);
-                layout["xaxis"]["tickvals"] =years */
-            }
-
             if (this.props.slidersLayout && configStyle.XAxis.useSlider) {
                 layout = {
                     sliders: this.props.slidersLayout,
