@@ -122,6 +122,7 @@ export default class ControlBlockEditor extends Component<any, any> {
           isClear={true}
           onClear={this.clearClick}
           onDropdownVisibleChange={this.props.onDropdownVisibleChange}
+          enabled={(this.props.currentOpenedFilter == option) || (this.props.currentOpenedFilter == null)}
         />}
       </div>
     );

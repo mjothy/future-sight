@@ -97,6 +97,7 @@ export default class DataBlockEditor extends Component<any, any> {
               isClear={selected}
               onClear={this.clearClick}
               onDropdownVisibleChange={this.props.onDropdownVisibleChange}
+              enabled={(this.props.currentOpenedFilter == option) || (this.props.currentOpenedFilter == null)}
               regroupOrphans={option === "regions" ? "Common regions" : undefined}
             />
           </Row>

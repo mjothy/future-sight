@@ -15,6 +15,7 @@ interface SelectOptionProps {
     isClear?: boolean;
     onClear?: (type, e) => void;
     onDropdownVisibleChange?: (option: string, e: any) => void;
+    enabled?: boolean;
     onDeselect?: (type: string, selectedData: string[]) => void;
     loading?: boolean;
     className?: string;
@@ -144,6 +145,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 onDropdownVisibleChange={(e) =>
                     this.props.onDropdownVisibleChange?.(this.props.type, e)
                 }
+                disabled={this.props.enabled == false}
                 onDeselect={(selectedData) => this.props.onDeselect?.(this.props.type, selectedData.map((data: any) => data.value))}
                 dropdownMatchSelectWidth={false}
                 notFoundContent={(this.props.loading) ? (
@@ -260,6 +262,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                         return this.props.onDropdownVisibleChange?.(this.props.type, e)
                     }
                     }
+                    disabled={this.props.enabled == false}
                     dropdownMatchSelectWidth={false}
                     notFoundContent={(this.props.loading) ? (
                         <div>
