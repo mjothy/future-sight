@@ -595,12 +595,12 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             </>
         }
 
-        {configStyle.graphType != "table" &&
+        {this.isShowGraphConfig(configStyle.graphType) &&
           <>
             <Row>
               <Col span={2}/>
               <Col span={8}>
-                <label>Legend position: </label>
+                <label>Legend position:</label>
               </Col>
             </Row>
             <Row>
@@ -608,6 +608,11 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                 <Radio.Group options={this.legendPositions()} value={configStyle.legendPosition} onChange={this.onLegendPositionChange} />
               </Col>
             </Row>
+          </>
+        }
+
+        {configStyle.graphType != "table" &&
+          <>
             <h3>Colorscale</h3>
             <Row>
               <Col span={20}>
