@@ -24,7 +24,7 @@ class DataBlockView extends Component<any, any> {
     }
 
     // Check updated plotData (we need to check this because component render before fetch finish)
-    if (this.props.timeseriesData?.length != nextProps.timeseriesData?.length) {
+    if (JSON.stringify(this.props.timeseriesData) !== JSON.stringify(nextProps.timeseriesData)) {
       shouldUpdate = true;
     }
 

@@ -87,7 +87,7 @@ export default class BlockFilterManager extends Component<any, any> {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (
-            this.props.plotData[this.props.currentBlock.id]?.length != prevProps.plotData[this.props.currentBlock.id]?.length
+            JSON.stringify(this.props.plotData[this.props.currentBlock.id]) !== JSON.stringify(prevProps.plotData[this.props.currentBlock.id])
         ) {
             this.updateMissingData();
         }
