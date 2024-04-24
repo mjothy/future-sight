@@ -131,7 +131,7 @@ class SetupView extends Component<any, any> {
     } else {
       let isMissing = false;
       for (const option of Object.keys(this.state.dataStructure)) {
-        if (this.isDataMissing(option) && option != "categories") {
+        if (this.isDataMissing(option)) {
           isMissing = true;
           break;
         }

@@ -77,7 +77,7 @@ export default class DataBlockEditor extends Component<any, any> {
         <div className={selected ? 'transition' : ''} key={option}>
           <Row className="width-100 mt-16">
             <h4>
-              {option} {option == "categories" ? "(optional)" : ""} &nbsp;
+              {option}&nbsp;
               <label className='warning-label'>
                 {
                   this.props.isAllSelected()

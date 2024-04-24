@@ -65,7 +65,6 @@ export default class BlockFilterManager extends Component<any, any> {
             variables: metadata["variables"],
             scenarios: metadata["scenarios"],
             models: metadata["models"],
-            categories: metadata["categories"],
             versions: this.initVersionOptions(metadata["versions"])
         }
 
@@ -385,9 +384,7 @@ export default class BlockFilterManager extends Component<any, any> {
     }
 
     isAllSelected = () => {
-        const selectedOrder = this.props.currentBlock.config.metaData.selectOrder;
-        const obligatory = selectedOrder.filter(key => key != "categories");
-        return obligatory.length == 4
+        return this.props.currentBlock.config.metaData.selectOrder.length == 4
     }
 
     onShowNonDefaultRuns = (e) => {

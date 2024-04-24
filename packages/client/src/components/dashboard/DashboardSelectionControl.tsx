@@ -194,11 +194,10 @@ export default class DashboardSelectionControl extends Component<
    * Add default version to metadata.versions
   */
   checkIfSelectedInOptions = (optionsData, block: BlockModel) => {
-    let optionsLabel = [...this.props.optionsLabel];
+    const optionsLabel = [...this.props.optionsLabel];
     const metaData = JSON.parse(JSON.stringify(((block.config) as ConfigurationModel).metaData));
     let isDashboardUpdated = false;
     const missingData = {}
-    optionsLabel = optionsLabel.filter(key => key != "categories"); // TODO delete after
     optionsLabel.forEach(option => {
       if (option == "versions") { return }
       // Check if selected data (metaData[option]) are in options of drop down list

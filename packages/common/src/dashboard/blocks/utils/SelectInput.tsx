@@ -44,7 +44,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
 
             // Set the first element
             if (!currentNode) {
-                const checkable = (values.length === 1 || this.props.type == "categories"); // Set only Leafs as checkable
+                const checkable = (values.length === 1); // Set only Leafs as checkable
                 currentNode = { title: values[0], label: values[0], key: values[0], value: values[0], children: [], checkable };
                 if (values.length === 1 && this.props.regroupOrphans) {
                     // Regroup orphan nodes under single parent if option enabled
@@ -68,7 +68,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
             for (let i = 1; i < values.length; i++) {
                 let childNode = currentNode.children.find((node) => node.label === values[i]);
                 if (!childNode) {
-                    const checkable = (i === values.length - 1 || this.props.type == "categories"); // Set only Leafs as checkable
+                    const checkable = (i === values.length - 1); // Set only Leafs as checkable
                     const value = values.slice(0, i + 1).join('|');
                     childNode = { title: values[i], label: values[i], key: value, value, children: [], checkable };
                     currentNode.children.push(childNode);
@@ -296,7 +296,6 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
 
     render() {
         switch (this.props.type) {
-            case "categories": return this.treeSelectLeafOnly();
             case "variables":
             case "regions": return this.treeSelect();
             default: return this.defaultSelect();
