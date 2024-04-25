@@ -9,7 +9,6 @@ export default class BlockDataModel {
   versions: versionsModel = {};
   useVersion = false;
   showNonDefaultRuns=false;
-  categories: string[] = []
 
   /**
    * Selection order
@@ -35,10 +34,6 @@ export default class BlockDataModel {
     variables: {
       isMaster: false,
       values: [],
-    },
-    categories: {
-      isMaster: false,
-      values: []
     }
   };
 }

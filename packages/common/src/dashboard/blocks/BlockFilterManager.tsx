@@ -25,8 +25,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 regions: [],
                 variables: [],
                 scenarios: [],
-                models: [],
-                categories: []
+                models: []
             },
             staleFilters: {
                 regions: true,
