@@ -8,6 +8,7 @@ import PreviewGroup from '../PreviewGroup';
 import Logo from "../navbar/Logo";
 import withDraftManager from "../../services/withDraftManager";
 import {Content} from "antd/lib/layout/layout";
+import withRouter from "../../services/withRouter";
 
 const HomeView: React.FC<ComponentPropsWithDataManager> = ({dataManager, draftManager}) => {
     const [publishedDashboards, setPublishedDashboards] = useState({});
@@ -72,4 +73,4 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({dataManager, draftMa
     );
 };
 
-export default withDataManager(withDraftManager(HomeView));
+export default withDataManager(withRouter(withDraftManager(HomeView)));

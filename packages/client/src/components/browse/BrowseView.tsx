@@ -6,6 +6,7 @@ import withDataManager from '../../services/withDataManager';
 import withDraftManager from '../../services/withDraftManager';
 import withForm from '../../services/withForm';
 import PreviewGroup from '../PreviewGroup';
+import withRouter from "../../services/withRouter";
 
 const { Option } = Select;
 
@@ -196,4 +197,4 @@ class BrowseView extends React.Component<any, any> {
   }
 }
 
-export default withForm(withDataManager(withDraftManager(BrowseView)));
+export default withForm(withRouter(withDataManager(withDraftManager(BrowseView))));

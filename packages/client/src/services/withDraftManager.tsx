@@ -23,7 +23,7 @@ const withDraftManager = (Component) => {
                     const uuid = createUUID();
                     dashboard.id = uuid;
                     setDraft(uuid, dashboard);
-                    window.location.href = 'draft?id=' + uuid;
+                    this.props.navigate('/draft?id=' + uuid);
                 }
             } else {
                 notification.error({
