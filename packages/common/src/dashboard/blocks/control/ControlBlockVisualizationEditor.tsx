@@ -3,6 +3,8 @@ import Checkbox from 'antd/es/checkbox';
 import { Component } from 'react';
 import BlockStyleModel from '../../../models/BlockStyleModel';
 import {InfoCircleOutlined} from "@ant-design/icons";
+import {getChildrens} from "../utils/BlockDataUtils";
+import BlockModel from "../../../models/BlockModel";
 
 export default class ControlBlockVisualizationEditor extends Component<any, any> {
   configStyle: BlockStyleModel = new BlockStyleModel();
@@ -68,19 +70,38 @@ export default class ControlBlockVisualizationEditor extends Component<any, any>
   }
 
   onEnableMultiselectChecked = (e) => {
-    const metaData = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData));
-    //const configStyle = JSON.parse(JSON.stringify(this.props.currentBlock.config.configStyle));
+    const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+    const metaData = dashboard.blocks[this.props.currentBlock.id].config.metaData;
+    const configStyle = dashboard.blocks[this.props.currentBlock.id].config.configStyle;
 
-    this.configStyle.disableMultiSelect = e.target.checked;
+    configStyle.disableMultiSelect = e.target.checked;
 
     if(e.target.checked){
+      // Update parent
       Object.keys(metaData.master).forEach(option => {
         if(metaData.master[option].values?.length>0) {
           metaData.master[option].values = metaData.master[option].values.slice(0, 1);
         }
       })
+      // Update children
+      const children = getChildrens(dashboard.blocks, this.props.currentBlock.id);
+      if (children.length > 0) {
+        children.map((child: BlockModel | any) => {
+          const configChild = child.config;
+          configChild.metaData.selectOrder = this.props.currentBlock.config.metaData.selectOrder;
+          Object.keys(metaData.master).forEach(option => {
+            if(metaData.master[option].isMaster){
+              configChild.metaData[option] = metaData.master[option].values;
+            } else {
+              configChild.metaData[option] = [];
+            }
+          })
+          dashboard.blocks[child.id].config = { ...configChild };
+        });
+      }
     }
-    this.updateBlockConfig({ configStyle: this.configStyle, metaData })
+
+    this.props.updateDashboard(dashboard);
   }
 
   render() {
