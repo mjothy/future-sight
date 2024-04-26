@@ -157,7 +157,7 @@ export default class DataBlockEditor extends Component<any, any> {
     const controlId = this.props.currentBlock.controlBlock;
     const metaData: BlockDataModel = this.props.currentBlock.config.metaData
     const configStyle: BlockStyleModel = this.props.currentBlock.config.configStyle
-    const versionOptions = this.props.initVersionOptions(this.props.currentBlock.config.metaData.versions)
+    const versionOptions = this.props.optionsData.versions
     let disabled = true
 
     if (!metaData.useVersion) {
