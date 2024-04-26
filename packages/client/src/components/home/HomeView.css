@@ -8,6 +8,10 @@
   padding: 20px 40px;
 }
 
+.home-view-wrapper .content{
+  width: 95%;
+}
+
 .create-container {
   display: flex;
   flex-direction: column;

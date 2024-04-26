@@ -21,7 +21,7 @@ const HomeView: React.FC<ComponentPropsWithDataManager> = ({dataManager, draftMa
     return (
         <>
             <div className="home-view-wrapper">
-                <Content>
+                <Content className={"content"}>
                 <div className={"home-header"}>
                     <div className="home-logo">
                         <Logo/>

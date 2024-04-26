@@ -83,7 +83,7 @@ export default class AboutView extends React.Component<any, any>{
         return (
             <>
                 <div className="home-view-wrapper">
-                    <Content>
+                    <Content className={"content"}>
                         <Card >
                             <h1>About</h1>
                             {this.intro()}
