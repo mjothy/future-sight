@@ -77,11 +77,14 @@ export default class BlockFilterManager extends Component<any, any> {
 
         return optionsData;
     }
-    componentDidMount() {
+    async componentDidMount() {
+        const metaIndicators = await this.props.dataManager.fetchMeta();
         const metadata = this.props.currentBlock.config.metaData
-        if (metadata["scenarios"].length > 0 && metadata["models"].length > 0) {
-            this.updateFilterOptions("versions")
-        }
+        this.setState({metaIndicators}, ()=>{
+            if (metadata["scenarios"].length > 0 && metadata["models"].length > 0) {
+                this.updateFilterOptions("versions")
+            }
+        })
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
