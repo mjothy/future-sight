@@ -31,10 +31,10 @@
     "origin": "iiasa",
     "icon": "global"
   },
-  "categories": {
-    "id": "categories",
-    "label": "Categories",
-    "path": "/categories",
+  "meta": {
+    "id": "meta",
+    "label": "Meta indicators",
+    "path": "/meta",
     "required": false,
     "origin": "fs",
     "icon": "tag"

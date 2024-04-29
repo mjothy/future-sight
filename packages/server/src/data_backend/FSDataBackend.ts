@@ -22,6 +22,10 @@ export default class FSDataBackend implements IDataBackend {
         })
     }
 
+    getMeta(): any {
+        return {}
+    }
+
     getDataFocus = (dataFocusFilters: OptionsDataModel, filterIDs?: string[]) => {
         const optionsData = {
             regions: [],

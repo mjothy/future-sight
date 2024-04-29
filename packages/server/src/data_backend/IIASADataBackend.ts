@@ -176,4 +176,32 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
     }
 
     getDataUnion = () => [];
+
+    // NOTE:  showNonDefaultRuns: filter argument not supported
+    async getMeta() {
+        const filteredValues = {};
+        const metaObject = filters.meta;
+        const result = {};
+        // NOTE: api/meta not working without table parameter
+        const response = await this.patchPromise(metaObject.path+"/?table=true", {});
+
+        const runIndex = response["columns"].indexOf("run__id")
+        const categoryIndex = response["columns"].indexOf("key")
+        const subCategoryIndex = response["columns"].indexOf("value")
+
+        const data = response["data"]
+
+        data.forEach(obj => {
+            const category = obj[categoryIndex];
+            const subCategory = obj[subCategoryIndex];
+            const runId = obj[runIndex];
+
+            result[category] ??= {};
+            result[category][subCategory] ??= [];
+
+            result[category][subCategory].push(runId)
+        })
+
+        return result;
+    }
 }

@@ -146,6 +146,21 @@ export default class ExpressServer {
       }
     });
 
+    this.app.post('/api/meta', async (req, res, next) => {
+
+      try {
+        const data = await this.dataProxy.getMeta();
+        res.send(data);
+      } catch (error: any) {
+        console.error("meta: ", error);
+        if (error.status == 401) {
+          res.status(401).send({ message: error.message });
+        } else {
+          res.status(error.status ? error.status : 500).send({ message: "Server error!!" });
+        }
+      }
+    });
+
     // ===================
     //   Redis calls
     // ===================
