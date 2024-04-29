@@ -11,6 +11,7 @@ import './DataBlockEditor.css';
 /**
  * The form in sidebar to add/edit dara block
  */
+// TODO this.props.onCategoryChange
 export default class DataBlockEditor extends Component<any, any> {
 
   clearClick = (option, e) => {
