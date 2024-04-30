@@ -12,7 +12,7 @@ export default class BlockFilterManager extends Component<any, any> {
     constructor(props) {
         super(props);
         const metadata = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData))
-        this.state = this.getInitState(metadata)
+        this.state = {...this.getInitState(metadata), metaIndicators: {}}
     }
 
     getInitState = (metadata) => {
@@ -421,6 +421,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 isAllSelected={this.isAllSelected}
                 onShowNonDefaultRuns={this.onShowNonDefaultRuns}
                 initVersionOptions={this.initVersionOptions}
+                metaIndicators={this.state.metaIndicators}
             />
         ) : (
             <ControlBlockEditor

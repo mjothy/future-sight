@@ -107,6 +107,71 @@ export default class DataBlockEditor extends Component<any, any> {
     );
   };
 
+  selectMeta = () => {
+    const id = this.props.currentBlock.id;
+    const metaData = this.props.dashboard.blocks[id].config.metaData;
+
+    const onMetaIndicatorsChange = (option, selectedData: string[]) => {
+      const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+      const metaIndicators = dashboard.blocks[id].config.metaData.metaIndicators ?? {};
+      const newValues = {}
+      selectedData.forEach(element => {
+        newValues[element] = metaIndicators[element] ?? {}
+      })
+
+      dashboard.blocks[id].config.metaData.metaIndicators = newValues;
+      this.props.updateDashboard(dashboard)
+    }
+
+    const onSubMetaIndicatorsChange = (parentMeta, selectedData: string[]) => {
+      const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+      const metaIndicators = dashboard.blocks[id].config.metaData.metaIndicators ?? {};
+      const newValues = {};
+      selectedData.forEach(element => {
+        newValues[element] = this.props.metaIndicators[parentMeta][element]
+      })
+
+      metaIndicators[parentMeta] = newValues;
+      dashboard.blocks[id].config.metaData.metaIndicators = metaIndicators;
+      this.props.updateDashboard(dashboard)
+    }
+    return (
+        <>
+            <Row>
+              <Col span={6}>
+                Category:
+              </Col>
+              <Col span={18}>
+                <SelectInput
+                    type={"meta"}
+                    label={""}
+                    className={"width-90"} value={Object.keys(metaData.metaIndicators ?? {})} options={Object.keys(this.props.metaIndicators)}
+                    onChange={onMetaIndicatorsChange}
+                    placeholder={""}
+                />
+              </Col>
+            </Row>
+
+            <Row align="stretch">
+              {
+                Object.keys(metaData.metaIndicators ?? {}).map(meta => {
+                  return <Col span={11} style={{marginTop: 3, height: "100%"}}>
+                    {meta}  <SelectInput
+                      type={meta}
+                      label={""}
+                      className={"width-90"} value={Object.keys(metaData.metaIndicators[meta] ?? {})} options={Object.keys(this.props.metaIndicators[meta] ?? {})}
+                      onChange={onSubMetaIndicatorsChange}
+                      placeholder={""}
+                  />
+                  </Col>
+                })
+              }
+            </Row>
+
+        </>
+    );
+  };
+
   controlledInputs = () => {
     const id = this.props.currentBlock.controlBlock;
     const controlBlock = this.props.dashboard.blocks[id].config.metaData;
@@ -276,6 +341,8 @@ export default class DataBlockEditor extends Component<any, any> {
       Object.keys(this.props.optionsData).length > 0 &&
       <div>
         <div>
+          {this.selectMeta()}
+          <Divider />
           <span className={"advanced-options-switch"}>
             <span>Advanced options</span>
             <Switch size="small" onChange={this.props.onUseVersionSwitched} checked={metaData.useVersion} />

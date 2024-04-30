@@ -22,6 +22,8 @@ interface SelectOptionProps {
     isClosable?: boolean;
     regroupOrphans?: string;
     disableMultiSelect?: boolean;
+    placeholder?: string
+
 }
 
 const COLORS = ['red', 'blue', 'green', 'yellow'];
@@ -253,7 +255,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                     className={"fsselectinput " + this.props.className}
                     dropdownRender={this.dropdownRender} // TODO
                     tagRender={(props) => this.tagRender(props, true)} // TODO
-                    placeholder={this.props.label || this.props.type}
+                    placeholder={this.props.placeholder ?? (this.props.label || this.props.type)}
                     value={this.props.value}
                     loading={this.props.loading}
                     onChange={this.onChange}

@@ -1,3 +1,5 @@
+import {MetaModel} from "./BlockDataModel";
+
 export default class OptionsDataModel {
 
     regions: string[] = [];
@@ -5,5 +7,5 @@ export default class OptionsDataModel {
     scenarios: string[] = [];
     models: string[] = [];
     versions: any[] = [];
-
+    metaIndicators: MetaModel = {};
 }

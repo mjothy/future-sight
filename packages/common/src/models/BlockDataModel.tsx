@@ -7,6 +7,7 @@ export default class BlockDataModel {
   regions: string[] = [];
   variables: string[] = [];
   versions: versionsModel = {};
+  metaIndicators: MetaModel = {};
   useVersion = false;
   showNonDefaultRuns=false;
 
@@ -49,4 +50,10 @@ export interface versionModel{
   id: string,
   version: string,
   [key: string]: any;
+}
+
+export interface MetaModel {
+  [category: string]: {
+    [subCategory: string]: [] // [] = run__id
+  }
 }
