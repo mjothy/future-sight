@@ -1,17 +1,20 @@
 
 // TODO add interface
 import { versionsModel } from "@future-sight/common/build/models/BlockDataModel";
+import DataFocusFilter from "../models/DataFocusFilter";
 
 export default class Filter {
 
     private body = {};
     private selectOrder?: string[];
-    private dataFocusFilters?: any;
+    private dataFocusFilters?: DataFocusFilter;
     private showNonDefaultRuns?: boolean;
+    private metaRuns: number[];
     constructor(globalSelectedData, dataFocusFilters?: any, selectOrder?: string[], showNonDefaultRuns?: boolean) {
         this.selectOrder = selectOrder;
         this.dataFocusFilters = dataFocusFilters;
         this.showNonDefaultRuns = showNonDefaultRuns
+        this.metaRuns = this.setMetaRuns(globalSelectedData);
         this.body = {
             "models": this.modelBody(globalSelectedData),
             "scenarios": this.scenarioBody(globalSelectedData),
@@ -20,6 +23,41 @@ export default class Filter {
             "units": this.unitsBody(globalSelectedData),
             "runs": this.runBody(globalSelectedData)
         };
+
+    }
+
+    setMetaRuns = (globalSelectedData) => {
+        const runIdsSet: Set<number> = new Set();
+
+        if(globalSelectedData?.metaIndicators != null){
+            Object.entries(globalSelectedData?.metaIndicators).forEach(([key, subMeta])=>{
+                if (subMeta instanceof Object) {
+                    Object.keys(subMeta).forEach(obj => {
+                        subMeta[obj]?.forEach(runId => runIdsSet.add(runId));
+                    })
+                }
+            })
+        }
+
+        return Array.from(runIdsSet);
+    }
+
+    /**
+     * Get runs id from selected meta indicators
+     */
+    public getMetaRuns = () => {
+        return this.metaRuns;
+    }
+
+    addRunsToBody = (body) => {
+        if(this.getMetaRuns()?.length > 0){
+            if(body.run == null){
+                body.run = {};
+                body.run["id__in"] = this.getMetaRuns();
+            } else {
+                body.run["id__in"] = [...(body.run["id__in"] ?? []), ...this.getMetaRuns()];
+            }
+        }
     }
 
     getBody = (filterId) => {
@@ -290,15 +328,17 @@ export default class Filter {
     addDataFocusToSelectedData = (selectedData) => {
         if (this.dataFocusFilters != null) {
             Object.keys(this.dataFocusFilters).forEach(key => {
-                let newSelected: string[] = selectedData[key];
-                if (newSelected?.length > 0) {
-                    // {Second filter} Find matching values in this.dataFocusFilters[key] and selectedData[key]
-                    const values: string[] = this.dataFocusFilters[key].filter(value => newSelected.includes(value));
-                    newSelected = values;
-                } else {
-                    newSelected = [...this.dataFocusFilters[key]];
+                if(Array.isArray(this.dataFocusFilters?.[key])){
+                    let newSelected: string[] = selectedData[key];
+                    if (newSelected?.length > 0) {
+                        // {Second filter} Find matching values in this.dataFocusFilters[key] and selectedData[key]
+                        const values: string[] = this.dataFocusFilters?.[key]?.filter(value => newSelected.includes(value));
+                        newSelected = values;
+                    } else {
+                        newSelected = [...this.dataFocusFilters?.[key]];
+                    }
+                    selectedData[key] = Array.from(new Set(newSelected));
                 }
-                selectedData[key] = Array.from(new Set(newSelected));
             });
         }
         return selectedData;

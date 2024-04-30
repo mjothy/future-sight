@@ -53,7 +53,8 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
             variables: [],
             scenarios: [],
             models: [],
-            versions: []
+            versions: [],
+            metaIndicators: {}
         };
 
         Object.keys(selectedData).forEach(key => {
@@ -61,6 +62,8 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
                 selectedData[key] = blockMetaData[key]
             }
         });
+
+        selectedData["metaIndicators"] = blockMetaData?.metaIndicators ?? {};
 
         const filter = new Filter(selectedData, dataFocusFilters, selectOrder, showNonDefaultRuns);
 
@@ -71,6 +74,7 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
             filteredValues["versions"] = this.prepareVersions(data);
         } else {
             const body = filter.getBody(filterId);
+            filter.addRunsToBody(body); // Add runs id from meta indicators if they are selected
             const data = await this.patchPromise(filters[filterId].path, body);
             filteredValues[filterId] = data?.map(element => element.name);
         }
