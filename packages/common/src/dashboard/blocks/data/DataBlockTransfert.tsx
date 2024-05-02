@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import DataBlockView from "./DataBlockView";
 import LoaderMask from "../utils/LoaderMask";
+import {getMetaRuns} from "../utils/BlockDataUtils";
 
 class DataBlockTransfert extends Component<any, any> {
 
@@ -38,8 +39,21 @@ class DataBlockTransfert extends Component<any, any> {
 
   render() {
     let timeseriesData = this.props.plotData[this.props.currentBlock.id]
+
     if (!timeseriesData) {
       timeseriesData = []
+    } else {
+      // Filter by meta indicators
+      const metaData = this.props.currentBlock.config.metaData;
+      if(metaData.metaIndicators){
+        const metaIndicatorRuns = getMetaRuns(metaData.metaIndicators);
+        if(metaIndicatorRuns.length > 0){
+          timeseriesData = timeseriesData.filter( element =>{
+            return metaIndicatorRuns.includes(element["run"]?.id);
+          })
+        }
+
+      }
     }
 
     return <>

@@ -104,7 +104,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         return (
             <Tag
                 color={this.props.options?.includes(value) ? undefined : 'red'}
-                closable={this.props.isClosable}
+                closable={this.props.isClosable || !this.props.options?.includes(value) }
                 onClose={onClose}
                 icon={this.props.options?.includes(value) ? undefined : <ExclamationCircleOutlined />}
                 className={this.props.options?.includes(value) ? 'ant-select-selection-item' : 'ant-select-selection-item data-missing-tag'}

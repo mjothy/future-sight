@@ -3,16 +3,21 @@ import ConfigurationModel from '../../models/ConfigurationModel';
 import OptionsDataModel from '../../models/OptionsDataModel';
 import ControlBlockEditor from './control/ControlBlockEditor';
 import DataBlockEditor from './data/DataBlockEditor';
-import { getBlock } from './utils/BlockDataUtils';
+import {getBlock, getMetaRuns} from './utils/BlockDataUtils';
 import BlockDataModel, { versionsModel } from "../../models/BlockDataModel";
 import DashboardModel from "../../models/DashboardModel";
 import { getSelectedFiltersLabels } from './utils/DashboardUtils';
+import {BlockModel} from "../../index";
 
 export default class BlockFilterManager extends Component<any, any> {
     constructor(props) {
         super(props);
         const metadata = JSON.parse(JSON.stringify(this.props.currentBlock.config.metaData))
-        this.state = {...this.getInitState(metadata), metaIndicators: {}}
+        this.state = {
+            ...this.getInitState(metadata),
+            metaIndicators: {},
+            forceOptionsDataUpdate: false
+        }
     }
 
     getInitState = (metadata) => {
@@ -79,22 +84,35 @@ export default class BlockFilterManager extends Component<any, any> {
     }
     async componentDidMount() {
         const metaIndicators = await this.props.dataManager.fetchMeta();
-        const metadata = this.props.currentBlock.config.metaData
-        this.setState({metaIndicators}, ()=>{
-            if (metadata["scenarios"].length > 0 && metadata["models"].length > 0) {
-                this.updateFilterOptions("versions")
+
+        let metaData = this.props.currentBlock.config.metaData;
+
+        if(metaData.metaIndicators != null && Object.keys(metaData.metaIndicators)?.length > 0){
+            metaData.selectOrder.map(async filterId => {
+                await this.updateFilterOptions(filterId);
+            })
+        }
+
+        this.setState({metaIndicators}, async () => {
+            if (metaData["scenarios"].length > 0 && metaData["models"].length > 0) {
+                await this.updateFilterOptions("versions")
             }
-        })
+        });
+
+        this.updateMissingData();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+        const metadata = this.props.currentBlock.config.metaData
+        const prevMetadata = prevProps.currentBlock.config.metaData
+
         if (
-            JSON.stringify(this.props.plotData[this.props.currentBlock.id]) !== JSON.stringify(prevProps.plotData[this.props.currentBlock.id])
+            JSON.stringify(this.props.plotData[this.props.currentBlock.id]) !== JSON.stringify(prevProps.plotData[this.props.currentBlock.id]) ||
+            JSON.stringify(metadata.metaIndicators) !== JSON.stringify(prevMetadata.metaIndicators) // TODO Refactor: pass timeseries(this.props.plotData[this.props.currentBlock.id])) in props
         ) {
             this.updateMissingData();
         }
         if (this.props.currentBlock.id !== prevProps.currentBlock.id) {
-            const metadata = this.props.currentBlock.config.metaData
             this.setState(this.getInitState(metadata),
                 () => {
                     if (metadata["scenarios"].length > 0 && metadata["models"].length > 0) {
@@ -103,6 +121,27 @@ export default class BlockFilterManager extends Component<any, any> {
                 }
             )
         }
+
+        if(JSON.stringify(metadata["scenarios"]) !== JSON.stringify(prevMetadata["scenarios"]) ||
+            JSON.stringify(metadata["models"]) !== JSON.stringify(prevMetadata["models"])){ // TODO Refactor
+            this.updateFilterOptions("versions");
+        }
+
+        if(this.state.forceOptionsDataUpdate != prevState.forceOptionsDataUpdate && this.state.forceOptionsDataUpdate){
+            const config = this.props.currentBlock.config;
+            config.metaData.selectOrder.map(async filterId => {
+                await this.updateFilterOptions(filterId);
+            })
+
+            // Set stale
+            const staleFilters = {...this.state.staleFilters}
+            const staleKeys = Object.keys(staleFilters).filter(key => !config.metaData.selectOrder.includes(key))
+            staleKeys.forEach(key=>{
+                staleFilters[key] = true;
+            })
+            this.setState({staleFilters, forceOptionsDataUpdate: false})
+        }
+
     }
 
 
@@ -133,9 +172,12 @@ export default class BlockFilterManager extends Component<any, any> {
                 this.setState({
                     optionsData,
                     isLoadingOptions: { ...this.state.isLoadingOptions, [filterId]: false },
-                }, () => {
-                    this.props.checkIfSelectedInOptions(this.state.optionsData, this.props.currentBlock)
+                },  async () => {
+                    if (filterId == "versions") {
+                        await this.updateBlockVersions(this.state.optionsData, this.props.currentBlock);
+                    }
                     this.updateMissingData();
+                    //await this.props.checkIfSelectedInOptions(this.state.optionsData, this.props.currentBlock)
                 })
             })
             .catch(err => {
@@ -144,6 +186,40 @@ export default class BlockFilterManager extends Component<any, any> {
                 });
             })
     }
+
+    /**
+     * TODO add description
+     */
+    updateBlockVersions = async (optionsData, block: BlockModel) => {
+        let metaData = JSON.parse(JSON.stringify(((block.config) as ConfigurationModel).metaData));
+        const versions = {};
+        for (const model of metaData["models"]) {
+            for (const scenario of metaData["scenarios"]) {
+                if (!metaData["versions"]?.[model]?.[scenario] || metaData["versions"][model][scenario].length === 0) {
+                    if (optionsData["versions"][model] && optionsData["versions"][model][scenario]) {
+                        if (!versions[model]) {
+                            versions[model] = {};
+                        }
+                        versions[model][scenario] = optionsData["versions"][model][scenario].default ?
+                            [optionsData["versions"][model][scenario].default] :
+                            [optionsData["versions"][model][scenario].values[0] ?? []] // here
+                    }
+                } else {
+                    if (!versions[model]) {
+                        versions[model] = {};
+                    }
+                    versions[model][scenario] = metaData["versions"][model][scenario];
+                }
+            }
+        }
+        metaData["versions"] = versions;
+
+        // Update versions of current block
+        const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+        dashboard.blocks[block.id as string].config.metaData = {...metaData};
+        await this.props.updateDashboard(dashboard);
+    }
+
 
     /**
      * Get meta data of controlled options of current data block
@@ -185,11 +261,30 @@ export default class BlockFilterManager extends Component<any, any> {
     getExistingRaws = (metaData, blockId) => {
         const existDataRaws: any[] = [];
 
+        // TODO Refactor
+        let timeseriesData = this.props.plotData[this.props.currentBlock.id];
+
+        if (!timeseriesData) {
+            timeseriesData = []
+        } else {
+            // Filter by meta indicators
+            const metaData = this.props.currentBlock.config.metaData;
+            if(metaData.metaIndicators){
+                const metaIndicatorRuns = getMetaRuns(metaData.metaIndicators);
+                if(metaIndicatorRuns.length > 0){
+                    timeseriesData = timeseriesData.filter( element =>{
+                        return metaIndicatorRuns.includes(element["run"]?.id);
+                    })
+                }
+
+            }
+        }
+
         metaData.models.forEach((model) => {
             metaData.scenarios.forEach((scenario) => {
                 metaData.variables.forEach((variable) => {
                     metaData.regions.forEach((region) => {
-                        const d = this.props.plotData[blockId]?.find(
+                        const d = timeseriesData?.find(
                             (e) =>
                                 e.model === model &&
                                 e.scenario === scenario &&
@@ -248,6 +343,9 @@ export default class BlockFilterManager extends Component<any, any> {
                     await this.props.updateDashboard(dashboard);
                 }
 
+                // Update missing data
+                this.updateMissingData();
+
                 // Check added and deleted options from selection
                 if (config.metaData[filterId].length != this.state.currentSelection.length) {
                     const staleFilters = {...this.state.staleFilters}
@@ -271,7 +369,6 @@ export default class BlockFilterManager extends Component<any, any> {
                         && ["models", "scenarios"].every(item => selectOrder.includes(item))
                     ) {
                         await this.updateFilterOptions("versions")
-                        // TODO update currentBlock.metadata.versions
                     }
 
                     /*for (const tempFilterId of selectOrder.slice(selectOrderIndex + 1)) {
@@ -358,6 +455,20 @@ export default class BlockFilterManager extends Component<any, any> {
 
     };
 
+    onMetaDropdownVisibleChange = async (filterId, isOpening) => {
+
+        if(!isOpening){
+            const staleFilters = { ...this.state.staleFilters }
+
+            for (const tempFilterId of Object.keys(staleFilters)) {
+                staleFilters[tempFilterId] = true
+            }
+            // TODO force update only on sub meta update
+            this.setState({ forceOptionsDataUpdate: true })
+        }
+
+    }
+
     updateChildsBlocks = (dashboard, controlBlockId) => {
         const configParent = this.props.dashboard.blocks[controlBlockId].config;
 
@@ -414,6 +525,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 isLoadingOptions={this.state.isLoadingOptions}
                 onChange={this.onChange}
                 onDropdownVisibleChange={this.onDropdownVisibleChange}
+                onMetaDropdownVisibleChange={this.onMetaDropdownVisibleChange}
                 currentOpenedFilter={this.state.currentOpenedFilter}
                 onUseVersionSwitched={this.onUseVersionSwitched}
                 onVersionSelected={this.onVersionSelected}

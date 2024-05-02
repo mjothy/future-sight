@@ -135,6 +135,14 @@ export default class DataBlockEditor extends Component<any, any> {
       dashboard.blocks[id].config.metaData.metaIndicators = metaIndicators;
       this.props.updateDashboard(dashboard)
     }
+
+    const clearClick = () => {
+      const dashboard = JSON.parse(JSON.stringify(this.props.dashboard));
+      dashboard.blocks[id].config.metaData.metaIndicators = {};
+      this.props.updateDashboard(dashboard)
+      this.props.onMetaDropdownVisibleChange("meta", false)
+    }
+
     return (
         <>
             <Row>
@@ -144,10 +152,12 @@ export default class DataBlockEditor extends Component<any, any> {
               <Col span={18}>
                 <SelectInput
                     type={"meta"}
-                    label={""}
-                    className={"width-90"} value={Object.keys(metaData.metaIndicators ?? {})} options={Object.keys(this.props.metaIndicators)}
+                    className={"width-80"} value={Object.keys(metaData.metaIndicators ?? {})} options={Object.keys(this.props.metaIndicators)}
                     onChange={onMetaIndicatorsChange}
                     placeholder={""}
+                    isClear={true}
+                    onClear={clearClick}
+                    onDropdownVisibleChange={this.props.onMetaDropdownVisibleChange}
                 />
               </Col>
             </Row>
@@ -158,10 +168,10 @@ export default class DataBlockEditor extends Component<any, any> {
                   return <Col span={11} style={{marginTop: 3, height: "100%"}}>
                     {meta}  <SelectInput
                       type={meta}
-                      label={""}
                       className={"width-90"} value={Object.keys(metaData.metaIndicators[meta] ?? {})} options={Object.keys(this.props.metaIndicators[meta] ?? {})}
                       onChange={onSubMetaIndicatorsChange}
                       placeholder={""}
+                      onDropdownVisibleChange={this.props.onMetaDropdownVisibleChange}
                   />
                   </Col>
                 })
@@ -252,14 +262,16 @@ export default class DataBlockEditor extends Component<any, any> {
           const scenarioChildren: any[] = []
           const defaultVersion = versionOptions[model][scenario].default?.id || ""
           for (const version of versionOptions[model][scenario].values) {
-            const title = version.id == defaultVersion
-              ? `${version.version} (default)`
-              : `${version.version}`
-            scenarioChildren.push({
-              version: version, // For sorting
-              title: title,
-              value: JSON.stringify({ model, scenario, version })
-            })
+            if(version != null){
+              const title = version.id == defaultVersion
+                  ? `${version.version} (default)`
+                  : `${version.version}`
+              scenarioChildren.push({
+                version: version, // For sorting
+                title: title,
+                value: JSON.stringify({ model, scenario, version })
+              })
+            }
           }
           modelChildren.push({
             title: scenario,
