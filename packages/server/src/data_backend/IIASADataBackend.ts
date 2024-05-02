@@ -20,9 +20,8 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
             const filters: FilterObject = this.getFilters();
             filterIDs = Object.keys(filters);
         }
-        const filterKeys = filterIDs.filter(key => key != "categories"); // TODO delete filter
         const filter = new Filter({}, dataFocusFilters, undefined);
-        for (const key of filterKeys) {
+        for (const key of filterIDs) {
             const body = filter.getBody(key);
             const data = await this.patchPromise(filters[key].path, body);
             filteredValues[key] = data?.map(element => element.name);
@@ -74,7 +73,7 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
             filteredValues["versions"] = this.prepareVersions(data);
         } else {
             const body = filter.getBody(filterId);
-            filter.addRunsToBody(body); // Add runs id from meta indicators if they are selected
+            Filter.addRunsToBody(selectedData, body, filterId); // Add runs id from meta indicators if they are selected
             const data = await this.patchPromise(filters[filterId].path, body);
             filteredValues[filterId] = data?.map(element => element.name);
         }

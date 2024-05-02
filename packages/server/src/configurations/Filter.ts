@@ -9,12 +9,10 @@ export default class Filter {
     private selectOrder?: string[];
     private dataFocusFilters?: DataFocusFilter;
     private showNonDefaultRuns?: boolean;
-    private metaRuns: number[];
     constructor(globalSelectedData, dataFocusFilters?: any, selectOrder?: string[], showNonDefaultRuns?: boolean) {
         this.selectOrder = selectOrder;
         this.dataFocusFilters = dataFocusFilters;
         this.showNonDefaultRuns = showNonDefaultRuns
-        this.metaRuns = this.setMetaRuns(globalSelectedData);
         this.body = {
             "models": this.modelBody(globalSelectedData),
             "scenarios": this.scenarioBody(globalSelectedData),
@@ -26,7 +24,7 @@ export default class Filter {
 
     }
 
-    setMetaRuns = (globalSelectedData) => {
+    static getMetaRuns = (globalSelectedData) => {
         const runIdsSet: Set<number> = new Set();
 
         if(globalSelectedData?.metaIndicators != null){
@@ -42,20 +40,14 @@ export default class Filter {
         return Array.from(runIdsSet);
     }
 
-    /**
-     * Get runs id from selected meta indicators
-     */
-    public getMetaRuns = () => {
-        return this.metaRuns;
-    }
-
-    addRunsToBody = (body) => {
-        if(this.getMetaRuns()?.length > 0){
+    static addRunsToBody = (globalSelectedData, body, filterId) => {
+        if(Filter.getMetaRuns(globalSelectedData)?.length > 0){
+            //id__in only in region and variable
             if(body.run == null){
                 body.run = {};
-                body.run["id__in"] = this.getMetaRuns();
-            } else {
-                body.run["id__in"] = [...(body.run["id__in"] ?? []), ...this.getMetaRuns()];
+                body.run["id__in"] = this.getMetaRuns(globalSelectedData);
+            } else if(body.run?.["id__in"]?.length >= 0){
+                body.run["id__in"] = this.getMetaRuns(globalSelectedData); // TODO Check filter
             }
         }
     }
@@ -346,7 +338,7 @@ export default class Filter {
 
     getRunIdsFromVersionsModel = (versionsDict: versionsModel) => {
         const runIds: string[] = []
-        Object.values(versionsDict).forEach(
+        Object.values(versionsDict)?.forEach(
             scenario => Object.values(scenario).forEach(
                 versions => versions.forEach(
                     version => runIds.push(version.id)

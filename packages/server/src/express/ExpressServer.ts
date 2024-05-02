@@ -115,7 +115,7 @@ export default class ExpressServer {
 
         // Get categories from file system
         // TODO add category to filter when request to iaasa is provided
-        optionsData["categories"] = this.configurationProvider.getMetaIndicators();
+        //optionsData["categories"] = this.configurationProvider.getMetaIndicators();
 
         res.send(optionsData);
       } catch (error: any) {
@@ -134,7 +134,6 @@ export default class ExpressServer {
 
       try {
         const optionsData = await this.dataProxy.getFilteredData(req.body.filterId, req.body.metaData, req.body.dataFocusFilters);
-        optionsData["categories"] = this.configurationProvider.getMetaIndicators(); // TODO add categories to filter
         res.send(optionsData);
       } catch (error: any) {
         if (error.status == 401) {
@@ -237,6 +236,7 @@ export default class ExpressServer {
     //   System files
     // ===================
 
+    // TODO clean
     this.app.get(`/api/categories`, (req, res) => {
       res.send(this.configurationProvider.getMetaIndicators());
     });
