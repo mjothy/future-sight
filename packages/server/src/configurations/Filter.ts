@@ -43,12 +43,10 @@ export default class Filter {
     static addRunsToBody = (globalSelectedData, body, filterId) => {
         if(Filter.getMetaRuns(globalSelectedData)?.length > 0){
             //id__in only in region and variable
-            if(body.run == null){
+            if(body.run == null || body.run?.["id__in"] == null){
                 body.run = {};
                 body.run["id__in"] = this.getMetaRuns(globalSelectedData);
-            } else if(body.run?.["id__in"]?.length >= 0){
-                body.run["id__in"] = this.getMetaRuns(globalSelectedData); // TODO Check filter
-            }
+            } // TODO FIX: if filterId == model or scenario, do not add runs
         }
     }
 
