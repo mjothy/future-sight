@@ -35,7 +35,7 @@ const password = process.env.PASSWORD;
 const port = process.env.PORT ? process.env.PORT : DEFAULT_PORT;
 const cookieKey = process.env.COOKIE_KEY ? process.env.COOKIE_KEY : DEFAULT_COOKIE_KEY;
 const clientPath = isProd ? './public' : '../../../client/public';
-const redisUrl = process.env.REDIS ? process.env.REDIS : DEV_REDIS_URL;
+let redisUrl = process.env.REDIS ? process.env.REDIS : DEV_REDIS_URL;
 
 const dataPath = isProd ? PROD_DATA_PATH : DEV_DATA_PATH;
 const dataUnionPath = isProd ? PROD_DATA_UNION_PATH : DEV_DATA_UNION_PATH;
@@ -46,6 +46,10 @@ const configPath = isProd ? PROD_CONFIG_PATH : DEV_CONFIG_PATH;
 // Initialize configuration
 const config_file = fs.readFileSync(configPath);
 const config = JSON.parse(config_file.toString());
+// Overide redis url if in conf
+if("REDIS" in config) {
+  redisUrl = config["REDIS"];
+}
 
 // data loading
 let dataBackend;

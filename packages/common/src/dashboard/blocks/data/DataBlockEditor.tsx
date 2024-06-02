@@ -11,6 +11,7 @@ import './DataBlockEditor.css';
 /**
  * The form in sidebar to add/edit dara block
  */
+// TODO this.props.onCategoryChange
 export default class DataBlockEditor extends Component<any, any> {
 
   clearClick = (option, e) => {
@@ -40,7 +41,6 @@ export default class DataBlockEditor extends Component<any, any> {
   };
 
   onChange = (option, selectedData: string[]) => {
-    console.log("selectedData: ", selectedData)
     if (selectedData.length <= 0) {
       this.clearClick(option, null);
     } else {
@@ -78,7 +78,7 @@ export default class DataBlockEditor extends Component<any, any> {
         <div className={selected ? 'transition' : ''} key={option}>
           <Row className="width-100 mt-16">
             <h4>
-              {option} {option == "categories" ? "(optional)" : ""} &nbsp;
+              {option}&nbsp;
               <label className='warning-label'>
                 {
                   this.props.isAllSelected()
@@ -98,6 +98,7 @@ export default class DataBlockEditor extends Component<any, any> {
               isClear={selected}
               onClear={this.clearClick}
               onDropdownVisibleChange={this.props.onDropdownVisibleChange}
+              enabled={(this.props.currentOpenedFilter == option) || (this.props.currentOpenedFilter == null)}
               regroupOrphans={option === "regions" ? "Common regions" : undefined}
             />
           </Row>

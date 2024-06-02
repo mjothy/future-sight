@@ -57,3 +57,38 @@ export function stackGroups(metaData, stackBy) {
     }
     return stacks;
 }
+
+
+/**
+ *
+ * @param metaData the block selected data
+ * @param stackBy the stack by option
+ * @returns stacks group [[{},{}], [{},{},{}]]
+ */
+export function groupByGroups(metaData, groupBy) {
+    const groups: any = []
+
+    if (groupBy != undefined && groupBy != "") {
+        const arr: any = [];
+        const keysWithoutStack = keys.filter(key => key != groupBy);
+        keysWithoutStack.forEach(key => {
+            arr.push(metaData[key]);
+        })
+        const allPossibleCombinaison = combineAll(arr); // same as indexes
+        metaData[groupBy].forEach(valueStack => {
+            const arrInStack: any = [];
+            allPossibleCombinaison.forEach(comb => {
+                const obj = {}
+                for (let i = 0; i < keysWithoutStack.length; i++) {
+                    obj[keysWithoutStack[i]] = comb[i];
+                }
+                arrInStack.push({
+                    [groupBy]:valueStack,
+                    ...obj
+                });
+            })
+            groups.push([...arrInStack])
+        });
+    }
+    return groups;
+}

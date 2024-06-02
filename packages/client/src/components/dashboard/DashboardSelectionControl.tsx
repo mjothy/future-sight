@@ -84,8 +84,9 @@ export default class DashboardSelectionControl extends Component<
   };
 
   copyBlock = (blockSelectedId: string) => {
-    const layoutItem = new LayoutModel((this.getLastId() + 1).toString());
     const dashboard = this.state.dashboard;
+    const layout = dashboard.layout.find(l => l.i === blockSelectedId);
+    const layoutItem = new LayoutModel((this.getLastId() + 1).toString(), layout);
 
     const newBlock = Object.assign({}, this.state.dashboard.blocks[blockSelectedId])
     newBlock.id = layoutItem.i
@@ -193,11 +194,10 @@ export default class DashboardSelectionControl extends Component<
    * Add default version to metadata.versions
   */
   checkIfSelectedInOptions = (optionsData, block: BlockModel) => {
-    let optionsLabel = [...this.props.optionsLabel];
+    const optionsLabel = [...this.props.optionsLabel];
     const metaData = JSON.parse(JSON.stringify(((block.config) as ConfigurationModel).metaData));
     let isDashboardUpdated = false;
     const missingData = {}
-    optionsLabel = optionsLabel.filter(key => key != "categories"); // TODO delete after
     optionsLabel.forEach(option => {
       if (option == "versions") { return }
       // Check if selected data (metaData[option]) are in options of drop down list

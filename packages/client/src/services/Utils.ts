@@ -1,15 +1,31 @@
 import { notification } from 'antd';
 
 export default class Utils {
-  static copyToClipboard = (path?: string, params?: string) => {
+
+  static getUrl = (path?: string, params?: string) => {
     let url = path ? window.location.origin + path : window.location.href;
-    url = params ? url + params : url
+    url = params ? url + params : url;
+    return url;
+  }
+
+  static copyToClipboard = (path?: string, params?: string) => {
+    const url = Utils.getUrl(path, params);
     navigator.clipboard.writeText(url).then(() => {
       notification.info({
         message: `Link copied to clipboard`,
       });
     });
   };
+
+  static copyToClipboardEmbed = (path?: string, params?: string) => {
+    const url = Utils.getUrl(path, params);
+    const result = `<iframe width="100%" height="400" src="${url}" title="future-sight" allowfullscreen></iframe>`
+    navigator.clipboard.writeText(result).then(() => {
+      notification.info({
+        message: `Link copied to clipboard`,
+      });
+    });
+  }
 
   // static throttle(cb, delay = 1000) { // 2s
 

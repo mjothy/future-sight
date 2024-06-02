@@ -4,13 +4,14 @@ import {
   AreaChartOutlined, BarChartOutlined, EnvironmentOutlined, LineChartOutlined, TableOutlined, PieChartOutlined,
   ExclamationCircleOutlined, BoxPlotOutlined
 } from '@ant-design/icons';
-import { Col, Input, Row, Select, Checkbox, InputNumber } from 'antd';
+import {Col, Input, Row, Select, Checkbox, InputNumber, Radio} from 'antd';
 import PlotColorscalePicker from '../utils/PlotColorscalePicker';
 import BoxVisualizationEditor from "./graphType/box/BoxVisualizationEditor";
 
 
 const { Option } = Select;
 
+const POSITIONS = ["top", "bottom", "left", "right" ];
 const PLOTLY_AGGREGATION = [
   {
     value: 'sum',
@@ -36,7 +37,7 @@ const plotTypes = [
 ];
 
 const colorbarTitle = ['variable', 'unit'];
-const TIME_STEPS = [5, 10, 15, 20]
+const TIME_STEPS = [2, 5, 10, 15, 20]
 
 export default class DataBlockVisualizationEditor extends Component<any, any> {
 
@@ -101,9 +102,19 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     this.updateBlockConfig({ configStyle: configStyle })
   };
 
+  onLegendPositionChange = (checkedValue) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.legendPosition = checkedValue.target.value ? checkedValue.target.value : "right";
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
   legendOptions = () => {
     const legendKeys = Object.keys(this.props.currentBlock.config.configStyle.legend)
     return legendKeys.map((att) => { return { "label": att, "value": att } });
+  }
+
+  legendPositions = () => {
+    return POSITIONS.map((att) => { return { "label": att, "value": att } });
   }
 
   onYAxisLabelChange = (e) => {
@@ -133,6 +144,9 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
   onStackCheckChange = (e) => {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.stack.isStack = e.target.checked;
+    if(e.target.checked && configStyle.stack.isGroupBy){
+      configStyle.stack.isGroupBy = false;
+    }
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
@@ -146,12 +160,6 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
     configStyle.aggregation.type = value;
     configStyle.aggregation.label = PLOTLY_AGGREGATION.find(element => element.value == value)?.label;
-    this.updateBlockConfig({ configStyle: configStyle })
-  }
-
-  onStackGroupByChange = (e) => {
-    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
-    configStyle.stack.isGroupBy = e.target.checked;
     this.updateBlockConfig({ configStyle: configStyle })
   }
 
@@ -212,6 +220,39 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
     configStyle.colorscale = colorscale;
     this.updateBlockConfig({ configStyle: configStyle })
   }
+  private onGroupByCheckChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.stack.isGroupBy = e.target.checked;
+    if(e.target.checked && configStyle.stack.isStack) {
+      configStyle.stack.isStack = false;
+    }
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+  private onGroupByValueChange = (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.stack.value = value;
+    this.updateBlockConfig({ configStyle: configStyle })
+  }
+
+
+  onYAxisCustomRangeChange = (e) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.YAxis.useCustomRange = e.target.checked;
+    this.updateBlockConfig({ configStyle: configStyle })
+  };
+
+  private onYRangeMinChange = (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.YAxis.min = value;
+    this.updateBlockConfig({ configStyle: configStyle })
+  };
+
+  private onYRangeMaxChange= (value) => {
+    const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
+    configStyle.YAxis.max = value;
+    this.updateBlockConfig({ configStyle: configStyle })
+  };
 
   render() {
     const configStyle = structuredClone(this.props.currentBlock.config.configStyle);
@@ -258,6 +299,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
           <PieVisualizationEditor
             optionsLabel={this.props.optionsLabel}
             onStackValueChange={this.onStackValueChange}
+            onGroupByCheckChange={this.onGroupByCheckChange}
             updateBlockConfig={this.updateBlockConfig}
             plotData={this.props.plotData}
             currentBlock={this.props.currentBlock}
@@ -269,6 +311,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                 optionsLabel={this.props.optionsLabel}
                 onStackValueChange={this.onStackValueChange}
                 onStackCheckChange={this.onStackCheckChange}
+                onGroupByCheckChange={this.onGroupByCheckChange}
                 updateBlockConfig={this.updateBlockConfig}
                 plotData={this.props.plotData}
                 currentBlock={this.props.currentBlock}
@@ -277,45 +320,54 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
 
 
         {["area", "bar"].includes(configStyle.graphType) &&
-          <>
-            <h3>Stack</h3>
-            <Row>
-              <Col span={2} className={'checkbox-col'}>
-                <Checkbox
-                  onChange={this.onStackCheckChange}
-                  checked={configStyle.stack.isStack}
-                />
-              </Col>
-              <Col span={6} className={'checkbox-col-label'}>
-                <label>Stack by ... </label>
-              </Col>
-              <Col span={9} className={'checkbox-col-label'}>
-                <Select
-                  placeholder="Select"
-                  value={metaData[configStyle.stack.value]?.length > 1 ? configStyle.stack.value : null}
-                  onChange={this.onStackValueChange}
-                  notFoundContent={(
-                    <div>
-                      <ExclamationCircleOutlined />
-                      <p>Item not found.</p>
-                    </div>
-                  )}
-                  allowClear
-                  disabled={!configStyle.stack.isStack}
-                  dropdownMatchSelectWidth={true}
-                >
-                  {this.props.optionsLabel.map((value) => {
-                    if (metaData[value].length > 1) return (
-                      <Option key={value} value={value}>
-                        {value}
-                      </Option>
-                    )
-                  }
-                  )}
-                </Select>
-              </Col>
-            </Row>
-          </>
+            <>
+              <h3>Stack/Group</h3>
+              <Row className="mb-10">
+                <Col span={2} className={'checkbox-col'}>
+                  <Checkbox
+                      onChange={this.onStackCheckChange}
+                      checked={configStyle.stack.isStack}
+                  />
+                </Col>
+                <Col span={3} className={'checkbox-col-label'}>
+                  <label>Stack</label>
+                </Col>
+                <Col span={2} className={'checkbox-col'}>
+                  <Checkbox
+                      onChange={this.onGroupByCheckChange}
+                      checked={configStyle.stack.isGroupBy}
+                  />
+                </Col>
+                <Col span={3} className={'checkbox-col-label'}>
+                  <label>Group</label>
+                </Col>
+                <Col span={9} className={'checkbox-col-label'}>
+                  <Select
+                      placeholder="Select"
+                      value={metaData[configStyle.stack.value]?.length > 1 ? configStyle.stack.value : null}
+                      onChange={this.onStackValueChange}
+                      notFoundContent={(
+                          <div>
+                            <ExclamationCircleOutlined/>
+                            <p>Item not found.</p>
+                          </div>
+                      )}
+                      allowClear
+                      disabled={!configStyle.stack.isStack && !configStyle.stack.isGroupBy}
+                      dropdownMatchSelectWidth={true}
+                  >
+                    {this.props.optionsLabel.map((value) => {
+                          if (metaData[value].length > 1) return (
+                              <Option key={value} value={value}>
+                                {value}
+                              </Option>
+                          )
+                        }
+                    )}
+                  </Select>
+                </Col>
+              </Row>
+            </>
         }
 
         {["line", "area", "bar"].includes(configStyle.graphType) &&
@@ -423,6 +475,38 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
         <Row className="mb-10">
           <Col span={2} className={'checkbox-col'}>
             <Checkbox
+                onChange={this.onYAxisCustomRangeChange}
+                checked={configStyle.YAxis.useCustomRange}
+            />
+          </Col>
+          <Col span={16} className={'checkbox-col-label'}>
+            <label>Custom Y axis range</label>
+          </Col>
+        </Row>
+        <Row className="mb-10">
+          <Col span={2} />
+          <Col span={8}>
+            <InputNumber
+                className="width-100"
+                placeholder="Left"
+                onChange={this.onYRangeMinChange}
+                value={configStyle.YAxis.min}
+                disabled={!configStyle.YAxis.useCustomRange}
+            />
+          </Col>
+          <Col span={8} className="ml-20">
+            <InputNumber
+                className="width-100"
+                placeholder="Right"
+                onChange={this.onYRangeMaxChange}
+                value={configStyle.YAxis.max}
+                disabled={!configStyle.YAxis.useCustomRange}
+            />
+          </Col>
+        </Row>
+        <Row className="mb-10">
+          <Col span={2} className={'checkbox-col'}>
+            <Checkbox
               onChange={this.onCustomRangeChange}
               checked={configStyle.XAxis.useCustomRange}
             />
@@ -491,7 +575,7 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
             </Row>
 
             {!(
-                configStyle.graphType == "bar" && configStyle.stack.isStack && !!configStyle.stack.value
+                configStyle.graphType == "bar" && (configStyle.stack.isStack || configStyle.stack.isGroupBy) && !!configStyle.stack.value
             ) &&  <>
                 <Row>
                   <Col span={2}/>
@@ -505,8 +589,28 @@ export default class DataBlockVisualizationEditor extends Component<any, any> {
                   <Checkbox.Group options={this.legendOptions()} value={defaultLegendOptions} onChange={this.onLegendContentChange} />
                   </Col>
                 </Row>
+
               </>
-            }          </>}
+            }
+            </>
+        }
+
+        {this.isShowGraphConfig(configStyle.graphType) &&
+          <>
+            <Row>
+              <Col span={2}/>
+              <Col span={8}>
+                <label>Legend position:</label>
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <Radio.Group options={this.legendPositions()} value={configStyle.legendPosition} onChange={this.onLegendPositionChange} />
+              </Col>
+            </Row>
+          </>
+        }
+
         {configStyle.graphType != "table" &&
           <>
             <h3>Colorscale</h3>

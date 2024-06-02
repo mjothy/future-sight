@@ -81,43 +81,73 @@ export default class PlotlyUtils {
         const XAxisConfig = configStyle.XAxis
         const data = JSON.parse(JSON.stringify(plotData))
 
-        if (XAxisConfig.useCustomRange && XAxisConfig.left && XAxisConfig.right) {
-            for (let i = 0; i < data.length; i++) {
-                const dataElement = data[i]
-                const dataPoints = [...dataElement.data]
-                dataElement.data = dataPoints.filter(
-                    (dataPoint) =>
-                        (XAxisConfig.left || 0) <= dataPoint.year &&
-                        dataPoint.year <= (XAxisConfig.right || 0))
+        if (XAxisConfig.useCustomRange) {
+            const left = XAxisConfig.left ?? 0;
+            const right = XAxisConfig.right ?? 0;
+            if(left > 1900 && right >= left){
+                for (let i = 0; i < data.length; i++) {
+                    const dataElement = data[i]
+                    const dataPoints = [...dataElement.data]
+                    dataElement.data = dataPoints.filter(
+                        (dataPoint) =>
+                            left <= dataPoint.year &&
+                            dataPoint.year <= right)
+                }
             }
+
+            if (XAxisConfig.timestep != null) {
+                this.addTimestep(data, XAxisConfig.timestep, left > 1900 ? left : null, (left > 1900 && right >= left) ? right : null);
+            }
+
         }
-
-        this.addTimestep(data, XAxisConfig);
-
         return data
     }
 
-    static addTimestep(data, XAxisConfig) {
-        if (XAxisConfig.useCustomRange) {
-            const step = XAxisConfig.timestep;
-            if (step != null) {
-                data.forEach(timeSerie => {
-                    const years = timeSerie.data.map(e => e.year)
-                    const years_step: number[] = [];
-                    if (years.length > 0) {
-                        const min = years[0];
-                        const max = years[years.length - 1]
-                        for (let i = min; i <= max; i = i + step) {
-                            years_step.push(i);
-                        }
-                    }
+    static addTimestep(data, step, yearLeft, yearRight) {
 
-                    if (years_step.length > 0) {
-                        timeSerie.data = timeSerie.data.filter(e => years_step.includes(e.year));
-                    }
-                })
+        data.forEach(timeSerie => {
+            const years = timeSerie.data.map(e => e.year)
+            const years_step: number[] = [];
+            if (years.length > 0) {
+                const min = yearLeft ?? years[0];
+                const max = yearRight ?? years[years.length - 1]
+                for (let i = min; i <= max; i = i + step) {
+                    years_step.push(i);
+                }
+            }
+
+            if (years_step.length > 0) {
+                timeSerie.data = timeSerie.data.filter(e => years_step.includes(e.year));
+            }
+        })
+    }
+
+    /**
+     * Show only data points between max and min selected values (min and max are configurable)
+     * for plotly plots, this part is implemented using range attribute in plot layout config
+     * This methode is useful only for type=table
+     * @param plotData data with time series {model, scenario, ... , data:{year, value}}
+     * @param configStyle plot configuration
+     */
+    static filterByCustomYRange = (plotData: PlotDataModel[], configStyle: BlockStyleModel) => {
+        const YAxisConfig = configStyle.YAxis
+        const data = JSON.parse(JSON.stringify(plotData))
+
+        if (YAxisConfig.useCustomRange) {
+            const min = YAxisConfig.min;
+            const max = YAxisConfig.max;
+            if(min || max){
+                for (let i = 0; i < data.length; i++) {
+                    const dataElement = data[i]
+                    const dataPoints = [...dataElement.data]
+                    dataElement.data = dataPoints.filter(
+                        (dataPoint) =>
+                            (min || dataPoint.value) <= dataPoint.value &&
+                            dataPoint.value <= (max || dataPoint.value))
+                }
             }
         }
+        return data
     }
 
     static ySumByYear = (data) => {

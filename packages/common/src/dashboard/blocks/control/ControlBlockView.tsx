@@ -70,12 +70,12 @@ export default class ControlBlockView extends Component<any, any> {
   selectDropDown = (option) => {
     const metaData = this.props.currentBlock.config.metaData;
     const optionLabel = this.props.currentBlock.config.configStyle.subtitle[option].isCustom ?
-      this.props.currentBlock.config.configStyle.subtitle[option].value :
-      option
+      this.props.currentBlock.config.configStyle.subtitle[option].value : option;
+    const config = this.props.currentBlock.config.configStyle;
     return (
       <div className="control-block-row" key={option}>
         <h4 className="control-block-subtitle"> {optionLabel}: </h4>
-        <SelectInput
+        <SelectInput disableMultiSelect={config.disableMultiSelect}
           type={option}
           isClosable={true}
           label={optionLabel}

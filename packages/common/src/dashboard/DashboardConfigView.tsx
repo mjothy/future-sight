@@ -185,7 +185,12 @@ class DashboardConfigView extends Component<any, any> {
      * Check if fetched data has any deprecated version, and update metadata if has one
      */
     checkDeprecatedVersion = (data: PlotDataModel[]) => {
-        return !data?.every((plotData) => plotData.run.is_default);
+        if(data == null)
+            return
+        if(data.length <= 0)
+            return
+
+        return !data.every((plotData) => plotData.run.is_default);
     }
 
     getDeprecatedWarning = (block) => {

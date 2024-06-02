@@ -175,7 +175,7 @@ class DashboardDataConfiguration extends Component<
     const toRender = (readonly ? (
       <ReadOnlyDashboard
         shareButtonOnClickHandler={() => Utils.copyToClipboard()}
-        embedButtonOnClickHandler={() => Utils.copyToClipboard(undefined, "&embedded")}
+        embedButtonOnClickHandler={() => Utils.copyToClipboardEmbed(undefined, "&embedded")}
         blockData={this.blockData}
         // filters={this.state.filters}
         plotData={this.state.plotData}

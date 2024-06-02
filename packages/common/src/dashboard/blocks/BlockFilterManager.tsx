@@ -20,13 +20,13 @@ export default class BlockFilterManager extends Component<any, any> {
             /**
              * Data options in dropDown Inputs
              */
+            // TODO add state for categorie
             optionsData: this.initOptionsData(metadata),
             missingData: {
                 regions: [],
                 variables: [],
                 scenarios: [],
-                models: [],
-                categories: []
+                models: []
             },
             staleFilters: {
                 regions: true,
@@ -34,6 +34,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 scenarios: true,
                 models: true
             },
+            currentOpenedFilter: null,
             isLoadingOptions: {
                 regions: false,
                 variables: false,
@@ -64,7 +65,6 @@ export default class BlockFilterManager extends Component<any, any> {
             variables: metadata["variables"],
             scenarios: metadata["scenarios"],
             models: metadata["models"],
-            categories: metadata["categories"],
             versions: this.initVersionOptions(metadata["versions"])
         }
 
@@ -86,7 +86,7 @@ export default class BlockFilterManager extends Component<any, any> {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (
-            this.props.plotData[this.props.currentBlock.id]?.length != prevProps.plotData[this.props.currentBlock.id]?.length
+            JSON.stringify(this.props.plotData[this.props.currentBlock.id]) !== JSON.stringify(prevProps.plotData[this.props.currentBlock.id])
         ) {
             this.updateMissingData();
         }
@@ -217,59 +217,66 @@ export default class BlockFilterManager extends Component<any, any> {
 
         // onOpen if filter is stale, fetch data
         if (isOpening) {
-            this.setState({ currentSelection: config.metaData[filterId] })
-            const staleFilters = { ...this.state.staleFilters }
-            if (staleFilters[filterId]) {
-                await this.updateFilterOptions(filterId)
-                staleFilters[filterId] = false
-                this.setState({ staleFilters })
+
+            if(this.state.currentOpenedFilter == null){
+                this.setState({ currentSelection: config.metaData[filterId], currentOpenedFilter: filterId }, async () => {
+                    const staleFilters = {...this.state.staleFilters}
+                    if (staleFilters[filterId]) {
+                        await this.updateFilterOptions(filterId)
+                        staleFilters[filterId] = false
+                        this.setState({staleFilters})
+                    }
+                })
             }
+
         }
 
         // onClose
         else {
-            let selectOrder = config.metaData.selectOrder
+            this.setState({currentOpenedFilter: null}, async () => {
+                let selectOrder = config.metaData.selectOrder
 
-            // add selected filter to selectOrder array
-            if (config.metaData[filterId].length > 0 && !selectOrder.includes(filterId)) {
-                selectOrder = Array.from(
-                    new Set<string>([...config.metaData.selectOrder, filterId])
-                );
-                dashboard.blocks[this.props.currentBlock.id].config.metaData.selectOrder = selectOrder
-                await this.props.updateDashboard(dashboard);
-            }
-
-            // Check added and deleted options from selection
-            if (config.metaData[filterId].length != this.state.currentSelection.length) {
-                const staleFilters = { ...this.state.staleFilters }
-                const selectOrderIndex = selectOrder.indexOf(filterId)
-
-                // - higher idx filters
-                for (const tempFilterId of selectOrder.slice(selectOrderIndex + 1)) {
-                    staleFilters[tempFilterId] = true
+                // add selected filter to selectOrder array
+                if (config.metaData[filterId].length > 0 && !selectOrder.includes(filterId)) {
+                    selectOrder = Array.from(
+                        new Set<string>([...config.metaData.selectOrder, filterId])
+                    );
+                    dashboard.blocks[this.props.currentBlock.id].config.metaData.selectOrder = selectOrder
+                    await this.props.updateDashboard(dashboard);
                 }
 
-                // Update unselected filter to stale
-                for (const tempFilterId of Object.keys(staleFilters).filter((x) => !selectOrder.includes(x))) {
-                    staleFilters[tempFilterId] = true
+                // Check added and deleted options from selection
+                if (config.metaData[filterId].length != this.state.currentSelection.length) {
+                    const staleFilters = {...this.state.staleFilters}
+                    const selectOrderIndex = selectOrder.indexOf(filterId)
+
+                    // - higher idx filters
+                    for (const tempFilterId of selectOrder.slice(selectOrderIndex + 1)) {
+                        staleFilters[tempFilterId] = true
+                    }
+
+                    // Update unselected filter to stale
+                    for (const tempFilterId of Object.keys(staleFilters).filter((x) => !selectOrder.includes(x))) {
+                        staleFilters[tempFilterId] = true
+                    }
+                    this.setState({staleFilters: staleFilters})
+
+                    // Update versions if model or scenario modified
+                    const updatedFilters = selectOrder.slice(selectOrderIndex)
+                    if (
+                        ["models", "scenarios"].some(item => updatedFilters.includes(item))
+                        && ["models", "scenarios"].every(item => selectOrder.includes(item))
+                    ) {
+                        await this.updateFilterOptions("versions")
+                        // TODO update currentBlock.metadata.versions
+                    }
+
+                    /*for (const tempFilterId of selectOrder.slice(selectOrderIndex + 1)) {
+                        await this.updateFilterOptions(tempFilterId)
+                    }*/
+
                 }
-                this.setState({ staleFilters: staleFilters })
-
-                // Update versions if model or scenario modified
-                const updatedFilters = selectOrder.slice(selectOrderIndex)
-                if (
-                    ["models", "scenarios"].some(item => updatedFilters.includes(item))
-                    && ["models", "scenarios"].every(item => selectOrder.includes(item))
-                ) {
-                    await this.updateFilterOptions("versions")
-                    // TODO update currentBlock.metadata.versions
-                }
-
-                /*for (const tempFilterId of selectOrder.slice(selectOrderIndex + 1)) {
-                    await this.updateFilterOptions(tempFilterId)
-                }*/
-
-            }
+            })
         }
     };
 
@@ -377,9 +384,7 @@ export default class BlockFilterManager extends Component<any, any> {
     }
 
     isAllSelected = () => {
-        const selectedOrder = this.props.currentBlock.config.metaData.selectOrder;
-        const obligatory = selectedOrder.filter(key => key != "categories");
-        return obligatory.length == 4
+        return this.props.currentBlock.config.metaData.selectOrder.length == 4
     }
 
     onShowNonDefaultRuns = (e) => {
@@ -406,11 +411,13 @@ export default class BlockFilterManager extends Component<any, any> {
                 isLoadingOptions={this.state.isLoadingOptions}
                 onChange={this.onChange}
                 onDropdownVisibleChange={this.onDropdownVisibleChange}
+                currentOpenedFilter={this.state.currentOpenedFilter}
                 onUseVersionSwitched={this.onUseVersionSwitched}
                 onVersionSelected={this.onVersionSelected}
                 setStaleFiltersFromSelectOrder={this.setStaleFiltersFromSelectOrder}
                 isAllSelected={this.isAllSelected}
                 onShowNonDefaultRuns={this.onShowNonDefaultRuns}
+                initVersionOptions={this.initVersionOptions}
             />
         ) : (
             <ControlBlockEditor
@@ -421,6 +428,7 @@ export default class BlockFilterManager extends Component<any, any> {
                 onChange={this.onChange}
                 onDropdownVisibleChange={this.onDropdownVisibleChange}
                 setStaleFiltersFromSelectOrder={this.setStaleFiltersFromSelectOrder}
+                currentOpenedFilter={this.state.currentOpenedFilter}
             />
         );
     }

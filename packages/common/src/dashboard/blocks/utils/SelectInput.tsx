@@ -15,11 +15,13 @@ interface SelectOptionProps {
     isClear?: boolean;
     onClear?: (type, e) => void;
     onDropdownVisibleChange?: (option: string, e: any) => void;
+    enabled?: boolean;
     onDeselect?: (type: string, selectedData: string[]) => void;
     loading?: boolean;
     className?: string;
     isClosable?: boolean;
     regroupOrphans?: string;
+    disableMultiSelect?: boolean;
 }
 
 const COLORS = ['red', 'blue', 'green', 'yellow'];
@@ -42,7 +44,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
 
             // Set the first element
             if (!currentNode) {
-                const checkable = (values.length === 1 || this.props.type == "categories"); // Set only Leafs as checkable
+                const checkable = (values.length === 1); // Set only Leafs as checkable
                 currentNode = { title: values[0], label: values[0], key: values[0], value: values[0], children: [], checkable };
                 if (values.length === 1 && this.props.regroupOrphans) {
                     // Regroup orphan nodes under single parent if option enabled
@@ -66,7 +68,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
             for (let i = 1; i < values.length; i++) {
                 let childNode = currentNode.children.find((node) => node.label === values[i]);
                 if (!childNode) {
-                    const checkable = (i === values.length - 1 || this.props.type == "categories"); // Set only Leafs as checkable
+                    const checkable = (i === values.length - 1); // Set only Leafs as checkable
                     const value = values.slice(0, i + 1).join('|');
                     childNode = { title: values[i], label: values[i], key: value, value, children: [], checkable };
                     currentNode.children.push(childNode);
@@ -114,6 +116,14 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         this.setState({ searchValue });
     }
 
+    onChange = (selectedData: string[]) => {
+        let data = selectedData;
+        if(this.props.disableMultiSelect && data.length > 0){
+            data = data.slice(-1);
+        }
+        this.props.onChange(this.props.type, data.map((element: any) => element.value != null ? element.value : element));// when TreeSelect selecteData is object {value, key}
+    }
+
     /**
      * Customize TreeSelect component
      * @returns TreeSelect
@@ -126,9 +136,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 loading={this.props.loading}
                 treeCheckable={true}
                 placeholder={this.props.label || this.props.type}
-                onChange={(selectedData: any[]) =>
-                    this.props.onChange(this.props.type, selectedData.map((data: any) => data.value != null ? data.value : data))
-                }
+                onChange={this.onChange}
                 treeData={this.props.loading ? undefined : this.splitOptions(this.props.options)}
                 tagRender={(props) => this.tagRender(props, true)}
                 treeCheckStrictly={true}
@@ -137,6 +145,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 onDropdownVisibleChange={(e) =>
                     this.props.onDropdownVisibleChange?.(this.props.type, e)
                 }
+                disabled={this.props.enabled == false}
                 onDeselect={(selectedData) => this.props.onDeselect?.(this.props.type, selectedData.map((data: any) => data.value))}
                 dropdownMatchSelectWidth={false}
                 notFoundContent={(this.props.loading) ? (
@@ -195,13 +204,12 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
     treeSelectLeafOnly = () => {
         return <Input.Group compact>
             <TreeSelect
+                treeDataSimpleMode={ this.props.disableMultiSelect }
                 value={this.props.value}
                 loading={this.props.loading}
                 treeCheckable={true}
                 placeholder={this.props.label || this.props.type}
-                onChange={(selectedData: any[]) =>
-                    this.props.onChange(this.props.type, selectedData.map((data: any) => data.value != null ? data.value : data))
-                }
+                onChange={this.onChange}
                 tagRender={(props) => this.tagRender(props, false)} // false: show only the value of selected leaf
                 showCheckedStrategy={"SHOW_CHILD"}
                 className={"fsselectinput " + this.props.className}
@@ -241,21 +249,20 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
         return (
             <Input.Group compact>
                 <Select
-                    mode="multiple"
+                    mode={"multiple"}
                     className={"fsselectinput " + this.props.className}
                     dropdownRender={this.dropdownRender} // TODO
                     tagRender={(props) => this.tagRender(props, true)} // TODO
                     placeholder={this.props.label || this.props.type}
                     value={this.props.value}
                     loading={this.props.loading}
-                    onChange={(selectedData) => {
-                        return this.props.onChange(this.props.type, selectedData)
-                    }}
+                    onChange={this.onChange}
                     // on close: save data
                     onDropdownVisibleChange={(e) => {
                         return this.props.onDropdownVisibleChange?.(this.props.type, e)
                     }
                     }
+                    disabled={this.props.enabled == false}
                     dropdownMatchSelectWidth={false}
                     notFoundContent={(this.props.loading) ? (
                         <div>
@@ -289,7 +296,6 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
 
     render() {
         switch (this.props.type) {
-            case "categories": return this.treeSelectLeafOnly();
             case "variables":
             case "regions": return this.treeSelect();
             default: return this.defaultSelect();

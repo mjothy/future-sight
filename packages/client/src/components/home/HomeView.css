@@ -4,6 +4,12 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  overflow-y: auto;
+  padding: 20px 40px;
+}
+
+.home-view-wrapper .content{
+  width: 95%;
 }
 
 .create-container {
@@ -11,7 +17,7 @@
   flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
-  width: 75%;
+  width: 100%;
 }
 
 .drafts {
@@ -27,4 +33,8 @@
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
+}
+
+.home-header, h3{
+  text-align: center;
 }

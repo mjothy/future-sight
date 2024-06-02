@@ -3,10 +3,13 @@ export default class BlockStyleModel {
   showLegend = false;
   showDeprecatedVersionWarning = true;
   YAxis = {
-    label: false,
-    unit: false,
+    label: true,
+    unit: true,
     force0: false,
-    percentage: false
+    percentage: false,
+    useCustomRange: false,
+    min: null,
+    max: null
   };
   legend = {
     Model: false,
@@ -15,6 +18,7 @@ export default class BlockStyleModel {
     Variable: false,
     Version: false,
   };
+  legendPosition = 'right';
   title = {
     value: 'Title',
     isVisible: true,
@@ -33,10 +37,6 @@ export default class BlockStyleModel {
       value: ""
     },
     variables: {
-      isCustom: false,
-      value: ""
-    },
-    categories: {
       isCustom: false,
       value: ""
     }
@@ -65,6 +65,7 @@ export default class BlockStyleModel {
     showSubtitle: true
   };
   showBoxPoints = false;
+  disableMultiSelect = true;
   colorscale = [
     "#1f77b4",
     "#ff7f0e",

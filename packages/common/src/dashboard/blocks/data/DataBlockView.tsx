@@ -6,7 +6,7 @@ import PlotlyUtils from '../../graphs/PlotlyUtils';
 import * as _ from 'lodash';
 import PlotDataModel from "../../../models/PlotDataModel";
 import withColorizer from "../../../hoc/colorizer/withColorizer";
-import { stackGroups } from '../utils/StackGraphs';
+import {groupByGroups, stackGroups} from '../utils/StackGraphs';
 import PieView from "./graphType/pie/PieView";
 import BoxView from "./graphType/box/BoxView";
 
@@ -24,7 +24,7 @@ class DataBlockView extends Component<any, any> {
     }
 
     // Check updated plotData (we need to check this because component render before fetch finish)
-    if (this.props.timeseriesData?.length != nextProps.timeseriesData?.length) {
+    if (JSON.stringify(this.props.timeseriesData) !== JSON.stringify(nextProps.timeseriesData)) {
       shouldUpdate = true;
     }
 
@@ -35,6 +35,8 @@ class DataBlockView extends Component<any, any> {
   getPlotData = () => {
     let data: PlotDataModel[] = this.props.timeseriesData;
     data = PlotlyUtils.filterByCustomXRange(data, this.props.currentBlock.config.configStyle)
+    data = PlotlyUtils.filterByCustomYRange(data, this.props.currentBlock.config.configStyle)
+    data = data.filter(element => element.data?.length > 0); // IMPORTANT: to not add plot for scenarios without data
     return data
   }
 
@@ -62,8 +64,18 @@ class DataBlockView extends Component<any, any> {
           indexStackBy = configStyle.stack.value?.slice(0, -1)
         }
 
-        dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, indexStackBy);
+        if (configStyle.stack && configStyle.stack.isGroupBy && (configStyle.graphType === 'area' || configStyle.graphType === 'bar')) {
+          stacks = groupByGroups(currentBlock.config.metaData, configStyle.stack.value);
+          indexStackBy = configStyle.stack.value?.slice(0, -1)
+        }
+
         const indexKeys = PlotlyUtils.getIndexKeys(data)
+        let otherIndexes:any = indexKeys.filter(i => i !== indexStackBy)
+        if(otherIndexes.length <= 0){
+          otherIndexes = undefined
+        }
+        const colorIndex = configStyle.stack.isGroupBy ? (otherIndexes) : (indexStackBy ? [indexStackBy]: undefined);// if groupBy, 
+        dataWithColor = this.props.colorizer.colorizeData(data, configStyle.colorscale, colorIndex);
 
         dataWithColor?.map((dataElement) => {
           showData.push(this.preparePlotData(dataElement, configStyle, stacks, indexKeys));
@@ -83,7 +95,7 @@ class DataBlockView extends Component<any, any> {
       }
     }
 
-    if (configStyle.graphType == "bar" && configStyle.stack.isStack && !!configStyle.stack.value && stacks.length > 1) {
+    if (configStyle.graphType == "bar" && (configStyle.stack.isStack || configStyle.stack.isGroupBy ) && !!configStyle.stack.value && stacks.length > 1) {
 
       // Separate visualizeData into years to bypass plotly limitation on sorting multicategory xaxis
 
@@ -146,13 +158,23 @@ class DataBlockView extends Component<any, any> {
     ];
 
     const values: any[] = [];
+    // Generate years of column
+    let years_columns = data.reduce((acc, dataElement) => {
+      const years_de = dataElement.data.map(e => e.year) || [];
+      // @ts-ignore
+      return acc.concat(years_de);
+    }, []);
+
+    const years_set = new Set(years_columns);
+    years_columns = Array.from(years_set);
+    years_columns.sort((a, b) => a - b);
+
     data?.map((dataElement) => {
       const obj = {};
-      dataElement.data?.map((e) => {
-        obj[e.year] = e.value;
-        if (!columns_list.includes(e.year)) {
-          columns_list.push(e.year)
-        }
+
+      years_columns.map((year:string) => {
+        const dataPoint = dataElement.data?.find(e => e.year == year);
+        obj[year] = dataPoint ? Number(dataPoint.value).toFixed(2): "-";
       });
 
       values.push({
@@ -164,18 +186,22 @@ class DataBlockView extends Component<any, any> {
       });
     });
 
-    const columns = columns_list.map(col => {
+    const columns1 = columns_list.map((col, idx) => {
+        return {
+          title: col, dataIndex: col, width: 200, align:'center'
+        }
+    });
+    const columns2 = years_columns.map((col, idx) => {
       return {
-        title: col, dataIndex: col
+        title: col, dataIndex: col, width: 60, align:'center'
       }
-    })
-
-    return { columns, values };
+    });
+    return { columns: columns1.concat(columns2, [{title: "", dataIndex: "extra", width: 30, align:'center'}]), values }; // the extra column to add empty space at the end of table
   }
 
   preparePlotData = (dataElement: PlotDataModel, configStyle: BlockStyleModel, stacks?: undefined[], indexKeys: string[] = []) => {
     let obj;
-    const xyDict = this.getXY(dataElement);
+    const xyDict = this.getXY(dataElement, configStyle);
     switch (configStyle.graphType) {
       case 'line':
         obj = {
@@ -183,6 +209,7 @@ class DataBlockView extends Component<any, any> {
           mode: "lines+markers",
           x: xyDict.x,
           y: xyDict.y,
+          connectgaps: true,
           name: PlotlyUtils.getLabel(this.getLegend(dataElement, configStyle.legend, configStyle.showLegend), this.props.width, "legendtext"),
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
@@ -201,7 +228,7 @@ class DataBlockView extends Component<any, any> {
           showlegend: configStyle.showLegend,
           hovertext: this.plotHoverText(dataElement),
         };
-        if (configStyle.stack.isStack && stacks != null) {
+        if ((configStyle.stack.isStack || configStyle.stack.isGroupBy) && stacks != null) {
           // Add the current element to a stack (if it exist in stagGroups)
           // stack is array contains possible stacks [[{},{}], [{},{}]]
           if (stacks.length == 0) {
@@ -231,7 +258,7 @@ class DataBlockView extends Component<any, any> {
           hovertext: this.plotHoverText(dataElement),
           marker: { color: dataElement.color || null },
         };
-        if (configStyle.stack.isStack && stacks != null) {
+        if ((configStyle.stack.isStack || configStyle.stack.isGroupBy) && stacks != null) {
           if (stacks.length == 0) {
             obj.stackgroup = 0;
           } else {
@@ -246,14 +273,26 @@ class DataBlockView extends Component<any, any> {
               )
               if (isExist) {
 
-                if (stacks.length > 0) {
-                  obj.name = dataElement[indexStackBy];
-                  obj.legendgroup = dataElement[indexStackBy];
-                }
-                if (stacks.length > 1) {
-                  const nonStackIndex = indexKeys.filter(x => x !== indexStackBy)
-                  const groupIndexName = nonStackIndex.map(idx => dataElement[idx]).join(" - ")
-                  obj.x = [xyDict.x, new Array(xyDict.x.length).fill(groupIndexName)] // TODO change groupIndexName to stackIndexName
+                if(configStyle.stack.isStack){
+                  if (stacks.length > 0) {
+                    obj.name = dataElement[indexStackBy];
+                    obj.legendgroup = dataElement[indexStackBy];
+                  }
+                  if (stacks.length > 1) {
+                    const nonStackIndex = indexKeys.filter(x => x !== indexStackBy)
+                    const groupIndexName = nonStackIndex.map(idx => dataElement[idx]).join(" - ")
+                    obj.x = [xyDict.x, new Array(xyDict.x.length).fill(groupIndexName)] // TODO change groupIndexName to stackIndexName
+                  }
+                } else  if(configStyle.stack.isGroupBy){
+                  if (stacks.length > 0) {
+                    const nonStackIndex = indexKeys.filter(x => x !== indexStackBy)
+                    const groupIndexName = nonStackIndex.map(idx => dataElement[idx]).join(" - ")
+                    obj.name = groupIndexName;
+                    obj.legendgroup = groupIndexName;
+                  }
+                  if (stacks.length > 1) {
+                    obj.x = [xyDict.x, new Array(xyDict.x.length).fill(dataElement[indexStackBy])]
+                  }
                 }
                 obj.stackgroup = key;
               }
@@ -330,15 +369,26 @@ class DataBlockView extends Component<any, any> {
    * @param dataElement The retrieved data (from API)
    * @returns {x: x_array, y: y_array}
    */
-  getXY = (dataElement: PlotDataModel) => {
+  getXY = (dataElement: PlotDataModel, configStyle) => {
+    const XAxisConfig = configStyle.XAxis
+    const step = XAxisConfig.timestep ? XAxisConfig.timestep : 1;
     const x: any[] = [];
-    const y: any[] = []
-    dataElement.data?.map((d) => {
-      if (d.value !== "") {
-        x.push(d.year)
-        y.push(d.value)
+    const y: any[] = [];
+    if(XAxisConfig.useCustomRange && XAxisConfig.left > 1900 && XAxisConfig.right >= XAxisConfig.left){
+      for (let year = XAxisConfig.left; year <= XAxisConfig.right; year = year + step) {
+        x.push(year);
+        const obj = dataElement.data?.find(e => e.year == year);
+        y.push(obj ? obj.value : null);
       }
-    });
+    } else {
+      dataElement.data?.map((d) => {
+        if (d.value !== "") {
+          x.push(d.year)
+          y.push(d.value)
+        }
+      });
+    }
+
     return { x, y };
   };
 
@@ -360,7 +410,7 @@ class DataBlockView extends Component<any, any> {
       }
     }
 
-    if (configStyle.graphType == "bar" && configStyle.stack.isStack) {
+    if (configStyle.graphType == "bar" && (configStyle.stack.isStack || configStyle.stack.isGroupBy)) {
       layout["orientation"] = "v"
     }
 
@@ -374,7 +424,7 @@ class DataBlockView extends Component<any, any> {
     let stackGroupSySum: { x, y }[] = [];
     let isTwoXAxis = false;
 
-    if (!configStyle.stack.isStack || configStyle.graphType == "line") {
+    if ((!configStyle.stack.isStack && !configStyle.stack.isGroupBy) || configStyle.graphType == "line") {
       data.forEach(dataElement => {
         const result = dataElement.x.map((value, index) => {
           return { x: value, y: dataElement.y[index] };
@@ -396,6 +446,7 @@ class DataBlockView extends Component<any, any> {
         line: {
           dash: 'dot'
         },
+        connectgaps: true,
         showlegend: configStyle.showLegend,
         marker: { color: "black" },
         name: configStyle.aggregation.label,

@@ -5,6 +5,5 @@ export default class OptionsDataModel {
     scenarios: string[] = [];
     models: string[] = [];
     versions: any[] = [];
-    categories?: string[] = [];
 
 }

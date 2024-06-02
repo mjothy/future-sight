@@ -15,13 +15,13 @@ export default class Colorizer {
      * Add color to each element of the data array
      * @returns PlotDataModel[]
      */
-    colorizeData = (data: PlotDataModel[], colorset: string[], customIndex?: string) => {
+    colorizeData = (data: PlotDataModel[], colorset: string[], customIndex?: string[]) => {
         if (data.length === 0) {
             return data
         }
 
         let indexKeys: string[] = customIndex
-            ? [customIndex]
+            ? customIndex
             : PlotlyUtils.getIndexKeys(data, this.dataFilterKeys)
 
         if (indexKeys.length === 0 && this.defaultIndex) {
