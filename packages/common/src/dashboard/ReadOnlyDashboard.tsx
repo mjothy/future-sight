@@ -117,7 +117,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                 size="small"
                 shape="circle"
                 icon={<DownloadOutlined />}
-                onClick={download}
+                onClick={downloadAsCSV}
             />,
             <Button
                 key="toImg"
