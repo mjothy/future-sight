@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-extra-boolean-cast */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { CheckCircleOutlined, DownCircleOutlined, LinkOutlined, MessageOutlined, PicCenterOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, DownCircleOutlined, FileImageOutlined, LinkOutlined, MessageOutlined, PicCenterOutlined } from '@ant-design/icons';
 import { Button, PageHeader, Spin, Tag, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
@@ -12,6 +12,7 @@ import GetGeoJsonContextProvider from '../services/GetGeoJsonContextProvider';
 import DashboardConfigView from './DashboardConfigView';
 import { Parser } from '@json2csv/plainjs';
 import dashboardToCsv from "../services/dashboardToCsv";
+import { toSvg } from 'html-to-image';
 
 /*TODO Check that embedded and published view have the same purpose and always look ok,
 * For instance, do we want full width with scrolling when in published view
@@ -53,7 +54,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
         setDashboard({ ...updatedDashboard });
     };
 
-    const download = () => {
+    const downloadAsCSV = () => {
         const opts = {};
         const parser = new Parser(opts);
         const csvJson = dashboardToCsv(props.plotData)
@@ -66,6 +67,21 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
         document.body.appendChild(link);
         link.click();
         link.remove();
+    }
+
+    const toImg = () => {
+        let dashboard_node = document.getElementById("dashboard-content")
+        if (dashboard_node) {
+            toSvg(dashboard_node).then((dataUrl) => {
+                let link = document.createElement("a");
+                let name = dashboard?.userData.title;
+                link.setAttribute('download', name + ".svg");
+                link.href = dataUrl;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            })
+        }
     }
 
     const getExtras = () => {
@@ -92,11 +108,18 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                 key="download"
                 type="default"
                 size="small"
+                shape="circle"
                 icon={<DownCircleOutlined />}
-                onClick={download}
-            >
-                Download data
-            </Button>
+                onClick={downloadAsCSV}
+            />,
+            <Button
+                key="toImg"
+                type="default"
+                size="small"
+                shape="circle"
+                icon={<FileImageOutlined />}
+                onClick={toImg}
+            />
         ]
         if (dashboard?.userData.forum) {
             const forumLink = (
@@ -169,9 +192,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                     avatar={{ alt: 'logo-short', shape: 'square', size: 'large' }}
                 />
             )}
-            <div className="dashboard-content">
-                {(isLoading || !dashboard) && <Spin />}
-                {/*<div className="dashboard-content" style={{width: `${TEST_RATIO*100}vh`}}>*/}
+            <div className="dashboard-content" id="dashboard-content">
                 {(isLoading || !dashboard) && <Spin />}
                 {dashboard && (
                     <GetGeoJsonContextProvider getGeoJson={props.dataManager.fetchRegionsGeojson}>

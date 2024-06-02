@@ -36,17 +36,18 @@
     "craco-less": "^2.0.0",
     "html2canvas": "^1.4.1",
     "plotly.js": "^2.12.1",
+    "postcss-normalize": "^10.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-grid-layout": "^1.3.4",
     "react-plotly.js": "^2.5.1",
     "react-router-dom": "^6.3.0",
-    "react-scripts": "4.0.3",
+    "react-scripts": "^5.0.1",
     "web-vitals": "^2.1.0"
   },
   "scripts": {
     "dev": "craco start",
-    "build": "craco build",
+    "build": "craco --openssl-legacy-provider build",
     "test": "craco test",
     "eject": "craco eject",
     "analyze": "source-map-explorer 'build/static/js/*.js'"

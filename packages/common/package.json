@@ -31,6 +31,8 @@
     "@mapbox/geo-viewport": "^0.5.0",
     "@turf/turf": "^6.5.0",
     "@uiw/react-md-editor": "^3.18.1",
+    "downloadjs": "^1.4.7",
+    "html-to-image": "^1.11.11",
     "prop-types": "^15.8.1",
     "react-colorscales": "^0.7.3",
     "rehype-parse": "^8.0.4",

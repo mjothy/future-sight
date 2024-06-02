@@ -16,7 +16,7 @@
     },
     "ecmaVersion": "latest"
   },
-  "plugins": ["react", "@typescript-eslint"],
+  "plugins": ["@typescript-eslint"],
   "rules": {
     "react/react-in-jsx-scope": "off",
     "no-use-before-define": "off",
