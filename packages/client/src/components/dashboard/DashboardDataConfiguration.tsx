@@ -48,10 +48,17 @@ class DashboardDataConfiguration extends Component<
        * PlotData of selected values in metaData of current block
        */
       plotData: {},
-      loadingControlBlock: {
-
-      }
+      /**
+       * documentation strings for each dimension / options available (regions, models...)
+       */
+      docData: {},
+      loadingControlBlock: {}
     };
+  }
+
+  async componentDidMount() {
+    const initialDocData = await this.props.dataManager.fetchDocData()
+    this.setState({docData: initialDocData})
   }
 
   saveData = async (id: string, username: string, password: string, image?: string) => {

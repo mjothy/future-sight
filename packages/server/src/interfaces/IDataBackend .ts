@@ -31,6 +31,11 @@ export default interface IDataBackend {
     getFilteredData: (filterId, metaData?: any, dataFocus?: any) => any | Promise<any>;
 
     /**
+     * Retreive documentation data associated to options
+     */
+    getDocData: () => any| Promise<any>;
+
+    /**
      * Meta indicators
      */
     getMeta:() => any | Promise<any>;

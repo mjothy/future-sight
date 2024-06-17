@@ -20,6 +20,8 @@ export default interface IDataManager {
 
   getOptions: () => any;
 
+  fetchDocData: () => Promise<any>;
+
   fetchFilterOptions: (data: any) => Promise<any>;
 
   fetchMeta : () => Promise<any>;

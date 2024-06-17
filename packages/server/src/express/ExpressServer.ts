@@ -87,6 +87,20 @@ export default class ExpressServer {
       res.send(this.dataProxy.getFilters());
     });
 
+    this.app.post('/api/docData', async (req, res) => {
+      try {
+        const response = await this.dataProxy.getDocData();
+        res.status(200).send(response);
+      } catch (error: any) {
+        if (error.status == 401) {
+          res.status(401).send({ message: error.message });
+        } else {
+          console.error(error);
+          res.status(error.status ? error.status : 500).send({ message: "No documentation found for filters" });
+        }
+      }
+    });
+
     this.app.post('/api/plotData', async (req, res) => {
       try {
         const selectedData: DataModel[] = req.body;

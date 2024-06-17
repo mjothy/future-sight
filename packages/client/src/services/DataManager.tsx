@@ -6,6 +6,10 @@ export default class DataManager implements IDataManager {
     return '/api';
   }
 
+  fetchDocData = async () : Promise<any> => {
+    return await this.sendRequest("api/docData");
+  }
+
   fetchPlotData = async (data: DataModel[]): Promise<PlotDataModel[]> => {
     return await this.sendRequest(`api/plotData`, data);
   };
