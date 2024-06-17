@@ -83,6 +83,11 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         return filteredValues;
     };
 
+    getDocData = async () => {
+        const reponse = this.patchPromise("/docs/regions", undefined, true, "GET")
+        return reponse;
+    }
+
     getTimeSeries = async (selectedData: DataModel[]) => {
         const timeSeries: TimeSerieObject[] = [];
         const runIds = selectedData.map(obj => obj.run?.id);

@@ -48,6 +48,10 @@ class DashboardDataConfiguration extends Component<
        * PlotData of selected values in metaData of current block
        */
       plotData: {},
+      /**
+       * documentation strings for each dimension / options available (regions, models...)
+       */
+      docData: this.props.dataManager.fetchDocData(),
       loadingControlBlock: {
 
       }
