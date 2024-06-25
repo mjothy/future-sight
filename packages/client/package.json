@@ -46,7 +46,7 @@
     "web-vitals": "^2.1.0"
   },
   "scripts": {
-    "dev": "craco start",
+    "dev": "craco --max_old_space_size=4096 start",
     "build": "craco --openssl-legacy-provider build",
     "test": "craco test",
     "eject": "craco eject",
