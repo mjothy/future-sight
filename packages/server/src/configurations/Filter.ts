@@ -202,7 +202,7 @@ export default class Filter {
         if(plotData.runs?.length <= 0  || plotData.regions?.length <= 0 || plotData.variables?.length <= 0){
             return null;
         }
-        requestBody.run = { id__in: plotData.runs}
+        requestBody.run = { id__in: plotData.runs, default_only: false}
         requestBody.region = { name__in: plotData.regions};
         requestBody.variable = { name__in: plotData.variables };
 
@@ -278,10 +278,8 @@ export default class Filter {
         const selectedFilterData = {};
         if (filtersToApply.length > 0) {
             filtersToApply.forEach(key => selectedFilterData[key] = selectedData[key]);
-            return selectedFilterData;
-        } else {
-            return selectedFilterData;
         }
+        return selectedFilterData;
     }
 
     /**
