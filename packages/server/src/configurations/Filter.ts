@@ -40,13 +40,25 @@ export default class Filter {
         return Array.from(runIdsSet);
     }
 
-    static addRunsToBody = (globalSelectedData, body, filterId) => {
+    /**
+     * Add runs related to meta indicators to filter body.
+     * When (model, scenario) options are both selected,
+     * they form a list of runs that takes priority over the runs of meta indicators.
+     *
+     * @param globalSelectedData
+     * @param body
+     * @param filterId
+     */
+    static addMetaRunsToBody = (globalSelectedData, body, filterId) => {
         if(Filter.getMetaRuns(globalSelectedData)?.length > 0){
-            //id__in only in region and variable
-            if(body.run == null || body.run?.["id__in"] == null){
+            if(body.run == null){
                 body.run = {};
+            }
+            // Only add meta runs when model and scenario did not get selected already.
+            // In other words, when there are no run filter the body.
+            if (body.run?.["id__in"] == null){
                 body.run["id__in"] = this.getMetaRuns(globalSelectedData);
-            } // TODO FIX: if filterId == model or scenario, do not add runs
+            }
         }
     }
 

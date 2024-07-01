@@ -25,7 +25,6 @@ export default class BlockFilterManager extends Component<any, any> {
             /**
              * Data options in dropDown Inputs
              */
-            // TODO add state for categorie
             optionsData: this.initOptionsData(metadata),
             missingData: {
                 regions: [],

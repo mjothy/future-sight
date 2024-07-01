@@ -73,7 +73,7 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
             filteredValues["versions"] = this.prepareVersions(data);
         } else {
             const body = filter.getBody(filterId);
-            Filter.addRunsToBody(selectedData, body, filterId); // Add runs id from meta indicators if they are selected
+            Filter.addMetaRunsToBody(selectedData, body, filterId); // Add runs id from meta indicators if they are selected
             const data = await this.patchPromise(filters[filterId].path, body);
             filteredValues[filterId] = data?.map(element => element.name);
         }
