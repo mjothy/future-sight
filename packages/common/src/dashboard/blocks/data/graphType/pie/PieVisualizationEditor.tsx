@@ -48,7 +48,7 @@ export default class PieVisualizationEditor extends Component<any, any> {
 
     render() {
         const configStyle = structuredClone(this.props.currentBlock.config.configStyle)
-        const blockData = this.props.plotData[this.props.currentBlock.id]
+        const blockData = this.props.plotData[this.props.currentBlock.id] ?? []
         const availableYears = this.getAvailableYears(blockData)
         return (
             <>
