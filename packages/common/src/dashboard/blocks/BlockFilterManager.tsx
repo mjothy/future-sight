@@ -352,7 +352,7 @@ export default class BlockFilterManager extends Component<any, any> {
 
                     // - higher idx filters
                     for (const tempFilterId of selectOrder.slice(selectOrderIndex + 1)) {
-                        staleFilters[tempFilterId] = true
+                        await this.updateFilterOptions(tempFilterId)
                     }
 
                     // Update unselected filter to stale
