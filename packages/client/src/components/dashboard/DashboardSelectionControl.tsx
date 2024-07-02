@@ -192,7 +192,9 @@ export default class DashboardSelectionControl extends Component<
   /**
    * Check if data in selection (selected data) are present in Select options
    * Add default version to metadata.versions
-   * TODO clean
+   * TODO Mario (To delete according to meryam changes)
+   * TODO With current implementation the selected options that do not exist are highlighted in red and not deleted
+   * TODO Confirm it was decided like this
   */
   checkIfSelectedInOptions = (optionsData, block: BlockModel) => {
     const optionsLabel = [...this.props.optionsLabel];

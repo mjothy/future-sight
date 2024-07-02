@@ -83,8 +83,7 @@ export default class BlockFilterManager extends Component<any, any> {
     }
     async componentDidMount() {
         const metaIndicators = await this.props.dataManager.fetchMeta();
-
-        let metaData = this.props.currentBlock.config.metaData;
+        const metaData = this.props.currentBlock.config.metaData;
 
         if(metaData.metaIndicators != null && Object.keys(metaData.metaIndicators)?.length > 0){
             metaData.selectOrder.map(async filterId => {
@@ -111,6 +110,7 @@ export default class BlockFilterManager extends Component<any, any> {
         ) {
             this.updateMissingData();
         }
+
         if (this.props.currentBlock.id !== prevProps.currentBlock.id) {
             this.setState(this.getInitState(metadata),
                 () => {
@@ -121,11 +121,7 @@ export default class BlockFilterManager extends Component<any, any> {
             )
         }
 
-        if(JSON.stringify(metadata["scenarios"]) !== JSON.stringify(prevMetadata["scenarios"]) ||
-            JSON.stringify(metadata["models"]) !== JSON.stringify(prevMetadata["models"])){ // TODO Refactor
-            this.updateFilterOptions("versions");
-        }
-
+        // Refresh selected filters and put to stale unselected filters
         if(this.state.forceOptionsDataUpdate != prevState.forceOptionsDataUpdate && this.state.forceOptionsDataUpdate){
             const config = this.props.currentBlock.config;
             config.metaData.selectOrder.map(async filterId => {
@@ -134,10 +130,12 @@ export default class BlockFilterManager extends Component<any, any> {
 
             // Set stale
             const staleFilters = {...this.state.staleFilters}
-            const staleKeys = Object.keys(staleFilters).filter(key => !config.metaData.selectOrder.includes(key))
-            staleKeys.forEach(key=>{
-                staleFilters[key] = true;
+            Object.keys(staleFilters).forEach(key => {
+                if (!config.metaData.selectOrder.includes(key)) {
+                    staleFilters[key] = true;
+                }
             })
+
             this.setState({staleFilters, forceOptionsDataUpdate: false})
         }
 
@@ -187,10 +185,15 @@ export default class BlockFilterManager extends Component<any, any> {
     }
 
     /**
-     * TODO add description
+     * When refreshing versions from backend, update the versions of the block:
+     * add default versions
+     * remove versions that do not exist anymore
+     *
+     * @param optionsData updated options
+     * @param block
      */
     updateBlockVersions = async (optionsData, block: BlockModel) => {
-        let metaData = JSON.parse(JSON.stringify(((block.config) as ConfigurationModel).metaData));
+        const metaData = JSON.parse(JSON.stringify(((block.config) as ConfigurationModel).metaData));
         const versions = {};
         for (const model of metaData["models"]) {
             for (const scenario of metaData["scenarios"]) {
@@ -260,7 +263,10 @@ export default class BlockFilterManager extends Component<any, any> {
     getExistingRaws = (metaData, blockId) => {
         const existDataRaws: any[] = [];
 
-        // TODO Refactor
+        // Beware here we filter the available timeseries by metaindicator runs
+        // Which means that if a default version is not included in the metaindicator runs it will show a missing data message
+        // While still having data shown. Inconsistent with what we discussed monday 01/07
+        // TODO Mario
         let timeseriesData = this.props.plotData[this.props.currentBlock.id];
 
         if (!timeseriesData) {
@@ -271,11 +277,10 @@ export default class BlockFilterManager extends Component<any, any> {
             if(metaData.metaIndicators){
                 const metaIndicatorRuns = getMetaRuns(metaData.metaIndicators);
                 if(metaIndicatorRuns.length > 0){
-                    timeseriesData = timeseriesData.filter( element =>{
-                        return metaIndicatorRuns.includes(element["run"]?.id);
-                    })
+                    timeseriesData = timeseriesData.filter(
+                        element => metaIndicatorRuns.includes(element["run"]?.id)
+                    )
                 }
-
             }
         }
 
@@ -454,6 +459,7 @@ export default class BlockFilterManager extends Component<any, any> {
 
     };
 
+    // TODO Erick adapt behavior to match one note
     onMetaDropdownVisibleChange = async (filterId, isOpening) => {
 
         if(!isOpening){

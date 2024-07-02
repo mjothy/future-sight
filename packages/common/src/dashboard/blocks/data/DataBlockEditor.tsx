@@ -346,6 +346,7 @@ export default class DataBlockEditor extends Component<any, any> {
     return defaultValues
   }
 
+  // TODO Erick add a way to hide the selectMeta
   render() {
     const metaData = this.props.currentBlock.config.metaData;
 
