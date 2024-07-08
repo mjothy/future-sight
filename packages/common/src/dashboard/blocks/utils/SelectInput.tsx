@@ -253,8 +253,8 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 <Select
                     mode={"multiple"}
                     className={"fsselectinput " + this.props.className}
-                    dropdownRender={this.dropdownRender} // TODO
-                    tagRender={(props) => this.tagRender(props, true)} // TODO
+                    dropdownRender={this.dropdownRender}
+                    tagRender={(props) => this.tagRender(props, true)}
                     placeholder={this.props.placeholder ?? (this.props.label || this.props.type)}
                     value={this.props.value}
                     loading={this.props.loading}

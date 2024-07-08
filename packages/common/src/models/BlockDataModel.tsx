@@ -8,7 +8,7 @@ export default class BlockDataModel {
   variables: string[] = [];
   versions: versionsModel = {};
   metaIndicators: MetaModel = {};
-  useVersion = false;
+  useMetaIndicators = false;
   showNonDefaultRuns=false;
 
   /**

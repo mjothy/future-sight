@@ -119,7 +119,7 @@
           "variables": [],
           "metaIndicators": {},
           "versions": {},
-          "useVersion": false,
+          "useMetaIndicators": false,
           "showNonDefaultRuns": false,
           "selectOrder": [],
           "master": {

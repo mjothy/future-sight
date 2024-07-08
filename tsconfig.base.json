@@ -21,8 +21,7 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": false,
-    "strict": true,
-    "jsx": "react"
+    "strict": true
   },
 	"exclude": [
     "node_modules",
