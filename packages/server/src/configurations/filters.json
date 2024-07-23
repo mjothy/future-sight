@@ -3,6 +3,7 @@
     "id": "models",
     "label": "Models",
     "path": "/iamc/models/",
+    "docPath": "/docs/models/",
     "required": true,
     "origin": "iiasa",
     "icon": "control"
@@ -11,6 +12,7 @@
     "id": "scenarios",
     "label": "Scenarios",
     "path": "/iamc/scenarios/",
+    "docPath": "/docs/scenarios/",
     "required": true,
     "origin": "iiasa",
     "icon": "branches"
@@ -19,6 +21,7 @@
     "id": "variables",
     "label": "Variables",
     "path": "/iamc/variables/",
+    "docPath": "/docs/iamc/variables/",
     "required": true,
     "origin": "iiasa",
     "icon": "line-chart"
@@ -27,6 +30,7 @@
     "id": "regions",
     "label": "Regions",
     "path": "/iamc/regions/",
+    "docPath": "/docs/regions/",
     "required": true,
     "origin": "iiasa",
     "icon": "global"

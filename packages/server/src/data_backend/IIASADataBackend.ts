@@ -86,11 +86,25 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
         return filteredValues;
     };
 
+    fetchAndFormatDocData = async (filter: any) => {
+        const optionsDoc = await this.patchPromise(filter.docPath, undefined, true, "GET")
+        const optionsData = await this.patchPromise(filter.path, undefined)
+        const formatedDoc = {}
+        for (const iDoc of optionsDoc) {
+            const optionName = optionsData.find(element => element.id === iDoc["dimension__id"])?.name
+            if (optionName){
+                formatedDoc[optionName] = iDoc["description"]
+            }
+        }
+        return formatedDoc
+    }
+
     getDocData = async () => {
-        const regions = await this.patchPromise("/docs/regions/", undefined, true, "GET")
-        const scenarios = await this.patchPromise("/docs/scenarios/", undefined, true, "GET")
-        const models = await this.patchPromise("/docs/models/", undefined, true, "GET")
-        const variables = await this.patchPromise("/docs/iamc/variables/", undefined, true, "GET")
+        const filters = this.getFilters()
+        const regions = await this.fetchAndFormatDocData(filters.regions)
+        const scenarios = await this.fetchAndFormatDocData(filters.scenarios)
+        const models = await this.fetchAndFormatDocData(filters.models)
+        const variables = await this.fetchAndFormatDocData(filters.variables)
         return {regions, scenarios, models, variables};
     }
 

@@ -103,6 +103,7 @@ export default class DataBlockEditor extends Component<any, any> {
                             onDropdownVisibleChange={this.props.onDropdownVisibleChange}
                             enabled={(this.props.currentOpenedFilter == option) || (this.props.currentOpenedFilter == null)}
                             regroupOrphans={option === "regions" ? "Common regions" : undefined}
+                            docs={this.props.docData[option]}
                         />
                     </Row>
                 </div>

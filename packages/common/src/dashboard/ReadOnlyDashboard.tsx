@@ -37,6 +37,7 @@ interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
     blockData: (block: BlockModel) => void;
     optionsLabel: string[]
     plotData: any[];
+    docData: {filterId:{[optionName: string]: string}};
     updateLoadingControlBlock: (id, status) => Promise<void>;
     loadingControlBlock: any;
 }

@@ -68,6 +68,7 @@ export default class PopupFilterContent extends Component<any, any> {
       onChange={this.onChange}
       onDropdownVisibleChange={this.onDropdownVisibleChange}
       isClosable={true}
+      docs={this.props.docData[type]}
     />
   }
 

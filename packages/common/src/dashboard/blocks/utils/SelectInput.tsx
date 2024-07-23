@@ -1,7 +1,8 @@
-import { CloseCircleOutlined, ExclamationCircleOutlined, LoadingOutlined } from '@ant-design/icons';
-import { Button, Input, Select, Tag, Tooltip, TreeSelect } from 'antd'
-import React, { Component } from 'react'
-const { Option } = Select;
+import {CloseCircleOutlined, ExclamationCircleOutlined, InfoCircleOutlined, LoadingOutlined} from '@ant-design/icons';
+import {Button, Input, Select, Tag, Tooltip, TreeSelect} from 'antd'
+import React, {Component} from 'react'
+
+const {Option} = Select;
 
 interface SelectOptionProps {
     /**
@@ -10,7 +11,7 @@ interface SelectOptionProps {
     type: string;
     label?: string;
     value: string[];
-    options: any;
+    options: string[];
     onChange: (type: string, selectedData: string[]) => void;
     isClear?: boolean;
     onClear?: (type, e) => void;
@@ -22,8 +23,8 @@ interface SelectOptionProps {
     isClosable?: boolean;
     regroupOrphans?: string;
     disableMultiSelect?: boolean;
-    placeholder?: string
-
+    placeholder?: string;
+    docs?: { [optionName: string]: string };
 }
 
 const COLORS = ['red', 'blue', 'green', 'yellow'];
@@ -33,7 +34,7 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
 
     constructor(props) {
         super(props);
-        this.state = { searchValue: "" }
+        this.state = {searchValue: ""}
     }
 
     splitOptions = (options) => {
@@ -47,7 +48,26 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
             // Set the first element
             if (!currentNode) {
                 const checkable = (values.length === 1); // Set only Leafs as checkable
-                currentNode = { title: values[0], label: values[0], key: values[0], value: values[0], children: [], checkable };
+                let nodeTitle = values[0]
+                if (checkable && this.props.docs?.[option]) {
+                    nodeTitle =
+                        <>
+                            {values[0]}
+                            &nbsp;
+                            <Tooltip title={this.props.docs[option]}>
+                                <InfoCircleOutlined/>
+                            </Tooltip>
+                        </>
+                }
+
+                currentNode = {
+                    title: nodeTitle,
+                    label: values[0],
+                    key: values[0],
+                    value: values[0],
+                    children: [],
+                    checkable
+                };
                 if (values.length === 1 && this.props.regroupOrphans) {
                     // Regroup orphan nodes under single parent if option enabled
                     let orphanParent = treeData.find((node) => node.label === this.props.regroupOrphans)
@@ -72,7 +92,19 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 if (!childNode) {
                     const checkable = (i === values.length - 1); // Set only Leafs as checkable
                     const value = values.slice(0, i + 1).join('|');
-                    childNode = { title: values[i], label: values[i], key: value, value, children: [], checkable };
+                    let childNodeTitle = values[i]
+                    if (checkable && this.props.docs?.[option]) {
+                        childNodeTitle =
+                            <>
+                                {values[i]}
+                                &nbsp;
+                                <Tooltip title={this.props.docs[option]}>
+                                    <InfoCircleOutlined/>
+                                </Tooltip>
+                            </>
+                    }
+
+                    childNode = {title: childNodeTitle, label: values[i], key: value, value, children: [], checkable};
                     currentNode.children.push(childNode);
                 } else {
                     if (!childNode.checkable) {
@@ -100,27 +132,29 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
     }
 
     tagRender = (props, isShowValue) => {
-        const { value, label, onClose } = props;
+        const {value, label, onClose} = props;
+        const isValueIncluded = this.props.options?.includes(value)
         return (
             <Tag
-                color={this.props.options?.includes(value) ? undefined : 'red'}
-                closable={this.props.isClosable || !this.props.options?.includes(value) }
+                color={isValueIncluded ? undefined : 'red'}
+                closable={this.props.isClosable || !isValueIncluded}
                 onClose={onClose}
-                icon={this.props.options?.includes(value) ? undefined : <ExclamationCircleOutlined />}
-                className={this.props.options?.includes(value) ? 'ant-select-selection-item' : 'ant-select-selection-item data-missing-tag'}
+                icon={isValueIncluded ? undefined : <ExclamationCircleOutlined/>}
+                className={isValueIncluded ? 'ant-select-selection-item' : 'ant-select-selection-item data-missing-tag'}
             >
-                <label className='ant-select-selection-item-content' style={VALUE_STYLE[value]}>{isShowValue ? value : label}</label>
+                <label className='ant-select-selection-item-content'
+                       style={VALUE_STYLE[value]}>{isShowValue ? value : label}</label>
             </Tag>
         );
     }
 
     onSearch = (searchValue) => {
-        this.setState({ searchValue });
+        this.setState({searchValue});
     }
 
     onChange = (selectedData: string[]) => {
         let data = selectedData;
-        if(this.props.disableMultiSelect && data.length > 0){
+        if (this.props.disableMultiSelect && data.length > 0) {
             data = data.slice(-1);
         }
         this.props.onChange(this.props.type, data.map((element: any) => element.value != null ? element.value : element));// when TreeSelect selecteData is object {value, key}
@@ -152,12 +186,12 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 dropdownMatchSelectWidth={false}
                 notFoundContent={(this.props.loading) ? (
                     <div>
-                        <LoadingOutlined />
+                        <LoadingOutlined/>
                         <p>Fetching data</p>
                     </div>
                 ) : (
                     <div>
-                        <ExclamationCircleOutlined /> This item does not exists for your filter selections.
+                        <ExclamationCircleOutlined/> This item does not exists for your filter selections.
                     </div>
                 )}
                 treeExpandAction="doubleClick"
@@ -166,13 +200,13 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 dropdownRender={this.dropdownRender}
             />
             {this.props.isClear && <Tooltip title="Clear">
-                <Button
-                    type="default"
-                    onClick={(e) => this.props.onClear?.(this.props.type, e)}
+				<Button
+					type="default"
+					onClick={(e) => this.props.onClear?.(this.props.type, e)}
 
-                    icon={<CloseCircleOutlined />}
-                />
-            </Tooltip>}
+					icon={<CloseCircleOutlined/>}
+				/>
+			</Tooltip>}
         </Input.Group>
     }
 
@@ -199,14 +233,14 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                     </TreeSelect.TreeNode>
                 );
             }
-            return <TreeSelect.TreeNode {...item} key={item.key} />;
+            return <TreeSelect.TreeNode {...item} key={item.key}/>;
         });
     }
 
     treeSelectLeafOnly = () => {
         return <Input.Group compact>
             <TreeSelect
-                treeDataSimpleMode={ this.props.disableMultiSelect }
+                treeDataSimpleMode={this.props.disableMultiSelect}
                 value={this.props.value}
                 loading={this.props.loading}
                 treeCheckable={true}
@@ -222,12 +256,12 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                 dropdownMatchSelectWidth={false}
                 notFoundContent={(this.props.loading) ? (
                     <div>
-                        <LoadingOutlined />
+                        <LoadingOutlined/>
                         <p>Fetching data</p>
                     </div>
                 ) : (
                     <div>
-                        <ExclamationCircleOutlined /> This item does not exists for your filter selections.
+                        <ExclamationCircleOutlined/> This item does not exists for your filter selections.
                     </div>
                 )}
                 treeExpandAction="doubleClick"
@@ -238,12 +272,12 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
 
             </TreeSelect>
             {this.props.isClear && <Tooltip title="Clear">
-                <Button
-                    type="default"
-                    onClick={(e) => this.props.onClear?.(this.props.type, e)}
-                    icon={<CloseCircleOutlined />}
-                />
-            </Tooltip>}
+				<Button
+					type="default"
+					onClick={(e) => this.props.onClear?.(this.props.type, e)}
+					icon={<CloseCircleOutlined/>}
+				/>
+			</Tooltip>}
         </Input.Group>
     }
 
@@ -268,29 +302,36 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
                     dropdownMatchSelectWidth={false}
                     notFoundContent={(this.props.loading) ? (
                         <div>
-                            <LoadingOutlined />
+                            <LoadingOutlined/>
                             <p>Fetching data</p>
                         </div>
                     ) : (
                         <div>
-                            <ExclamationCircleOutlined /> This item does not exists for your filter selections.
+                            <ExclamationCircleOutlined/> This item does not exists for your filter selections.
                         </div>
                     )}
                 >
                     {this.props.loading ? undefined : this.props.options?.map((value) => (
                         <Option key={value} value={value}>
+                            {
+                                this.props.docs?.[value] &&
+								<Tooltip title={this.props.docs[value]}>
+									<InfoCircleOutlined/>
+								</Tooltip>
+                            }
+                            &nbsp;
                             {value}
                         </Option>
                     ))}
                 </Select>
                 {this.props.isClear && <Tooltip title="Clear">
-                    <Button
-                        type="default"
-                        onClick={(e) => this.props.onClear?.(this.props.type, e)}
+					<Button
+						type="default"
+						onClick={(e) => this.props.onClear?.(this.props.type, e)}
 
-                        icon={<CloseCircleOutlined />}
-                    />
-                </Tooltip>}
+						icon={<CloseCircleOutlined/>}
+					/>
+				</Tooltip>}
             </Input.Group>
         )
 
@@ -299,8 +340,10 @@ export default class SelectInput extends Component<SelectOptionProps, any> {
     render() {
         switch (this.props.type) {
             case "variables":
-            case "regions": return this.treeSelect();
-            default: return this.defaultSelect();
+            case "regions":
+                return this.treeSelect();
+            default:
+                return this.defaultSelect();
         }
     }
 }

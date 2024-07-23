@@ -189,6 +189,7 @@ class DashboardDataConfiguration extends Component<
         optionsLabel={this.optionsLabel}
         updateLoadingControlBlock={this.updateLoadingControlBlock}
         loadingControlBlock={this.state.loadingControlBlock}
+        docData={this.state.docData}
         {...this.props}
       />
     ) : (
@@ -200,6 +201,7 @@ class DashboardDataConfiguration extends Component<
         optionsLabel={this.optionsLabel}
         updateLoadingControlBlock={this.updateLoadingControlBlock}
         loadingControlBlock={this.state.loadingControlBlock}
+        docData={this.state.docData}
         {...this.props}
       /> || <div className="dashboard">
         <Spin className="centered" />

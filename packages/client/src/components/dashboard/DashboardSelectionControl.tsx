@@ -24,6 +24,7 @@ export interface DashboardSelectionControlProps
   optionsLabel: string[];
   updateLoadingControlBlock: (id, status) => Promise<void>;
   loadingControlBlock: any
+  docData: {filterId:{[optionName: string]: string}};
 }
 
 export default class DashboardSelectionControl extends Component<
