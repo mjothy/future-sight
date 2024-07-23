@@ -206,7 +206,6 @@ export default class DashboardSelectionControl extends Component<
         updateDashboard={this.updateDashboard}
         saveDashboard={this.saveData}
         deleteBlocks={this.deleteBlocks}
-        checkIfSelectedInOptions={this.checkIfSelectedInOptions}
         isDraft={this.state.isDraft}
         {...this.props}
       />

@@ -185,7 +185,6 @@ export default class BlockFilterManager extends Component<any, any> {
                         await this.updateBlockVersions(this.state.optionsData, this.props.currentBlock);
                     }
                     this.updateMissingData();
-                    //await this.props.checkIfSelectedInOptions(this.state.optionsData, this.props.currentBlock)
                 })
             })
             .catch(err => {
