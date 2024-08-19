@@ -1,17 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'antd';
+import { Button, Tooltip } from 'antd';
 
 export default class AddButton extends Component<any, any> {
-  static propTypes = {
-    label: PropTypes.string,
-    type: PropTypes.string,
-  };
-
-  static defaultProps = {
-    label: 'Add',
-    type: 'text',
-  };
 
   clicked = () => {
     this.props.clicked();
@@ -19,9 +10,11 @@ export default class AddButton extends Component<any, any> {
 
   render() {
     return (
-      <Button type="default" onClick={this.clicked}>
-        {this.props.label}
-      </Button>
+      <Tooltip title={this.props.action.info} placement="bottom">
+        <Button type={this.props.action.button} onClick={this.clicked}>
+          {this.props.action.label}
+        </Button>
+      </Tooltip>
     );
   }
 }

@@ -28,7 +28,11 @@ export default class BlockViewManager extends Component<any, any> {
 
     switch (blockType) {
       case 'json':
-        return <JsonBlockView currentBlock={this.props.currentBlock} />
+        return <JsonBlockView 
+          currentBlock={this.props.currentBlock} 
+          width={this.props.width}
+          height={this.props.height}
+        />
       case 'text':
         return <TextBlockView currentBlock={this.props.currentBlock} />;
       case 'data':
