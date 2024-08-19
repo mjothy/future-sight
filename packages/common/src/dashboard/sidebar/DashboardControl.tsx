@@ -7,16 +7,20 @@ import React, {useState} from "react";
 
 const actions = [
   {
-    label: 'Add data block',
+    label: 'Data block',
     type: 'data',
   },
   {
-    label: 'Add text block',
+    label: 'Text block',
     type: 'text',
   },
   {
-    label: 'Add control block',
+    label: 'Control block',
     type: 'control',
+  },
+  {
+    label: 'JSON block',
+    type: 'json',
   },
 ];
 
