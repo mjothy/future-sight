@@ -1,4 +1,4 @@
-export default class TextConfigurationModel {
+export default class JsonConfigurationModel {
   json = {
     data: undefined,
     layout: undefined,

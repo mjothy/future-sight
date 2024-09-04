@@ -26,12 +26,12 @@ export default class JsonBlockView extends React.Component<JsonBlockViewProps, a
 
   getMargins = () => {
     return {
-      l: 60,
-      r: 10,
-      b: 30,
-      t: 5,
-      pad: 4,
-  }
+        l: 60,
+        r: 10,
+        b: 30,
+        t: 5,
+        pad: 4,
+    }
   }
 
   render() {
@@ -42,18 +42,19 @@ export default class JsonBlockView extends React.Component<JsonBlockViewProps, a
     if (!layout || !data) {
       return <i>No data</i>
     }
-    layout = {
-      width: this.props.width,
-      height: this.props.height,
-      margin: this.getMargins(),
-      font: {
-          size: 10,
-      },
-      dragmode: "zoom",
-      xaxis: {
-          automargin: true
-      }
-  };
+    const baseLayout = {
+        width: this.props.width,
+        height: this.props.height,
+        margin: this.getMargins(),
+        font: {
+            size: 10,
+        },
+        dragmode: "zoom",
+        xaxis: {
+            automargin: true
+        }
+    };
+    layout = Object.assign(layout, baseLayout)
     return (
       <Plot
           key={this.props.currentBlock.id}
