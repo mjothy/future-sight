@@ -25,28 +25,28 @@ export default class JsonBlockView extends React.Component<JsonBlockViewProps, a
     return shouldUpdate;
   }
 
-  getMargins = () => {
+  getMargins = (layout) => {
     return {
       l: 60,
       r: 10,
       b: 30,
-      t: 5,
+      t: layout.title ? 50 : 5,
       pad: 4,
   }
   }
 
   render() {
-    let layout = this.props.currentBlock.config.json.layout
-    let data = this.props.currentBlock.config.json.data
-    let config = this.props.currentBlock.config.json.config
-    let frames = this.props.currentBlock.config.json.frames
+    let layout = Object.assign({}, this.props.currentBlock.config.json.layout);
+    let data = this.props.currentBlock.config.json.data;
+    let config = this.props.currentBlock.config.json.config;
+    let frames = this.props.currentBlock.config.json.frames;
     if (!layout || !data) {
       return <i>No data</i>
     }
     layout = Object.assign(layout, {
       width: this.props.width,
       height: this.props.height,
-      margin: this.getMargins(),
+      margin: this.getMargins(layout),
       font: {
           size: 10,
       },
@@ -54,7 +54,7 @@ export default class JsonBlockView extends React.Component<JsonBlockViewProps, a
       xaxis: {
           automargin: true
       }
-  });
+    });
     return (
       <React.Fragment>
         <WarningOutlined 
