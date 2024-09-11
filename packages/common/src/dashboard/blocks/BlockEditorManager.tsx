@@ -10,6 +10,7 @@ import {
 } from '@ant-design/icons';
 import ControlBlockVisualizationEditor from './control/ControlBlockVisualizationEditor';
 import BlockFilterManager from './BlockFilterManager';
+import JsonBlockEditor from "./json/JsonBlockEditor";
 
 const { TabPane } = Tabs;
 
@@ -50,6 +51,8 @@ export default class BlockEditorManager extends Component<any, any> {
             />
           );
         }
+      case 'json':
+        return <JsonBlockEditor {...this.props} />
       case 'text':
         return <TextBlockEditor {...this.props} />;
       case 'control':

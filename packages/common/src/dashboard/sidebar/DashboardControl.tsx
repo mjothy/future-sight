@@ -7,16 +7,28 @@ import React, {useState} from "react";
 
 const actions = [
   {
-    label: 'Add data block',
+    label: 'Data block',
+    info: 'Standard graph block, start here for a simple visualisation !',
+    button: "primary",
     type: 'data',
   },
   {
-    label: 'Add text block',
+    label: 'Text block',
+    info: 'A text area to explain some context, or add details.',
+    button: "default",
     type: 'text',
   },
   {
-    label: 'Add control block',
+    label: 'Control block',
+    info: 'A complex block to allow interactive use of datablocks by the viewer.',
+    button: "default",
     type: 'control',
+  },
+  {
+    label: 'JSON block',
+    info: 'A developper block that allow json plotly charts.',
+    button: "default",
+    type: 'json',
   },
 ];
 
@@ -44,11 +56,10 @@ const DashboardControl: React.FC<any> = (props) => {
       >
         <Row >
           {actions.map((action) => (
-              <Col key={action.type} span="8">
+              <Col key={action.type} span="6">
                 <AddButton
-                    label={action.label}
-                    type={action.type}
-                    clicked={() => clicked(action.type)}
+                  action={action}
+                  clicked={() => clicked(action.type)}
                 />
               </Col>
           ))}

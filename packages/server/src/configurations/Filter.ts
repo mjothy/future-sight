@@ -1,12 +1,13 @@
 
 // TODO add interface
 import { versionsModel } from "@future-sight/common/build/models/BlockDataModel";
+import DataFocusFilter from "../models/DataFocusFilter";
 
 export default class Filter {
 
     private body = {};
     private selectOrder?: string[];
-    private dataFocusFilters?: any;
+    private dataFocusFilters?: DataFocusFilter;
     private showNonDefaultRuns?: boolean;
     constructor(globalSelectedData, dataFocusFilters?: any, selectOrder?: string[], showNonDefaultRuns?: boolean) {
         this.selectOrder = selectOrder;
@@ -20,6 +21,45 @@ export default class Filter {
             "units": this.unitsBody(globalSelectedData),
             "runs": this.runBody(globalSelectedData)
         };
+
+    }
+
+    static getMetaRuns = (globalSelectedData) => {
+        const runIdsSet: Set<number> = new Set();
+
+        if(globalSelectedData?.metaIndicators != null){
+            Object.entries(globalSelectedData?.metaIndicators).forEach(([key, subMeta])=>{
+                if (subMeta instanceof Object) {
+                    Object.keys(subMeta).forEach(obj => {
+                        subMeta[obj]?.forEach(runId => runIdsSet.add(runId));
+                    })
+                }
+            })
+        }
+
+        return Array.from(runIdsSet);
+    }
+
+    /**
+     * Add runs related to meta indicators to filter body.
+     * When (model, scenario) options are both selected,
+     * they form a list of runs that takes priority over the runs of meta indicators.
+     *
+     * @param globalSelectedData
+     * @param body
+     * @param filterId
+     */
+    static addMetaRunsToBody = (globalSelectedData, body, filterId) => {
+        if(Filter.getMetaRuns(globalSelectedData)?.length > 0){
+            if(body.run == null){
+                body.run = {};
+            }
+            // Only add meta runs when model and scenario did not get selected already.
+            // In other words, when there are no run filter the body.
+            if (body.run?.["id__in"] == null){
+                body.run["id__in"] = this.getMetaRuns(globalSelectedData);
+            }
+        }
     }
 
     getBody = (filterId) => {
@@ -202,7 +242,7 @@ export default class Filter {
         if(plotData.runs?.length <= 0  || plotData.regions?.length <= 0 || plotData.variables?.length <= 0){
             return null;
         }
-        requestBody.run = { id__in: plotData.runs}
+        requestBody.run = { id__in: plotData.runs, default_only: false}
         requestBody.region = { name__in: plotData.regions};
         requestBody.variable = { name__in: plotData.variables };
 
@@ -278,10 +318,8 @@ export default class Filter {
         const selectedFilterData = {};
         if (filtersToApply.length > 0) {
             filtersToApply.forEach(key => selectedFilterData[key] = selectedData[key]);
-            return selectedFilterData;
-        } else {
-            return selectedFilterData;
         }
+        return selectedFilterData;
     }
 
     /**
@@ -292,15 +330,17 @@ export default class Filter {
     addDataFocusToSelectedData = (selectedData) => {
         if (this.dataFocusFilters != null) {
             Object.keys(this.dataFocusFilters).forEach(key => {
-                let newSelected: string[] = selectedData[key];
-                if (newSelected?.length > 0) {
-                    // {Second filter} Find matching values in this.dataFocusFilters[key] and selectedData[key]
-                    const values: string[] = this.dataFocusFilters[key].filter(value => newSelected.includes(value));
-                    newSelected = values;
-                } else {
-                    newSelected = [...this.dataFocusFilters[key]];
+                if(Array.isArray(this.dataFocusFilters?.[key])){
+                    let newSelected: string[] = selectedData[key];
+                    if (newSelected?.length > 0) {
+                        // {Second filter} Find matching values in this.dataFocusFilters[key] and selectedData[key]
+                        const values: string[] = this.dataFocusFilters?.[key]?.filter(value => newSelected.includes(value));
+                        newSelected = values;
+                    } else {
+                        newSelected = [...this.dataFocusFilters?.[key]];
+                    }
+                    selectedData[key] = Array.from(new Set(newSelected));
                 }
-                selectedData[key] = Array.from(new Set(newSelected));
             });
         }
         return selectedData;
@@ -308,7 +348,7 @@ export default class Filter {
 
     getRunIdsFromVersionsModel = (versionsDict: versionsModel) => {
         const runIds: string[] = []
-        Object.values(versionsDict).forEach(
+        Object.values(versionsDict)?.forEach(
             scenario => Object.values(scenario).forEach(
                 versions => versions.forEach(
                     version => runIds.push(version.id)

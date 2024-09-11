@@ -21,10 +21,6 @@
     "@types/node": "^16.7.0",
     "@types/react": "^17.0.22",
     "@types/react-dom": "^17.0.9",
-    "@typescript-eslint/eslint-plugin": "^5.30.4",
-    "@typescript-eslint/parser": "^5.30.4",
-    "eslint": "^8.19.0",
-    "eslint-plugin-react": "^7.30.1",
     "prettier": "^2.7.1",
     "typescript": "^4.3.5"
   },
@@ -46,7 +42,7 @@
     "web-vitals": "^2.1.0"
   },
   "scripts": {
-    "dev": "craco start",
+    "dev": "craco --max_old_space_size=4096 start",
     "build": "craco --openssl-legacy-provider build",
     "test": "craco test",
     "eject": "craco eject",

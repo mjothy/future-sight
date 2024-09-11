@@ -87,6 +87,20 @@ export default class ExpressServer {
       res.send(this.dataProxy.getFilters());
     });
 
+    this.app.post('/api/docData', async (req, res) => {
+      try {
+        const response = await this.dataProxy.getDocData();
+        res.status(200).send(response);
+      } catch (error: any) {
+        if (error.status == 401) {
+          res.status(401).send({ message: error.message });
+        } else {
+          console.error(error);
+          res.status(error.status ? error.status : 500).send({ message: "No documentation found for filters" });
+        }
+      }
+    });
+
     this.app.post('/api/plotData', async (req, res) => {
       try {
         const selectedData: DataModel[] = req.body;
@@ -115,7 +129,7 @@ export default class ExpressServer {
 
         // Get categories from file system
         // TODO add category to filter when request to iaasa is provided
-        optionsData["categories"] = this.configurationProvider.getMetaIndicators();
+        //optionsData["categories"] = this.configurationProvider.getMetaIndicators();
 
         res.send(optionsData);
       } catch (error: any) {
@@ -134,13 +148,27 @@ export default class ExpressServer {
 
       try {
         const optionsData = await this.dataProxy.getFilteredData(req.body.filterId, req.body.metaData, req.body.dataFocusFilters);
-        optionsData["categories"] = this.configurationProvider.getMetaIndicators(); // TODO add categories to filter
         res.send(optionsData);
       } catch (error: any) {
         if (error.status == 401) {
           res.status(401).send({ message: error.message });
         } else {
           console.error(error);
+          res.status(error.status ? error.status : 500).send({ message: "Server error!!" });
+        }
+      }
+    });
+
+    this.app.post('/api/meta', async (req, res, next) => {
+
+      try {
+        const data = await this.dataProxy.getMeta();
+        res.send(data);
+      } catch (error: any) {
+        console.error("meta: ", error);
+        if (error.status == 401) {
+          res.status(401).send({ message: error.message });
+        } else {
           res.status(error.status ? error.status : 500).send({ message: "Server error!!" });
         }
       }
@@ -222,6 +250,7 @@ export default class ExpressServer {
     //   System files
     // ===================
 
+    // TODO clean
     this.app.get(`/api/categories`, (req, res) => {
       res.send(this.configurationProvider.getMetaIndicators());
     });

@@ -4,6 +4,8 @@ import TextBlockView from './text/TextBlockView';
 import DataBlockTransfert from "./data/DataBlockTransfert";
 import ConfigurationModel from '../../models/ConfigurationModel';
 import BlockDataModel from '../../models/BlockDataModel';
+import JsonBlockEditor from "./json/JsonBlockEditor";
+import JsonBlockView from './json/JsonBlockView';
 
 /**
  * Render the view of block in Grid Layout
@@ -25,6 +27,12 @@ export default class BlockViewManager extends Component<any, any> {
       : 'data';
 
     switch (blockType) {
+      case 'json':
+        return <JsonBlockView 
+          currentBlock={this.props.currentBlock} 
+          width={this.props.width}
+          height={this.props.height}
+        />
       case 'text':
         return <TextBlockView currentBlock={this.props.currentBlock} />;
       case 'data':
@@ -47,6 +55,7 @@ export default class BlockViewManager extends Component<any, any> {
           blockData={this.props.blockData}
           getMetaData={this.getMetaData}
           updateLoadingControlBlock={this.props.updateLoadingControlBlock}
+          docData={this.props.docData}
         />;
       default:
         return <p>Error !</p>;

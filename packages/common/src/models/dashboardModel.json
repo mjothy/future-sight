@@ -46,10 +46,6 @@
             "variables": {
               "isCustom": false,
               "value": ""
-            },
-            "categories": {
-              "isCustom": false,
-              "value": ""
             }
           },
           "YAxis": {
@@ -121,9 +117,9 @@
           "scenarios": [],
           "regions": [],
           "variables": [],
-          "categories": [],
+          "metaIndicators": {},
           "versions": {},
-          "useVersion": false,
+          "useMetaIndicators": false,
           "showNonDefaultRuns": false,
           "selectOrder": [],
           "master": {
@@ -140,10 +136,6 @@
               "values": []
             },
             "variables": {
-              "isMaster": false,
-              "values": []
-            },
-            "categories": {
               "isMaster": false,
               "values": []
             }

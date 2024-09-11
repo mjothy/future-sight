@@ -28,3 +28,19 @@ export function getUnselectedInputOptions(block: BlockModel, optionsLabel: strin
 export function getChildrens(blocks, conyrolBlockId) {
     return Object.values(blocks).filter((block: BlockModel | any) => block.controlBlock === conyrolBlockId)
 }
+
+export function getMetaRuns(metaIndicators) {
+    const runIdsSet: Set<number> = new Set();
+
+    if(metaIndicators != null){
+        Object.entries(metaIndicators)?.forEach(([key, subMeta])=>{
+            if (subMeta instanceof Object) {
+                Object.keys(subMeta)?.forEach(obj => {
+                    subMeta[obj]?.forEach(runId => runIdsSet.add(runId));
+                })
+            }
+        })
+    }
+
+    return Array.from(runIdsSet);
+}

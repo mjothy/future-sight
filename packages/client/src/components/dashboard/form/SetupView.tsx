@@ -153,7 +153,7 @@ class SetupView extends Component<any, any> {
       <>
         <div className="back-to-setup">
           <Button value="setup" onClick={this.show}>
-            <FilterTwoTone />Data focus {selectedFilterLabel.slice(0, -2)}
+            <FilterTwoTone />Global filter {selectedFilterLabel.slice(0, -2)}
           </Button>
         </div>
         <Modal

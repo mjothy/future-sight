@@ -83,6 +83,7 @@ export default class ControlBlockView extends Component<any, any> {
           value={metaData.master[option].values}
           onChange={this.onChange}
           options={metaData[option]}
+          docs={this.props.docData[option]}
         />
       </div>
       // <Row className="mb-10" key={option}>

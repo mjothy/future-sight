@@ -282,6 +282,7 @@ class DashboardConfigView extends Component<any, any> {
                                 updateDashboard={this.props.updateDashboard}
                                 updateLoadingControlBlock={this.props.updateLoadingControlBlock}
                                 loadingControlBlock={this.props.loadingControlBlock}
+                                docData={this.props.docData}
                             />
                         </div>
                     </div>

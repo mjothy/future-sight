@@ -59,7 +59,7 @@ export default class IIASADataManager {
                 // Refresh access token
                 const refreshToken = await this.authentication.refreshToken();
                 if (refreshToken) {
-                    return await this.patchPromise(url, body, false);
+                    return await this.patchPromise(url, body, false, method);
                 }
             } else {
                 throw err;

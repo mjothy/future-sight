@@ -3,17 +3,16 @@ import {
   blocksIdToDelete,
   compareDataStructure,
   ComponentPropsWithDataManager,
-  ConfigurationModel,
   DashboardModel,
   LayoutModel,
   PlotDataModel,
 } from '@future-sight/common';
-import { Component } from 'react';
-import { RoutingProps } from '../app/Routing';
+import {Component} from 'react';
+import {RoutingProps} from '../app/Routing';
 
 import DashboardView from './DashboardView';
-import { getDraft, setDraft } from '../drafts/DraftUtils';
-import { notification, Spin } from 'antd';
+import {getDraft, setDraft} from '../drafts/DraftUtils';
+import {Spin} from 'antd';
 
 export interface DashboardSelectionControlProps
   extends ComponentPropsWithDataManager,
@@ -25,6 +24,7 @@ export interface DashboardSelectionControlProps
   optionsLabel: string[];
   updateLoadingControlBlock: (id, status) => Promise<void>;
   loadingControlBlock: any
+  docData: {filterId:{[optionName: string]: string}};
 }
 
 export default class DashboardSelectionControl extends Component<
@@ -189,101 +189,6 @@ export default class DashboardSelectionControl extends Component<
     }
   };
 
-  /**
-   * Check if data in selection (selected data) are present in Select options
-   * Add default version to metadata.versions
-  */
-  checkIfSelectedInOptions = (optionsData, block: BlockModel) => {
-    const optionsLabel = [...this.props.optionsLabel];
-    const metaData = JSON.parse(JSON.stringify(((block.config) as ConfigurationModel).metaData));
-    let isDashboardUpdated = false;
-    const missingData = {}
-    optionsLabel.forEach(option => {
-      if (option == "versions") { return }
-      // Check if selected data (metaData[option]) are in options of drop down list
-      const dataInOptionsData = metaData[option].filter(data => optionsData[option].includes(data));
-      if (dataInOptionsData.length < metaData[option].length) {
-        isDashboardUpdated = true;
-        missingData[option] = metaData[option].filter(data => !optionsData[option].includes(data));
-        metaData[option] = dataInOptionsData;
-        if (metaData[option].length === 0) {
-          metaData.selectOrder = metaData.selectOrder.filter(option1 => option1 !== option);
-        }
-      }
-    });
-
-    if (
-      metaData.selectOrder.includes("models")
-      && metaData.selectOrder.includes("scenarios")
-    ) { // check if selected version exists in new version dictionary
-      let dataInOptionsData = []
-
-      // Remove versions that do not exists
-      for (const model of Object.keys(metaData["versions"])) {
-        for (const scenario of Object.keys(metaData["versions"][model])) {
-          dataInOptionsData = metaData["versions"][model][scenario].filter(
-            data => optionsData["versions"]?.[model]?.[scenario]?.values
-              .map(tempVersionDict => tempVersionDict.id)
-              .includes(data.id)
-          );
-          if (dataInOptionsData.length < metaData["versions"][model][scenario].length) {
-            isDashboardUpdated = true;
-            metaData["versions"][model][scenario] = dataInOptionsData;
-          }
-        }
-      }
-
-      // add default versions to metadata if no version is selected
-      for (const model in optionsData["versions"]) {
-        for (const scenario in optionsData["versions"][model]) {
-          if (!metaData["versions"][model]) {
-            (metaData["versions"][model] = {});
-          }
-          if (!metaData["versions"][model][scenario] || metaData["versions"][model][scenario].length===0) {
-            isDashboardUpdated = true;
-            // Select default version or if no default version
-            metaData["versions"][model][scenario] = optionsData["versions"][model][scenario].default ?
-              [optionsData["versions"][model][scenario].default] :
-              [optionsData["versions"][model][scenario].values[0]]
-          }
-        }
-      }
-
-    } else { // Models or scenarios not filled so remove versions
-      if (Object.keys(metaData["versions"]).length > 0) {
-        isDashboardUpdated = true;
-        metaData["versions"] = {}
-      }
-    }
-
-    if (isDashboardUpdated) {
-      const dashboard = JSON.parse(JSON.stringify(this.state.dashboard));
-      dashboard.blocks[block.id as string].config.metaData = { ...metaData };
-      this.updateDashboard(dashboard);
-      Object.keys(missingData).length > 0 && notification.warning({
-        message: 'Options removed from selection box',
-        description: (<div dangerouslySetInnerHTML={{ __html: this.notifDesc(missingData) }}></div>),
-        placement: 'bottomRight',
-      });
-    }
-  }
-
-  notifDesc = (missingData) => {
-    let notif = "Some selected options are not available with new filters: <br/>";
-    Object.keys(missingData).forEach(key => {
-      if (missingData[key].length > 0) {
-        let msg = '';
-        missingData[key].forEach(value => {
-          msg = msg + value + ', ';
-        })
-
-        notif = notif + key + ': ' + msg + '<br/>';
-      }
-    })
-
-    return notif;
-  }
-
   render() {
     if (!this.state.dashboard) {
       return (
@@ -302,7 +207,6 @@ export default class DashboardSelectionControl extends Component<
         updateDashboard={this.updateDashboard}
         saveDashboard={this.saveData}
         deleteBlocks={this.deleteBlocks}
-        checkIfSelectedInOptions={this.checkIfSelectedInOptions}
         isDraft={this.state.isDraft}
         {...this.props}
       />

@@ -37,6 +37,7 @@ interface ReadOnlyDashboardProps extends ComponentPropsWithDataManager {
     blockData: (block: BlockModel) => void;
     optionsLabel: string[]
     plotData: any[];
+    docData: {filterId:{[optionName: string]: string}};
     updateLoadingControlBlock: (id, status) => Promise<void>;
     loadingControlBlock: any;
 }
@@ -236,6 +237,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                             plotData={props.plotData}
                             updateLoadingControlBlock={props.updateLoadingControlBlock}
                             loadingControlBlock={props.loadingControlBlock}
+                            docData={props.docData}
                         />
                     </GetGeoJsonContextProvider>
                 )}

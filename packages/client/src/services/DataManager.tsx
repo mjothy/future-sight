@@ -6,6 +6,10 @@ export default class DataManager implements IDataManager {
     return '/api';
   }
 
+  fetchDocData = async () : Promise<any> => {
+    return await this.sendRequest("api/docData");
+  }
+
   fetchPlotData = async (data: DataModel[]): Promise<PlotDataModel[]> => {
     return await this.sendRequest(`api/plotData`, data);
   };
@@ -104,6 +108,9 @@ export default class DataManager implements IDataManager {
     return await this.sendRequest(`api/filterOptions`, data);
   };
 
+  fetchMeta = async () => {
+    return await this.sendRequest(`api/meta`);
+  };
 
   fetchDataFocusOptions = async (data) => {
     return await this.sendRequest(`api/dataFocus`, data);
@@ -131,7 +138,7 @@ export default class DataManager implements IDataManager {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      body: data ? JSON.stringify(data) : null,
     });
 
     if (!response.ok) {

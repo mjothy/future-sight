@@ -20,9 +20,8 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
             const filters: FilterObject = this.getFilters();
             filterIDs = Object.keys(filters);
         }
-        const filterKeys = filterIDs.filter(key => key != "categories"); // TODO delete filter
         const filter = new Filter({}, dataFocusFilters, undefined);
-        for (const key of filterKeys) {
+        for (const key of filterIDs) {
             const body = filter.getBody(key);
             const data = await this.patchPromise(filters[key].path, body);
             filteredValues[key] = data?.map(element => element.name);
@@ -53,7 +52,8 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
             variables: [],
             scenarios: [],
             models: [],
-            versions: []
+            versions: [],
+            metaIndicators: {}
         };
 
         Object.keys(selectedData).forEach(key => {
@@ -61,6 +61,8 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
                 selectedData[key] = blockMetaData[key]
             }
         });
+
+        selectedData["metaIndicators"] = blockMetaData?.metaIndicators ?? {};
 
         const filter = new Filter(selectedData, dataFocusFilters, selectOrder, showNonDefaultRuns);
 
@@ -71,6 +73,7 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
             filteredValues["versions"] = this.prepareVersions(data);
         } else {
             const body = filter.getBody(filterId);
+            Filter.addMetaRunsToBody(selectedData, body, filterId); // Add runs id from meta indicators if they are selected
             const data = await this.patchPromise(filters[filterId].path, body);
             filteredValues[filterId] = data?.map(element => element.name);
         }
@@ -82,6 +85,28 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
 
         return filteredValues;
     };
+
+    fetchAndFormatDocData = async (filter: any) => {
+        const optionsDoc = await this.patchPromise(filter.docPath, undefined, true, "GET")
+        const optionsData = await this.patchPromise(filter.path, undefined)
+        const formatedDoc = {}
+        for (const iDoc of optionsDoc) {
+            const optionName = optionsData.find(element => element.id === iDoc["dimension__id"])?.name
+            if (optionName){
+                formatedDoc[optionName] = iDoc["description"]
+            }
+        }
+        return formatedDoc
+    }
+
+    getDocData = async () => {
+        const filters = this.getFilters()
+        const regions = await this.fetchAndFormatDocData(filters.regions)
+        const scenarios = await this.fetchAndFormatDocData(filters.scenarios)
+        const models = await this.fetchAndFormatDocData(filters.models)
+        const variables = await this.fetchAndFormatDocData(filters.variables)
+        return {regions, scenarios, models, variables};
+    }
 
     getTimeSeries = async (selectedData: DataModel[]) => {
         const timeSeries: TimeSerieObject[] = [];
@@ -176,4 +201,32 @@ export default class IIASADataBackend extends IIASADataManager implements IDataB
     }
 
     getDataUnion = () => [];
+
+    // NOTE:  showNonDefaultRuns: filter argument not supported
+    async getMeta() {
+        const filteredValues = {};
+        const metaObject = filters.meta;
+        const result = {};
+        // NOTE: api/meta not working without table parameter
+        const response = await this.patchPromise(metaObject.path+"/?table=true", {});
+
+        const runIndex = response["columns"].indexOf("run__id")
+        const categoryIndex = response["columns"].indexOf("key")
+        const subCategoryIndex = response["columns"].indexOf("value")
+
+        const data = response["data"]
+
+        data.forEach(obj => {
+            const category = obj[categoryIndex];
+            const subCategory = obj[subCategoryIndex];
+            const runId = obj[runIndex];
+
+            result[category] ??= {};
+            result[category][subCategory] ??= [];
+
+            result[category][subCategory].push(runId)
+        })
+
+        return result;
+    }
 }
