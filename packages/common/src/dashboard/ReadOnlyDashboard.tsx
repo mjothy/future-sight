@@ -237,6 +237,7 @@ const ReadOnlyDashboard: React.FC<ReadOnlyDashboardProps> = (
                             plotData={props.plotData}
                             updateLoadingControlBlock={props.updateLoadingControlBlock}
                             loadingControlBlock={props.loadingControlBlock}
+                            docData={props.docData}
                         />
                     </GetGeoJsonContextProvider>
                 )}

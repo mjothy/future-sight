@@ -1,6 +1,7 @@
 import React from 'react';
 import * as _ from 'lodash';
 import Plot from 'react-plotly.js';
+import { WarningOutlined } from '@ant-design/icons';
 
 interface JsonBlockViewProps {
   currentBlock: any;
@@ -42,7 +43,7 @@ export default class JsonBlockView extends React.Component<JsonBlockViewProps, a
     if (!layout || !data) {
       return <i>No data</i>
     }
-    layout = {
+    layout = Object.assign(layout, {
       width: this.props.width,
       height: this.props.height,
       margin: this.getMargins(),
@@ -53,15 +54,21 @@ export default class JsonBlockView extends React.Component<JsonBlockViewProps, a
       xaxis: {
           automargin: true
       }
-  };
+  });
     return (
-      <Plot
-          key={this.props.currentBlock.id}
-          data={data}
-          layout={layout}
-          config={config}
-          frames={frames}
-      />
+      <React.Fragment>
+        <WarningOutlined 
+          title="This chart was uploaded by the Author. Data might not come from the standard ECEMF database."
+          style={{"position": "fixed", "top":"1px", "left":"1px", "zIndex": 2}}
+          />
+        <Plot
+            key={this.props.currentBlock.id}
+            data={data}
+            layout={layout}
+            config={config}
+            frames={frames}
+        />
+      </React.Fragment>
     );
   }
 }

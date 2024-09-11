@@ -55,6 +55,7 @@ export default class BlockViewManager extends Component<any, any> {
           blockData={this.props.blockData}
           getMetaData={this.getMetaData}
           updateLoadingControlBlock={this.props.updateLoadingControlBlock}
+          docData={this.props.docData}
         />;
       default:
         return <p>Error !</p>;

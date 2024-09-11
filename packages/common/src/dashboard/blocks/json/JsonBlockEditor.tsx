@@ -5,7 +5,7 @@ export default class JsonBlockEditor extends React.Component<any, any> {
     render() {
         return (
             <React.Fragment>
-                <h3>Paste your JSON here</h3>
+                <h3>From Python Plotly, export your figure in JSON with write_json, then paste your JSON here</h3>
                 <Input.TextArea rows={10} value={JSON.stringify(this.props.currentBlock.config.json)}
                                 onChange={(value) => {
                                     let json
