@@ -1,6 +1,5 @@
 import { build } from "esbuild";
 
-import rimraf = require("rimraf");
 const cssModulesPlugin = require("esbuild-css-modules-plugin");
 
 /**
@@ -8,10 +7,6 @@ const cssModulesPlugin = require("esbuild-css-modules-plugin");
  */
 interface BuildOptions {
   env: "production" | "development";
-}
-
-export async function cleanup() {
-  await rimraf("../build/", (err) => console.log(err));
 }
 
 /**
@@ -59,7 +54,6 @@ export async function buildServer(options: BuildOptions) {
  * The builder function of all packages .
  */
 async function buildAll() {
-  await cleanup();
   await Promise.all([
     buildServer({
       env: "production",
